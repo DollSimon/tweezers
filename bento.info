@@ -1,0 +1,34 @@
+Name: tweezer
+Version: 0.1
+Summary: Tools to read, analyse and interpret dual-trap optical tweezer experiments
+Description: 
+    **tweezer** is an extensible Python package for the analysis of dual-trap optical tweezer experiments.
+    
+Author: Marcus Jahnel, MPI-CBG
+AuthorEmail: jahnel@mpi-cbg.de
+Maintainer: Marcus Jahnel, MPI-CBG
+MaintainerEmail: jahnel@mpi-cbg.de
+License: UNKNOWN
+Platforms: UNKNOWN
+
+ExtraSourceFiles:
+    README.txt,
+    setup.py
+
+Library:
+    InstallRequires:
+        nose,
+        pytest,
+        pandas,
+        tables,
+        scipy,
+        numpy
+    Modules:
+        first_function,
+        rocket,
+        fio,
+        sun
+    Packages:
+        tweezer,
+        tweezer.gui,
+        tweezer.io

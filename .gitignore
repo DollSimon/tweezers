@@ -3,3 +3,11 @@
 examples/
 
 .cache/
+
+build/
+dist/
+
+convert.log
+tox.ini
+
+tweezer.egg-info/
