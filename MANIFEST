@@ -6,8 +6,12 @@ tweezer/first_function.py
 tweezer/io.py
 tweezer/sun.py
 tweezer/utils.py
+tweezer/core/__init__.py
+tweezer/core/geometry.py
+tweezer/core/polymer.py
+tweezer/core/trap.py
+tweezer/core/tweezer_experiment.py
+tweezer/core/visualisation.py
 tweezer/gui/__init__.py
 tweezer/gui/rocket.py
-tweezer/io/__init__.py
-tweezer/io/fio.py
 tweezer/ott/__init__.py

@@ -1,5 +1,1 @@
-__all__ = ['first_function', 'sun', 'io', 'utils']
-
-# Core modules
-import io
-import gui
+__all__ = ['first_function', 'sun', 'io', 'utils', 'ott', 'gui', 'core']

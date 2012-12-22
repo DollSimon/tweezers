@@ -21,8 +21,10 @@ config = {
     'version': '0.1',
     'install_requires': ['nose', 'pytest', 'pandas', 'tables',
     'scipy', 'numpy'],
-    'packages': ['tweezer', 'tweezer.io', 'tweezer.gui', 'tweezer.ott'],
-    'py_modules': ['first_function', 'rocket', 'fio', 'sun', 'io', 'utils'],
+    'packages': ['tweezer', 'tweezer.gui', 'tweezer.ott',
+    'tweezer.core'],
+    'py_modules': ['first_function', 'rocket', 'fio', 'sun', 'io', 'utils',
+    'polymer', 'geometry', 'trap', 'simulations'],
     'scripts': [],
     'name': 'tweezer'
 }
