@@ -1,0 +1,5 @@
+#!/bin/sh
+INSTALLDIR=`dirname $0`
+echo $INSTALLDIR
+CONFIG=$INSTALLDIR/plantuml.conf
+java -jar $INSTALLDIR/plantuml.jar -config $CONFIG $1 $2 $3 $4 $5
