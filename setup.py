@@ -24,7 +24,7 @@ config = {
     'packages': ['tweezer', 'tweezer.gui', 'tweezer.ott',
     'tweezer.core'],
     'py_modules': ['first_function', 'rocket', 'fio', 'sun', 'io', 'utils',
-    'polymer', 'geometry', 'trap', 'simulations'],
+    'polymer', 'geometry', 'trap', 'simulations', 'trap_calibration'],
     'scripts': [],
     'name': 'tweezer'
 }

@@ -6,13 +6,17 @@
 The Tweezer Code Docs!
 ===================================
 
-Tools to analyse data of dual-trap optical tweezer experiments.
+Tools to analyse data of dual-trap optical tweezer experiments. 
+
+This is to test :cite:`Revyakin:2003dm` all the features of cites.
+
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
-
+   
+   References
 
 
 Indices and tables
@@ -22,3 +26,4 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+.. bibliography:: test.bib
