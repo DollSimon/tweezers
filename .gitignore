@@ -11,3 +11,6 @@ convert.log
 tox.ini
 
 tweezer.egg-info/
+
+# certain ipython notebook files
+Sandbox.ipynb

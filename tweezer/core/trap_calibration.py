@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 Contains classes and functions related to the calibration of forces in an optical trap
 """
@@ -7,7 +10,7 @@ import numpy as np
 class SingleTrapPowerSpectrum(object):
     """
     Analytic form for fitting the power spectrum of a microsphere trapped in a single optical trap
-    
+
 
     Parameter:
         D - diffusion_coefficient (µm^2 / s)
