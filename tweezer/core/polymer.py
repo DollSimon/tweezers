@@ -57,7 +57,8 @@ class ExtensibleWormLikeChain(object):
             x = self.L * (1 - (1 / 2.0) * sqrt((kB * self.T) / (f * self.P)) +
                          (f / self.S))
         else:
-            x = nan
+            raise(ValueError("Force must be positive"))
+            x = ValueError("Rocket")
 
         return x
 

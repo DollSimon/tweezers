@@ -18,4 +18,3 @@ class VersionChecker(object):
     def __init__(self, python_function):
         self.python_function = python_function
 
-    def 

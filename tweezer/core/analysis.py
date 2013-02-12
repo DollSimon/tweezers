@@ -1,41 +1,75 @@
+
 """
-Classes and Functions used for handling various data input and output tasks.
+Analysis of Tweezer Experiments
 """
 
-import pandas as pd
-
-class DataReader(object):
-    """docstring for DataReader"""
-    def __init__(self, file_name):
-        super(DataReader, self).__init__()
-        self.file_name = file_name
-
-    def read_data(arg):
-        """
-        Reads raw tweezer according to the argument specified
-        """
+import numpy as np 
+import pandas as pd 
+import scipy as sci 
+import matplotlib as mp 
 
 
-class TweezerCalibrationValues(object):
+class TweezerExperimentMetaData(dict):
     """
-    Stores tweezer calibration values and metadata about the experiments
+    The metadata of the tweezer experiment.
     """
-
     def __init__(self):
+        dict.__init__(self)
         pass
 
-    @property
-    def units(self, quantity):
-        try:
-            if not isinstance(quantity, str):
-                raise TypeError
-        except TypeError, e:
-            print('We need a string here to query the dictionary')
 
-        reference_units = self._reference_units()
-        units = dict()
+class TweezerExperiment(object):
+    """
+    Analysis of a tweezer experiment. Holds the data, metadata of a tweezer experiment.
+    """
 
-        print('Units of {} : [{}]'.format(quantity, 'test'))
+    def __init__(self, **parameters):
+        """
+        __init__(**parameters)
+
+        Initialise TweezerExperiment object to default and supplied parameter values.
+        The supplied parameter values are in a dictionary 'parameters' with
+        keys correspond to the parameter names.
+        """
+
+        ## Set default parameters
+        
+        # General physical parameters
+        self.thermal_energy = 4.14 
+        self.viscosity = 0.9e-9        
+
+        # Parameters for the worm like chain models
+        self.wlc_stretch_modulus = 1200;
+        self.wlc_persistence_length = 53;
+
+
+        self.metadata = TweezerExperimentMetaData()
+        self.averaging_time = 10;
+        self.lptime = 1000;
+        self.savitzky_golay_time = 2000;
+        self.acctime = 2500;
+        self.L0 = 3077;
+        self.thermal_energy = 4.14;
+        self.nmPbp = 0.338;
+        self.vhbinsize = 0.5;
+        self.vhlow = -4.75;
+        self.vhhigh = 24.75;
+        self.PDtimeSD = 2;
+        self.PDtime = 0.8;
+        self.IntoFinP = 4;
+        self.force_bin_size = 0.2
+        self.force_bounds = (0, 15)     # boundaries for applied forces
+        self.nfbinsize = 0.01;
+        self.nflow = 0.3;
+        self.nfhigh = 1.5;
+        self.removedrift = 1;
+        self.confint = 0.68269;
+        self.mindL = 10;
+        self.dtinterval = 1;
+        self.velwin = 20;
+        self.btcutoff = 1;
+        self.nolateP = 1;
+
 
     def print_units(self):
         """
@@ -52,10 +86,11 @@ class TweezerCalibrationValues(object):
         Contains a dictionary of all the units used in tweezer experiments.
         """
         reference_units = dict()
-        reference_units = {   'date': ['day', 'month', 'year'],
-                    'time_of_experiment': ['hour', 'minute', 'second'],
-                    'laser_diode_temperature': 'C',
-                    'laser_diode_operating_hours': 'h',
+        reference_units = {   
+                    'thermal_energy': 'pN * nm',
+                    'wlc_persistence_length': 'nm',
+                    'wlc_stretch_modulus': 'pN',
+                    'viscosity': 'pN / nm^2 s',
                     'laser_diode_current': 'A',
                     'aod_andor_center_x': 'px',
                     'aod_andor_center_y': 'px',
@@ -105,4 +140,3 @@ class TweezerCalibrationValues(object):
 
         for keys, values in reference_units.items():
             print("{} : {}".format(keys, values))
-

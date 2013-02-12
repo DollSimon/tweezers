@@ -1,4 +1,4 @@
-from tweezer.first_function import first_function
+import sure
 
 def test_adding():
-    assert first_function(3, 6) == 9
+    assert (5).should.be.within(2, 6)

@@ -1,1 +1,1 @@
-__all__ = ['first_function', 'sun', 'io', 'utils', 'ott', 'gui', 'core']
+__all__ = ['io', 'utils', 'ott', 'gui', 'core']
