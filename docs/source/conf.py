@@ -132,6 +132,12 @@ html_theme_path = [csp.get_theme_dir()]
 # [optional] set some of the options listed above...
 html_theme_options = { "roottarget": "index" }
 
+# Bootstrap theme
+# import sphinx_bootstrap_theme
+
+# html_theme = 'bootstrap'
+# html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 # html_theme = 'default'
