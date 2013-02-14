@@ -1,0 +1,69 @@
+#! /usr/bin/env python
+
+"""
+Tweezer Data Analysis on Steroids
+
+Usage: 
+  tweezer watch [-t | -m] [<DIR>...] [-l]
+  tweezer (analyse | analyze) [-t | -m] <FILE>...
+  tweezer convert FILE <LANGUAGE>
+  tweezer overview [-t | -m] <DIR>...
+  tweezer (-h | --help)
+  tweezer (-v | --version)
+
+Commands:
+  watch         Monitor directory for changes
+  analyse       Perform specified data analysis
+  analyze       Perform specified data analysis
+  convert       Convert data to be able to work in specified language
+  overview      Produce "Overview.pdf" for data files in directory
+
+Arguments:
+  FILE          Input file
+  PATH          Out directory
+  DIR           Input directory
+  LANGUAGE      Preferred language or data container 
+
+Options:
+  -h --help     Show this screen
+  -v --version  Show version number
+  -t --tweebot  Tweebot tweezer mode
+  -m --manual   Manual tweezer mode
+  -l --logging  Write log file
+
+"""
+import os
+
+from docopt import docopt
+
+try:
+    from tweezer.core.polymer import ExtensibleWormLikeChain as WLC 
+except ImportError:
+    exit('This program requires the installation of the tweezer package.') 
+
+
+if __name__ == '__main__':
+    args = docopt(__doc__, version='Tweezer Analysis Program, 0.1')
+
+    print(args)
+
+    # Checking and setting default values
+    if not args['--tweebot'] and not args['--manual']:
+        args['--tweebot'] = True
+
+    print(args)
+
+    # tweezer analyse | analyze
+    if args['analyse'] or args['analyze']:
+        print('Rocket')
+
+    # tweezer watch
+    if args['watch']:
+
+        # check directory
+        if not args['<DIR>']:
+            args['<DIR>']= os.getcwd()
+
+        print('Sun')
+
+    print(args)
