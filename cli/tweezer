@@ -38,6 +38,7 @@ from docopt import docopt
 
 try:
     from tweezer.core.polymer import ExtensibleWormLikeChain as WLC 
+    from tweezer.core.watcher import run_watcher
 except ImportError:
     exit('This program requires the installation of the tweezer package.') 
 
@@ -64,6 +65,8 @@ if __name__ == '__main__':
         if not args['<DIR>']:
             args['<DIR>']= os.getcwd()
 
-        print('Sun')
+        print('The sun is rising!')
+        run_watcher()
+        print('The sun sets!')
 
     print(args)

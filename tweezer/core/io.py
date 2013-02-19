@@ -3,6 +3,7 @@ Classes and Functions used for handling various data input and output tasks.
 """
 
 import pandas as pd
+import sure
 
 class DataReader(object):
     """docstring for DataReader"""
@@ -105,4 +106,42 @@ class TweezerCalibrationValues(object):
 
         for keys, values in reference_units.items():
             print("{} : {}".format(keys, values))
+
+
+def find_files(files, regex_pattern, verbose=False):
+    """
+    Finds all files in a list that matches a certain pattern.
+
+    Parameters:
+    """"""""""""
+
+        files           : list of files
+        regex_pattern   : regular expression pattern
+        verbose         : whether or not to print extra information
+
+    Returns:
+    """"""""
+    
+        files_found     : list of files that matches the pattern
+
+    """
+    if files:
+        if not all([isinstance(i, str) for i in files]):
+            raise TypeError('Expects a list of strings representing file paths.')
+
+
+    files_found = []
+    
+    for iFile in files:
+        match = re.findall(regex_pattern, iFile)
+        if match:
+            files_found.append(iFile)
+            if verbose:
+                print("Found file: {}".format(iFile))
+
+        else:
+            if verbose:
+                print("Pattern not found!")
+        
+    return files_found
 

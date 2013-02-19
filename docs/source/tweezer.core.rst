@@ -48,12 +48,3 @@ core Package
     :members:
     :undoc-members:
     :show-inheritance:
-
-:mod:`tweezer_experiment` Module
---------------------------------
-
-.. automodule:: tweezer.core.tweezer_experiment
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
