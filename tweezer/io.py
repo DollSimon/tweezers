@@ -6,6 +6,7 @@ Performs file reads and data conversion.
 
 import pandas as pd
 import numpy as np
+import re
 
 def read_tweezer_txt(file_name):
     """
@@ -47,11 +48,29 @@ def read_tweebot_txt(file_name):
     df = df.dropna(axis = 1)
 
     # set index as time and column names
-    print(calib['Delta time (s)'])
-    
+    print(calibration['Delta time (s)'])
+    if 'Delta time (s)' in calibration:
+        df.index = calibration['Delta time (s)']
     df.columns = column_names
 
+
     return df, calibration 
+
+
+def read_thermal_calibration(file_name):
+    """
+    Reads time series and calculated power spectra of a thermal calibration.
+    """
+    if is_calibration_time_series(file_name):
+
+        print('Rocket!')
+    elif is_calibration_spectrum(file_name):
+        print('Rackoon!')
+    else:
+        print('Wrong file format or file type!')
+
+
+
 
 
 def read_tweezer_mat(file_name):
@@ -156,3 +175,152 @@ def read_tweebot_header(datalog_file, calibration_as_dict = True):
 
     return column_names, calib_data, header_line
 
+
+def read_calibration_header(file_name):
+    """
+    Extracts the header information in tweezer thermal calibration files.
+
+    Parameter:
+    """"""""""""
+      file_name: File under scrutiny, either the original time series or the spectra.
+      type:        
+    """
+
+
+
+def is_calibration_time_series(file_name):
+    """
+    Checks whether file is a tweezer thermal calibration time series.
+
+    Parameter:
+    """"""""""""
+      file_name:    File to check identity for.
+
+    Return:
+    """"""
+      result:   Boolean, True for tweezer time series of the form 'TS_1_a.txt' 
+    """
+    TIME_SERIES_PATTERN = re.compile(r'(TS)_(\w)*_*(\d)+_*(\w)*(.txt)', re.IGNORECASE)
+
+    if re.search(TIME_SERIES_PATTERN, file_name):
+        result = True
+    else:
+        result = False
+
+    return result 
+
+
+def is_calibration_spectrum(file_name):
+    """
+    Checks whether file is a tweezer thermal calibration power spectrum.
+
+    Parameter:
+    """"""""""""
+      file_name:    File to check identity for.
+
+    Return:
+    """"""
+      result:   Boolean, True for tweezer thermal calibration spectrum of the form 'PSD_1_a.txt'
+    """
+    SPECTRUM_PATTERN = re.compile(r'(PSD)_(\w)*_*(\d)+_*(\w)*(.txt)', re.IGNORECASE)
+
+    if re.search(SPECTRUM_PATTERN, file_name):
+        result = True
+    else:
+        result = False
+
+    return result 
+
+
+def is_tweebot_datalog(file_name):
+    """
+    Checks whether file is a tweebot datalog file.
+
+    Parameter:
+    """"""""""""
+      file_name:    File to check identity for.
+
+    Return:
+    """"""
+      result:   Boolean, True for TweeBot datalog files of the form '27.Datalog.2012.11.27.05.34.16.datalog.txt'
+    """
+    DATALOG_PATTERN = re.compile(r'(\d)+.(Datalog)(.\d+)+.(datalog)(.txt)', re.IGNORECASE)
+
+    if re.search(DATALOG_PATTERN, file_name):
+        result = True
+    else:
+        result = False
+
+    return result 
+
+
+def is_tweebot_stats(file_name):
+    """
+    Checks whether file is a tweebot statistics file.
+
+    Parameter:
+    """"""""""""
+      file_name:    File to check identity for.
+
+    Return:
+    """"""
+      result:   Boolean, True for TweeBot statistics files of the form '27.TweeBotStatss.txt'
+    """
+    STATS_PATTERN = re.compile(r'(\d)+.(TweeBotStats)(\w)*(.txt)', re.IGNORECASE)
+
+    if re.search(STATS_PATTERN, file_name):
+        result = True
+    else:
+        result = False
+
+    return result 
+
+
+def is_tweebot_log(file_name):
+    """
+    Checks whether file is a tweebot log file.
+
+    Parameter:
+    """"""""""""
+      file_name:    File to check identity for.
+
+    Return:
+    """"""
+      result:   Boolean, True for TweeBot log files of the form '27.TweeBotLog.2013.02.20.01.16.33.txt'
+    """
+    LOG_PATTERN = re.compile(r'(\d)+.(TweeBotLog)(.\d+)+(.txt)', re.IGNORECASE)
+
+    if re.search(LOG_PATTERN, file_name):
+        result = True
+    else:
+        result = False
+
+    return result 
+
+def is_tweezer_data(file_name):
+    """
+    Checks whether file is a tweezer data file (manually recorded).
+
+    Parameter:
+    """"""""""""
+      file_name:    File to check identity for.
+
+    Return:
+    """"""
+      result:   Boolean, True for Tweezer data files of the form 'pre_27_a.txt' in the 'data' directory.
+    """
+    DATA_PATTERN = re.compile(r'(\w*)_*(\d+)?_*(\w*)(.txt)', re.IGNORECASE)
+
+    if re.search(DATA_PATTERN, file_name):
+        result = True
+    else:
+        result = False
+
+    if 'PSD' in file_name:
+        result = False
+    elif 'TS' in file_name:
+        result = False
+    elif len(file_name.split('.')) > 2:
+        result = False
+
+    return result 
