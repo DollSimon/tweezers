@@ -18,3 +18,6 @@ Sandbox.ipynb
 # sublime project files
 *.sublime-project
 *.sublime-workspace
+
+# files related to python testing system
+.coverage
