@@ -1,0 +1,48 @@
+import json
+import pandas as pd
+
+
+class TweezerDictionary(dict):
+
+    def __init__(self):
+        dict.__init__({})
+
+    def dump_to_json(self, file_name):
+        """
+        Dumps the dictionary to json 
+
+        """
+        pass
+
+
+class TweezerList(list):
+    """
+    Tweezer List class
+    """
+    def __init__(self):
+        list.__init__([])
+        self.test = 4
+
+
+class TweezerDataFrame(pd.DataFrame):
+    """
+    Tweezer DataFrame class
+    """
+    def __init__(self):
+        pd.DataFrame.__init__(pd.DataFrame())
+
+    def rocket(self, name):
+        print("{} is {}".format(self.new, name))
+
+
+class Foo(object):
+
+    def __init__(self):
+        self.df = pd.DataFrame([1,2,3],[3,4,5])
+
+    def __getattr__(self, attr):
+        return getattr(self.df, attr)    
+
+    def __getitem__(self, key):
+        ''' Item lookup'''
+        return self.df.__getitem__(key)

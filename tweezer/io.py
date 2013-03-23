@@ -6,6 +6,7 @@ Performs file reads and data conversion.
 
 import pandas as pd
 import numpy as np
+import datetime as dt
 import re
 
 def read_tweezer_txt(file_name):
@@ -47,12 +48,14 @@ def read_tweebot_txt(file_name):
     # get rid of unnamed and empty colums
     df = df.dropna(axis = 1)
 
-    # set index as time and column names
-    print(calibration['Delta time (s)'])
-    if 'Delta time (s)' in calibration:
-        df.index = calibration['Delta time (s)']
+    # set column names and index as time 
     df.columns = column_names
 
+    if 'Time sent (s)' in column_names:
+        dates = pd.DatetimeIndex([dt.datetime.fromtimestamp(time) for time in df['Time sent (s)']])
+        df.index = dates
+    else:
+        print("No time index set: Could not find column 'Time sent (s)' in data")
 
     return df, calibration 
 
