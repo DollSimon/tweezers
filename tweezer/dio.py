@@ -23,23 +23,20 @@ def read_tweebot_txt(file_name):
     """
     Reads dual-trap data and metadata from TweeBot datalog files.
 
-    Parameters:
-    """"""""""""
+    :param file_name: Path to the TweeBot datalog file.
 
-      file_name: Path to the TweeBot datalog file.
+    :return df: Pandas DataFrame containing the recorded data
 
-
-    Returns:
-    """""" 
-
-        df: Pandas DataFrame containing the recorded data
-
-        calibration: Dictionary containing the metadata of the experiment
-
+    :return calibration: Dictionary containing the metadata of the experiment
 
     Usage
     """"""
     >>> df, cal = read_tweebot_txt('27.Datalog.2013.02.17.19.42.09.datalog.txt')
+
+    .. note::
+
+        This function only works for TweeBot data files in the form of 2013
+
     """
     column_names, calibration, header_line = read_tweebot_header(file_name)
 

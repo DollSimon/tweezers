@@ -11,6 +11,10 @@ class TweezerDictionary(dict):
         """
         Dumps the dictionary to json 
 
+        :param integer new: THis is a test
+        :param np.array rocket: The new test type
+        
+
         """
         pass
 

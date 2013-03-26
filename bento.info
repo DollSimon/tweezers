@@ -8,11 +8,11 @@ Author: Marcus Jahnel, MPI-CBG
 AuthorEmail: jahnel@mpi-cbg.de
 Maintainer: Marcus Jahnel, MPI-CBG
 MaintainerEmail: jahnel@mpi-cbg.de
-License: UNKNOWN
+License: MIT License
 Platforms: UNKNOWN
 
 ExtraSourceFiles:
-    README.txt,
+    README.md,
     setup.py
 
 Library:
@@ -31,4 +31,7 @@ Library:
     Packages:
         tweezer,
         tweezer.gui,
+        tweezer.core,
+        tweezer.scripts,
+        tweezer.ott,
         tweezer.io

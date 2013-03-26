@@ -9,6 +9,22 @@ core Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`analysis` Module
+----------------------
+
+.. automodule:: tweezer.core.analysis
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`datatypes` Module
+-----------------------
+
+.. automodule:: tweezer.core.datatypes
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`geometry` Module
 ----------------------
 
