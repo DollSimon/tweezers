@@ -5,7 +5,7 @@ Analysis of Tweezer Experiments
 
 import numpy as np 
 import pandas as pd 
-import scipy as sci 
+import scipy as sp 
 import matplotlib as mp 
 
 

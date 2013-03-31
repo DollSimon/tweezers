@@ -34,75 +34,97 @@ Options:
 
 """
 import os
+import sys
 
 from docopt import docopt
-from tweezer import __version__
 from clint import args 
 from clint.textui import colored, puts, indent 
 from termcolor import cprint
 
-# try:
-#     from tweezer.core.polymer import ExtensibleWormLikeChain as WLC 
-#     from tweezer.core.watcher import run_watcher
-# except ImportError:
-#     exit('This program requires the installation of the tweezer package.') 
+from tweezer import __version__
+try:
+    from tweezer.core.polymer import ExtensibleWormLikeChain as WLC 
+    # from tweezer.core.watcher import run_watcher
+except ImportError:
+    puts('')
+    with indent(2):
+        puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
+        puts('')
+        puts('Please check installation instructions @ {}'.format(colored.yellow('http://bitbucket.org/majahn/tweezer')))
+    exit()
+
+
+VERSION = ".".join(str(x) for x in __version__)
 
 
 def start():
-    cprint("Rackoon new", "red")
-    version = ".".join(str(x) for x in __version__)
 
-    puts('{0} @ version {1} by Marcus Jahnel, Grill-Lab {2}'.format(
+    args = docopt(__doc__, version=VERSION, help=False)
+
+    puts('\n{}'.format(colored.red('Development: Show arguments')))
+    print(args)
+    puts('')
+
+    # Getting help
+    if args['--help']:
+        puts('{0} : {1}'.format(
             colored.blue('tweezer'),
-            version,
-            colored.green('jahnel@mpi-cbg.de')))
-    puts('{0}: http://bitbucket.org/majahn/tweezer'.format(colored.yellow('source')))
+            'A data analysis tool for single-molecule experiments'))
+        puts('')
+        puts('{0}: http://bitbucket.org/majahn/tweezer @ version {1}'.format(
+            colored.yellow('Source'),
+            VERSION))
+        puts('')
 
-    puts('{}'.format(colored.magenta('A tool for data analysis.')))
-    puts('{}'.format(colored.green('A tool for data analysis.')))
-    puts('{}'.format(colored.cyan('A tool for data analysis.')))
-    puts('{}'.format(colored.yellow('A tool for data analysis.')))
-    puts('{}'.format(colored.red('A tool for data analysis.')))
-    puts('{}'.format(colored.black('A tool for data analysis.')))
-    puts('{}'.format(colored.white('A tool for data analysis.')))
-    puts('{}'.format(colored.clean('A tool for data analysis.')))
-    puts('{}'.format(colored.blue('A tool for data analysis.')))
+        puts(colored.white('Tweezer Data Analysis Command Line Interface'))
 
-    puts('\n{0}:'.format(colored.cyan('tentacles')))
-    args = docopt(__doc__, version=version)
+        with indent(2):
+            puts('\n{}:'.format(colored.green('Usage')))
+            with indent(2):
+                puts('tweezer watch [-t | -m] [<DIR>...] [-l]')
+                puts('tweezer (analyse | analyze) [-t | -m] <FILE>...')
+                puts('tweezer convert FILE <LANGUAGE>')
+                puts('tweezer overview [-t | -m] <DIR>...')
+                puts('tweezer (-h | --help)')
+                puts('tweezer (-v | --version)')
+              
+            puts('\n{}:'.format(colored.green('Commands')))
+            with indent(2):
+                puts('watch         Monitor directory for changes')
+                puts('analyse       perform specified data analysis')
+                puts('analyze       Perform specified data analysis')
+                puts('convert       Convert data to be able to work in specified language')
+                puts('overview      Produce "Overview.pdf" for data files in directory')
 
+            puts('\n{}:'.format(colored.green('Arguments')))
+            with indent(2):
+                puts('FILE          Input file')
+                puts('PATH          Out directory')
+                puts('DIR           Input directory')
+                puts('LANGUAGE      Preferred language or data container')
 
-    puts('{0}. version {1} by Grill-Lab {2}'.format(
-            colored.blue('tweezer'),
-            version(),
-            colored.green('jahnel@mpi-cbg.de')))
-    puts('{0}: http://bitbucket.org/majahn/tweezer'.format(colored.yellow('source')))
-
-    puts('\n{0}:'.format(colored.cyan('tentacles')))
-
-    with indent(4):
-        puts(colored.green('octogit login'))
-        puts(colored.green("octogit create <repo> 'description'"))
-        puts(colored.green("octogit create <repo> 'description' <organization>"))
-        puts(colored.green('octogit issues [--assigned]'))
-        puts(colored.green('octogit issues'))
-        puts(colored.green("octogit issues create 'issue title' 'description'"))
-        puts(colored.green('octogit issues <number>'))
-        puts(colored.green('octogit issues <number> close'))
-        puts(colored.green('octogit issues <number> view'))
-        puts('\n')
-
-    # print(args)
-
+            puts('\n{}:'.format(colored.green('Options')))
+            with indent(2):
+                puts('-h --help     Show this screen')
+                puts('-v --version  Show version number')
+                puts('-t --tweebot  Tweebot tweezer mode')
+                puts('-m --manual   Manual tweezer mode')
+                puts('-l --logging  Write log file')
+          
     # Checking and setting default values
     if not args['--tweebot'] and not args['--manual']:
         args['--tweebot'] = True
 
-    # print(args)
-
     # tweezer analyse | analyze
-    if args['analyse'] or args['analyze']:
-        cprint('Rocket', 'green')
+    if args['analyse'] or args['analyze']: 
+        puts('{}'.format(args['<FILE>']))
+        puts('i{}V'.format(colored.red('Rackooon')))
+        puts('This is os.path.dirname(os.path.abspath(__file__))
+        puts(''.format(colored.green('Rackooon')))
+        puts('Test')
+        puts('First argument is {}'.format(sys.argv[0]))
+        puts('Second argument is {}'.format(sys.argv[1]))
+        puts('Third argument is {}'.format(sys.argv[2]))
 
     # tweezer watch
     if args['watch']:
@@ -114,5 +136,3 @@ def start():
         print('The sun is rising!')
         run_watcher()
         print('The sun sets!')
-
-    print(args)

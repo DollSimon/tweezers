@@ -17,14 +17,16 @@ LONG_DESCRIPTION = """
 """
 
 DEPENDENCIES = ['nose', 'pytest', 'docopt', 'pandas', 'tables', 'numpy', 
-    'scipy', 'termcolor']
+    'scipy', 'termcolor', 'parsley']
 
 PACKAGES = ['tweezer', 'tweezer.gui', 'tweezer.core', 'tweezer.cli', 
     'tweezer.ott', 'tweezer.scripts']
 
-MODULES = ['dio', 'utils', 'polymer', 'geometry', 'trap', 'watcher', 
-    'visualisation', 'simulations', 'trap_calibration', 'datatypes', 
-    'analysis']
+MODULES = ['tweezer.core.dio', 'tweezer.utils', 'tweezer.core.polymer', 
+    'tweezer.core.geometry', 'tweezer.core.trap', 'tweezer.core.watcher', 
+    'tweezer.core.visualisation', 'tweezer.core.simulations', 
+    'tweezer.core.trap_calibration', 'tweezer.core.datatypes', 
+    'tweezer.core.analysis', 'tweezer.core.parsers'] 
 
 setup(
     name='tweezer',

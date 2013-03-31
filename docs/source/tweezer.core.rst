@@ -64,3 +64,11 @@ core Package
     :members:
     :undoc-members:
     :show-inheritance:
+
+:mod:`parsers` Module
+---------------------
+
+.. automodule:: tweezer.core.parsers
+    :members:
+    :undoc-members:
+    :show-inheritance:
