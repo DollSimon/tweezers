@@ -1,6 +1,20 @@
 import json
 import pandas as pd
 
+class TweezerFunction(object):     
+    """     
+    Abstract class to represent mathematical functions and endow them with 
+    user-friendly functionality.
+    """
+    def __init__(self):
+         raise NotImplementedError("Generic Tweezer Function not implemented yet") 
+
+    def __callable__(self):
+        raise NotImplementedError("__callable__")
+        
+    def plot(self):
+        raise NotImplementedError("plot method not implemented")
+
 
 class TweezerDictionary(dict):
 
