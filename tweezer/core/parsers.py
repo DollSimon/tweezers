@@ -103,9 +103,12 @@ def classify(file_path):
         gro = <'g' 'r' 'o' 'o' 'v' 'y'>:groovy -> str(groovy)
         wgr = <'w' 'h' 'o' 'l' 'e' '.' gro>
         png = <'p' 'n' 'g'>:png -> str(png)
+        jpg = <('j' 'e' 'p' 'g' | 'j' 'p' 'g')>:jpg -> str(jpg)
         avi = <'a' 'v' 'i'>:avi -> str(avi)
-        tif = <'t' 'i' 'f'+>:tif -> str(tif)
-        end = '.' (txt | gro | png | wgr | avi | tif)
+        csv = <'c' 's' 'v'>:csv -> str(csv)
+        fts = <'f' 'i' 't' 's'>:fts -> str(fts)
+        tif = <'t' 'i' ('f' 'f' | 'f')>:tif -> str(tif)
+        end = '.' (txt | gro | png | jpg | wgr | avi | tif | csv)
 
         # date and time
         y = <digit{4}>:year -> int(year)
@@ -132,9 +135,13 @@ def classify(file_path):
         and = <'a' 'n' 'd' 'o' 'r'>:andor -> str(andor)
         ssh = <('S' | 's') 'n' 'a' 'p' 's' 'h' 'o' 't'>
         cal = <'c' 'a' 'l' 'i' 'b' 'r' 'a' 't' 'i' 'o' 'n'>
-        vid = <'v' 'i' 'd' 'e' 'o'>
+        vid = <'v' 'i' 'd' 'e' ('o' 's' | 'o')>
         tpx = <('a' 'o' 'd' | 'p' 'm') '2' 'p' 'i' 'x'>
         clb = <'c' 'a' 'l' 'i' 'b'>
+        tmp = <'t' 'e' 'm' 'p' 'l' 'a' 't' ('e' 's' | 'e')>
+        flw = <'f' 'l' 'o' 'w' 'c' 'e' 'l' 'l'>
+        pcs = <'p' 'i' 'c' 't' 'u' 'r' ('e' 's' | 's')>
+        trc = <'t' 'r' 'a' 'c' 'k' 'i' 'n' 'g'>
 
         # bot file patterns
         bot_data = <path ps t s dat s date s dat end> -> 'BOT_DATA'
@@ -156,14 +163,47 @@ def classify(file_path):
         man_aod_dc_r = <path ps ('A' 'O' 'D' | 'a' 'o' 'd') s cal s clb s tpx end> -> 'MAN_AOD_DIST_CAL_RES' 
         man_aod_dc_m = <path ps ('A' 'O' 'D' | 'a' 'o' 'd') s cal s <'a' 'o' 'd' '2' 'p'> end> -> 'MAN_AOD_DIST_CAL_MAT' 
 
-        type = (man_data | man_pm_dc_v | man_pm_dc_r | man_pm_dc_m | man_aod_dc_v | man_aod_dc_r | man_aod_dc_m | bot_data | bot_log | bot_stats | bot_focus | bot_script | bot_ccd | bot_andor ):type -> str(type)
+        man_dc_tmp = <path ps cal s tmp s <'d' 'b'> s <'t' 'b'> end> -> 'MAN_DIST_CAL_TMP'
+        man_vid = <vid ps (t '_' <letter+> | t) '.' avi> -> 'MAN_VID' 
+        man_flow = <flw ps (t '_' <letter+> | t) '.' csv > -> 'MAN_FLOW' 
+        man_pics = <pcs ps (t '_' <letter+> | t) '.' jpg > -> 'MAN_PICS' 
+        man_track = <trc ps (t '_' <letter+> | t) '.' csv > -> 'MAN_TRACK' 
+        man_tmp = <tmp ps (t '_' <letter+> | t) '.' tif > -> 'MAN_TMP' 
+
+        # general file patterns
+        tc_ts = <path ps 'T' 'S' s (t '_' <letter+> | t) '.' 'txt'> -> 'TC_TS'
+        tc_psd = <path ps 'P' 'S' 'D' s (t '_' <letter+> | t) '.' 'txt'> -> 'TC_PSD'
+        andor_vid = <path ps path <'.' fts>> -> 'ANDOR_VID'
+
+        type = (man_data | 
+            man_pm_dc_v | 
+            man_pm_dc_r | 
+            man_pm_dc_m | 
+            man_aod_dc_v | 
+            man_aod_dc_r | 
+            man_aod_dc_m | 
+            man_dc_tmp | 
+            man_vid | 
+            man_flow | 
+            man_pics | 
+            man_track | 
+            man_tmp | 
+            tc_ts | 
+            tc_psd | 
+            andor_vid | 
+            bot_data | 
+            bot_log | 
+            bot_stats | 
+            bot_focus | 
+            bot_script | 
+            bot_ccd | 
+            bot_andor ):type -> str(type)
 
         pattern = type:type -> str(type) 
     """, {})
     
     try:
         file_type = type_grammar(file_name).pattern()
-        print(file_type)
     except ParseError, err:
         file_type = None 
 

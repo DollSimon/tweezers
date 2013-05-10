@@ -33,13 +33,20 @@ MAN_AOD_DIST_CAL_VID = 'path/AOD_calibration_video.avi'
 
 MAN_DIST_CAL_TMP = 'path/calibration_template_db_tb.tif'
 
+MAN_VID = ['videos/4.avi', 'videos/4_c.avi']
+MAN_PICS = ['pictures/4.jpg', 'pictures/5_r.jpg']
+MAN_FLOW = ['flowcell/2.csv', 'flowcell/3_t.csv']
+MAN_TRACK = ['tracking/2.csv', 'tracking/3_t.csv']
+MAN_TMP = ['templates/4.tif', 'templates/2_a.tif']
+
 # Valid files for both tweezer modes (e.g. thermal calibration)
 TC_PSD = ['path/PSD_4_d.txt', 'path/PSD_5.txt', 'path/PSD_10.txt']
 TC_TS = ['path/TS_4_d.txt', 'path/TS_5.txt', 'path/TS_10.txt']
+ANDOR_VID = ['path/test.fits', 'path with whitespace/file with white space.fits']
 
-MAN_FILES = namedtuple('MAN_FILES', ['data', 'pm_dist_cal_res', 'pm_dist_cal_mat', 'pm_dist_cal_vid','dist_cal_temp', 'aod_dist_cal_res', 'aod_dist_cal_mat', 'aod_dist_cal_vid'])
+MAN_FILES = namedtuple('MAN_FILES', ['data', 'pm_dist_cal_res', 'pm_dist_cal_mat', 'pm_dist_cal_vid','dist_cal_temp', 'aod_dist_cal_res', 'aod_dist_cal_mat', 'aod_dist_cal_vid', 'vid', 'pics', 'flow', 'track', 'tmp'])
 
-man = MAN_FILES(MAN_DATA, MAN_PM_DIST_CAL_RES, MAN_PM_DIST_CAL_MAT, MAN_PM_DIST_CAL_VID, MAN_DIST_CAL_TMP, MAN_AOD_DIST_CAL_RES, MAN_AOD_DIST_CAL_MAT, MAN_AOD_DIST_CAL_VID)
+man = MAN_FILES(MAN_DATA, MAN_PM_DIST_CAL_RES, MAN_PM_DIST_CAL_MAT, MAN_PM_DIST_CAL_VID, MAN_DIST_CAL_TMP, MAN_AOD_DIST_CAL_RES, MAN_AOD_DIST_CAL_MAT, MAN_AOD_DIST_CAL_VID, MAN_VID, MAN_PICS, MAN_FLOW, MAN_TRACK, MAN_TMP)
 
 def test_tweebot_files():
     # infer valid files correctly
@@ -73,4 +80,26 @@ def test_manunal_files():
     classify(man.aod_dist_cal_mat).should.equal('MAN_AOD_DIST_CAL_MAT')
     classify(man.aod_dist_cal_vid).should.equal('MAN_AOD_DIST_CAL_VID')
 
-    # classify(man.dist_cal_temp).should.equal('MAN_DIST_CAL_TMP')
+    classify(man.dist_cal_temp).should.equal('MAN_DIST_CAL_TMP')
+    classify(man.vid[0]).should.equal('MAN_VID')
+    classify(man.vid[1]).should.equal('MAN_VID')
+    classify(man.flow[0]).should.equal('MAN_FLOW')
+    classify(man.flow[1]).should.equal('MAN_FLOW')
+    classify(man.pics[0]).should.equal('MAN_PICS')
+    classify(man.pics[1]).should.equal('MAN_PICS')
+    classify(man.track[0]).should.equal('MAN_TRACK')
+    classify(man.track[1]).should.equal('MAN_TRACK')
+    classify(man.tmp[0]).should.equal('MAN_TMP')
+    classify(man.tmp[1]).should.equal('MAN_TMP')
+
+
+def test_general_files():
+    # infer valid files correctly
+    classify(TC_PSD[0]).should.equal('TC_PSD')
+    classify(TC_PSD[1]).should.equal('TC_PSD')
+    classify(TC_PSD[2]).should.equal('TC_PSD')
+    classify(TC_TS[0]).should.equal('TC_TS')
+    classify(TC_TS[1]).should.equal('TC_TS')
+    classify(TC_TS[2]).should.equal('TC_TS')
+    classify(ANDOR_VID[0]).should.equal('ANDOR_VID')
+    classify(ANDOR_VID[1]).should.equal('ANDOR_VID')
