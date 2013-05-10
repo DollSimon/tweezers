@@ -9,6 +9,7 @@ Usage:
   tweezer (analyse | analyze) [-t | -m] <FILE>...
   tweezer convert FILE <LANGUAGE>
   tweezer overview [-t | -m] <DIR>...
+  tweezer list [<DIR>...]
   tweezer (-h | --help)
   tweezer (-v | --version)
 
@@ -18,6 +19,7 @@ Commands:
   analyze       Perform specified data analysis
   convert       Convert data to be able to work in specified language
   overview      Produce "Overview.pdf" for data files in directory
+  list          List all files and file types in a directory recursively
 
 Arguments:
   FILE          Input file
@@ -44,7 +46,7 @@ from termcolor import cprint
 from tweezer import __version__
 try:
     from tweezer.core.polymer import ExtensibleWormLikeChain as WLC 
-    # from tweezer.core.watcher import run_watcher
+    from tweezer.core.watcher import run_watcher
 except ImportError:
     puts('')
     with indent(2):
@@ -119,7 +121,7 @@ def start():
     if args['analyse'] or args['analyze']: 
         puts('{}'.format(args['<FILE>']))
         puts('i{}V'.format(colored.red('Rackooon')))
-        puts('This is os.path.dirname(os.path.abspath(__file__))
+        puts('This is {}'.format(os.path.dirname(os.path.abspath(__file__))))
         puts(''.format(colored.green('Rackooon')))
         puts('Test')
         puts('First argument is {}'.format(sys.argv[0]))
@@ -133,6 +135,9 @@ def start():
         if not args['<DIR>']:
             args['<DIR>']= os.getcwd()
 
+        DIR = args['<DIR>']
+
+        puts('Calling watch from {}'.format(colored.green(DIR)))
         print('The sun is rising!')
-        run_watcher()
+        run_watcher(DIR)
         print('The sun sets!')

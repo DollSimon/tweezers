@@ -22,6 +22,8 @@ import re
 from watchdog.observers.fsevents import FSEventsObserver as Observer
 from watchdog.events import FileSystemEventHandler
 
+from tweezer.core.parsers import classify
+
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 print >> sys.stdout, "Watching changes to the base directory {}".format(BASEDIR)
 
@@ -95,12 +97,13 @@ def run_behave():
     os.chdir(BASEDIR)
     subprocess.call(r'behave')
 
-def getext(filename):
-    '''
-    Get the file extension.
-    '''
+def get_type(file_name):
+    """
+    Get the file type and other attributes
+    """
+    file_type = classify(file_name)
+    return os.path.splitext(file_name)[-1].lower()
 
-    return os.path.splitext(filename)[-1].lower()
 
 class ChangeHandler(FileSystemEventHandler):
     '''
@@ -111,15 +114,22 @@ class ChangeHandler(FileSystemEventHandler):
         '''
         If any file or folder is changed
         '''
+        print(event.event_type)
         if event.is_directory:
+            print("Something connected to directories")
             return
-        if getext(event.src_path) == '.py':
+        if get_type(event.src_path) == '.py':
             run_behave()
-        elif getext(event.src_path) == '.rst':
+        elif get_type(event.src_path) == '.rst':
             build_docs()
+        elif get_type(event.src_path) == '.txt':
+            print("Hurray")
+        elif get_type(event.src_path) == '.groovy':
+            print("A new groovy file")
+            print(event.src_path)
         
 
-def run_watcher():
+def run_watcher(directory):
     '''
     Called when run as main.
     Look for changes to code and doc files.
@@ -129,7 +139,7 @@ def run_watcher():
     
         event_handler = ChangeHandler()
         observer = Observer()
-        observer.schedule(event_handler, BASEDIR, recursive=True)
+        observer.schedule(event_handler, directory, recursive=True)
         observer.start()
         try:
             while True:
@@ -139,4 +149,4 @@ def run_watcher():
         observer.join()
 
 if __name__ == '__main__':
-    run_watcher()
+    sys.exit(run_watcher(BASEDIR))

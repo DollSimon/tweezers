@@ -17,6 +17,14 @@ tweezer Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`ixo` Module
+-----------------
+
+.. automodule:: tweezer.ixo
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`utils` Module
 -------------------
 
