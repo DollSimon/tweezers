@@ -47,6 +47,7 @@ from tweezer import __version__
 try:
     from tweezer.core.polymer import ExtensibleWormLikeChain as WLC 
     from tweezer.core.watcher import run_watcher
+    from tweezer.cli.utils import list_tweezer_files
 except ImportError:
     puts('')
     with indent(2):
@@ -87,6 +88,7 @@ def start():
                 puts('tweezer (analyse | analyze) [-t | -m] <FILE>...')
                 puts('tweezer convert FILE <LANGUAGE>')
                 puts('tweezer overview [-t | -m] <DIR>...')
+                puts('tweezer list [<DIR>...]')
                 puts('tweezer (-h | --help)')
                 puts('tweezer (-v | --version)')
               
@@ -97,6 +99,7 @@ def start():
                 puts('analyze       Perform specified data analysis')
                 puts('convert       Convert data to be able to work in specified language')
                 puts('overview      Produce "Overview.pdf" for data files in directory')
+                puts('list          List all files and file types in a directory recursively')
 
             puts('\n{}:'.format(colored.green('Arguments')))
             with indent(2):
@@ -141,3 +144,18 @@ def start():
         print('The sun is rising!')
         run_watcher(DIR)
         print('The sun sets!')
+
+    # tweezer list
+    if args['list']:
+
+        # check directory
+        if not args['<DIR>']:
+            args['<DIR>']= os.getcwd()
+
+        DIR = args['<DIR>']
+
+        puts('Calling tweezer list from {}'.format(colored.green(DIR)))
+        list_tweezer_files(DIR)
+        print('The sun is rising!')
+        print('The sun sets!')
+
