@@ -6,6 +6,7 @@ examples/
 
 build/
 dist/
+sandbox/
 
 convert.log
 tox.ini
