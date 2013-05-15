@@ -86,7 +86,12 @@ def classify(file_path):
     :return file_type: (String) classifier of the file 
     """
     base_name = os.path.basename(file_path)
-    parent_dir = get_parent_directory(file_path)
+
+    try: 
+        parent_dir = get_parent_directory(file_path)
+    except IndexError, e:
+        parent_dir = ''
+
     file_name = '/'.join([parent_dir, base_name])
 
     type_grammar = makeGrammar("""
@@ -108,7 +113,9 @@ def classify(file_path):
         csv = <'c' 's' 'v'>:csv -> str(csv)
         fts = <'f' 'i' 't' 's'>:fts -> str(fts)
         tif = <'t' 'i' ('f' 'f' | 'f')>:tif -> str(tif)
-        end = '.' (txt | gro | png | jpg | wgr | avi | tif | csv)
+        tdms = <'t' 'd' 'm' 's'>:tdms -> str(tdms)
+        tdms_index = <'t' 'd' 'm' 's' '_' 'i' 'n' 'd' 'e' 'x'>:tdms_index -> str(tdms_index)
+        end = '.' (txt | gro | png | jpg | wgr | tdms | avi | tif | csv | tdms_index)
 
         # date and time
         y = <digit{4}>:year -> int(year)
@@ -129,6 +136,7 @@ def classify(file_path):
         sta = <('S' | 's') 't' 'a' 'g' 'e'>:stage -> str(stage)
         fst = <foc 's' 'i' 'n' 'g' sta>
         fuf = <'f' 'u' 'l' 'l' foc>
+        ref = <'r' 'e' foc>
         ftb = <foc 't' 'a' 'b' 'l' 'e'>
         sct = <('S' | 's') 'a' 'v' 'e' 'd' twb ('S' | 's') 'c' 'r' 'i' 'p' 't'>
         ccd = <'c' 'c' 'd'>:ccd -> str(ccd)
@@ -147,10 +155,12 @@ def classify(file_path):
         bot_data = <path ps t s dat s date s dat end> -> 'BOT_DATA'
         bot_log = <path ps t s log s date end> -> 'BOT_LOG'
         bot_stats = <path ps t s sts end> -> 'BOT_STATS'
-        bot_focus = <path ps fst s fuf t s ftb end> -> 'BOT_FOCUS'
+        bot_focus = <path ps fst s (fuf | ref) t s ftb end> -> 'BOT_FOCUS'
         bot_script = <path ps t s sct s date end> -> 'BOT_SCRIPT' 
         bot_ccd = <path ps t s ssh s{2} date s ms s ccd end> -> 'BOT_CCD' 
         bot_andor = <path ps t s ssh s{2} date s ms s and end> -> 'BOT_ANDOR' 
+        bot_tdms = <path ps t s date '.' tdms> -> 'BOT_TDMS' 
+        bot_tdms_index = <path ps t s date '.' tdms_index> -> 'BOT_TDMS_INDEX' 
 
         # manual file patterns
         man_data = <'d' 'a' 't' 'a' ps (t '_' <letter+> | t) end> -> 'MAN_DATA'
@@ -197,6 +207,8 @@ def classify(file_path):
             bot_focus | 
             bot_script | 
             bot_ccd | 
+            bot_tdms | 
+            bot_tdms_index | 
             bot_andor ):type -> str(type)
 
         pattern = type:type -> str(type) 
@@ -205,6 +217,6 @@ def classify(file_path):
     try:
         file_type = type_grammar(file_name).pattern()
     except ParseError, err:
-        file_type = None 
+        file_type = 'UNKNOWN' 
 
     return file_type

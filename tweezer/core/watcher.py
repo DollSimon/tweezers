@@ -2,13 +2,7 @@
 #-*- coding: utf-8 -*-
 
 """
-Monitors our code & docs for changes
-
-To get coverage:
-
-    python -m coverage run -m unittest discover
-    python -m coverage report -m
-        Or: `python -m coverage html`
+Monitors a tweezer directory for file changing events
 
 """
 
@@ -19,17 +13,20 @@ import datetime
 import time
 import re
 
+import macropy.core.macros
+
+from collections import deque
+from Queue import Queue
+
 from watchdog.observers.fsevents import FSEventsObserver as Observer
 from watchdog.events import FileSystemEventHandler
+
+from clint.textui import colored, puts, indent 
+from termcolor import cprint
 
 from tweezer.core.parsers import classify
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
-print >> sys.stdout, "Watching changes to the base directory {}".format(BASEDIR)
-
-TWEEBOT_DATA_PATTERN = re.compile(r"(\d)+.(datalog)(.\d+)+.(datalog)(.txt)", re.IGNORECASE)
-TWEEBOT_STATS_PATTERN = re.compile(r"(\d)+.(tweebotstats)(.txt)", re.IGNORECASE)
-TWEEBOT_LOGS_PATTERN = re.compile(r"(\d)+.(tweebotlog)(.\d+)+(.txt)", re.IGNORECASE)
 
 def find_files(files, regex_pattern, verbose=False):
     """
@@ -106,36 +103,52 @@ def get_type(file_name):
 
 
 class ChangeHandler(FileSystemEventHandler):
-    '''
-    React to changes in Python and Rest files by
-    running unit tests (Python) or building docs (.rst)
-    '''
-    def on_any_event(self, event):
-        '''
-        If any file or folder is changed
-        '''
-        print(event.event_type)
+    """
+    Reacts to changes on the file system and dispatches the appropriate methods for the registered file system event.
+    """
+    def __init__(self):
+        super(ChangeHandler, self).__init__()
+        self.dataq = deque()
+        self.logq = deque()
+
+    def on_created(self, event):
+        """
+        If any file or directory is on_created
+        """
         if event.is_directory:
-            print("Something connected to directories")
+            print("The directory {} has been {}".format(colored.red(event.src_path), colored.blue(event.event_type)))
             return
-        if get_type(event.src_path) == '.py':
-            run_behave()
-        elif get_type(event.src_path) == '.rst':
-            build_docs()
-        elif get_type(event.src_path) == '.txt':
-            print("Hurray")
-        elif get_type(event.src_path) == '.groovy':
-            print("A new groovy file")
-            print(event.src_path)
-        
+            
+        file_type = classify(event.src_path)
+        event_type = event.event_type
+
+        print("A {} file has been {}".format(colored.red(file_type), colored.blue(event_type)))
+
+        if file_type == 'BOT_DATA':
+            print('Data file event')
+            self.dataq.append(event.src_path)
+            if len(self.dataq) > 1:
+                # print(list(self.dataq))
+                print("More than one data file registered.")
+
+        if file_type == 'BOT_LOG':
+            print('Log file event')
+            self.logq.append(event.src_path)
+            if len(self.logq) > 1:
+                print("More than one log file registered.")
+                # print(list(self.logq))
+
 
 def run_watcher(directory):
     '''
-    Called when run as main.
-    Look for changes to code and doc files.
+    Called when run as main() from the command line.
+    Looks for changes to the file system.
+    Can be stopped with CTRL+C.
     '''
 
-    while 1:
+    data_files = Queue()
+
+    while True:
     
         event_handler = ChangeHandler()
         observer = Observer()
@@ -143,9 +156,19 @@ def run_watcher(directory):
         observer.start()
         try:
             while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
+                time.sleep(10)
+                print(event_handler.dataq)
+                print("I'm accessing the queue from outside")
+                print(event_handler.dataq)
+        except (KeyboardInterrupt, SystemExit) as close:
+            q = observer.event_queue
             observer.stop()
+            with indent(2):
+                puts("\n{}\n".format(colored.white('Thanks for watching...')))
+                puts("{}\n".format(colored.white('Finishing up...')))
+                puts("Files left in the data queue: {}".format(colored.magenta(len(event_handler.dataq))))
+            print("The stored values are {}".format(event_handler.dataq))
+            return
         observer.join()
 
 if __name__ == '__main__':

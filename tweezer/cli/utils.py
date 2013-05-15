@@ -5,7 +5,10 @@ import os
 from clint.textui import colored, puts, indent 
 from termcolor import cprint
 
+from macropy.macros.adt import macros, case
+
 from tweezer.core.parsers import classify
+
 
 def list_tweezer_files(directory):
     """ 
@@ -25,6 +28,22 @@ def list_tweezer_files(directory):
 
         puts("There are {} files.".format(colored.blue(sum(1 for f in files))))
         for f in files:
-            print(classify(f))
-    
+            print(classify(os.path.join(path, f)))
+
+
+def file_cache(parameter):
+    """
+    Short description 
+
+    :param parameter: Description
+
+    :return name: Description
+    """
+    pass
+
+
+@case 
+class MyPoint(x, y): 
+    def rocket(self, n):
+        print(n)
 

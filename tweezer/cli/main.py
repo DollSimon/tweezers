@@ -140,10 +140,11 @@ def start():
 
         DIR = args['<DIR>']
 
-        puts('Calling watch from {}'.format(colored.green(DIR)))
-        print('The sun is rising!')
+        with indent(2):
+            puts('Calling tweezer watch from {}\n'.format(colored.green(DIR)))
+            puts('To stop this script hit {}.'.format(colored.red("CTRL + C")))
+            
         run_watcher(DIR)
-        print('The sun sets!')
 
     # tweezer list
     if args['list']:
