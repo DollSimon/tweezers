@@ -1,0 +1,17 @@
+grabbead(s)	88.7728259563446
+grabbead.failure	2.0
+grabbead.success	73.0
+grabtwobeads(s)	339.0126259326935
+grabtwobeads.beadisnull	12.0
+grabtwobeads.grab1stbead.success	36.0
+grabtwobeads.grab2ndbead.success	27.0
+grabtwobeads.losttrackbead1	8.0
+grabtwobeads.success	27.0
+grabtwobeads.try(s)	274.21172285079956
+grabtwobeadstether.badbead1	10.0
+grabtwobeadstether.goodbead1	36.0
+grabtwobeadstether.twobeadsqualitypretest.failed	25.0
+simpletether.failure	20.0
+simpletether.success	7.0
+simpletether.test.anomalousforce	20.0
+takesnapshots(s)	0.11641192436218262

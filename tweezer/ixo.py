@@ -4,6 +4,7 @@ General utility functions used for tweezer package.
 """
 import os
 import cProfile
+import envoy
 
 
 def profile_this(fn):
@@ -73,3 +74,18 @@ class VersionChecker(object):
     def __init__(self, python_function):
         self.python_function = python_function
 
+
+def run_rscript(script, script_path='/Library/Frameworks/R.framework/Resources/library/tweezR/', **kwargs):
+    """
+    Calls an R script 
+
+    :param script: (Str) name of the script 
+
+    :param script_path: (Path)
+    """
+    if script_path[-1] == '/':
+        path = "".join(script_path, script)
+    else:
+        path = "/".join(script_path, script)
+
+    r = envoy.run("Rscript {} ")
