@@ -1,0 +1,60 @@
+\documentclass[a4paper, landscape, 10pt, onesided, twocolumn]{scrreprt}
+
+\usepackage[a4paper, landscape, nomarginpar, margin=0.5cm,top=1.0cm, bottom=1.0cm, nohead]{geometry} 
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[table]{xcolor}
+\usepackage{colortbl}
+\usepackage{ctable}
+\usepackage{booktabs}
+\usepackage{tabulary}
+\usepackage{tabularx}
+\usepackage{underscore}
+\usepackage{array}
+\usepackage{stfloats}
+\usepackage{tikz} 
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{siunitx}
+\usepackage{fullpage}
+
+\usepackage[makestderr]{pythontex}
+\restartpythontexsession{\thesection}
+
+\usepackage[small, bf]{caption}
+\captionsetup{width=0.3\textwidth}
+\usepackage[section]{placeins}
+\renewcommand*{\raggedsection}{\centering}
+
+\definecolor{darkblue}{rgb}{0.1,0.115,0.4981}
+\definecolor{darkred}{rgb}{0.45,0.025,0.1551}
+\definecolor{darkbrown}{rgb}{0.3,0.157,0.013}
+
+\usepackage[colorlinks, linkcolor=darkblue, citecolor=darkblue, urlcolor=darkblue, bookmarks=true]{hyperref}
+
+% \input{dtCommands}   
+
+\pagestyle{empty} 
+
+% \pgfrealjobname{tweebot_overview_template} 
+\title{TweeBot Experiment} 
+\author{Marcus Jahnel}
+
+\begin{document}
+\subsection*{General information}
+
+Hello
+\begin{pyconsole}[][frame=single]
+x = 123
+y = 345
+z = x + y
+z
+def f(expr):
+    return(expr**4)
+
+f(x)
+print('Python says hi from the console!')
+\end{pyconsole}
+
+\end{document}
