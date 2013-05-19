@@ -1,0 +1,9 @@
+# Date: 2/22/2013 2:56 PM
+
+#AOD2Pixel X (Hz/px): 0.000019
+# Intercept X AOD2P: -120.253631
+# STD X AOD2P: 0.021907
+
+# AOD2Pixel Y (Hz/px): -0.000024
+# Intercept Y AOD2P: 843.847828
+# STD Y AOD2P: 0.029695                                                            

@@ -3,7 +3,6 @@ Input/Output routines for the tweezer package.
 
 Performs file reads and data conversion.
 """
-
 import pandas as pd
 import numpy as np
 import datetime as dt
@@ -19,7 +18,7 @@ def read_tweezer_txt(file_name):
     return lines
 
 
-def read_tweebot_txt(file_name):
+def read_tweebot_data(file_name):
     """
     Reads dual-trap data and metadata from TweeBot datalog files.
 
@@ -38,7 +37,7 @@ def read_tweebot_txt(file_name):
         This function only works for TweeBot data files in the form of 2013
 
     """
-    column_names, calibration, header_line = read_tweebot_header(file_name)
+    column_names, calibration, header_line = read_tweebot_data_header(file_name)
 
     df = pd.read_table(file_name, header = header_line)
 
@@ -68,9 +67,6 @@ def read_thermal_calibration(file_name):
         print('Rackoon!')
     else:
         print('Wrong file format or file type!')
-
-
-
 
 
 def read_tweezer_mat(file_name):
@@ -116,7 +112,7 @@ def read_tracking_data(file_name):
     return df
 
 
-def read_tweebot_header(datalog_file, calibration_as_dict = True):
+def read_tweebot_data_header(datalog_file, calibration_as_dict = True):
     """
     Extracts the header of a Tweebot data log file as a list
 
@@ -138,8 +134,8 @@ def read_tweebot_header(datalog_file, calibration_as_dict = True):
 
     Usage:
     """"""
-    >>> col, cal, header_line = read_tweebot_header('27.Datalog.2013.02.17.19.42.09.datalog.txt')
-    >>> col, cal, header_line = read_tweebot_header('27.Datalog.2013.02.17.19.42.09.datalog.txt', calibration_as_dict = False)
+    >>> col, cal, header_line = read_tweebot_data_header('27.Datalog.2013.02.17.19.42.09.datalog.txt')
+    >>> col, cal, header_line = read_tweebot_data_header('27.Datalog.2013.02.17.19.42.09.datalog.txt', calibration_as_dict = False)
     """
     column_names = []
     calibration_list = []

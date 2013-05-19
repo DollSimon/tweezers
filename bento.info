@@ -24,14 +24,13 @@ Library:
         scipy,
         numpy
     Modules:
-        first_function,
-        rocket,
-        fio,
-        sun
+        io,
+        utils,
+        ixo
     Packages:
         tweezer,
         tweezer.gui,
         tweezer.core,
         tweezer.scripts,
         tweezer.ott,
-        tweezer.io
+        tweezer.cli

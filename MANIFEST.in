@@ -1,1 +1,3 @@
 include docs/*.txt
+include tweezer/data/*/*
+include tweezer/templates/*/*
