@@ -1,3 +1,7 @@
 include docs/*.txt
 include tweezer/data/*/*
-include tweezer/templates/*/*
+include tweezer/templates/pytex/pytex_template.tex
+include tweezer/templates/knitr/knitr_template.Rnw
+
+global-exclude tweezer/templates/pytex/*
+global-exclude tweezer/templates/pytex/pythontex-files-pytex_template/*

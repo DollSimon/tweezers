@@ -26,3 +26,12 @@ Sandbox.ipynb
 # ignore all files related to pythontex except the template itself
 tweezer/templates/pytex/*
 !tweezer/templates/pytex/*.tex
+
+# all TODO files
+*.TODO
+
+# Latex extra files
+*.aux
+*.out
+*.log
+*template.pdf

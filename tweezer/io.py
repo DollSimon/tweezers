@@ -7,6 +7,10 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 import re
+from collections import namedtuple, OrderedDict
+from nptdms import TdmsFile
+
+from tweezer.ixo import TweebotDictionary, TweezerUnits
 
 def read_tweezer_txt(file_name):
     """
@@ -18,15 +22,18 @@ def read_tweezer_txt(file_name):
     return lines
 
 
-def read_tweebot_data(file_name):
+def read_tweebot_data(file_name, simplify_names=True):
     """
     Reads dual-trap data and metadata from TweeBot datalog files.
 
     :param file_name: Path to the TweeBot datalog file.
+    :param simplify_names: (Bool) greatly simplifies the string representations of the varibles
 
     :return df: Pandas DataFrame containing the recorded data
 
     :return calibration: Dictionary containing the metadata of the experiment
+
+    :return cal_units: Lookup Table for units of the calibration data
 
     Usage
     """"""
@@ -45,15 +52,20 @@ def read_tweebot_data(file_name):
     df = df.dropna(axis = 1)
 
     # set column names and index as time 
-    df.columns = column_names
+    if simplify_names:
+        df.columns = simplify_tweebot_data_names(column_names)
+        calibration, _  = simplify_calibration_data(calibration)
 
     if 'Time sent (s)' in column_names:
         dates = pd.DatetimeIndex([dt.datetime.fromtimestamp(time) for time in df['Time sent (s)']])
         df.index = dates
+    elif 'timeSent' in column_names:
+        dates = pd.DatetimeIndex([dt.datetime.fromtimestamp(time) for time in df['timeSent']])
+        df.index = dates
     else:
         print("No time index set: Could not find column 'Time sent (s)' in data")
 
-    return df, calibration 
+    return df, calibration
 
 
 def read_thermal_calibration(file_name):
@@ -67,6 +79,98 @@ def read_thermal_calibration(file_name):
         print('Rackoon!')
     else:
         print('Wrong file format or file type!')
+
+
+def simplify_tweebot_data_names(variable_names):
+    v = variable_names
+    if 'Time sent (s)' in v:
+        v[v.index('Time sent (s)')] = 'timeSent'
+
+    if 'Time received (s)' in v:
+        v[v.index('Time received (s)')] = 'timeReceived'
+
+    if 'Experiment Phase (int)' in v:
+        v[v.index('Experiment Phase (int)')] = 'experimentPhase'
+
+    if 'Message index (int)' in v:
+        v[v.index('Message index (int)')] = 'mIndex'
+
+    if 'Extension from Trap and PSD positions (nm)' in v:
+        v[v.index('Extension from Trap and PSD positions (nm)')] = 'extensionTrap'
+
+    if 'Extension from image measurements (nm)' in v:
+        v[v.index('Extension from image measurements (nm)')] = 'extenstionImage'
+
+    if 'Force felt by AOD (pN)' in v:
+        v[v.index('Force felt by AOD (pN)')] = 'forceAod'
+
+    if 'Force felt by PM  (pN)' in v:
+        v[v.index('Force felt by PM  (pN)')] = 'forcePm'
+
+    if 'AOD to PM vector x (nm)' in v:
+        v[v.index('AOD to PM vector x (nm)')] = 'trapDistX'
+
+    if 'AOD to PM vector y (nm)' in v:
+        v[v.index('AOD to PM vector y (nm)')] = 'trapDistY'
+
+    if 'AODx (V)' in v:
+        v[v.index('AODx (V)')] = 'dispAodX'
+
+    if 'AODy (V)' in v:
+        v[v.index('AODy (V)')] = 'dispAodY'
+
+    if 'PMx (V)' in v:
+        v[v.index('PMx (V)')] = 'dispPmX'
+
+    if 'PMy (V)' in v:
+        v[v.index('PMy (V)')] = 'dispPmY'
+
+    if 'PMsensorx (V)' in v:
+        v[v.index('PMsensorx (V)')] = 'mirrorX'
+
+    if 'PMsensory (V)' in v:
+        v[v.index('PMsensory (V)')] = 'mirrorY'
+
+    if 'PMxdiff (V)' in v:
+        v[v.index('PMxdiff (V)')] = 'pmX'
+
+    if 'PMydiff (V)' in v:
+        v[v.index('PMydiff (V)')] = 'pmY'
+
+    if 'PMxsum (V)' in v:
+        v[v.index('PMxsum (V)')] = 'pmS'
+
+    if 'AODxdiff (V)' in v:
+        v[v.index('AODxdiff (V)')] = 'aodX'
+
+    if 'AODydiff (V)' in v:
+        v[v.index('AODydiff (V)')] = 'aodY'
+
+    if 'AODxsum (V)' in v:
+        v[v.index('AODxsum (V)')] = 'aodS'
+
+    if 'StageX (mm)' in v:
+        v[v.index('StageX (mm)')] = 'stageX'
+
+    if 'StageY (mm)' in v:
+        v[v.index('StageY (mm)')] = 'stageY'
+
+    if 'StageZ (mm)' in v:
+        v[v.index('StageZ (mm)')] = 'stageZ'
+
+    if 'Pressure (a.u.)' in v:
+        v[v.index('Pressure (a.u.)')] = 'pressure'
+
+    if 'FBx (V)' in v:
+        v[v.index('FBx (V)')] = 'fbX'
+
+    if 'FBy (V)' in v:
+        v[v.index('FBy (V)')] = 'fbY'
+
+    if 'FBsum(V)' in v:
+        v[v.index('FBsum (V)')] = 'fbZ'
+
+    return v
 
 
 def read_tweezer_mat(file_name):
@@ -86,8 +190,16 @@ def read_tweezer_r(file_name):
 def read_tdms(file_name):
     """
     Reads data from Labview TDMS file.
+
+    :param file_name: (path) to tdms file
+
+    :return df: (pd.DataFrame) with the channels as columns
+    
     """
-    pass
+    df = pd.DataFrame()
+    tf = TdmsFile(file_name)
+    for channel in len(tf.group_channels('Untitled')):
+        pass
 
 
 def read_tweebot_stats(file_name):
@@ -158,7 +270,7 @@ def read_tweebot_data_header(datalog_file, calibration_as_dict = True):
 
     if calibration_as_dict:
 
-        calib_data = {}
+        calib_data = OrderedDict()
 
         for line in calibration_list:
             try: 
@@ -172,16 +284,18 @@ def read_tweebot_data_header(datalog_file, calibration_as_dict = True):
     return column_names, calib_data, header_line
 
 
-def read_calibration_header(file_name):
+def simplify_calibration_data(calibration_dict):
     """
-    Extracts the header information in tweezer thermal calibration files.
+    Converts a tweebot calibration dictionary into named tuples
 
-    Parameter:
-    """"""""""""
-      file_name: File under scrutiny, either the original time series or the spectra.
-      type:        
+    :param calibration_dict: (dict) holds the calibration data written by Tweebot
+    
+    :return cal: (extended namedtuple) that holds the calibration data in accessible form
+    :return units: (extended namedtuple) that holds the corresponding units
     """
-
+    cal = TweebotDictionary(*calibration_dict.values())
+    units = TweezerUnits()
+    return cal, units
 
 
 def is_calibration_time_series(file_name):

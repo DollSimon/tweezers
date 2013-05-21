@@ -47,3 +47,9 @@ class MyPoint(x, y):
     def rocket(self, n):
         print(n)
 
+@case 
+class TweezerFile(file_type, date, origin):
+    pass
+
+
+def 

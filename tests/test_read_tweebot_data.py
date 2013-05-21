@@ -8,7 +8,7 @@ import nose
 from nose.tools import with_setup
 import pytest
 
-from tweezer.io import read_tweebot_data_header, read_tweebot_data
+from tweezer.io import read_tweebot_data_header, read_tweebot_data, clean_calibration_data
 from tweezer import path_to_sample_data
 from tweezer.core.parsers import classify
 
@@ -27,4 +27,7 @@ def test_return_values():
     df.should.be.a('pandas.core.frame.DataFrame')
     cal.should.be.a('dict')
     
-    
+
+def test_clean_naming():
+    cols, calib, header = read_tweebot_data_header(bot_file)
+    cal, units = clean_calibration_data(calib)
