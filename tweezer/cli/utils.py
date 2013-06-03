@@ -13,7 +13,7 @@ def list_tweezer_files(directory):
 
     :param directory: (Path) starting directory
 
-    :return files: (defaultdict) where keys are file types and values are corresponding files
+    :return files: (defaultdict) where keys are file types and values are corresponding files specified by their full path
 
     """
     files = defaultdict(list)
@@ -21,7 +21,7 @@ def list_tweezer_files(directory):
     for (path, dirs, file_names) in os.walk(directory):
         types = classify_all(file_names)
         for t, f in izip(types, file_names):
-            files[t.lower()].append(f)
+            files[t.lower()].append(os.path.join(directory, path, f))
 
     return files
 
@@ -37,15 +37,15 @@ def file_cache(parameter):
     pass
 
 
-def collect_files_per_trial(trial=1, subtrial=None, files=defaultdict(list)):
+def collect_files_per_trial(files=defaultdict(list), trial=1, subtrial=None):
     """
     Collects all files corresponding to one experiment based on trial and subtrial number.
     
+    :param files: (defaultdict) of all files found in the current directory tree
+
     :param trial: (int) specifies the trial number
 
     :param subtrial: (str) specifies the subtrial in a file name pattern such as '1_a...'
-
-    :param files: (defaultdict) of all files found in the current directory tree
     
     :return trial_files: (defaultdict) that stores all files connected to one experiment
     
@@ -59,7 +59,7 @@ def collect_files_per_trial(trial=1, subtrial=None, files=defaultdict(list)):
 
     for t, f in files.iteritems():
         for x in f:
-            if re.search('^\s*{}\W'.format(trial_name), x):
+            if re.search('^\s*{}\W'.format(trial_name), os.path.basename(x)):
                 trial_files[t].append(x)
         else:
             if not trial_files.has_key(t):
