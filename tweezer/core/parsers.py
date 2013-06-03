@@ -37,6 +37,7 @@ def parse_tweebot_datalog_pattern(file_name):
         infos = data_parser(file_name).pattern()
         match = True
     except ParseError, err:
+        print(err)
         infos = None
         match = False
 
@@ -217,7 +218,7 @@ def classify(file_path):
     
     try:
         file_type = type_grammar(file_name).pattern()
-    except ParseError, err:
+    except ParseError:
         file_type = 'UNKNOWN' 
 
     return file_type
@@ -357,7 +358,7 @@ def classify_all(files):
 
         try: 
             parent_dir = get_parent_directory(f)
-        except IndexError, e:
+        except IndexError:
             parent_dir = ''
 
         file_name = '/'.join([parent_dir, base_name])
@@ -365,7 +366,7 @@ def classify_all(files):
         try:
             file_type = type_grammar(file_name).pattern()
             file_types.append(file_type)
-        except ParseError, err:
+        except ParseError:
             file_type = 'UNKNOWN' 
             file_types.append(file_type)
 
