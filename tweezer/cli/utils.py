@@ -13,7 +13,7 @@ def list_tweezer_files(directory):
 
     :param directory: (Path) starting directory
 
-    :return files: (defaultdict) where keys are file types and values are corresponding files
+    :return files: (defaultdict) where keys are file types and values are corresponding files specified by their full path
 
     """
     files = defaultdict(list)
@@ -21,7 +21,7 @@ def list_tweezer_files(directory):
     for (path, dirs, file_names) in os.walk(directory):
         types = classify_all(file_names)
         for t, f in izip(types, file_names):
-            files[t.lower()].append(f)
+            files[t.lower()].append(os.path.join(directory, path, f))
 
     return files
 
