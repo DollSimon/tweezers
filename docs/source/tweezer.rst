@@ -39,7 +39,10 @@ Subpackages
 .. toctree::
 
     tweezer.core
+    tweezer.cli
     tweezer.gui
     tweezer.ott
     tweezer.scripts
+    tweezer.templates
+    tweezer.data
 

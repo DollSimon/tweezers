@@ -54,7 +54,6 @@ def read_tweebot_data(file_name, simplify_names=True):
     # set column names and index as time 
     if simplify_names:
         df.columns = simplify_tweebot_data_names(column_names)
-        calibration, _  = simplify_calibration_data(calibration)
 
     if 'Time sent (s)' in column_names:
         dates = pd.DatetimeIndex([dt.datetime.fromtimestamp(time) for time in df['Time sent (s)']])
@@ -196,10 +195,24 @@ def read_tdms(file_name):
     :return df: (pd.DataFrame) with the channels as columns
     
     """
-    df = pd.DataFrame()
     tf = TdmsFile(file_name)
-    for channel in len(tf.group_channels('Untitled')):
-        pass
+
+    if 'Untitled' in tf.groups():
+        g = 'Untitled'
+        df = pd.DataFrame(tf.channel_data(g, 'Untitled'), columns=['pmX'])
+        df['pmY'] = tf.channel_data(g, 'Untitled 1')
+        df['aodX'] = tf.channel_data(g, 'Untitled 2')
+        df['aodY'] = tf.channel_data(g, 'Untitled 3')
+        df['pmS'] = tf.channel_data(g, 'Untitled 4')
+        df['aodS'] = tf.channel_data(g, 'Untitled 5')
+        df['fbS'] = tf.channel_data(g, 'Untitled 6')
+        df['mirrorX'] = tf.channel_data(g, 'Untitled 7')
+        df['mirrorY'] = tf.channel_data(g, 'Untitled 8')
+        df['fbX'] = tf.channel_data(g, 'Untitled 9')
+        df['fbY'] = tf.channel_data(g, 'Untitled 10')
+        df['pressure'] = tf.channel_data(g, 'Untitled 11')
+        
+    return df 
 
 
 def read_tweebot_stats(file_name):
@@ -224,25 +237,18 @@ def read_tracking_data(file_name):
     return df
 
 
-def read_tweebot_data_header(datalog_file, calibration_as_dict = True):
+def read_tweebot_data_header(datalog_file, dtype='DataFrame'):
     """
     Extracts the header of a Tweebot data log file as a list
 
-    Parameters:
-    """"""""""""
-        datalog_file :          Tweebot datalog file from which the header is extracted
+    :param datalog_file : (path) Tweebot datalog file from which the header is extracted
 
-        calibration_as_dict :   Boolean, whether to return calibration data as list or dictionary [True]
+    :param dtype: (Str) specifies the return type of the calibration data, either 'DataFrame' (default) or 'Dict' or 'List'
+        
 
+    :return calib_data :    Calibration data - pandas DataFrame (default), dictionary or list
 
-    Returns:
-    """"""
-
-        column_names :  Column names corresponding to the recorded variables
-
-        calib_data :    Calibration data - dictionary [default] or list
-
-        header_line :   Line of the header line with column names
+    :return header_line :   Line of the header line with column names
 
     Usage:
     """"""
@@ -252,6 +258,8 @@ def read_tweebot_data_header(datalog_file, calibration_as_dict = True):
     column_names = []
     calibration_list = []
     line_count = 0
+
+    dtype = dtype.upper()
 
     with open(datalog_file, 'r') as f:
 
@@ -268,34 +276,25 @@ def read_tweebot_data_header(datalog_file, calibration_as_dict = True):
             elif '#' in line[0:2] and ":" in line:
                 calibration_list.append(line.strip().strip('\t\n\r').strip('#').strip())
 
-    if calibration_as_dict:
+    calib_data = OrderedDict()
 
-        calib_data = OrderedDict()
+    for line in calibration_list:
+        try: 
+            calib_data[line.split(': ')[0]] = np.float32(line.split(': ')[1])
+        except ValueError:
+            calib_data[line.split(': ')[0]] = line.split(': ')[1]
 
-        for line in calibration_list:
-            try: 
-                calib_data[line.split(': ')[0]] = np.float32(line.split(': ')[1])
-            except ValueError:
-                calib_data[line.split(': ')[0]] = line.split(': ')[1]
-
+    if dtype == 'DICT':
+        calib_data = TweebotDictionary(*calib_data.values())
+    elif dtype == 'DATAFRAME':
+        calib_data = TweebotDictionary(*calib_data.values())._asdict()
+        df = pd.DataFrame(dict(calib_data), columns=dict(calib_data).keys(), index=[1])
+        df['timeStep'] = df['deltaTime']
+        calib_data = df
     else:
         calib_data = calibration_list
 
     return column_names, calib_data, header_line
-
-
-def simplify_calibration_data(calibration_dict):
-    """
-    Converts a tweebot calibration dictionary into named tuples
-
-    :param calibration_dict: (dict) holds the calibration data written by Tweebot
-    
-    :return cal: (extended namedtuple) that holds the calibration data in accessible form
-    :return units: (extended namedtuple) that holds the corresponding units
-    """
-    cal = TweebotDictionary(*calibration_dict.values())
-    units = TweezerUnits()
-    return cal, units
 
 
 def is_calibration_time_series(file_name):

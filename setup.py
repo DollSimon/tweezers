@@ -26,7 +26,8 @@ MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.utils',
     'tweezer.core.polymer', 'tweezer.core.geometry', 'tweezer.core.trap', 
     'tweezer.core.watcher', 'tweezer.core.visualisation', 
     'tweezer.core.simulations', 'tweezer.core.trap_calibration', 
-    'tweezer.core.datatypes', 'tweezer.core.analysis', 'tweezer.core.parsers'] 
+    'tweezer.core.datatypes', 'tweezer.core.analysis', 'tweezer.core.parsers', 
+    'tweezer.core.overview', 'tweezer.cli.utils'] 
 
 setup(
     name='tweezer',
@@ -36,7 +37,7 @@ setup(
     author='Marcus Jahnel, MPI-CBG',
     author_email='jahnel@mpi-cbg.de',
     install_requires=DEPENDENCIES,
-    packages=['tweezer', 'tweezer.gui', 'tweezer.cli', 'tweezer.ott', 'tweezer.'],
+    packages=PACKAGES,
     package_data={'tweezer': ['data/*/*', 'templates/*/*']},
     entry_points={
         'console_scripts': [

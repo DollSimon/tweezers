@@ -31,4 +31,4 @@ def test_simple_rscript():
     # calling tweebot script with one arguments
     t = envoy.run('Rscript {} 4 x:n=5'.format(r_script))
     t.status_code.should.equal(0) 
-  
+ 

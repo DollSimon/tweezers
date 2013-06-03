@@ -22,6 +22,8 @@ Sandbox.ipynb
 
 # files related to python testing system
 .coverage
+setup.cfg
+bento.info
 
 # ignore all files related to pythontex except the template itself
 tweezer/templates/pytex/*
@@ -35,3 +37,6 @@ tweezer/templates/pytex/*
 *.out
 *.log
 *template.pdf
+
+# profile files
+*.profile

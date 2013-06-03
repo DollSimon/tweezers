@@ -6,9 +6,9 @@ Tweezer Data Analysis on Steroids
 
 Usage: 
   tweezer watch [-t | -m] [<DIR>...] [-l]
-  tweezer (analyse | analyze) [-t | -m] <FILE>...
-  tweezer convert FILE <LANGUAGE>
-  tweezer overview [-t | -m] <DIR>...
+  tweezer (analyse | analyze) [-t | -m] [<FILE>...]
+  tweezer convert [<FILE>...] <LANGUAGE>
+  tweezer overview [-t | -m] ([<DIR>...] | -f [<FILE>...])
   tweezer list [<DIR>...]
   tweezer (-h | --help)
   tweezer (-v | --version)
@@ -33,6 +33,7 @@ Options:
   -t --tweebot  Tweebot tweezer mode
   -m --manual   Manual tweezer mode
   -l --logging  Write log file
+  -f --file     Switch to file mode when input can be file or dir
 
 """
 import os
@@ -48,6 +49,7 @@ try:
     from tweezer.core.polymer import ExtensibleWormLikeChain as WLC 
     from tweezer.core.watcher import run_watcher
     from tweezer.cli.utils import list_tweezer_files
+    from tweezer.core.overview import full_tweebot_overview, tweebot_overview
 except ImportError:
     puts('')
     with indent(2):
@@ -85,9 +87,9 @@ def start():
             puts('\n{}:'.format(colored.green('Usage')))
             with indent(2):
                 puts('tweezer watch [-t | -m] [<DIR>...] [-l]')
-                puts('tweezer (analyse | analyze) [-t | -m] <FILE>...')
-                puts('tweezer convert FILE <LANGUAGE>')
-                puts('tweezer overview [-t | -m] <DIR>...')
+                puts('tweezer (analyse | analyze) [-t | -m] [<FILE>...]')
+                puts('tweezer convert [<FILE>...] <LANGUAGE>')
+                puts('tweezer overview [-t | -m] ([<DIR>...] | -f [<FILE>...])')
                 puts('tweezer list [<DIR>...]')
                 puts('tweezer (-h | --help)')
                 puts('tweezer (-v | --version)')
@@ -115,6 +117,8 @@ def start():
                 puts('-t --tweebot  Tweebot tweezer mode')
                 puts('-m --manual   Manual tweezer mode')
                 puts('-l --logging  Write log file')
+                puts('-l --logging  Write log file')
+                puts('-f --file     Switch to file mode when input can be file or dir')
           
     # Checking and setting default values
     if not args['--tweebot'] and not args['--manual']:
@@ -156,7 +160,32 @@ def start():
         DIR = args['<DIR>']
 
         puts('Calling tweezer list from {}'.format(colored.green(DIR)))
-        list_tweezer_files(DIR)
+        files = list_tweezer_files(DIR)
         print('The sun is rising!')
+        print('There are {} file types'.format(len(files)))
+        print('There are the following types: {} '.format(len(files)))
+        puts('Here is the result: {}'.format(colored.blue(files)))
         print('The sun sets!')
 
+    # tweezer overview
+    if args['overview']:
+
+        # check directory
+        if not args['<DIR>']:
+            args['<DIR>']= os.getcwd()
+
+        DIR = args['<DIR>']
+
+        # check file input
+        if args['--file']:
+            FILES = args['<FILE>']
+        else:
+            FILES = None
+
+        if FILES:
+            for f in FILES:
+                path = os.path.join(DIR, f)
+                tweebot_overview(path)
+
+        puts('Calling tweezer overview from {}'.format(colored.green(DIR)))
+        full_tweebot_overview(DIR)

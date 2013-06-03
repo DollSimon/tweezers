@@ -1,11 +1,6 @@
-#!/usr/bin/env python
-#-*- coding: utf-8 -*-
-
 import os
 from clint.textui import colored, puts, indent 
 from termcolor import cprint
-
-from macropy.macros.adt import macros, case
 
 from tweezer.core.parsers import classify
 
@@ -16,7 +11,6 @@ def list_tweezer_files(directory):
 
     :param directory: (Path) starting directory
 
-    
     """
     for (path, dirs, files) in os.walk(directory):
         with indent(2):
@@ -40,16 +34,3 @@ def file_cache(parameter):
     :return name: Description
     """
     pass
-
-
-@case 
-class MyPoint(x, y): 
-    def rocket(self, n):
-        print(n)
-
-@case 
-class TweezerFile(file_type, date, origin):
-    pass
-
-
-def 
