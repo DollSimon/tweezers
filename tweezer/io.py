@@ -3,11 +3,13 @@ Input/Output routines for the tweezer package.
 
 Performs file reads and data conversion.
 """
+import re
+from collections import namedtuple, OrderedDict
+
 import pandas as pd
 import numpy as np
 import datetime as dt
-import re
-from collections import namedtuple, OrderedDict
+import pytz
 from nptdms import TdmsFile
 
 from tweezer.ixo import TweebotDictionary, TweezerUnits
@@ -225,8 +227,18 @@ def read_tweebot_stats(file_name):
 def read_tweebot_logs(file_name):
     """
     Reads data from TweeBot log files.
+
+    :param file_name: (path) Tweebot log file to be parsed
+    
+    :return log: (pd.DataFrame) with the logging data
     """
-    pass
+    log = pd.read_table(file_name)
+    log.columns = ['time', 'kind', 'routine', 'message']
+    log.index = pd.to_datetime(log.time)
+    log.tz_localize('Europe/Berlin')
+    log.drop('time', axis=1)
+
+    return log
 
 
 def read_tracking_data(file_name):
