@@ -5,6 +5,7 @@ Performs file reads and data conversion.
 """
 import re
 from collections import namedtuple, OrderedDict
+import datetime
 
 import pandas as pd
 import numpy as np
@@ -13,6 +14,8 @@ import pytz
 from nptdms import TdmsFile
 
 from tweezer.ixo import TweebotDictionary, TweezerUnits
+from tweezer.core.parsers import parse_tweebot_tdms_file_name
+
 
 def read_tweezer_txt(file_name):
     """
@@ -188,17 +191,23 @@ def read_tweezer_r(file_name):
     pass
 
 
-def read_tdms(file_name):
+def read_tdms(file_name, frequency=1000):
     """
     Reads data from Labview TDMS file.
 
     :param file_name: (path) to tdms file
 
+    :param frequency: (int) sampling frequency in Hz (default is 1000 Hz, i.e. data taken at 1 ms time resolution)
+
     :return df: (pd.DataFrame) with the channels as columns
     
     """
+    info = parse_tweebot_tdms_file_name(file_name)
+
+    # open tdms connection
     tf = TdmsFile(file_name)
 
+    # read data
     if 'Untitled' in tf.groups():
         g = 'Untitled'
         df = pd.DataFrame(tf.channel_data(g, 'Untitled'), columns=['pmX'])
@@ -214,6 +223,14 @@ def read_tdms(file_name):
         df['fbY'] = tf.channel_data(g, 'Untitled 10')
         df['pressure'] = tf.channel_data(g, 'Untitled 11')
         
+    # set index; in pandas the alias for microsecond offset is 'U'
+    if info.date:
+        index = pd.date_range(start = info.date, period = len(df), freq = '{}U'.format(int(1000000.0/frequency)))
+        df.index = index
+    else:
+        index = pd.date_range(start = datetime.datetime.now(), period = len(df), freq = '{}U'.format(int(1000000.0/frequency))  )
+        df.index = index
+
     return df 
 
 

@@ -2,12 +2,54 @@
 Different parser utils for detecting file patterns and extracting information from them. 
 """
 import os
+import datetime
+from collections import namedtuple
 
 from parsley import makeGrammar, ParseError
 from tweezer.ixo import get_subdirs, get_parent_directory, profile_this
 
 
-def parse_tweebot_datalog_pattern(file_name):
+def parse_tweebot_tdms_file_name(file_name):
+    """
+    Extract metadata from file name
+    
+    :param file_name: (path) name of a tweebot tdms file
+
+    :return FileInfo: (namedtuple) that carries the trial, subtrial and date of the corresponding tdms file
+    """
+    data_parser = makeGrammar("""
+        y = <digit{4}>:year -> int(year)
+        mo = <digit{2}>:month -> int(month)
+        d = <digit{2}>:day -> int(day)
+        h = <digit{2}>:hour -> int(hour)
+        mi = <digit{2}>:minute -> int(minute)
+        sc = <digit{2}>:second -> int(second)
+        t = <digit+>:trial -> str(trial)
+        sub = <letter{1}>:subtrial -> str(subtrial)
+        ext = '.' <'t' 'd' 'm' 's'>:ext -> str(ext)
+        s = '.' | '_' | ' '
+        pattern = (<t '_' sub> | t):name s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc ext -> (name, y, mo, d, h, mi, sc)
+    """, {})
+
+    file_info = namedtuple('FileInfo', ['trial', 'subtrial', 'date'])
+
+    try:
+        infos = data_parser(file_name).pattern()
+        if '_' in infos[0]:
+            trial, subtrial = infos[0].split('_')
+        else:
+            trial, subtrial = infos[0], None
+
+        date = datetime.datetime(*infos[1:7])
+        result = file_info(trial, subtrial, date)
+
+    except ParseError:
+        result = file_info(None, None, None)
+
+    return result
+
+
+def parse_tweebot_datalog_file_name(file_name):
     """
     Extracts useful information from a given file name. 
     
@@ -16,9 +58,7 @@ def parse_tweebot_datalog_pattern(file_name):
     :return match: (Boolean) True if the file_name pattern was found
 
     :return infos: (dict) Additional information stored in the file name
-
     """
-    
     data_parser = makeGrammar("""
         y = <digit{4}>:year -> int(year)
         mo = <digit{2}>:month -> int(month)
@@ -26,36 +66,40 @@ def parse_tweebot_datalog_pattern(file_name):
         h = <digit{2}>:hour -> int(hour)
         mi = <digit{2}>:minute -> int(minute)
         sc = <digit{2}>:second -> int(second)
-        t = <digit+>:trial -> int(trial)
+        t = <digit+>:trial -> str(trial)
+        sub = <letter{1}>:subtrial -> str(subtrial)
         ext = '.' <'t' 'x' 't'>:ext -> str(ext)
         n = <('D' | 'd') 'a' 't' 'a' 'l' 'o' 'g'>:name -> str(name)
         s = '.' | '_' | ' '
-        pattern = t:t s n:n s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s n ext:ext -> (t, n, y, mo, d, h, mi, sc, ext)
+        pattern = (<t '_' sub> | t):name s n s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s n ext -> (name, y, mo, d, h, mi, sc)
     """, {})
+
+    file_info = namedtuple('FileInfo', ['trial', 'subtrial', 'date'])
 
     try:
         infos = data_parser(file_name).pattern()
-        match = True
-    except ParseError, err:
-        print(err)
-        infos = None
-        match = False
+        if '_' in infos[0]:
+            trial, subtrial = infos[0].split('_')
+        else:
+            trial, subtrial = infos[0], None
 
-    return match, infos 
+        date = datetime.datetime(*infos[1:7])
+        result = file_info(trial, subtrial, date)
+
+    except ParseError:
+        result = file_info(None, None, None)
+
+    return result
 
 
-def parse_tweebot_files(file_path):
+def parse_tweebot_log_file_name(file_name):
     """
-    Extracts useful information from a given file name. 
+    Extract metadata from file name
     
-    :param String file_path: File path, including name of course, to be tested
-    
-    :return match: (Boolean) True if the file type could be determined
+    :param file_name: (path) name of a tweebot log file of type "18.TweeBotLog.2013.02.19.22.43.07.txt"
 
-    :return infos: (dict) Additional information stored in the file name
-
+    :return FileInfo: (namedtuple) that carries the trial, subtrial and date of the corresponding log file
     """
-    
     data_parser = makeGrammar("""
         y = <digit{4}>:year -> int(year)
         mo = <digit{2}>:month -> int(month)
@@ -63,20 +107,31 @@ def parse_tweebot_files(file_path):
         h = <digit{2}>:hour -> int(hour)
         mi = <digit{2}>:minute -> int(minute)
         sc = <digit{2}>:second -> int(second)
-        t = <digit+>:trial -> int(trial)
+        t = <digit+>:trial -> str(trial)
+        sub = <letter{1}>:subtrial -> str(subtrial)
+        twb = <('T' | 't') 'w' 'e' 'e' ('b' | 'B') 'o' 't'>:tweebot -> str(tweebot)
+        log = <twb ('L' | 'l') 'o' 'g'>:log -> str(log)
         ext = '.' <'t' 'x' 't'>:ext -> str(ext)
-        n = <('D' | 'd') 'a' 't' 'a' 'l' 'o' 'g'>:name -> str(name)
         s = '.' | '_' | ' '
-        pattern = t:t s n:n s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s n ext:ext -> (t, n, y, mo, d, h, mi, sc, ext)
+        pattern = (<t '_' sub> | t):name s log s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc ext -> (name, y, mo, d, h, mi, sc)
     """, {})
+
+    file_info = namedtuple('FileInfo', ['trial', 'subtrial', 'date'])
 
     try:
         infos = data_parser(file_name).pattern()
-        match = True
-    except ParseError, err:
-        match = False
+        if '_' in infos[0]:
+            trial, subtrial = infos[0].split('_')
+        else:
+            trial, subtrial = infos[0], None
 
-    return match, infos 
+        date = datetime.datetime(*infos[1:7])
+        result = file_info(trial, subtrial, date)
+
+    except ParseError:
+        result = file_info(None, None, None)
+
+    return result
 
 
 def classify(file_path):
@@ -91,7 +146,7 @@ def classify(file_path):
 
     try: 
         parent_dir = get_parent_directory(file_path)
-    except IndexError, e:
+    except IndexError:
         parent_dir = ''
 
     file_name = '/'.join([parent_dir, base_name])
