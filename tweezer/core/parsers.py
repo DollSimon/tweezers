@@ -8,6 +8,65 @@ from collections import namedtuple
 from parsley import makeGrammar, ParseError
 from tweezer.ixo import get_subdirs, get_parent_directory, profile_this
 
+def parse_tweezer_file_name(file_name, parser='bot_data'):
+    """
+    Extracts metadata from a tweezer file name
+    
+    :param file_name: (path) of the corresponding tweezer file
+
+    :param parser: (str) that specifies the file type to be parsed
+
+    :return FileInfo: (namedtuple) that carries the trial, subtrial and date of the corresponding tdms file
+    """
+    name = os.path.basename(file_name) 
+    file_info = namedtuple('FileInfo', ['trial', 'subtrial', 'date'])
+
+    base_grammar = makeGrammar("""
+        y = <digit{4}>:year -> int(year)
+        mo = <digit{2}>:month -> int(month)
+        d = <digit{2}>:day -> int(day)
+        h = <digit{2}>:hour -> int(hour)
+        mi = <digit{2}>:minute -> int(minute)
+        sc = <digit{2}>:second -> int(second)
+        t = <digit+>:trial -> str(trial)
+        sub = <letter{1}>:subtrial -> str(subtrial)
+        s = '.' | '_' | ' '
+    """, {})
+
+    if parser is 'bot_data':
+        name_parser = makeGrammar("""
+            n = <('D' | 'd') 'a' 't' 'a' 'l' 'o' 'g'>:name -> str(name)
+            ext = '.' <'t' 'x' 't'>:ext -> str(ext)
+            pattern = (<t '_' sub> | t):name s n s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s n ext -> (name, y, mo, d, h, mi, sc)
+            """, {}, extends = base_grammar)
+    elif parser is 'bot_log':
+        name_parser = makeGrammar("""
+            twb = <('T' | 't') 'w' 'e' 'e' ('b' | 'B') 'o' 't'>:tweebot -> str(tweebot)
+            log = <twb ('L' | 'l') 'o' 'g'>:log -> str(log)
+            ext = '.' <'t' 'x' 't'>:ext -> str(ext)
+            pattern = (<t '_' sub> | t):name s log s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc ext -> (name, y, mo, d, h, mi, sc)
+            """, {}, extends = base_grammar)
+    elif parser is 'bot_tdms':
+        name_parser = makeGrammar("""
+            ext = '.' <'t' 'd' 'm' 's'>:ext -> str(ext)
+            pattern = (<t '_' sub> | t):name s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc ext -> (name, y, mo, d, h, mi, sc)
+            """, {}, extends = base_grammar)
+
+    try:
+        infos = name_parser(name).pattern()
+        if '_' in infos[0]:
+            trial, subtrial = infos[0].split('_')
+        else:
+            trial, subtrial = infos[0], None
+
+        date = datetime.datetime(*infos[1:7])
+        result = file_info(trial, subtrial, date)
+
+    except ParseError:
+        result = file_info(None, None, None)
+
+    return result
+
 
 def parse_tweebot_tdms_file_name(file_name):
     """
@@ -69,7 +128,7 @@ def parse_tweebot_datalog_file_name(file_name):
         t = <digit+>:trial -> str(trial)
         sub = <letter{1}>:subtrial -> str(subtrial)
         ext = '.' <'t' 'x' 't'>:ext -> str(ext)
-        n = <('D' | 'd') 'a' 't' 'a' 'l' 'o' 'g'>:name -> str(name)
+        n = <('D' | 'd') 'a' 't' 'a' 'l' 'o' 'g'>:n -> str(n)
         s = '.' | '_' | ' '
         pattern = (<t '_' sub> | t):name s n s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s n ext -> (name, y, mo, d, h, mi, sc)
     """, {})

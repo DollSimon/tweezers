@@ -4,7 +4,7 @@ import re
 from collections import defaultdict
 from itertools import izip
 
-from tweezer.core.parsers import classify_all
+from tweezer.core.parsers import classify_all, parse_tweezer_file_name
 
 
 def list_tweezer_files(directory):
@@ -64,5 +64,27 @@ def collect_files_per_trial(files=defaultdict(list), trial=1, subtrial=None):
         else:
             if not trial_files.has_key(t):
                 trial_files[t].append(None)
+
+    return trial_files
+
+
+def sort_tweebot_trials(files=defaultdict(list), sort_by='bot_data'):
+    """
+    Sorts a dictionary of all tweezer files into a dictionary that splits according to all files found for specified key
+    
+    :param files: (defaultdict) of all files found in the current directory tree
+    :param sort_by: (str) specifying the file type to use for the sorting 
+
+    :return trial_files: (dict) of 
+    
+    .. note::
+
+        The reason for this is that there are many more log files written than data files. Like this you can either look at the successful trials or all trials, depending on your needs
+    """
+    trials = [int(parse_tweezer_file_name(f, parser=sort_by).trial) for f in files[sort_by]]
+
+    trial_files = {}
+    for t in trials:
+        trial_files[t] = collect_files_per_trial(files=files, trial=t)
 
     return trial_files
