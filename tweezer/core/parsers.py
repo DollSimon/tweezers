@@ -6,7 +6,7 @@ import datetime
 from collections import namedtuple
 
 from parsley import makeGrammar, ParseError
-from tweezer.ixo import get_subdirs, get_parent_directory, profile_this
+from tweezer.ixo import get_parent_directory
 
 def parse_tweezer_file_name(file_name, parser='bot_data'):
     """
@@ -51,6 +51,22 @@ def parse_tweezer_file_name(file_name, parser='bot_data'):
             ext = '.' <'t' 'd' 'm' 's'>:ext -> str(ext)
             pattern = (<t '_' sub> | t):name s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc ext -> (name, y, mo, d, h, mi, sc)
             """, {}, extends = base_grammar)
+    elif parser is 'bot_andor':
+        name_parser = makeGrammar("""
+            ms = <digit{2, 3}>:microsecond -> int(microsecond)
+            and = <'a' 'n' 'd' 'o' 'r'>:andor -> str(andor)
+            ssh = <('S' | 's') 'n' 'a' 'p' 's' 'h' 'o' 't'> 
+            ext = '.' <'p' 'n' 'g'>:ext -> str(ext)
+            pattern = (<t '_' sub> | t):name s ssh s{2} y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s ms:ms s and ext -> (name, y, mo, d, h, mi, sc, ms)
+            """, {}, extends = base_grammar)
+    elif parser is 'bot_ccd':
+        name_parser = makeGrammar("""
+            ms = <digit{2, 3}>:microsecond -> int(microsecond)
+            ccd = <'c' 'c' 'd'>:ccd -> str(ccd)
+            ssh = <('S' | 's') 'n' 'a' 'p' 's' 'h' 'o' 't'> 
+            ext = '.' <'p' 'n' 'g'>:ext -> str(ext)
+            pattern = (<t '_' sub> | t):name s ssh s{2} y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s ms:ms s ccd ext -> (name, y, mo, d, h, mi, sc, ms)
+            """, {}, extends = base_grammar)
 
     try:
         infos = name_parser(name).pattern()
@@ -59,7 +75,11 @@ def parse_tweezer_file_name(file_name, parser='bot_data'):
         else:
             trial, subtrial = infos[0], None
 
-        date = datetime.datetime(*infos[1:7])
+        try:
+            date = datetime.datetime(*infos[1:8])
+        except TypeError:
+            date = None
+
         result = file_info(trial, subtrial, date)
 
     except ParseError:
