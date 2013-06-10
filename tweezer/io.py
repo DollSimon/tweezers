@@ -10,8 +10,9 @@ import datetime
 import pandas as pd
 import numpy as np
 import datetime as dt
-import pytz
+import envoy
 from nptdms import TdmsFile
+
 
 from tweezer.ixo import TweebotDictionary
 from tweezer.core.parsers import parse_tweezer_file_name
@@ -21,10 +22,20 @@ def read_tweezer_txt(file_name):
     """
     Reads dual-trap data and metadata contained in text files
     """
+    # check file sanity and correct it if necessary
+    shell_call = envoy.run('tail -n 12 {}'.format(file_name), timeout=5)
+    if shell_call.status_code is 0:
+        tail = shell_call.std_out.split("\n")
+
+    if any([l.strip().startswith("#") for l in tail]):
+        is_file_sane = False 
+    else:
+        is_file_sane = True
+
     with open(file_name, 'r') as f:
         lines = f.readlines()
 
-    return lines
+    return lines, is_file_sane
 
 
 def read_tweebot_data(file_name, simplify_names=True):
@@ -106,12 +117,13 @@ def read_thermal_calibration(file_name, frequency=80000):
     time = [dt*i for i in xrange(nSamples)]
 
     # read header information
-    header_pos = [ind for ind, line in enumerate(fl[0:15]) if re.match('^\w', line)][-1]
+    header_pos = [ind for ind, line in enumerate(fl[0:15]) if re.match('^[a-zA-Z]', line.strip())][-1]
     header = fl[header_pos]
     columns = [col.replace('.', '_').strip() for col in header.strip().split('\t')]
 
-    # read files
-    ts = pd.read_table(file_name, sep='\t', skiprows=header_pos+1, 
+    data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
+    # read file data
+    ts = pd.read_table(file_name, sep='\t', skiprows=data_pos, 
         names=columns, header=None)
 
     # setting time as a data column and an index to be on the safe side
@@ -126,7 +138,81 @@ def read_thermal_calibration(file_name, frequency=80000):
 
 
 def read_tweezer_power_spectrum(file_name):
-    pass
+    """
+    Reads data from tweezer power spectrum file. These files are produced by LabView and contain the raw PSDs and the fits used to extract trap calibration results
+    
+    :param file_name: (path) file path to the tweezer power spectrum file
+
+    :return psd: (pandas.DataFrame) with all the raw and fitted data as well as the fit results
+    """
+    # get header information
+    with open(file_name, 'r') as f:
+        fl = f.readlines(1000)
+
+    # parsing header information
+    comments = [line.strip().strip("# ") for line in fl[0:40] if line.strip().startswith('#')] 
+
+    units = {}
+    fit_results = {}
+
+    for line in comments:
+        if 'Date' in line:
+            try:
+                date_string = line.split(": ")[-1].replace("\t", " ")
+                date = datetime.datetime.strptime(date_string, '%m/%d/%Y %H:%M %p') 
+            except:
+                date = datetime.datetime.now()
+        elif 'nSamples' in line:
+            try:
+                nSamples = int(float(line.strip().split(": ")[-1]))
+            except:
+                nSamples = 2**20
+        elif 'nBlocks' in line:
+            try:
+                nBlocks = int(float(line.strip().split(": ")[-1]))
+            except:
+                nBlocks = 128
+        elif 'sampleRate' in line:
+            try:
+                sampleRate = int(float(line.strip().split(": ")[-1]))
+            except:
+                sampleRate = 80000
+        else:
+            if ":" in line:
+                parts = line.split(": ")
+            elif re.search('\w\s(\d|-\d)', line):
+                parts = line.split(" ")
+
+            if "." in parts[0]:
+                var, unit, value = parts[0].split(".")[0], parts[0].split(".")[1], float(parts[1])
+            else:
+                var, unit, value = parts[0], None, float(parts[1])
+
+            units[var] = unit
+            fit_results[var] = value
+
+    # getting header and data
+    header_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[a-zA-Z]', line.strip())][-1]
+    header = fl[header_pos]
+    columns = [col.replace('.', '_').strip() for col in header.strip().split('\t')]
+
+    data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
+
+    # read file data
+    psd = pd.read_table(file_name, sep='\t', skiprows=data_pos, 
+        names=columns, header=None)
+
+    psd.date = date
+    psd.nSamples = nSamples
+    psd.nBlocks = nBlocks
+    psd.sampleRate = sampleRate
+
+    for k, v in fit_results.iteritems():
+        psd.__setattr__(k, v)
+
+    psd.units = units
+
+    return psd
 
 
 def simplify_tweebot_data_names(variable_names):

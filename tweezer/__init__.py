@@ -25,6 +25,8 @@ def path_to_sample_data(data_type = 'MAN_DATA'):
 
     if data_type == 'MAN_DATA':
         example_file = to_file(get_example_path('man_data'))
+    if data_type == 'BAD_MAN_DATA':
+        example_file = to_file(get_example_path('man_data'), location=-2)
     elif data_type == 'BOT_DATA':
         example_file = to_file(get_example_path('bot_data'))
     elif data_type == 'BOT_STATS':
