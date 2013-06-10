@@ -72,17 +72,61 @@ def read_tweebot_data(file_name, simplify_names=True):
     return df, calibration
 
 
-def read_thermal_calibration(file_name):
+def read_thermal_calibration(file_name, frequency=80000):
     """
     Reads time series and calculated power spectra of a thermal calibration.
-    """
-    if is_calibration_time_series(file_name):
 
-        print('Rocket!')
-    elif is_calibration_spectrum(file_name):
-        print('Rackoon!')
-    else:
-        print('Wrong file format or file type!')
+    :param file_name: (path) to the tweezer time series file containing the raw values of the PSD signals
+
+    :param frequency: (int) sampling frequency of time series
+    
+    :return ts: (pandas.DataFrame) with the raw thermal calibration data. The index is time.
+    
+    """
+    # get header information
+    with open(file_name, 'r') as f:
+        fl = f.readlines(1000)
+
+    # finding the date; if any error occurs take the current date and time
+    comments = [line for line in fl[0:15] if line.strip().startswith('#')] 
+
+    try:
+        date_string = [l.strip().replace("\t", " ").split(": ")[-1] for l in comments if 'Date' in l][0]
+        date = datetime.datetime.strptime(date_string, '%m/%d/%Y %H:%M %p')
+    except:
+        date = datetime.datetime.now()
+
+    try:
+        nSamples = int(float([l.strip().split(": ")[-1] for l in comments if 'samples' in l][0]))
+    except:
+        nSamples = 2**20
+
+    # time step in seconds
+    dt = 1.0/frequency
+    time = [dt*i for i in xrange(nSamples)]
+
+    # read header information
+    header_pos = [ind for ind, line in enumerate(fl[0:15]) if re.match('^\w', line)][-1]
+    header = fl[header_pos]
+    columns = [col.replace('.', '_').strip() for col in header.strip().split('\t')]
+
+    # read files
+    ts = pd.read_table(file_name, sep='\t', skiprows=header_pos+1, 
+        names=columns, header=None)
+
+    # setting time as a data column and an index to be on the safe side
+    ts['time'] = time
+    ts.index = time
+
+    # pass date as an attribute 
+    ts.date = date
+    ts.nSamples = nSamples
+
+    return ts
+
+
+def read_tweezer_power_spectrum(file_name):
+    pass
 
 
 def simplify_tweebot_data_names(variable_names):
@@ -326,139 +370,6 @@ def read_tweebot_data_header(datalog_file, dtype='DataFrame'):
     return column_names, calib_data, header_line
 
 
-def is_calibration_time_series(file_name):
-    """
-    Checks whether file is a tweezer thermal calibration time series.
+def gather_tweebot_data(trial=1, subtrial=None):
+    pass
 
-    Parameter:
-    """"""""""""
-      file_name:    File to check identity for.
-
-    Return:
-    """"""
-      result:   Boolean, True for tweezer time series of the form 'TS_1_a.txt' 
-    """
-    TIME_SERIES_PATTERN = re.compile(r'(TS)_(\w)*_*(\d)+_*(\w)*(.txt)', re.IGNORECASE)
-
-    if re.search(TIME_SERIES_PATTERN, file_name):
-        result = True
-    else:
-        result = False
-
-    return result 
-
-
-def is_calibration_spectrum(file_name):
-    """
-    Checks whether file is a tweezer thermal calibration power spectrum.
-
-    Parameter:
-    """"""""""""
-      file_name:    File to check identity for.
-
-    Return:
-    """"""
-      result:   Boolean, True for tweezer thermal calibration spectrum of the form 'PSD_1_a.txt'
-    """
-    SPECTRUM_PATTERN = re.compile(r'(PSD)_(\w)*_*(\d)+_*(\w)*(.txt)', re.IGNORECASE)
-
-    if re.search(SPECTRUM_PATTERN, file_name):
-        result = True
-    else:
-        result = False
-
-    return result 
-
-
-def is_tweebot_datalog(file_name):
-    """
-    Checks whether file is a tweebot datalog file.
-
-    Parameter:
-    """"""""""""
-      file_name:    File to check identity for.
-
-    Return:
-    """"""
-      result:   Boolean, True for TweeBot datalog files of the form '27.Datalog.2012.11.27.05.34.16.datalog.txt'
-    """
-    DATALOG_PATTERN = re.compile(r'(\d)+.(Datalog)(.\d+)+.(datalog)(.txt)', re.IGNORECASE)
-
-    if re.search(DATALOG_PATTERN, file_name):
-        result = True
-    else:
-        result = False
-
-    return result 
-
-
-def is_tweebot_stats(file_name):
-    """
-    Checks whether file is a tweebot statistics file.
-
-    Parameter:
-    """"""""""""
-      file_name:    File to check identity for.
-
-    Return:
-    """"""
-      result:   Boolean, True for TweeBot statistics files of the form '27.TweeBotStatss.txt'
-    """
-    STATS_PATTERN = re.compile(r'(\d)+.(TweeBotStats)(\w)*(.txt)', re.IGNORECASE)
-
-    if re.search(STATS_PATTERN, file_name):
-        result = True
-    else:
-        result = False
-
-    return result 
-
-
-def is_tweebot_log(file_name):
-    """
-    Checks whether file is a tweebot log file.
-
-    Parameter:
-    """"""""""""
-      file_name:    File to check identity for.
-
-    Return:
-    """"""
-      result:   Boolean, True for TweeBot log files of the form '27.TweeBotLog.2013.02.20.01.16.33.txt'
-    """
-    LOG_PATTERN = re.compile(r'(\d)+.(TweeBotLog)(.\d+)+(.txt)', re.IGNORECASE)
-
-    if re.search(LOG_PATTERN, file_name):
-        result = True
-    else:
-        result = False
-
-    return result 
-
-def is_tweezer_data(file_name):
-    """
-    Checks whether file is a tweezer data file (manually recorded).
-
-    Parameter:
-    """"""""""""
-      file_name:    File to check identity for.
-
-    Return:
-    """"""
-      result:   Boolean, True for Tweezer data files of the form 'pre_27_a.txt' in the 'data' directory.
-    """
-    DATA_PATTERN = re.compile(r'(\w*)_*(\d+)?_*(\w*)(.txt)', re.IGNORECASE)
-
-    if re.search(DATA_PATTERN, file_name):
-        result = True
-    else:
-        result = False
-
-    if 'PSD' in file_name:
-        result = False
-    elif 'TS' in file_name:
-        result = False
-    elif len(file_name.split('.')) > 2:
-        result = False
-
-    return result 

@@ -20,8 +20,8 @@ def path_to_sample_data(data_type = 'MAN_DATA'):
     """
     data_type = data_type.upper()
 
-    def to_file(path):
-        return os.path.join(path, os.listdir(path)[-1])
+    def to_file(path, location=-1):
+        return os.path.join(path, os.listdir(path)[location])
 
     if data_type == 'MAN_DATA':
         example_file = to_file(get_example_path('man_data'))
@@ -41,8 +41,10 @@ def path_to_sample_data(data_type = 'MAN_DATA'):
             example_file = "".join([os.path.splitext(example_file)[0], '.tdms'])
     elif data_type == 'MAN_DIST_CAL_':
         example_file = to_file(get_example_path('man_dist_cal'))
-    elif data_type == 'TC':
+    elif data_type == 'TC_TS':
         example_file = to_file(get_example_path('thermal_calibration'))
+    elif data_type == 'TC_PSD':
+        example_file = to_file(get_example_path('thermal_calibration'), location=-2)
     elif data_type == 'MAN_TRACK':
         example_file = to_file(get_example_path('man_track'))
     elif data_type == 'MAN_FLOW':
