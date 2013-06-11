@@ -166,8 +166,6 @@ def read_tweezer_txt(file_name):
     data.date = date
     data.hasErrors = hasErrors
 
-    # drop rows with "NaN" values
-    data
     return data
 
 
