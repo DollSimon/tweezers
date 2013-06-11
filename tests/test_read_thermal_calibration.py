@@ -22,10 +22,6 @@ def test_read_tweezer_power_spectrum():
     # units
     psd.units["yOffsetT1"].should.equal("V") 
     
-    
-    
-    
-    
 
 # Testing the test
 def main():

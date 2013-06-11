@@ -24,9 +24,9 @@ def path_to_sample_data(data_type = 'MAN_DATA'):
         return os.path.join(path, os.listdir(path)[location])
 
     if data_type == 'MAN_DATA':
-        example_file = to_file(get_example_path('man_data'))
-    if data_type == 'BAD_MAN_DATA':
         example_file = to_file(get_example_path('man_data'), location=-2)
+    elif data_type == 'BAD_MAN_DATA':
+        example_file = to_file(get_example_path('man_data'))
     elif data_type == 'BOT_DATA':
         example_file = to_file(get_example_path('bot_data'))
     elif data_type == 'BOT_STATS':
@@ -51,6 +51,8 @@ def path_to_sample_data(data_type = 'MAN_DATA'):
         example_file = to_file(get_example_path('man_track'))
     elif data_type == 'MAN_FLOW':
         example_file = to_file(get_example_path('man_flow'))
+    else:
+        example_file = "unknown"
 
     return example_file
 

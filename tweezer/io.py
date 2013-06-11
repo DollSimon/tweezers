@@ -26,16 +26,149 @@ def read_tweezer_txt(file_name):
     shell_call = envoy.run('tail -n 12 {}'.format(file_name), timeout=5)
     if shell_call.status_code is 0:
         tail = shell_call.std_out.split("\n")
+    else:
+        raise IOError("The file {} does not exist".format(file_name))
 
     if any([l.strip().startswith("#") for l in tail]):
-        is_file_sane = False 
+        isFileSane = False 
     else:
-        is_file_sane = True
+        isFileSane = True
 
     with open(file_name, 'r') as f:
-        lines = f.readlines()
+        fl = f.readlines(1000)
 
-    return lines, is_file_sane
+    # parsing header information
+    header_comments = [line.strip().strip("# ") for line in fl[0:40] if line.strip().startswith('#')] 
+    tail_comments = [line.strip().strip("# ") for line in tail[-10:] if line.strip().startswith('#')] 
+    comments = header_comments + tail_comments
+
+    units = {}
+    meta = {}
+
+    for line in comments:
+        if 'Date' in line:
+            date_string = line.split(": ")[-1].replace("\t", " ")
+        elif 'starttime' in line:
+            time_string = line.strip().split(": ")[-1]
+        elif 'Laser Diode Status' in line:
+            pass
+        elif 'thermal calibration' in line:
+            pass
+        elif 'data averaged to while-loop' in line:
+            if 'FALSE' in line:
+                isDataAveraged = False
+            else:
+                isDataAveraged = True
+
+            meta['isDataAveraged'] = isDataAveraged
+
+        elif 'errors' in line:
+            error_string = line.split(": ")[-1]
+            errors = [int(e) for e in error_string.split("\t")]
+            if any(errors):
+                hasErrors = True
+            else:
+                hasErrors = False
+
+            meta['errors'] = errors
+            meta['hasErrors'] = hasErrors
+
+        elif 'number of samples' in line:
+            try:
+                nSamples = int(float(line.strip().split(": ")[-1]))
+            except:
+                nSamples = 1
+
+            meta['nSamples'] = nSamples
+
+        elif 'duration of measurement' in line:
+            try:
+                duration = int(float(line.strip().split(": ")[-1]))
+            except:
+                duration = 0
+
+            units['duration'] = 's'
+            meta['duration'] = duration
+
+        elif 'sample rate' in line:
+            try:
+                rawSampleRate = int(float(line.strip().split(": ")[-1]))
+            except:
+                rawSampleRate = 10000
+
+            units['rawSampleRate'] = 'Hz'
+            meta['rawSampleRate'] = rawSampleRate
+
+        elif 'Laser Diode Operating Hours' in line:
+            try:
+                laserOperatingHours = round(float(line.strip().split(": ")[-1]))
+            except:
+                laserOperatingHours = 0
+
+            meta['laserOperatingHours'] = laserOperatingHours
+            units['laserOperatingHours'] = 'h'
+
+        elif 'Laser Diode Current' in line:
+            try:
+                laserCurrent = round(float(line.strip().split(": ")[-1]))
+            except:
+                laserCurrent = 0
+
+            meta['laserCurrent'] = laserCurrent
+            units['laserCurrent'] = 'A'
+
+        else:
+            if ":" in line:
+                parts = line.split(": ")
+            elif re.search('\w\s(\d|-\d)', line):
+                parts = line.split(" ")
+
+            if "." in parts[0]:
+                var, unit, value = parts[0].split(".")[0], parts[0].split(".")[1], float(parts[1])
+            else:
+                var, unit, value = parts[0], None, float(parts[1])
+
+            units[var] = unit
+            meta[var] = value
+
+    # parsing the date
+    if date_string and time_string:
+        combined_date = " ".join([date_string.strip(), time_string.strip()])
+        date = datetime.datetime.strptime(combined_date, '%m/%d/%Y %I:%M %p')
+    else:
+        date = datetime.datetime.now()
+
+    # getting header and data
+    header_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[a-zA-Z]', line.strip())][-1]
+    header = fl[header_pos]
+    column_precursor = [col.strip() for col in header.strip().split('\t')]
+
+    columns = []
+    for c in column_precursor:
+        if re.search('\(([a-zA-Z]+)\)', c):
+            name, unit = re.search('^(\w+)\s+\(([a-zA-Z]+)\)', c).groups()
+            columns.append(name)
+            units[name] = unit
+        else:
+            columns.append(c)
+
+    data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
+
+    data = pd.read_table(file_name, sep='\t', header=None, skiprows=data_pos,
+        names=columns)
+
+    # drop rows with "NaN" values
+    data = data.dropna()
+
+    # adding attributes
+    data.units = units
+    data.meta = meta
+    data.date = date
+    data.hasErrors = hasErrors
+
+    # drop rows with "NaN" values
+    data
+    return data
 
 
 def read_tweebot_data(file_name, simplify_names=True):
