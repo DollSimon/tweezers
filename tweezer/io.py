@@ -9,12 +9,11 @@ import datetime
 
 import pandas as pd
 import numpy as np
-import datetime as dt
 import envoy
 from nptdms import TdmsFile
 
 
-from tweezer.ixo import TweebotDictionary
+from tweezer.ixo import TweebotDictionary, extract_meta_and_units, simplify_tweebot_data_names
 from tweezer.core.parsers import parse_tweezer_file_name
 
 
@@ -42,101 +41,13 @@ def read_tweezer_txt(file_name):
     tail_comments = [line.strip().strip("# ") for line in tail[-10:] if line.strip().startswith('#')] 
     comments = header_comments + tail_comments
 
-    units = {}
-    meta = {}
+    CommentInfo = extract_meta_and_units(comments)
 
-    for line in comments:
-        if 'Date' in line:
-            date_string = line.split(": ")[-1].replace("\t", " ")
-        elif 'starttime' in line:
-            time_string = line.strip().split(": ")[-1]
-        elif 'Laser Diode Status' in line:
-            pass
-        elif 'thermal calibration' in line:
-            pass
-        elif 'data averaged to while-loop' in line:
-            if 'FALSE' in line:
-                isDataAveraged = False
-            else:
-                isDataAveraged = True
+    units = CommentInfo.units
+    meta = CommentInfo.metadata
 
-            meta['isDataAveraged'] = isDataAveraged
-
-        elif 'errors' in line:
-            error_string = line.split(": ")[-1]
-            errors = [int(e) for e in error_string.split("\t")]
-            if any(errors):
-                hasErrors = True
-            else:
-                hasErrors = False
-
-            meta['errors'] = errors
-            meta['hasErrors'] = hasErrors
-
-        elif 'number of samples' in line:
-            try:
-                nSamples = int(float(line.strip().split(": ")[-1]))
-            except:
-                nSamples = 1
-
-            meta['nSamples'] = nSamples
-
-        elif 'duration of measurement' in line:
-            try:
-                duration = int(float(line.strip().split(": ")[-1]))
-            except:
-                duration = 0
-
-            units['duration'] = 's'
-            meta['duration'] = duration
-
-        elif 'sample rate' in line:
-            try:
-                rawSampleRate = int(float(line.strip().split(": ")[-1]))
-            except:
-                rawSampleRate = 10000
-
-            units['rawSampleRate'] = 'Hz'
-            meta['rawSampleRate'] = rawSampleRate
-
-        elif 'Laser Diode Operating Hours' in line:
-            try:
-                laserOperatingHours = round(float(line.strip().split(": ")[-1]))
-            except:
-                laserOperatingHours = 0
-
-            meta['laserOperatingHours'] = laserOperatingHours
-            units['laserOperatingHours'] = 'h'
-
-        elif 'Laser Diode Current' in line:
-            try:
-                laserCurrent = round(float(line.strip().split(": ")[-1]))
-            except:
-                laserCurrent = 0
-
-            meta['laserCurrent'] = laserCurrent
-            units['laserCurrent'] = 'A'
-
-        else:
-            if ":" in line:
-                parts = line.split(": ")
-            elif re.search('\w\s(\d|-\d)', line):
-                parts = line.split(" ")
-
-            if "." in parts[0]:
-                var, unit, value = parts[0].split(".")[0], parts[0].split(".")[1], float(parts[1])
-            else:
-                var, unit, value = parts[0], None, float(parts[1])
-
-            units[var] = unit
-            meta[var] = value
-
-    # parsing the date
-    if date_string and time_string:
-        combined_date = " ".join([date_string.strip(), time_string.strip()])
-        date = datetime.datetime.strptime(combined_date, '%m/%d/%Y %I:%M %p')
-    else:
-        date = datetime.datetime.now()
+    meta['originalFile'] = file_name
+    meta['isFileSane'] = isFileSane
 
     # getting header and data
     header_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[a-zA-Z]', line.strip())][-1]
@@ -160,23 +71,34 @@ def read_tweezer_txt(file_name):
     # drop rows with "NaN" values
     data = data.dropna()
 
+    # creating index
+    time = pd.Series(meta['timeStep'] * np.array(xrange(0, len(data))))
+    data['time'] = time
+
+    data.set_index('time', inplace=True)
+
     # adding attributes
     data.units = units
     data.meta = meta
-    data.date = date
-    data.hasErrors = hasErrors
+    data.date = meta['date']
 
     return data
 
 
-def read_tweebot_data(file_name, simplify_names=True):
+def read_tweebot_data(file_name):
     """
     Reads dual-trap data and metadata from TweeBot datalog files.
 
     :param file_name: Path to the TweeBot datalog file.
-    :param simplify_names: (Bool) greatly simplifies the string representations of the varibles
 
-    :return df: Pandas DataFrame containing the recorded data
+    :return data: (pandas.DataFrame) contains redorded data and also meta data and units as attributes.
+
+    .. note::
+
+        Try things like data.units or data.meta to see what's available. Be
+        aware that pandas.DataFrames can mutate when certain actions and
+        computations are performed (for example shape changes). It's not clear
+        whether the units and meta attributes persist.
 
     :return calibration: Dictionary containing the metadata of the experiment
 
@@ -184,34 +106,56 @@ def read_tweebot_data(file_name, simplify_names=True):
 
     Usage
     """"""
-    >>> df, cal = read_tweebot_txt('27.Datalog.2013.02.17.19.42.09.datalog.txt')
+    >>> data = read_tweebot_txt('27.Datalog.2013.02.17.19.42.09.datalog.txt')
 
     .. note::
 
-        This function only works for TweeBot data files in the form of 2013
+        This function so far only works for TweeBot data files in the form of 2013
 
     """
-    column_names, calibration, header_line = read_tweebot_data_header(file_name)
+    # column_names, calibration, header_line = read_tweebot_data_header(file_name)
+    HeaderInfo = read_tweebot_data_header(file_name)
 
-    df = pd.read_table(file_name, header = header_line)
+    data = pd.read_table(file_name, header = HeaderInfo.header_pos)
 
     # get rid of unnamed and empty colums
-    df = df.dropna(axis = 1)
+    data = data.dropna(axis = 1)
+
+    # add attributes from file_name
+    FileInfo = parse_tweezer_file_name(file_name, parser='bot_data') 
+    data.date = FileInfo.date
+    data.trial = FileInfo.trial
+    data.subtrial = FileInfo.subtrial
 
     # set column names and index as time 
-    if simplify_names:
-        df.columns = simplify_tweebot_data_names(column_names)
+    data.columns, data.units = simplify_tweebot_data_names(HeaderInfo.column_names)
 
-    if 'Time sent (s)' in column_names:
-        dates = pd.DatetimeIndex([dt.datetime.fromtimestamp(time) for time in df['Time sent (s)']])
-        df.index = dates
-    elif 'timeSent' in column_names:
-        dates = pd.DatetimeIndex([dt.datetime.fromtimestamp(time) for time in df['timeSent']])
-        df.index = dates
+    # determine timeStep as the smallest nearest-neighbour difference between sent times
+    if 'timeSent' in data.columns:
+        timeStep = min([round(n, 6) for n in np.diff(data.timeSent.values)])
     else:
-        print("No time index set: Could not find column 'Time sent (s)' in data")
+        raise KeyError("Can't find *timeSent* column in the data frame...")
 
-    return df, calibration
+    data['time'] = np.float32(data.timeSent - min(data.timeSent))
+
+    totalDuration = round(max(data.timeSent) - min(data.timeSent), 5)
+
+    # creating time index frame
+    time = pd.DataFrame({'time': np.float32(np.arange(0.00, totalDuration + timeStep, timeStep))})
+
+    attributes = list(set(dir(data)) ^ set(dir(time)))
+
+    combi = pd.merge(time, data, how='outer') 
+    for a in attributes:
+        combi.__setattr__(a, data.__getattribute__(a))
+
+    # extracting meta data from calibration frame
+    combi.meta = HeaderInfo.metadata
+    combi.units.update(HeaderInfo.units)
+
+    combi.meta['timeStep'] = timeStep
+
+    return combi
 
 
 def read_thermal_calibration(file_name, frequency=80000):
@@ -346,112 +290,6 @@ def read_tweezer_power_spectrum(file_name):
     return psd
 
 
-def simplify_tweebot_data_names(variable_names):
-    v = variable_names
-    if 'Time sent (s)' in v:
-        v[v.index('Time sent (s)')] = 'timeSent'
-
-    if 'Time received (s)' in v:
-        v[v.index('Time received (s)')] = 'timeReceived'
-
-    if 'Experiment Phase (int)' in v:
-        v[v.index('Experiment Phase (int)')] = 'experimentPhase'
-
-    if 'Message index (int)' in v:
-        v[v.index('Message index (int)')] = 'mIndex'
-
-    if 'Extension from Trap and PSD positions (nm)' in v:
-        v[v.index('Extension from Trap and PSD positions (nm)')] = 'extensionTrap'
-
-    if 'Extension from image measurements (nm)' in v:
-        v[v.index('Extension from image measurements (nm)')] = 'extenstionImage'
-
-    if 'Force felt by AOD (pN)' in v:
-        v[v.index('Force felt by AOD (pN)')] = 'forceAod'
-
-    if 'Force felt by PM  (pN)' in v:
-        v[v.index('Force felt by PM  (pN)')] = 'forcePm'
-
-    if 'AOD to PM vector x (nm)' in v:
-        v[v.index('AOD to PM vector x (nm)')] = 'trapDistX'
-
-    if 'AOD to PM vector y (nm)' in v:
-        v[v.index('AOD to PM vector y (nm)')] = 'trapDistY'
-
-    if 'AODx (V)' in v:
-        v[v.index('AODx (V)')] = 'dispAodX'
-
-    if 'AODy (V)' in v:
-        v[v.index('AODy (V)')] = 'dispAodY'
-
-    if 'PMx (V)' in v:
-        v[v.index('PMx (V)')] = 'dispPmX'
-
-    if 'PMy (V)' in v:
-        v[v.index('PMy (V)')] = 'dispPmY'
-
-    if 'PMsensorx (V)' in v:
-        v[v.index('PMsensorx (V)')] = 'mirrorX'
-
-    if 'PMsensory (V)' in v:
-        v[v.index('PMsensory (V)')] = 'mirrorY'
-
-    if 'PMxdiff (V)' in v:
-        v[v.index('PMxdiff (V)')] = 'pmX'
-
-    if 'PMydiff (V)' in v:
-        v[v.index('PMydiff (V)')] = 'pmY'
-
-    if 'PMxsum (V)' in v:
-        v[v.index('PMxsum (V)')] = 'pmS'
-
-    if 'AODxdiff (V)' in v:
-        v[v.index('AODxdiff (V)')] = 'aodX'
-
-    if 'AODydiff (V)' in v:
-        v[v.index('AODydiff (V)')] = 'aodY'
-
-    if 'AODxsum (V)' in v:
-        v[v.index('AODxsum (V)')] = 'aodS'
-
-    if 'StageX (mm)' in v:
-        v[v.index('StageX (mm)')] = 'stageX'
-
-    if 'StageY (mm)' in v:
-        v[v.index('StageY (mm)')] = 'stageY'
-
-    if 'StageZ (mm)' in v:
-        v[v.index('StageZ (mm)')] = 'stageZ'
-
-    if 'Pressure (a.u.)' in v:
-        v[v.index('Pressure (a.u.)')] = 'pressure'
-
-    if 'FBx (V)' in v:
-        v[v.index('FBx (V)')] = 'fbX'
-
-    if 'FBy (V)' in v:
-        v[v.index('FBy (V)')] = 'fbY'
-
-    if 'FBsum(V)' in v:
-        v[v.index('FBsum (V)')] = 'fbZ'
-
-    return v
-
-
-def read_tweezer_mat(file_name):
-    """
-    Reads data from Matlab file
-    """
-    pass
-
-
-def read_tweezer_r(file_name):
-    """
-    Reads data from R file.
-    """
-    pass
-
-
 def read_tdms(file_name, frequency=1000):
     """
     Reads data from Labview TDMS file.
@@ -527,64 +365,48 @@ def read_tracking_data(file_name):
     return df
 
 
-def read_tweebot_data_header(datalog_file, dtype='DataFrame'):
+def read_tweebot_data_header(datalog_file):
     """
     Extracts the header of a Tweebot data log file as a list
 
     :param datalog_file : (path) Tweebot datalog file from which the header is extracted
 
-    :param dtype: (Str) specifies the return type of the calibration data, either 'DataFrame' (default) or 'Dict' or 'List'
-        
-
-    :return calib_data :    Calibration data - pandas DataFrame (default), dictionary or list
-
-    :return header_line :   Line of the header line with column names
+    :return HeaderInfo: (namedtuple) info container with fields 'column_names', 'metadata', 'units', and 'header_pos', 'data_pos'
 
     Usage:
     """"""
-    >>> col, cal, header_line = read_tweebot_data_header('27.Datalog.2013.02.17.19.42.09.datalog.txt')
-    >>> col, cal, header_line = read_tweebot_data_header('27.Datalog.2013.02.17.19.42.09.datalog.txt', calibration_as_dict = False)
+    >>> HeaderInfo = read_tweebot_data_header('27.Datalog.2013.02.17.19.42.09.datalog.txt')
     """
-    column_names = []
-    calibration_list = []
-    line_count = 0
-
-    dtype = dtype.upper()
-
     with open(datalog_file, 'r') as f:
+        fl = f.readlines(1000)
 
-        first_lines = f.readlines(6000)
+    # parsing header information
+    comments = [line.strip().strip("# ") for line in fl[0:50] if line.strip().startswith('#')] 
 
-        for line in first_lines:
+    CommentInfo = extract_meta_and_units(comments)
 
-            line_count += 1
+    units = CommentInfo.units
+    meta = CommentInfo.metadata
 
-            if 'Message' in line or 'Force' in line:
-                column_names = line.strip('\t\n\r').split('\t')
-                header_line = line_count
+    meta['originalFile'] = datalog_file
 
-            elif '#' in line[0:2] and ":" in line:
-                calibration_list.append(line.strip().strip('\t\n\r').strip('#').strip())
+    CommentInfo = extract_meta_and_units(comments)
+    meta = CommentInfo.metadata
+    units = CommentInfo.units
 
-    calib_data = OrderedDict()
+    # getting header and data
+    header_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[a-zA-Z]', line.strip())][-1]
+    header = fl[header_pos]
+    column_names = [col.strip() for col in header.strip().split('\t')]
 
-    for line in calibration_list:
-        try: 
-            calib_data[line.split(': ')[0]] = np.float32(line.split(': ')[1])
-        except ValueError:
-            calib_data[line.split(': ')[0]] = line.split(': ')[1]
+    data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
 
-    if dtype == 'DICT':
-        calib_data = TweebotDictionary(*calib_data.values())
-    elif dtype == 'DATAFRAME':
-        calib_data = TweebotDictionary(*calib_data.values())._asdict()
-        df = pd.DataFrame(dict(calib_data), columns=dict(calib_data).keys(), index=[1])
-        df['timeStep'] = df['deltaTime']
-        calib_data = df
-    else:
-        calib_data = calibration_list
+    HeaderInfo = namedtuple('HeaderInfo', ['column_names', 'metadata', 'units', 
+        'header_pos', 'data_pos'])
 
-    return column_names, calib_data, header_line
+    H = HeaderInfo(column_names, meta, units, header_pos, data_pos)
+
+    return H
 
 
 def gather_tweebot_data(trial=1, subtrial=None):

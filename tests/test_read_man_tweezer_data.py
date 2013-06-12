@@ -16,9 +16,11 @@ def test_read_proper_man_data_file():
 
     # check results
     good.date.should.equal(datetime.datetime(2013, 3, 14, 19, 5)) 
-    good.hasErrors.should.equal(False) 
     good.units['FBy'].should.equal('V')
-    
+
+    good.meta['recordingRate'].should.equal(1000)
+    good.units['recordingRate'].should.equal('Hz')
+
 
 def test_read_corrupted_man_data_file():
     # read file
@@ -26,9 +28,7 @@ def test_read_corrupted_man_data_file():
 
     # check results
     bad.date.should.equal(datetime.datetime(2013, 6, 7, 12, 48))
-    bad.hasErrors.should.equal(False) 
     bad.meta['duration'].should.equal(48)
-    import ipdb; ipdb.set_trace()
     
 
     

@@ -6,9 +6,13 @@ General utility functions used for tweezer package.
 
 """
 import os
+import re
 import cProfile
-import envoy
+import datetime
+import copy
 from collections import namedtuple
+
+import envoy
 
 
 def profile_this(fn):
@@ -135,7 +139,7 @@ class TweebotDictionary(namedtuple('TweebotDictionary', ['date',
         'pmDistanceConversionY',
         'aodBeadRadius',
         'pmBeadRadius',
-        'sampleRate',
+        'samplingRate',
         'nSamples',
         'deltaTime',
         'timeStep'])):
@@ -185,7 +189,7 @@ class TweebotDictionary(namedtuple('TweebotDictionary', ['date',
         pmDistanceConversionY=None,
         aodBeadRadius=None,
         pmBeadRadius=None,
-        sampleRate=None,
+        samplingRate=None,
         nSamples=None,
         deltaTime=None,
         timeStep=None):
@@ -229,7 +233,7 @@ class TweebotDictionary(namedtuple('TweebotDictionary', ['date',
         pmDistanceConversionY,
         aodBeadRadius,
         pmBeadRadius,
-        sampleRate,
+        samplingRate,
         nSamples,
         deltaTime,
         timeStep)
@@ -273,9 +277,9 @@ class TweezerUnits(TweebotDictionary):
             pmStiffnessY='pN/nm',
             pmDistanceConversionX='V/nm',
             pmDistanceConversionY='V/nm',
-            aodBeadRadius='um',
-            pmBeadRadius='um',
-            sampleRate='Hz',
+            aodBeadRadius='nm',
+            pmBeadRadius='nm',
+            samplingRate='Hz',
             nSamples='int',
             deltaTime='s',
             timeStep='s'):
@@ -319,7 +323,492 @@ class TweezerUnits(TweebotDictionary):
             pmDistanceConversionY,
             aodBeadRadius,
             pmBeadRadius,
-            sampleRate,
+            samplingRate,
             nSamples,
             deltaTime,
             timeStep)
+
+
+def extract_meta_and_units(comment_list, file_type='man_data'):
+    """
+    Extracts metadata and units from the comments in raw tweezer data files
+
+    :param comment_list: (list) List of strings that hold the raw comment lines
+
+    :param file_type: (str) identifies the file type for which meta and units are extracted
+
+    :return CommentInfo: (namedtuple) that holds dictionaries for metadata and units
+    """
+    units = {}
+    meta = {}
+
+    # set defaults
+    units['laserDiodeCurrent'] = 'A'
+    units['laserDiodeHours'] = 'h'
+    units['laserDiodeTemp'] = 'C'
+    units['viscosity'] = 'pN s / nm^2'
+
+    units['samplingRate'] = 'Hz'
+    units['recordingRate'] = 'Hz'
+    units['timeStep'] = 's'
+
+    units['aodDetectorOffsetX'] = 'V'
+    units['aodDetectorOffsetY'] = 'V'
+    units['pmDetectorOffsetX'] = 'V'
+    units['pmDetectorOffsetY'] = 'V'
+
+    units['pmDistanceConversionX'] = 'V/nm'
+    units['pmDistanceConversionY'] = 'V/nm'
+    units['aodDistanceConversionX'] = 'V/nm'
+    units['aodDistanceConversionY'] = 'V/nm'
+
+    units['pmDisplacementSensitivityX'] = 'V/nm'
+    units['pmDisplacementSensitivityY'] = 'V/nm'
+    units['aodDisplacementSensitivityX'] = 'V/nm'
+    units['aodDisplacementSensitivityY'] = 'V/nm'
+
+    units['pmStiffnessX'] = 'pN/nm'
+    units['pmStiffnessY'] = 'pN/nm'
+    units['aodStiffnessX'] = 'pN/nm'
+    units['aodStiffnessY'] = 'pN/nm'
+
+    units['pmBeadDiameter'] = 'nm'
+    units['aodBeadDiameter'] = 'nm'
+    units['pmBeadRadius'] = 'nm'
+    units['aodBeadRadius'] = 'nm'
+
+    meta['laserDiodeCurrent'] = None
+    meta['laserDiodeHours'] = None
+    meta['laserDiodeTemp'] = None
+    meta['viscosity'] = None
+
+    meta['aodDetectorOffsetX'] = None
+    meta['aodDetectorOffsetY'] = None
+    meta['pmDetectorOffsetX'] = None
+    meta['pmDetectorOffsetY'] = None
+
+    meta['pmDistanceConversionX'] = None
+    meta['pmDistanceConversionY'] = None
+    meta['aodDistanceConversionX'] = None
+    meta['aodDistanceConversionY'] = None
+
+    meta['pmDisplacementSensitivityX'] = None
+    meta['pmDisplacementSensitivityY'] = None
+    meta['aodDisplacementSensitivityX'] = None
+    meta['aodDisplacementSensitivityY'] = None
+
+    meta['pmStiffnessX'] = None
+    meta['pmStiffnessY'] = None
+    meta['aodStiffnessX'] = None
+    meta['aodStiffnessY'] = None
+
+    meta['pmBeadDiameter'] = None
+    meta['aodBeadDiameter'] = None
+    meta['pmBeadRadius'] = None
+    meta['pmBeadRadius'] = None
+
+    meta['timeStep'] = None
+    meta['samplingRate'] = None
+    meta['recordingRate'] = None
+
+    for line in comment_list:
+        if 'Date' in line:
+            date_string = line.split(": ")[-1].replace("\t", " ")
+        elif 'starttime' in line:
+            time_string = line.strip().split(": ")[-1]
+        elif 'Time of Experiment' in line:
+            time_string = None
+        elif 'Laser Diode Status' in line:
+            pass
+        elif 'thermal calibration' in line:
+            pass
+        elif 'data averaged to while-loop' in line:
+            if 'FALSE' in line:
+                isDataAveraged = False
+            else:
+                isDataAveraged = True
+
+            meta['isDataAveraged'] = isDataAveraged
+
+        elif 'errors' in line:
+            error_string = line.split(": ")[-1]
+            errors = [int(e) for e in error_string.split("\t")]
+            if any(errors):
+                hasErrors = True
+            else:
+                hasErrors = False
+
+            meta['errors'] = errors
+            meta['hasErrors'] = hasErrors
+
+        elif 'number of samples' in line:
+            try:
+                nSamples = int(float(line.strip().split(": ")[-1]))
+            except:
+                nSamples = 1
+
+            meta['nSamples'] = nSamples
+
+        elif 'sample rate' in line:
+            try:
+                samplingRate = int(float(line.strip().split(": ")[-1]))
+            except:
+                samplingRate = 10000
+
+            meta['samplingRate'] = samplingRate
+
+        elif 'rate of while-loop' in line:
+            try:
+                recordingRate = int(float(line.strip().split(": ")[-1]))
+            except:
+                recordingRate = 10000
+
+            meta['recordingRate'] = recordingRate
+
+        elif 'duration of measurement' in line:
+            try:
+                duration = int(float(line.strip().split(": ")[-1]))
+            except:
+                duration = 0
+
+            units['duration'] = 's'
+            meta['duration'] = duration
+
+        elif 'AOD detector horizontal offset' in line:
+            try:
+                aodDetectorOffsetX = float(line.strip().split(": ")[-1])
+            except:
+                aodDetectorOffsetX = 0
+
+            units['aodDetectorOffsetX'] = 'V'
+            meta['aodDetectorOffsetX'] = aodDetectorOffsetX
+
+        elif 'AOD detector vertical offset' in line:
+            try:
+                aodDetectorOffsetY = float(line.strip().split(": ")[-1])
+            except:
+                aodDetectorOffsetY = 0
+
+            units['aodDetectorOffsetY'] = 'V'
+            meta['aodDetectorOffsetY'] = aodDetectorOffsetY
+
+        elif 'PM detector horizontal offset' in line:
+            try:
+                pmDetectorOffsetX = float(line.strip().split(": ")[-1])
+            except:
+                pmDetectorOffsetX = 0
+
+            units['pmDetectorOffsetX'] = 'V'
+            meta['pmDetectorOffsetX'] = pmDetectorOffsetX
+
+        elif 'PM detector vertical offset' in line:
+            try:
+                pmDetectorOffsetY = float(line.strip().split(": ")[-1])
+            except:
+                pmDetectorOffsetY = 0
+
+            units['pmDetectorOffsetY'] = 'V'
+            meta['pmDetectorOffsetY'] = pmDetectorOffsetY
+
+        elif 'PM horizontal trap stiffness' in line:
+            try:
+                pmStiffnessX = float(line.strip().split(": ")[-1])
+            except:
+                pmStiffnessX = None
+
+            meta['pmStiffnessX'] = pmStiffnessX
+
+        elif 'PM vertical trap stiffness' in line:
+            try:
+                pmStiffnessY = float(line.strip().split(": ")[-1])
+            except:
+                pmStiffnessY = None
+
+            meta['pmStiffnessY'] = pmStiffnessY
+            
+        elif 'AOD horizontal trap stiffness' in line:
+            try:
+                aodStiffnessX = float(line.strip().split(": ")[-1])
+            except:
+                aodStiffnessX = None
+
+            meta['aodStiffnessX'] = aodStiffnessX
+            
+        elif 'AOD vertical trap stiffness' in line:
+            try:
+                aodStiffnessY = float(line.strip().split(": ")[-1])
+            except:
+                aodStiffnessY = None
+
+            meta['aodStiffnessY'] = aodStiffnessY
+            
+        elif 'PM horizontal OLS' in line:
+            try:
+                pmDisplacementSensitivityX = float(line.strip().split(": ")[-1])
+            except:
+                pmDisplacementSensitivityX = None
+
+            meta['pmDisplacementSensitivityX'] = pmDisplacementSensitivityX
+            meta['pmDistanceConversionX'] = pmDisplacementSensitivityX
+            
+        elif 'PM vertical OLS' in line:
+            try:
+                pmDisplacementSensitivityY = float(line.strip().split(": ")[-1])
+            except:
+                pmDisplacementSensitivityY = None
+
+            meta['pmDisplacementSensitivityY'] = pmDisplacementSensitivityY
+            meta['pmDistanceConversionY'] = pmDisplacementSensitivityY
+            
+        elif 'AOD horizontal OLS' in line:
+            try:
+                aodDisplacementSensitivityX = float(line.strip().split(": ")[-1])
+            except:
+                aodDisplacementSensitivityX = None
+
+            meta['aodDisplacementSensitivityX'] = aodDisplacementSensitivityX
+            meta['aodDistanceConversionX'] = aodDisplacementSensitivityX
+            
+        elif 'AOD vertical OLS' in line:
+            try:
+                aodDisplacementSensitivityY = float(line.strip().split(": ")[-1])
+            except:
+                aodDisplacementSensitivityY = None
+
+            meta['aodDisplacementSensitivityY'] = aodDisplacementSensitivityY
+            meta['aodDistanceConversionY'] = aodDisplacementSensitivityY
+            
+        elif 'Viscosity' in line:
+            try:
+                viscosity = float(line.strip().split(": ")[-1])
+            except:
+                viscosity = 0.8902e-9 # viscosity of water @ 25C
+
+            units['viscosity'] = 'pN s / nm^2'
+            meta['viscosity'] = viscosity
+
+        elif 'dt ' in line:
+            try:
+                dt = float(line.strip().split(": ")[-1])
+            except:
+                dt = 0.0010
+
+            units['dt'] = units['timeStep'] = 's'
+            meta['dt'] = meta['timeStep'] = dt 
+
+        elif 'PM bead diameter' in line:
+            try:
+                pmBeadDiameter = float(line.strip().split(": ")[-1])
+                if pmBeadDiameter < 20:
+                    pmBeadDiameter = pmBeadDiameter * 1000
+                elif '(um)' in line:
+                    pmBeadDiameter = pmBeadDiameter * 1000
+            except:
+                pmBeadDiameter = 0
+
+            pmBeadRadius = pmBeadDiameter / 2.0
+
+            meta['pmBeadDiameter'] = pmBeadDiameter
+            meta['pmBeadRadius'] = pmBeadRadius
+
+        elif 'AOD bead diameter' in line:
+            try:
+                aodBeadDiameter = float(line.strip().split(": ")[-1])
+                if aodBeadDiameter < 20:
+                    aodBeadDiameter = aodBeadDiameter * 1000
+                elif '(um)' in line:
+                    aodBeadDiameter = aodBeadDiameter * 1000
+            except:
+                aodBeadDiameter = 0
+
+            aodBeadRadius = aodBeadDiameter / 2.0
+
+            meta['aodBeadDiameter'] = aodBeadDiameter
+            meta['aodBeadRadius'] = aodBeadRadius
+            
+        elif 'Laser Diode Operating Hours' in line:
+            try:
+                laserDiodeHours = round(float(line.strip().split(": ")[-1]))
+            except:
+                laserDiodeHours = 0
+
+            meta['laserDiodeHours'] = laserDiodeHours
+            units['laserDiodeHours'] = 'h'
+
+        elif 'Laser Diode Current' in line:
+            try:
+                laserDiodeCurrent = round(float(line.strip().split(": ")[-1]))
+            except:
+                laserDiodeCurrent = 0
+
+            meta['laserDiodeCurrent'] = laserDiodeCurrent
+            units['laserDiodeCurrent'] = 'A'
+
+        elif 'Laser Diode Temp' in line:
+            try:
+                laserDiodeTemp = round(float(line.strip().split(": ")[-1]))
+            except:
+                laserDiodeTemp = 0
+
+            meta['laserDiodeTemp'] = laserDiodeTemp
+            units['laserDiodeTemp'] = 'C'
+
+        else:
+            if ":" in line:
+                parts = line.split(": ")
+            elif re.search('\w\s(\d|-\d)', line):
+                parts = line.split(" ")
+
+            if "." in parts[0]:
+                var, unit, value = parts[0].split(".")[0], parts[0].split(".")[1], float(parts[1])
+            else:
+                var, unit, value = parts[0], None, float(parts[1])
+
+            units[var] = unit
+            meta[var] = value
+
+    # parsing the date
+    if date_string and time_string:
+        combined_date = " ".join([date_string.strip(), time_string.strip()])
+        date = datetime.datetime.strptime(combined_date, '%m/%d/%Y %I:%M %p')
+    else:
+        date = datetime.datetime.now()
+
+    meta['date'] = date
+
+    CommentInfo = namedtuple('CommentInfo', ['metadata', 'units'])
+    C = CommentInfo(meta, units)
+
+    return C
+
+
+def simplify_tweebot_data_names(variable_names):
+    """
+    Extracts tweebot variable names from a list of variables and substitutes them for common tweezer nomenclature
+    
+    :param variable_names: (list) with variable names as read by tweebot datalog reader
+
+    :return names: (list) new list with simpler variable names
+
+    :return units: (dict) with the corresponding units of the variable names
+    """
+    units = {}
+    names = copy.copy(variable_names)
+    if 'Time sent (s)' in names:
+        names[names.index('Time sent (s)')] = 'timeSent'
+        units['timeSent'] = 's'
+
+    if 'Time received (s)' in names:
+        names[names.index('Time received (s)')] = 'timeReceived'
+        units['timeReceived'] = 's'
+
+    if 'Experiment Phase (int)' in names:
+        names[names.index('Experiment Phase (int)')] = 'experimentPhase'
+        units['experimentPhase'] = 'int'
+
+    if 'Message index (int)' in names:
+        names[names.index('Message index (int)')] = 'mIndex'
+        units['mIndex'] = None
+
+    if 'Extension from Trap and PSD positions (nm)' in names:
+        names[names.index('Extension from Trap and PSD positions (nm)')] = 'extensionByTrap'
+        units['extensionByTrap'] = 'nm'
+
+    if 'Extension from image measurements (nm)' in names:
+        names[names.index('Extension from image measurements (nm)')] = 'extenstionByImage'
+        units['extenstionByImage'] = 'nm'
+
+    if 'Force felt by AOD (pN)' in names:
+        names[names.index('Force felt by AOD (pN)')] = 'forceAod'
+        units['forceAod'] = 'pN'
+
+    if 'Force felt by PM  (pN)' in names:
+        names[names.index('Force felt by PM  (pN)')] = 'forcePm'
+        units['forcePm'] = 'pN'
+
+    if 'AOD to PM vector x (nm)' in names:
+        names[names.index('AOD to PM vector x (nm)')] = 'trapSeparationX'
+        units['trapSeparationX'] = 'nm'
+
+    if 'AOD to PM vector y (nm)' in names:
+        names[names.index('AOD to PM vector y (nm)')] = 'trapSeparationY'
+        units['trapSeparationY'] = 'nm'
+
+    if 'AODx (V)' in names:
+        names[names.index('AODx (V)')] = 'dispAodX'
+        units['dispAodX'] = 'V'
+
+    if 'AODy (V)' in names:
+        names[names.index('AODy (V)')] = 'dispAodY'
+        units['dispAodX'] = 'V'
+
+    if 'PMx (V)' in names:
+        names[names.index('PMx (V)')] = 'dispPmX'
+        units['dispPmX'] = 'V'
+
+    if 'PMy (V)' in names:
+        names[names.index('PMy (V)')] = 'dispPmY'
+        units['dispPmY'] = 'V'
+
+    if 'PMsensorx (V)' in names:
+        names[names.index('PMsensorx (V)')] = 'mirrorX'
+        units['mirrorX'] = 'V'
+
+    if 'PMsensory (V)' in names:
+        names[names.index('PMsensory (V)')] = 'mirrorY'
+        units['mirrorY'] = 'V'
+
+    if 'PMxdiff (V)' in names:
+        names[names.index('PMxdiff (V)')] = 'pmX'
+        units['pmX'] = 'V'
+
+    if 'PMydiff (V)' in names:
+        names[names.index('PMydiff (V)')] = 'pmY'
+        units['pmY'] = 'V'
+
+    if 'PMxsum (V)' in names:
+        names[names.index('PMxsum (V)')] = 'pmSum'
+        units['pmSum'] = 'V'
+
+    if 'AODxdiff (V)' in names:
+        names[names.index('AODxdiff (V)')] = 'aodX'
+        units['aodX'] = 'V'
+
+    if 'AODydiff (V)' in names:
+        names[names.index('AODydiff (V)')] = 'aodY'
+        units['aodY'] = 'V'
+
+    if 'AODxsum (V)' in names:
+        names[names.index('AODxsum (V)')] = 'aodSum'
+        units['aodSum'] = 'V'
+
+    if 'StageX (mm)' in names:
+        names[names.index('StageX (mm)')] = 'stageX'
+        units['stageX'] = 'nm'
+
+    if 'StageY (mm)' in names:
+        names[names.index('StageY (mm)')] = 'stageY'
+        units['stageY'] = 'nm'
+
+    if 'StageZ (mm)' in names:
+        names[names.index('StageZ (mm)')] = 'stageZ'
+        units['stageZ'] = 'nm'
+
+    if 'Pressure (a.u.)' in names:
+        names[names.index('Pressure (a.u.)')] = 'pressure'
+        units['pressure'] = 'a.u.'
+
+    if 'FBx (V)' in names:
+        names[names.index('FBx (V)')] = 'fbX'
+        units['fbX'] = 'V'
+
+    if 'FBy (V)' in names:
+        names[names.index('FBy (V)')] = 'fbY'
+        units['fbY'] = 'V'
+
+    if 'FBsum(V)' in names:
+        names[names.index('FBsum (V)')] = 'fbZ'
+        units['fbZ'] = 'V'
+
+    return names, units
+
