@@ -5,10 +5,13 @@ Performs file reads and data conversion.
 """
 import re
 from collections import namedtuple, OrderedDict
-import datetime
+from datetime import datetime, timedelta
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+from pandas.core.datetools import Milli, Micro
+
+
 import envoy
 from nptdms import TdmsFile
 
@@ -116,46 +119,48 @@ def read_tweebot_data(file_name):
     # column_names, calibration, header_line = read_tweebot_data_header(file_name)
     HeaderInfo = read_tweebot_data_header(file_name)
 
-    data = pd.read_table(file_name, header = HeaderInfo.header_pos)
+    _data = pd.read_table(file_name, header = HeaderInfo.header_pos)
 
     # get rid of unnamed and empty colums
-    data = data.dropna(axis = 1)
+    _data = _data.dropna(axis = 1)
 
     # add attributes from file_name
     FileInfo = parse_tweezer_file_name(file_name, parser='bot_data') 
-    data.date = FileInfo.date
-    data.trial = FileInfo.trial
-    data.subtrial = FileInfo.subtrial
+    _data.date = FileInfo.date
+    _data.trial = FileInfo.trial
+    _data.subtrial = FileInfo.subtrial
 
     # set column names and index as time 
-    data.columns, data.units = simplify_tweebot_data_names(HeaderInfo.column_names)
+    _data.columns, _data.units = simplify_tweebot_data_names(HeaderInfo.column_names)
 
     # determine timeStep as the smallest nearest-neighbour difference between sent times
-    if 'timeSent' in data.columns:
-        timeStep = min([round(n, 6) for n in np.diff(data.timeSent.values)])
+    if 'timeSent' in _data.columns:
+        timeStep = Micro(1e6 * min([round(n, 6) for n in np.diff(_data.timeSent.values)]))
     else:
-        raise KeyError("Can't find *timeSent* column in the data frame...")
+        raise KeyError("Can't find *timeSent* column in the _data frame...")
 
-    data['time'] = np.float32(data.timeSent - min(data.timeSent))
+    _data['relativeTime'] = np.float32(_data.timeSent - min(_data.timeSent))
+    _data['time'] = [_data.date + timedelta(seconds=round(s, 6)) for s in _data.relativeTime.values]
 
-    totalDuration = round(max(data.timeSent) - min(data.timeSent), 5)
+    _data.index = _data.time.values
+    data = _data.asfreq(timeStep).drop(['time', 'relativeTime'], axis=1)
 
     # creating time index frame
-    time = pd.DataFrame({'time': np.float32(np.arange(0.00, totalDuration + timeStep, timeStep))})
+    attributes = list(set(dir(data)) ^ set(dir(_data)))
 
-    attributes = list(set(dir(data)) ^ set(dir(time)))
-
-    combi = pd.merge(time, data, how='outer') 
     for a in attributes:
-        combi.__setattr__(a, data.__getattribute__(a))
+        data.__setattr__(a, _data.__getattribute__(a))
+
+    # clean old frame
+    del _data
 
     # extracting meta data from calibration frame
-    combi.meta = HeaderInfo.metadata
-    combi.units.update(HeaderInfo.units)
+    data.meta = HeaderInfo.metadata
+    data.units.update(HeaderInfo.units)
 
-    combi.meta['timeStep'] = timeStep
+    data.meta['timeStep'] = timeStep
 
-    return combi
+    return data
 
 
 def read_thermal_calibration(file_name, frequency=80000):
@@ -178,9 +183,9 @@ def read_thermal_calibration(file_name, frequency=80000):
 
     try:
         date_string = [l.strip().replace("\t", " ").split(": ")[-1] for l in comments if 'Date' in l][0]
-        date = datetime.datetime.strptime(date_string, '%m/%d/%Y %H:%M %p')
+        date = datetime.strptime(date_string, '%m/%d/%Y %H:%M %p')
     except:
-        date = datetime.datetime.now()
+        date = datetime.now()
 
     try:
         nSamples = int(float([l.strip().split(": ")[-1] for l in comments if 'samples' in l][0]))
@@ -234,9 +239,9 @@ def read_tweezer_power_spectrum(file_name):
         if 'Date' in line:
             try:
                 date_string = line.split(": ")[-1].replace("\t", " ")
-                date = datetime.datetime.strptime(date_string, '%m/%d/%Y %H:%M %p') 
+                date = datetime.strptime(date_string, '%m/%d/%Y %H:%M %p') 
             except:
-                date = datetime.datetime.now()
+                date = datetime.now()
         elif 'nSamples' in line:
             try:
                 nSamples = int(float(line.strip().split(": ")[-1]))
@@ -327,7 +332,7 @@ def read_tdms(file_name, frequency=1000):
         index = pd.date_range(start = info.date, periods = len(df), freq = '{}U'.format(int(1000000.0/frequency)))
         df.index = index
     else:
-        index = pd.date_range(start = datetime.datetime.now(), periods = len(df), freq = '{}U'.format(int(1000000.0/frequency))  )
+        index = pd.date_range(start = datetime.now(), periods = len(df), freq = '{}U'.format(int(1000000.0/frequency))  )
         df.index = index
 
     return df 

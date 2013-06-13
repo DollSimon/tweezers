@@ -12,6 +12,7 @@ import datetime
 import copy
 from collections import namedtuple
 
+import numpy as np
 import envoy
 
 
@@ -377,6 +378,47 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
     units['pmBeadRadius'] = 'nm'
     units['aodBeadRadius'] = 'nm'
 
+    units['laserDiodeTemp'] = 'C' 
+    units['laserDiodeHours'] = 'h'
+    units['laserDiodeCurrent'] = 'A'
+    units['andorAodCenterX'] = 'px'
+    units['andorAodCenterY'] = 'px'
+    units['andorAodRangeX'] = 'px'
+    units['andorAodRangeY'] = 'px'
+    units['ccdAodCenterX'] = 'px'
+    units['ccdAodCenterY'] = 'px'
+    units['ccdAodRangeX'] = 'px'
+    units['ccdAodRangeY'] = 'px'
+    units['andorPmCenterX'] = 'px'
+    units['andorPmCenterY'] = 'px'
+    units['andorPmRangeX'] = 'px'
+    units['andorPmRangeY'] = 'px'
+    units['ccdPmCenterX'] = 'px'
+    units['ccdPmCenterY'] = 'px'
+    units['ccdPmRangeX'] = 'px'
+    units['ccdPmRangeY'] = 'px'
+    units['andorPixelSizeX'] = 'nm'
+    units['andorPixelSizeY'] = 'nm'
+    units['ccdPixelSizeX'] = 'nm'
+    units['ccdPixelSizeY'] = 'nm'
+    units['aodDetectorOffsetX'] = 'V'
+    units['aodDetectorOffsetY'] = 'V'
+    units['aodStiffnessX'] = 'pN/nm'
+    units['aodStiffnessY'] = 'pN/nm'
+    units['aodDistanceConversionX'] = 'V/nm'
+    units['aodDistanceConversionY'] = 'V/nm'
+    units['pmDetectorOffsetX'] = 'V'
+    units['pmDetectorOffsetY'] = 'V'
+    units['pmStiffnessX'] = 'pN/nm'
+    units['pmStiffnessY'] = 'pN/nm'
+    units['pmDistanceConversionX'] = 'V/nm'
+    units['pmDistanceConversionY'] = 'V/nm'
+    units['aodBeadRadius'] = 'nm'
+    units['pmBeadRadius'] = 'nm'
+    units['samplingRate'] = 'Hz'
+    units['nSamples'] = 'int'
+    units['deltaTime'] = 's'
+
     meta['laserDiodeCurrent'] = None
     meta['laserDiodeHours'] = None
     meta['laserDiodeTemp'] = None
@@ -410,6 +452,36 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
     meta['timeStep'] = None
     meta['samplingRate'] = None
     meta['recordingRate'] = None
+
+    meta['andorAodCenterX'] = None
+    meta['andorAodCenterY'] = None
+    meta['andorAodRangeX'] = None
+    meta['andorAodRangeY'] = None
+
+    meta['ccdAodCenterX'] = None
+    meta['ccdAodCenterY'] = None
+    meta['ccdAodRangeX'] = None
+    meta['ccdAodRangeY'] = None
+
+    meta['andorPmCenterX'] = None
+    meta['andorPmCenterY'] = None
+    meta['andorPmRangeX'] = None
+    meta['andorPmRangeY'] = None
+
+    meta['ccdPmCenterX'] = None
+    meta['ccdPmCenterY'] = None
+    meta['ccdPmRangeX'] = None
+    meta['ccdPmRangeY'] = None
+
+    meta['andorPixelSizeX'] = None
+    meta['andorPixelSizeY'] = None
+
+    meta['ccdPixelSizeX'] = None
+    meta['ccdPixelSizeY'] = None
+
+    meta['samplingRate'] = None
+    meta['nSamples'] = None
+    meta['deltaTime'] = None
 
     for line in comment_list:
         if 'Date' in line:
@@ -625,7 +697,189 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             meta['aodBeadDiameter'] = aodBeadDiameter
             meta['aodBeadRadius'] = aodBeadRadius
-            
+
+        elif 'Laser Diode Temp' in line:
+            laserDiodeTemp = float(line.strip().split(": ")[-1])
+            meta['laserDiodeTemp'] = laserDiodeTemp
+
+        elif 'Laser Diode Operating Hours' in line:
+            laserDiodeHours = float(line.strip().split(": ")[-1])
+            meta['laserDiodeHours'] = laserDiodeHours
+
+        elif 'Laser Diode Current' in line:
+            laserDiodeCurrent = float(line.strip().split(": ")[-1])
+            meta['laserDiodeCurrent'] = laserDiodeCurrent
+
+        elif 'AOD ANDOR center x' in line:
+            andorAodCenterX = float(line.strip().split(": ")[-1])
+            meta['andorAodCenterX'] = andorAodCenterX
+
+        elif 'AOD ANDOR center y' in line:
+            andorAodCenterY = float(line.strip().split(": ")[-1])
+            meta['andorAodCenterY'] = andorAodCenterY
+
+        elif 'AOD ANDOR range x' in line:
+            andorAodRangeX = float(line.strip().split(": ")[-1])
+            meta['andorAodRangeX'] = andorAodRangeX
+
+        elif 'AOD ANDOR range y' in line:
+            andorAodRangeY = float(line.strip().split(": ")[-1])
+            meta['andorAodRangeY'] = andorAodRangeY
+
+        elif 'AOD CCD center x' in line:
+            ccdAodCenterX = float(line.strip().split(": ")[-1])
+            meta['ccdAodCenterX'] = ccdAodCenterX
+
+        elif 'AOD CCD center y' in line:
+            ccdAodCenterY = float(line.strip().split(": ")[-1])
+            meta['ccdAodCenterY'] = ccdAodCenterY
+
+        elif 'AOD CCD range x' in line:
+            ccdAodRangeX = float(line.strip().split(": ")[-1])
+            meta['ccdAodRangeX'] = ccdAodRangeX
+
+        elif 'AOD CCD range y' in line:
+            ccdAodRangeY = float(line.strip().split(": ")[-1])
+            meta['ccdAodRangeY'] = ccdAodRangeY
+
+        elif 'PM ANDOR center x' in line:
+            andorPmCenterX = float(line.strip().split(": ")[-1])
+            meta['andorPmCenterX'] = andorPmCenterX
+
+        elif 'PM ANDOR center y' in line:
+            andorPmCenterY = float(line.strip().split(": ")[-1])
+            meta['andorPmCenterY'] = andorPmCenterY
+
+        elif 'PM ANDOR range x' in line:
+            andorPmRangeX = float(line.strip().split(": ")[-1])
+            meta['andorPmRangeX'] = andorPmRangeX
+
+        elif 'PM ANDOR range y' in line:
+            andorPmRangeY = float(line.strip().split(": ")[-1])
+            meta['andorPmRangeY'] = andorPmRangeY
+
+        elif 'PM CCD center x' in line:
+            ccdPmCenterX = float(line.strip().split(": ")[-1])
+            meta['ccdPmCenterX'] = ccdPmCenterX
+
+        elif 'PM CCD center y' in line:
+            ccdPmCenterY = float(line.strip().split(": ")[-1])
+            meta['ccdPmCenterY'] = ccdPmCenterY
+
+        elif 'PM CCD range x' in line:
+            ccdPmRangeX = float(line.strip().split(": ")[-1])
+            meta['ccdPmRangeX'] = ccdPmRangeX
+
+        elif 'PM CCD range y' in line:
+            ccdPmRangeY = float(line.strip().split(": ")[-1])
+            meta['ccdPmRangeY'] = ccdPmRangeY
+
+        elif 'ANDOR pixel size x' in line:
+            andorPixelSizeX = float(line.strip().split(": ")[-1])
+            meta['andorPixelSizeX'] = andorPixelSizeX
+
+        elif 'ANDOR pixel size y' in line:
+            andorPixelSizeY = float(line.strip().split(": ")[-1])
+            meta['andorPixelSizeY'] = andorPixelSizeY
+
+        elif 'CCD pixel size x' in line:
+            ccdPixelSizeX = float(line.strip().split(": ")[-1])
+            meta['ccdPixelSizeX'] = ccdPixelSizeX
+
+        elif 'CCD pixel size y' in line:
+            ccdPixelSizeY = float(line.strip().split(": ")[-1])
+            meta['ccdPixelSizeY'] = ccdPixelSizeY
+
+        elif 'AOD detector x offset' in line:
+            aodDetectorOffsetX = float(line.strip().split(": ")[-1])
+            meta['aodDetectorOffsetX'] = aodDetectorOffsetX
+
+        elif 'AOD detector y offset' in line:
+            aodDetectorOffsetY = float(line.strip().split(": ")[-1])
+            meta['aodDetectorOffsetY'] = aodDetectorOffsetY
+
+        elif 'AOD trap stiffness x' in line:
+            aodStiffnessX = float(line.strip().split(": ")[-1])
+            meta['aodStiffnessX'] = aodStiffnessX
+
+        elif 'AOD trap stiffness y' in line:
+            aodStiffnessY = float(line.strip().split(": ")[-1])
+            meta['aodStiffnessY'] = aodStiffnessY
+
+        elif 'AOD trap distance conversion x' in line:
+            aodDistanceConversionX = float(line.strip().split(": ")[-1])
+            meta['aodDistanceConversionX'] = aodDistanceConversionX
+
+        elif 'AOD trap distance conversion y' in line:
+            aodDistanceConversionY = float(line.strip().split(": ")[-1])
+            meta['aodDistanceConversionY'] = aodDistanceConversionY
+
+        elif 'PM detector x offset' in line:
+            pmDetectorOffsetX = float(line.strip().split(": ")[-1])
+            meta['pmDetectorOffsetX'] = pmDetectorOffsetX
+
+        elif 'PM detector y offset' in line:
+            pmDetectorOffsetY = float(line.strip().split(": ")[-1])
+            meta['pmDetectorOffsetY'] = pmDetectorOffsetY
+
+        elif 'PM trap stiffness x' in line:
+            pmStiffnessX = float(line.strip().split(": ")[-1])
+            meta['pmStiffnessX'] = pmStiffnessX
+
+        elif 'PM trap stiffness y' in line:
+            pmStiffnessY = float(line.strip().split(": ")[-1])
+            meta['pmStiffnessY'] = pmStiffnessY
+
+        elif 'PM trap distance conversion x' in line:
+            pmDistanceConversionX = float(line.strip().split(": ")[-1])
+            meta['pmDistanceConversionX'] = pmDistanceConversionX
+
+        elif 'PM trap distance conversion y' in line:
+            pmDistanceConversionY = float(line.strip().split(": ")[-1])
+            meta['pmDistanceConversionY'] = pmDistanceConversionY
+
+        elif 'AOD bead radius' in line:
+            try:
+                aodBeadRadius = float(line.strip().split(": ")[-1])
+                if aodBeadRadius < 20:
+                    aodBeadRadius = aodBeadRadius * 1000
+                elif '(um)' in line:
+                    aodBeadRadius = aodBeadRadius * 1000
+            except:
+                aodBeadRadius = 0
+
+            aodBeadDiameter = 2.0 * aodBeadRadius
+
+            meta['aodBeadDiameter'] = round(aodBeadDiameter, 2)
+            meta['aodBeadRadius'] = round(aodBeadRadius, 2)
+
+        elif 'PM bead radius ' in line:
+            try:
+                pmBeadRadius = float(line.strip().split(": ")[-1])
+                if pmBeadRadius < 20:
+                    pmBeadRadius = pmBeadRadius * 1000
+                elif '(um)' in line:
+                    pmBeadRadius = pmBeadRadius * 1000
+            except:
+                pmBeadRadius = 0
+
+            pmBeadDiameter = 2.0 * pmBeadRadius
+
+            meta['pmBeadDiameter'] = round(pmBeadDiameter, 2)
+            meta['pmBeadRadius'] = round(pmBeadRadius, 2)
+
+        elif 'Sample rate' in line:
+            samplingRate = float(line.strip().split(": ")[-1])
+            meta['samplingRate'] = samplingRate
+
+        elif 'Number of samples' in line:
+            nSamples = float(line.strip().split(": ")[-1])
+            meta['nSamples'] = nSamples
+
+        elif 'Delta time' in line:
+            deltaTime = float(line.strip().split(": ")[-1])
+            meta['deltaTime'] = deltaTime
+
         elif 'Laser Diode Operating Hours' in line:
             try:
                 laserDiodeHours = round(float(line.strip().split(": ")[-1]))
