@@ -7,10 +7,12 @@ import sure
 import nose
 from nose.tools import with_setup
 import pytest
+import datetime
 
-from tweezer.io import read_tweebot_data_header, read_tweebot_data
+from tweezer.io import read_tweebot_data
 from tweezer import path_to_sample_data
 from tweezer.core.parsers import classify
+from tweezer.ixo import wip
 
 # get example file
 bot_file = path_to_sample_data('bot_data')
@@ -107,3 +109,13 @@ def test_return_values():
     data.meta['samplingRate'].should.equal(1000)
     data.meta['nSamples'].should.equal(1)
     data.meta['deltaTime'].should.equal(0.001)
+
+
+real_file = '/Users/jahnel/code/example_data/tweebot/RNA_POL_II_19_02_2013/datalog/18.Datalog.2013.02.19.23.09.24.datalog.txt'
+
+def test_real_file():
+    df = read_tweebot_data(real_file)
+    df.units['deltaTime'].should.equal('s')
+    df.date.should.be(datetime.datetime(2013, 2, 19, 23, 9, 24))
+
+test_real_file.wip = 1

@@ -69,7 +69,7 @@ def read_tweezer_txt(file_name):
     data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
 
     data = pd.read_table(file_name, sep='\t', header=None, skiprows=data_pos,
-        names=columns)
+        names=columns, dtype=np.float64)
 
     # drop rows with "NaN" values
     data = data.dropna()
@@ -115,11 +115,19 @@ def read_tweebot_data(file_name):
 
         This function so far only works for TweeBot data files in the form of 2013
 
+    .. warning::
+
+        Currently this function removes duplicates in the *timeSent* column of the TweeBot datalog files.
+
     """
     # column_names, calibration, header_line = read_tweebot_data_header(file_name)
     HeaderInfo = read_tweebot_data_header(file_name)
 
-    _data = pd.read_table(file_name, header = HeaderInfo.header_pos)
+    # _data = pd.read_table(file_name, header = HeaderInfo.header_pos, dtype=np.float64)
+    try:
+        _data = pd.read_csv(file_name, header = HeaderInfo.header_pos, sep='\t', dtype=np.float64)
+    except:
+        raise IOError("Can't read the file: {}".format(file_name))
 
     # get rid of unnamed and empty colums
     _data = _data.dropna(axis = 1)
@@ -136,11 +144,21 @@ def read_tweebot_data(file_name):
     # determine timeStep as the smallest nearest-neighbour difference between sent times
     if 'timeSent' in _data.columns:
         timeStep = Micro(1e6 * min([round(n, 6) for n in np.diff(_data.timeSent.values)]))
-    else:
-        raise KeyError("Can't find *timeSent* column in the _data frame...")
+        if timeStep < Micro(1):
+            try:
+                timeStep = Micro(1e6 * HeaderInfo.metadata['deltaTime'])
+            except:
+                raise KeyError("Can't determine the timeStep for this file")
 
-    _data['relativeTime'] = np.float32(_data.timeSent - min(_data.timeSent))
-    _data['time'] = [_data.date + timedelta(seconds=round(s, 6)) for s in _data.relativeTime.values]
+    else:
+        raise KeyError("Can't determine the *timeStep* required for further calculations...")
+
+    rounding_precision = int(abs(np.log10(timeStep.n / 1e6)) + 1)
+
+    _data['relativeTime'] = np.float64(_data.timeSent) - round(min(_data.timeSent), 6)
+    _data['time'] = [_data.date + timedelta(seconds=round(s, rounding_precision)) for s in _data.relativeTime.values]
+    
+    _data.drop_duplicates(cols='timeSent', inplace=True)
 
     _data.index = _data.time.values
     data = _data.asfreq(timeStep).drop(['time', 'relativeTime'], axis=1)
@@ -204,7 +222,7 @@ def read_thermal_calibration(file_name, frequency=80000):
     data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
     # read file data
     ts = pd.read_table(file_name, sep='\t', skiprows=data_pos, 
-        names=columns, header=None)
+        names=columns, header=None, dtype=np.float64)
 
     # setting time as a data column and an index to be on the safe side
     ts['time'] = time
@@ -280,7 +298,7 @@ def read_tweezer_power_spectrum(file_name):
 
     # read file data
     psd = pd.read_table(file_name, sep='\t', skiprows=data_pos, 
-        names=columns, header=None)
+        names=columns, header=None, dtype=np.float64)
 
     psd.date = date
     psd.nSamples = nSamples
@@ -327,13 +345,30 @@ def read_tdms(file_name, frequency=1000):
         df['fbY'] = tf.channel_data(g, 'Untitled 10')
         df['pressure'] = tf.channel_data(g, 'Untitled 11')
         
+    # setting the units
+    units = {}
+    units['pmY'] = 'V'
+    units['aodX'] = 'V'
+    units['aodY'] = 'V'
+    units['pmS'] = 'V'
+    units['aodS'] = 'V'
+    units['fbS'] = 'V'
+    units['mirrorX'] = 'V'
+    units['mirrorY'] = 'V'
+    units['fbX'] = 'V'
+    units['fbY'] = 'V'
+    units['pressure'] = 'V'
+
     # set index; in pandas the alias for microsecond offset is 'U'
     if info.date:
         index = pd.date_range(start = info.date, periods = len(df), freq = '{}U'.format(int(1000000.0/frequency)))
         df.index = index
+        df.date = info.date
     else:
         index = pd.date_range(start = datetime.now(), periods = len(df), freq = '{}U'.format(int(1000000.0/frequency))  )
         df.index = index
+
+    df.units = units
 
     return df 
 
@@ -366,7 +401,7 @@ def read_tracking_data(file_name):
     """
     Reads data from Tweezer Tracking files.
     """
-    df = pd.read_csv(file_name, sep = '\t')
+    df = pd.read_csv(file_name, sep = '\t', dtype=np.float64)
     return df
 
 

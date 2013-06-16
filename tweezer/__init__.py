@@ -1,8 +1,15 @@
-__all__ = ['io', 'utils', 'ixo', 'ott', 'gui', 'core', 'scripts', 'cli']
+from __future__ import print_function, division
 
-__version__ = (0, 0, 1)
+__doc__ = """\
+Package for data analysis of optical trap experiments
+"""
 
 import os
+import glob
+
+__all__ = [ os.path.basename(f)[:-3] for f in glob.glob(os.path.dirname(__file__)+"/*.py")]
+
+__version__ = (0, 0, 1)
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -106,3 +113,14 @@ def path_to_templates(data_type = 'PYTEX'):
 
     return path
 
+
+def read(file_name, file_type='man_data'):
+    """
+    Convenience function to read the data from a given tweezer file name into a pandas DataFrame. It tries to make an educated guess about the file_type of the file in question and to dispatch the appropriate function call.
+    
+    :param file_name: (path) to the file to be read into a pandas.DataFrame
+
+    :return data: (pandas.DataFrame) If applicable this return type contains the time series data in a DataFrame and any metadata as its attributes
+    """
+    raise NotImplementedError("WIP: {}.read".format(__name__))
+    
