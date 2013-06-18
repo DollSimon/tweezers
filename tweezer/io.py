@@ -321,7 +321,7 @@ def read_tdms(file_name, frequency=1000):
 
     :param frequency: (int) sampling frequency in Hz (default is 1000 Hz, i.e. data taken at 1 ms time resolution)
 
-    :return df: (pd.DataFrame) with the channels as columns
+    :return data: (pd.DataFrame) with the channels as columns and index based on file_name infos
     
     """
     info = parse_tweezer_file_name(file_name, parser='bot_tdms')
@@ -332,18 +332,18 @@ def read_tdms(file_name, frequency=1000):
     # read data
     if 'Untitled' in tf.groups():
         g = 'Untitled'
-        df = pd.DataFrame(tf.channel_data(g, 'Untitled'), columns=['pmX'])
-        df['pmY'] = tf.channel_data(g, 'Untitled 1')
-        df['aodX'] = tf.channel_data(g, 'Untitled 2')
-        df['aodY'] = tf.channel_data(g, 'Untitled 3')
-        df['pmS'] = tf.channel_data(g, 'Untitled 4')
-        df['aodS'] = tf.channel_data(g, 'Untitled 5')
-        df['fbS'] = tf.channel_data(g, 'Untitled 6')
-        df['mirrorX'] = tf.channel_data(g, 'Untitled 7')
-        df['mirrorY'] = tf.channel_data(g, 'Untitled 8')
-        df['fbX'] = tf.channel_data(g, 'Untitled 9')
-        df['fbY'] = tf.channel_data(g, 'Untitled 10')
-        df['pressure'] = tf.channel_data(g, 'Untitled 11')
+        data = pd.DataFrame(tf.channel_data(g, 'Untitled'), columns=['pmX'])
+        data['pmY'] = tf.channel_data(g, 'Untitled 1')
+        data['aodX'] = tf.channel_data(g, 'Untitled 2')
+        data['aodY'] = tf.channel_data(g, 'Untitled 3')
+        data['pmS'] = tf.channel_data(g, 'Untitled 4')
+        data['aodS'] = tf.channel_data(g, 'Untitled 5')
+        data['fbS'] = tf.channel_data(g, 'Untitled 6')
+        data['mirrorX'] = tf.channel_data(g, 'Untitled 7')
+        data['mirrorY'] = tf.channel_data(g, 'Untitled 8')
+        data['fbX'] = tf.channel_data(g, 'Untitled 9')
+        data['fbY'] = tf.channel_data(g, 'Untitled 10')
+        data['pressure'] = tf.channel_data(g, 'Untitled 11')
         
     # setting the units
     units = {}
@@ -361,16 +361,16 @@ def read_tdms(file_name, frequency=1000):
 
     # set index; in pandas the alias for microsecond offset is 'U'
     if info.date:
-        index = pd.date_range(start = info.date, periods = len(df), freq = '{}U'.format(int(1000000.0/frequency)))
-        df.index = index
-        df.date = info.date
+        index = pd.date_range(start = info.date, periods = len(data), freq = '{}U'.format(int(1000000.0/frequency)))
+        data.index = index
+        data.date = info.date
     else:
-        index = pd.date_range(start = datetime.now(), periods = len(df), freq = '{}U'.format(int(1000000.0/frequency))  )
-        df.index = index
+        index = pd.date_range(start = datetime.now(), periods = len(data), freq = '{}U'.format(int(1000000.0/frequency))  )
+        data.index = index
 
-    df.units = units
+    data.units = units
 
-    return df 
+    return data 
 
 
 def read_tweebot_stats(file_name):

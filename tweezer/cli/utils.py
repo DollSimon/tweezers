@@ -88,3 +88,10 @@ def sort_tweebot_trials(files=defaultdict(list), sort_by='bot_data'):
         trial_files[t] = collect_files_per_trial(files=files, trial=t)
 
     return trial_files
+
+
+def print_default_settings():
+    pass 
+
+
+

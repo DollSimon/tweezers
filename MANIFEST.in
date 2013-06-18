@@ -1,5 +1,6 @@
 include docs/*.txt
 include tweezer/data/*/*
+include tweezer/data/default_settings.json
 include tweezer/templates/pytex/pytex_template.tex
 include tweezer/templates/knitr/knitr_template.Rnw
 

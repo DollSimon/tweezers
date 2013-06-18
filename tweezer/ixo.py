@@ -13,7 +13,9 @@ import copy
 from collections import namedtuple
 
 import numpy as np
+import pandas as pd
 import envoy
+import simplejson as json
 
 from functools import wraps
 from nose.plugins.attrib import attr
@@ -1113,3 +1115,56 @@ def h5_load(h5_file):
     if os.path.isfile(jFile):
         pass
 
+
+def combine_tweebot_data(datalog_content=pd.DataFrame([]), tdms_content=pd.DataFrame([])):
+    """
+    Aligns the data from different sources, most notably from Tweebot Datalog files and from TDMS files.
+    
+    :param datalog_content: (pandas.DataFrame) of 
+    :param tdms_content: (pandas.DataFrame) of high frequency tdms data
+    """
+    dc = datalog_content
+    tc = tdms_content
+
+    pass
+    # get attributes
+
+    # find common values in column....
+    # where is dc.pressure == tc.pressure
+
+    # combine attributes
+    # 
+
+def parse_json(file_name):
+    """ 
+    Parse a JSON file
+    First remove comments and then use the json module package
+    Comments look like :
+        // ...
+    or
+        /*
+        ...
+        */
+
+    :param file_name: (path) to json file
+
+    :return content: (dict)
+    """
+    # Regular expression for comments
+    comment_re = re.compile(
+        '(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
+        re.DOTALL | re.MULTILINE
+    )
+    with open(file_name) as f:
+        content = ''.join(f.readlines())
+
+        ## Looking for comments
+        match = comment_re.search(content)
+        while match:
+            # single line comment
+            content = content[:match.start()] + content[match.end():]
+            match = comment_re.search(content)
+
+        # Return json file
+        return json.loads(content)
+    

@@ -1,0 +1,91 @@
+{
+    "physics":
+        {
+            // viscosity of water 
+            "viscosity": 0.9e-9,
+
+            // kbT in pN * nm
+            "thermal_energy_pN_nm": 4.14,
+
+            // nm / bp
+            "nano_meter_per_base_pair": 0.338
+        },        
+
+    "polymer_mechanics":
+        {
+            // persistence length P in nm
+            "persistence_length_nm": 53,
+
+            // stretch modulus S in pN
+            "stretch_modulus_pN": 1200
+
+        },
+
+    "gauss_convolution_filter":
+        {
+            "window_size_points": 1000
+        },
+
+    "savitzky_golay_filter":
+        {
+            "window_size_points": 2000
+        },
+    "transcription_analysis":
+        {
+            // L0 in base pairs
+            "dna_start_length_bp": 5094,
+
+            // any pauses that are less than this distance apart will be merged
+            "minimum_distance_between_pauses_bp": 5,
+
+            "no_late_pauses": true,
+
+            "backtrack_cutoff_bp": 5,
+
+            "remove_drift": true,
+
+            "force_limits_pN": [1, 20],
+
+            "normalised_force_limits": [0.3, 1.5],
+
+            // How many nucleotides for residency time calculation
+            "df_interval": 1, 
+
+            // velocity in nt / s
+            "velocity_histogramm_limits_bp_per_s": [-5, 110],
+
+            // bin size in nt / s
+            "velocity_histogramm_bin_size_bp_per_s": 0.5,
+
+            "force_velocity_histogramm_force_bin_size": 0.5,
+
+            "normalized_force_velocity_histogramm_normalized_force_bin_size": 0.01,
+
+            "acceleration_time_ms": 2500,
+
+            // window size (units of dt) for velocity averaging in DTbacktrack
+            "velocity_window": 20,
+
+            // IntoFinP in s: Time we will extend the fv-analysis into the last pause
+            "time_into_last_pause_s": 5,
+
+            "pause_threshold_time_s": 3
+        },
+    "statistical_settings":
+        {
+            "confidence_interval": 0.68269
+        },
+    "general_settings":
+        {
+            "averaging_time_ms": 1
+        },
+    "general_tweebot_settings":
+        {
+
+            // default host addresses
+            "VideoServer1Address" : "dualtrap2",
+            "VideoServer2Address" : "dualtrap1"
+            
+        }
+
+}

@@ -38,7 +38,7 @@ setup(
     author_email='jahnel@mpi-cbg.de',
     install_requires=DEPENDENCIES,
     packages=PACKAGES,
-    package_data={'tweezer': ['data/*/*', 'templates/*/*']},
+    package_data={'tweezer': ['data/*/*', 'templates/*/*', 'data/default_settings.json']},
     entry_points={
         'console_scripts': [
             'dt=tweezer.cli.main:start',
