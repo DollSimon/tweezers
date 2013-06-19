@@ -1045,11 +1045,13 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
     # parsing the date
     if date_string and time_string:
         combined_date = " ".join([date_string.strip(), time_string.strip()])
-        date = datetime.datetime.strptime(combined_date, '%m/%d/%Y %I:%M %p')
+        date = datetime.strptime(combined_date, '%m/%d/%Y %I:%M %p')
     else:
-        date = datetime.datetime.now()
+        date = datetime.now()
 
     meta['date'] = date
 
     CommentInfo = namedtuple('CommentInfo', ['metadata', 'units'])
     C = CommentInfo(meta, units)
+
+    return C

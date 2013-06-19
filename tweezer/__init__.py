@@ -9,6 +9,8 @@ import glob
 
 from functools import partial
 
+from tweezer.core.parsers import classify
+
 __all__ = [ os.path.basename(f)[:-3] for f in glob.glob(os.path.dirname(__file__)+"/*.py")]
 
 __version__ = (0, 0, 1)
@@ -132,6 +134,13 @@ def read(file_name, file_type='man_data', **kwargs):
         read_tweezer_txt, read_thermal_calibration, read_tweezer_power_spectrum)  
 
     # classify file
+    try:
+        ftype = classify(file_name)
+        if 'unknown' in ftype.lower():
+            ftype = file_type
+    except:
+        print("Can't classify the file type myself. Trying the file_type default ('man_data')")
+        ftype = file_type
 
     if 'frequency' in kwargs:
         f = kwargs['frequency']
@@ -143,7 +152,7 @@ def read(file_name, file_type='man_data', **kwargs):
         'bot_tdms': read_tdms, 'tc_psd': read_tweezer_power_spectrum, 
         'tc_ts': read_thermal_calibration, 'bot_log': read_tweebot_logs}
 
-    data = read_mapper[file_type](file_name)
+    data = read_mapper[ftype.lower()](file_name)
 
     return data
     
