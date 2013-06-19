@@ -1,0 +1,212 @@
+
+// Default host addresses:
+
+VideoServer1Address	=	dualtrap2
+VideoServer2Address	=	dualtrap1
+
+StageRTSPAddress	=	dualtrap1
+RestRTSPAddress		=	dualtrap1
+
+
+// at 20 deg C, unit: Mega Poise = 1000 Pa.s
+FluidViscosity = 0.000001002 
+FluidEffectiveTubingViscosity = 1
+// 1 femto newton std dev per second
+FluidBrownianStdDev = 2e-12 
+FluidInitialPressure = 0.3
+FluidGravityPressure = 0.000000001
+FluidNegativePressure	=	-1
+FluidPositivePressure	=	1
+FluidPressureNoiseAmplitude	=	0.001
+FluidAlpha	=	0.0001
+FluidicsDefaultPressureTime	=	10
+
+//Fluidics Control:
+TargetPressureEpsilon 	= 	0.005
+MinTargetPressure 		= 	-0.25
+MaxTargetPressure		=	0.45	
+
+
+
+//unit: mm
+StageMinX	=	0
+StageMaxX	=	5
+StageMinY	=	0
+StageMaxY	=	3
+StageMinZ	=	0
+StageMaxZ	=	0.125
+StageMaxSpeed = 0.4
+
+// AOD
+AODANDORRangeX	=	24.54		=	pixels
+AODANDORRangeY	=	24.16		=	pixels
+AODANDORCenterX	=	268.40		=	pixels
+AODANDORCenterY	=	265.33		=	pixels
+AODCCDRangeX	=	92.77		=	pixels
+AODCCDRangeY	=	112.43		=	pixels
+AODCCDCenterX	=	280.16		=	pixels
+AODCCDCenterY	=	226.47		=	pixels
+AODSxy		=	0.0013
+AODSz		=	0.002
+AODK		=	0.003
+AODE		=	0.001
+AODRangeI	=	1
+
+
+
+// PM
+PMANDORRangeX	=	14.33		=	pixels
+PMANDORRangeY	=	8.46		=	pixels
+PMANDORCenterX	=	271.85		=	pixels	
+PMANDORCenterY	=	271.84		=	pixels
+PMCCDRangeX		=	54.00		=	pixels
+PMCCDRangeY		=	43.25		=	pixels
+PMCCDCenterX	=	299.90		=	pixels	
+PMCCDCenterY	=	252.175		=	pixels
+PMSxy		=	0.0013
+PMSz		=	0.002
+PMK			=	0.003
+PME			=	0.001
+PMRangeI	=	0
+
+//Thermal Calibration:
+TimeNeededToPerformThermalCalibration	=	5	=	seconds
+
+// PSD
+PSDPerBeadSAttenuationFactor	=	0.95	=	ratio
+PSDMaxS							= 	1		=	nm
+PSDNoiseXY						=	0.1		=	nm
+PSDNoiseS						=	0.005	=	
+PSDBeadDetectionNumberOfStdDev	=	5		=	stddevs
+
+// ANDOR Video Camera:
+// unit: pixels
+Video1					=	ANDOR
+ANDORFps				=	100 	= update me!
+ANDORWidth				=	512
+ANDORHeight				=	512
+// unit: nanometer
+ANDORPixel2NanoX		= 	293.94 = nm/pixel
+ANDORPixel2NanoY 		= 	288.53 = nm/pixel 
+// 270
+// unit: mm
+ANDORDepthOfView		=	0.04 = update me !!
+ANDOROffsetX			=	0
+ANDOROffsetY			=	0
+
+ANDORNumberOfTrackedBeads	=	5
+ANDORNoiseLevelXY			=	0.000250	=	score unit 
+ANDORNoiseLevelR			=	0.000250	=	mm
+ANDORNoiseLevelScore		=	0.05		=	mm
+
+ANDORMaximalRelativeInterFrameDelay	=	0.2
+ANDORMaximalInterFrameSentDelay		=	0.1
+ANDORFootPrintIncreaseFactorForMarking	=	1.4
+
+ANDORBeadDetectorDetectionTriggerThreshold		=	0.100	
+ANDORBeadDetectorBinaryThreshold				=	0.032
+ANDORBeadDetectorExponentialFilteringThreshold	=	0.001
+ANDORBeadDetectorExponentialFilteringAlpha		=	0.97
+ANDORNumberOfCenteringIterations				=	3
+ANDORSubPixelCentering							=	false
+
+// CCD Video Camera:
+// unit: pixels
+Video2					=	CCD
+CCDFps					=	25 	= update me!
+CCDWidth				=	640	
+CCDHeight				=	480
+// unit: nanometer
+CCDPixel2NanoX 			= 	74.1	=	nm/pixel for large magnification only (450mm lens)
+CCDPixel2NanoY 			= 	61.6	=	nm/pixel same...
+CCDPixel2NanoXOther 	= 	170.9	=	nm/pixel for small magnification only (200mm lens)
+CCDPixel2NanoYOther 	= 	142.7	=	nm/pixel same...
+// unit: mm
+CCDDepthOfView			=	0.002
+CCDFocusAmplitude		=	0.005
+CCDOffsetX				=	0.04427
+CCDOffsetY				=	0.04530
+
+CCDMaximalRelativeInterFrameDelay	=	0.5
+CCDMaximalInterFrameSentDelay		=	0.3
+CCDFootPrintIncreaseFactorForMarking	=	0.8
+
+CCDBeadDetectorDetectionTriggerThreshold		=	0.150	
+CCDBeadDetectorBinaryThreshold					=	0.040
+CCDBeadDetectorExponentialFilteringThreshold	=	0.001
+CCDBeadDetectorExponentialFilteringAlpha		=	0.97
+CCDNumberOfCenteringIterations					=	3
+CCDSubPixelCentering							=	false
+
+//CCD fine tracker:
+CCDAbsoluteDetectionThreshold					=	0.05
+CCDDetectionThreshold							=	0.5
+CCDFillingThreshold								=	0.3
+CCDMinimalWidth									=	10
+
+
+// In Trap Bead Tracking:
+InTrapThreshold			= 0.5
+InTrapImageAnalysisChangeThreshold 			=	 5
+
+// DNA:
+DNALengthInNucleotides	= 2500
+
+// Beads:
+Bead1Diameter 			= 0.002217
+Bead1DiameterStdDev		= 0.02 = percentage
+Bead1Density			= 1.1
+Bead2Diameter 			= 0.001620					=	0.00126
+Bead2DiameterStdDev		= 0.02 = percentage
+Bead2Density			= 1.1
+
+
+// Laser:
+TrapLaserCurrentMax			=	17
+TrapLaserCurrentMinToBeOn	=	7.5
+TrapLaserCurrentMinForDiodeOn	=	0.5
+
+//DataLogging:
+DataLoggingFolder			=	/TweeBot/DataLogs
+DefaultLoggingSamplesPerChannel	=	10	
+DefaultLoggingSamplingRate		=	1000
+
+
+
+//Folders:
+ScriptFolder				=	/Volumes/dualtrapgrill/TweeBotScripts
+RootFolder					=	/Volumes/dualtrapgrill/data_raw
+DefaultExperimentFolder		=	default
+SavedLocationsFolder		=	SavedLocations
+HardwareSettingsFolder		=	HardwareSettings
+TweeBotExperimentFolderExtraSubFoldersList = data thermal_calibration distance_calibration templates videos tracking pictures
+
+// FileCom files IMPORTANT: input and output are relative to the labview side
+FileComInputFile			=	/Volumes/dualtrapgrill/TweebotCommunication/dataSentTowardsTweebotPC/Java2Labview.txt 
+FileComOutputFile			=	/Volumes/dualtrapgrill/TweebotCommunication/dataReceivedFromTweebotPC/Labview2Java.txt		
+
+// Email account:
+TweeBotEmailUserName		=	Albert.Tweebot@googlemail.com
+TweeBotEmailUserPassword	=	bierchen
+
+
+// Focusing stage:
+FocussingStageGoToEpsilon	=	0.01	=	mm
+FocussingStageSpeed			=	0.4		=	mm/s
+FocussingStageHome			=	14	=	mm
+FocussingStageMin			=	1		=	mm
+FocussingStageMax			=	23	=	mm
+
+
+// high speed of the stage 0.1 mm/s
+// slow speed is half of high speed which is a typical bead flow speed.
+// force felt by bead when moving at high speed: 4.5 pn
+// parafine 0.002
+// bead1 1.04
+// bead2 2.80
+// parafine 3.4
+// 0.785 1.621 -0.034 
+
+// 5 seconds to go across ANDOR view field
+
+

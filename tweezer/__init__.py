@@ -13,7 +13,9 @@ __version__ = (0, 0, 1)
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
-_DEFAULT_SETTINGS = os.path.join(_ROOT, 'data', 'default_settings.json')
+_DEFAULT_SETTINGS = os.path.join(_ROOT, 'data', 'settings', 'default_settings.json')
+
+_TWEEBOT_CONFIG_TXT = os.path.join(_ROOT, 'data', 'settings', 'default.config.txt')
 
 def get_example_path(path, example_type='data'):
     return os.path.join(_ROOT, example_type, path)

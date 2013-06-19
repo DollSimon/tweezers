@@ -181,38 +181,55 @@ def start():
 
         # Check objects with special meaning
         if 'setting' in args['<OBJECT>']:
+
             has_settings = os.path.isfile('settings.json')
+
             if args['--part']:
                 part = args['--part']
             else:
                 part = 'all'
 
             if has_settings:
-                # parse settings file
+
                 settings = parse_json('settings.json')
+
                 if part != 'all':
-                    puts('These are the settings of type {}:'.format(colored.blue(part)))
+                    puts('These are the settings of type {}:\n'.format(colored.blue(part)))
                     try:
-                       pprint(settings[part], indent=2) 
+                        sections = [k for k in settings.keys() if part in k]
+                        for section in sections:
+                            if not len(sections) == 1:
+                                with indent(2):
+                                    puts('Settings of section: {}\n'.format(colored.yellow(section)))
+                            for key in settings[section]:
+                                with indent(2):
+                                    puts('{} : {}'.format(key, settings[section][key]))
+
+                            puts('\n')
+
                     except:
                         puts('No section with this type found in the settings')
                 else:
-                    print('These are all the settings.') 
-                    pprint(settings, indent=2)
+                    print('These are all the settings.\n') 
+                    try:
+                        for section in settings.keys():
+                            with indent(2):
+                                puts('Settings of section: {}\n'.format(colored.yellow(section)))
+                            for key in settings[section]:
+                                with indent(2):
+                                    puts('{} : {}'.format(key, settings[section][key]))
+
+                            puts('\n')
+                    except:
+                        pprint(settings, indent=2)
             else:
-                puts('No settings file found...')
+                puts('No settings file found...\n')
                 putSettigns = raw_input('Shall I add the default settings file to this directory: ')
                 if InterpretUserInput[putSettigns]:
                     print('I am copying it over...')
                     shutil.copy2(_DEFAULT_SETTINGS, os.path.join(DIR, 'settings.json'))
                 else:
                     print('Ok, than I have nothing to show...')
-
-                if args['--part']:
-                    part = args['--part']
-                    print('These are the settings of type {}:'.format(part))
-                else:
-                    print('These are the settings of type {}:')
 
         elif 'result' in args['<OBJECT>']:
             print('These are the results:')

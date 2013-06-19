@@ -20,14 +20,15 @@ DEPENDENCIES = ['nose', 'pytest', 'docopt', 'pandas', 'tables', 'numpy',
     'scipy', 'termcolor', 'parsley', 'clint']
 
 PACKAGES = ['tweezer', 'tweezer.gui', 'tweezer.core', 'tweezer.cli', 
-    'tweezer.ott', 'tweezer.scripts']
+    'tweezer.ott', 'tweezer.scripts', 'tweezer.tweebot', 'tweezer.ixo']
 
 MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.utils', 
     'tweezer.core.polymer', 'tweezer.core.geometry', 'tweezer.core.trap', 
     'tweezer.core.watcher', 'tweezer.core.visualisation', 
     'tweezer.core.simulations', 'tweezer.core.trap_calibration', 
     'tweezer.core.datatypes', 'tweezer.core.analysis', 'tweezer.core.parsers', 
-    'tweezer.core.overview', 'tweezer.cli.utils'] 
+    'tweezer.core.overview', 'tweezer.cli.utils', 'tweezer.tweebot.configuration',
+    'tweezer.ixo.json'] 
 
 setup(
     name='tweezer',
@@ -38,7 +39,8 @@ setup(
     author_email='jahnel@mpi-cbg.de',
     install_requires=DEPENDENCIES,
     packages=PACKAGES,
-    package_data={'tweezer': ['data/*/*', 'templates/*/*', 'data/default_settings.json']},
+    package_data={'tweezer': ['data/*/*', 'templates/*/*', 
+        'data/settings/default_settings.json', 'data/settings/default.config.txt']},
     entry_points={
         'console_scripts': [
             'dt=tweezer.cli.main:start',
