@@ -25,6 +25,14 @@ core Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`dio` Module
+-----------------
+
+.. automodule:: tweezer.core.dio
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`geometry` Module
 ----------------------
 
@@ -33,10 +41,18 @@ core Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`io` Module
-----------------
+:mod:`overview` Module
+----------------------
 
-.. automodule:: tweezer.core.io
+.. automodule:: tweezer.core.overview
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`parsers` Module
+---------------------
+
+.. automodule:: tweezer.core.parsers
     :members:
     :undoc-members:
     :show-inheritance:
@@ -65,10 +81,19 @@ core Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`parsers` Module
----------------------
+:mod:`trap_calibration` Module
+------------------------------
 
-.. automodule:: tweezer.core.parsers
+.. automodule:: tweezer.core.trap_calibration
     :members:
     :undoc-members:
     :show-inheritance:
+
+:mod:`watcher` Module
+---------------------
+
+.. automodule:: tweezer.core.watcher
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

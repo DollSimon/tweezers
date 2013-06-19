@@ -57,11 +57,13 @@ try:
     from tweezer.core.overview import full_tweebot_overview, tweebot_overview
     from tweezer.cli import InterpretUserInput
     from tweezer import _DEFAULT_SETTINGS
-    from tweezer.ixo import parse_json
-except ImportError:
+    from tweezer.ixo.json import parse_json
+except ImportError, err:
     puts('')
     with indent(2):
         puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
+        puts('')
+        puts('The following import error occurred: {}'.format(colored.red(err))) 
         puts('')
         puts('Please check installation instructions @ {}'.format(colored.yellow('http://bitbucket.org/majahn/tweezer')))
     exit()

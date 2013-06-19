@@ -1,23 +1,11 @@
-"""
-General utility functions used for tweezer package.
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
 
-"""
 import os
 import shutil
 
 import envoy
 from tempfile import mkdtemp
-
-
-class VersionChecker(object):
-
-    """
-    Keeps track of the code history that is used to analyse the data.
-
-    """
-
-    def __init__(self, python_function):
-        self.python_function = python_function
 
 
 def get_latest_file_from_git_repo(file_name, repo_name='tweezer', 
@@ -67,20 +55,3 @@ def get_latest_file_from_git_repo(file_name, repo_name='tweezer',
     
     # remove temp_dir
     shutil.rmtree(temp_dir)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

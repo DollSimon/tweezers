@@ -3,7 +3,7 @@
 
 import sure
 
-from tweezer.ixo import extract_meta_and_units
+from tweezer.io import extract_meta_and_units
 
 man_comments = ['Date of Experiment: 3/14/2013', 'measurement starttime: 7:05 PM', 
     'Laser Diode Status', 'Laser Diode Operating Hours (h): 0.000000', 

@@ -28,7 +28,9 @@ MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.utils',
     'tweezer.core.simulations', 'tweezer.core.trap_calibration', 
     'tweezer.core.datatypes', 'tweezer.core.analysis', 'tweezer.core.parsers', 
     'tweezer.core.overview', 'tweezer.cli.utils', 'tweezer.tweebot.configuration',
-    'tweezer.ixo.json'] 
+    'tweezer.ixo.json', 'tweezer.ixo.decorators', 'tweezer.ixo.git', 
+    'tweezer.ixo.hdf5', 'tweezer.ixo.latex', 'tweezer.ixo.os', 'tweezer.ixo.r',
+    'tweezer.tweebot.utils'] 
 
 setup(
     name='tweezer',

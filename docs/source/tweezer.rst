@@ -38,11 +38,11 @@ Subpackages
 
 .. toctree::
 
-    tweezer.core
     tweezer.cli
+    tweezer.core
     tweezer.gui
+    tweezer.ixo
     tweezer.ott
     tweezer.scripts
-    tweezer.templates
-    tweezer.data
+    tweezer.tweebot
 

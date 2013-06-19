@@ -10,7 +10,7 @@ cli Package
     :show-inheritance:
 
 :mod:`main` Module
-----------------------
+------------------
 
 .. automodule:: tweezer.cli.main
     :members:
@@ -18,9 +18,10 @@ cli Package
     :show-inheritance:
 
 :mod:`utils` Module
-----------------------
+-------------------
 
 .. automodule:: tweezer.cli.utils
     :members:
     :undoc-members:
     :show-inheritance:
+

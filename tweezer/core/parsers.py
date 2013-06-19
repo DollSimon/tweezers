@@ -6,7 +6,7 @@ import datetime
 from collections import namedtuple
 
 from parsley import makeGrammar, ParseError
-from tweezer.ixo import get_parent_directory
+from tweezer.ixo.os import get_parent_directory
 
 def parse_tweezer_file_name(file_name, parser='bot_data'):
     """
