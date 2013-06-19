@@ -399,8 +399,8 @@ def read_tracking_data(file_name):
     """
     Reads data from Tweezer Tracking files.
     """
-    df = pd.read_csv(file_name, sep = '\t', dtype=np.float64)
-    return df
+    data = pd.read_csv(file_name, sep = '\t', dtype=np.float64)
+    return data
 
 
 def read_tweebot_data_header(datalog_file):

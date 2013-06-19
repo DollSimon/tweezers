@@ -7,6 +7,8 @@ Package for data analysis of optical trap experiments
 import os
 import glob
 
+from functools import partial
+
 __all__ = [ os.path.basename(f)[:-3] for f in glob.glob(os.path.dirname(__file__)+"/*.py")]
 
 __version__ = (0, 0, 1)
@@ -118,7 +120,7 @@ def path_to_templates(data_type = 'PYTEX'):
     return path
 
 
-def read(file_name, file_type='man_data'):
+def read(file_name, file_type='man_data', **kwargs):
     """
     Convenience function to read the data from a given tweezer file name into a pandas DataFrame. It tries to make an educated guess about the file_type of the file in question and to dispatch the appropriate function call.
     
@@ -126,5 +128,22 @@ def read(file_name, file_type='man_data'):
 
     :return data: (pandas.DataFrame) If applicable this return type contains the time series data in a DataFrame and any metadata as its attributes
     """
-    raise NotImplementedError("WIP: {}.read".format(__name__))
+    from tweezer.io import (read_tdms, read_tweebot_data, read_tweebot_logs, 
+        read_tweezer_txt, read_thermal_calibration, read_tweezer_power_spectrum)  
+
+    # classify file
+
+    if 'frequency' in kwargs:
+        f = kwargs['frequency']
+        read_tweezer_power_spectrum = partial(read_tweezer_power_spectrum, frequency=f)
+        read_tdms = partial(read_tdms, frequency=f)
+
+    # use dictionary to dispatch the appropriate function (functions are first-class citizens!)
+    read_mapper = {'man_data': read_tweezer_txt, 'bot_data': read_tweebot_data, 
+        'bot_tdms': read_tdms, 'tc_psd': read_tweezer_power_spectrum, 
+        'tc_ts': read_thermal_calibration, 'bot_log': read_tweebot_logs}
+
+    data = read_mapper[file_type](file_name)
+
+    return data
     

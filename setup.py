@@ -22,15 +22,15 @@ DEPENDENCIES = ['nose', 'pytest', 'docopt', 'pandas', 'tables', 'numpy',
 PACKAGES = ['tweezer', 'tweezer.gui', 'tweezer.core', 'tweezer.cli', 
     'tweezer.ott', 'tweezer.scripts', 'tweezer.tweebot', 'tweezer.ixo']
 
-MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.utils', 
+MODULES = ['tweezer.io', 'tweezer.core.dio', 
     'tweezer.core.polymer', 'tweezer.core.geometry', 'tweezer.core.trap', 
     'tweezer.core.watcher', 'tweezer.core.visualisation', 
     'tweezer.core.simulations', 'tweezer.core.trap_calibration', 
     'tweezer.core.datatypes', 'tweezer.core.analysis', 'tweezer.core.parsers', 
-    'tweezer.core.overview', 'tweezer.cli.utils', 'tweezer.tweebot.configuration',
-    'tweezer.ixo.json', 'tweezer.ixo.decorators', 'tweezer.ixo.git', 
-    'tweezer.ixo.hdf5', 'tweezer.ixo.latex', 'tweezer.ixo.os', 'tweezer.ixo.r',
-    'tweezer.tweebot.utils'] 
+    'tweezer.core.overview', 'tweezer.cli.utils', 'tweezer.ixo.json', 
+    'tweezer.ixo.decorators', 'tweezer.ixo.git', 'tweezer.ixo.hdf5', 
+    'tweezer.ixo.latex', 'tweezer.ixo.opsys', 'tweezer.ixo.r',
+    'tweezer.tweebot.utils', 'tweezer.tweebot.configuration'] 
 
 setup(
     name='tweezer',
