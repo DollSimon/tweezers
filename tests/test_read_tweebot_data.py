@@ -12,7 +12,7 @@ import datetime
 from tweezer.io import read_tweebot_data
 from tweezer import path_to_sample_data
 from tweezer.core.parsers import classify
-from tweezer.ixo import wip
+from tweezer.ixo.decorators import wip
 
 # get example file
 bot_file = path_to_sample_data('bot_data')

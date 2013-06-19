@@ -9,3 +9,19 @@ include tweezer/templates/knitr/knitr_template.Rnw
 
 global-exclude tweezer/templates/pytex/*
 global-exclude tweezer/templates/pytex/pythontex-files-pytex_template/*
+
+# added by check_manifest.py
+include *.md
+include *.py
+include *.txt
+include MANIFEST
+recursive-include docs *.bib
+recursive-include docs *.conf
+recursive-include docs *.jar
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs Makefile
+recursive-include features *.feature
+recursive-include features *.py
+recursive-include tests *.py
+recursive-include tweezer *.tex

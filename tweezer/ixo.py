@@ -7,7 +7,6 @@ General utility functions used for tweezer package.
 """
 import os
 import re
-import cProfile
 import datetime
 import copy
 from collections import namedtuple
@@ -16,27 +15,6 @@ import numpy as np
 import pandas as pd
 import envoy
 import simplejson as json
-
-from functools import wraps
-from nose.plugins.attrib import attr
-from nose.plugins.skip import SkipTest
- 
-
-def profile_this(fn):
-    """
-    Decorator to profile the execution time of a function
-
-    :param fn: function to be profiled
-    """
-    def profiled_fn(*args, **kwargs):
-        # name of profile dump
-        fpath = fn.__name__ + ".profile"
-        prof = cProfile.Profile()
-        ret = prof.runcall(fn, *args, **kwargs)
-        prof.dump_stats(fpath)
-        return ret
-    return profiled_fn
-
 
 def get_subdirs(path, is_file=True):
     """
@@ -77,34 +55,6 @@ def get_parent_directory(file_name):
     :return parent_dir: (String) name of parent directory
     """
     return get_subdirs(file_name)[-1]
-
-
-def run_rscript(script, script_path='/Library/Frameworks/R.framework/Resources/library/tweezR/', **kwargs):
-    """
-    Calls an R script
-
-    :param script: (Str) name of the script
-
-    :param script_path: (Path)
-    """
-    if script_path[-1] == '/':
-        path = "".join(script_path, script)
-    else:
-        path = "/".join(script_path, script)
-
-    r = envoy.run("Rscript {} ")
-
-
-def compile_pytex_file(pytex_file='pytex_template.tex'):
-    """
-    Compile a [PythonTex](https://github.com/gpoore/pythontex) file into
-
-    :param pytex_file: (.tex file) A pytexDescription
-
-    """
-    pdflatex_call = envoy.run("pdflatex -interaction=batchmode {}".format(pytex_file))
-    pytex_call = envoy.run("pythontex.py {}".format(pytex_file))
-    pdflatex_call = envoy.run("pdflatex -interaction=batchmode {}".format(pytex_file))
 
 
 class TweebotDictionary(namedtuple('TweebotDictionary', ['date', 
@@ -1073,49 +1023,6 @@ def simplify_tweebot_data_names(variable_names):
     return names, units
 
 
-def fail(message):
-    raise AssertionError(message)
- 
-def wip(f):
-    @wraps(f)
-    def run_test(*args, **kwargs):
-        try:
-            f(*args, **kwargs)
-        except Exception as e:
-            raise SkipTest("WIP test failed: " + str(e))
-        fail("test passed but marked as work in progress")
-    
-    return attr('wip')(run_test)
-
-
-def h5_save(h5_file, DataFrame):
-    """
-    Saves pandas DataFrame with additional attributes to h5 file format. Since custom attributes can't be stored like this yet, these are recognised and saved as json file format with the same name.
-    
-    :param h5_file: (path) where to save the data
-    :param DataFrame: (pandas.DataFrame) that might carry additional custom attributes
-    """
-    # get attributes if any
-    REF = pd.DataFrame([])
-     
-    attributes = list(set(dir(REF)) ^ set(dir(data)))
-
-    if attributes:
-        pass
-
-
-def h5_load(h5_file):
-    """
-    Load pandas DataFrame from an h5 file. If there exists a .json file of the same name in the same directory the content of that file is parsed as custom attributes attached to the DataFrame
-    
-    :param h5_file: (path) of h5 file from which to load the data.
-    """
-    jFile = os.path.join(os.path.dirname(h5_file), ".".join([os.path.splitext(os.path.basename(h5_file))[0], 'json']))
-
-    if os.path.isfile(jFile):
-        pass
-
-
 def combine_tweebot_data(datalog_content=pd.DataFrame([]), tdms_content=pd.DataFrame([])):
     """
     Aligns the data from different sources, most notably from Tweebot Datalog files and from TDMS files.
@@ -1135,36 +1042,3 @@ def combine_tweebot_data(datalog_content=pd.DataFrame([]), tdms_content=pd.DataF
     # combine attributes
     # 
 
-def parse_json(file_name):
-    """ 
-    Parse a JSON file
-    First remove comments and then use the json module package
-    Comments look like :
-        // ...
-    or
-        /*
-        ...
-        */
-
-    :param file_name: (path) to json file
-
-    :return content: (dict)
-    """
-    # Regular expression for comments
-    comment_re = re.compile(
-        '(^)?[^\S\n]*/(?:\*(.*?)\*/[^\S\n]*|/[^\n]*)($)?',
-        re.DOTALL | re.MULTILINE
-    )
-    with open(file_name) as f:
-        content = ''.join(f.readlines())
-
-        ## Looking for comments
-        match = comment_re.search(content)
-        while match:
-            # single line comment
-            content = content[:match.start()] + content[match.end():]
-            match = comment_re.search(content)
-
-        # Return json file
-        return json.loads(content)
-    
