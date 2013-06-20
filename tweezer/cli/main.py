@@ -10,8 +10,8 @@ Usage:
   tweezer convert [<FILE>...] <LANGUAGE>
   tweezer overview [-t | -m] ([<DIR>...] | -f [<FILE>...])
   tweezer list [<DIR>...]
-  tweezer show <OBJECT> [--part=<TYPE>]
-  tweezer update <OBJECT> [--part=<TYPE>]
+  tweezer show <OBJECT> [--part=<TYPE>] [-d]
+  tweezer update <OBJECT> [--part=<TYPE>] [-d]
   tweezer (-h | --help)
   tweezer (-v | --version)
 
@@ -40,6 +40,7 @@ Options:
   -m --manual       Manual tweezer mode
   -l --logging      Write log file
   -p --part=<TYPE>  Part or Subclass of an object
+  -d --default      Refer to the saved default object
   -f --file         Switch to file mode when input can be file or dir
 """
 import os
@@ -56,7 +57,9 @@ try:
     from tweezer.cli.utils import list_tweezer_files
     from tweezer.core.overview import full_tweebot_overview, tweebot_overview
     from tweezer.cli import InterpretUserInput
+    from tweezer.cli.utils import pprint_settings
     from tweezer import _DEFAULT_SETTINGS
+    from tweezer import _TWEEBOT_CONFIG
     from tweezer.ixo.json import parse_json
 except ImportError, err:
     puts('')
@@ -101,8 +104,8 @@ def start():
                 puts('tweezer convert [<FILE>...] <LANGUAGE>')
                 puts('tweezer overview [-t | -m] ([<DIR>...] | -f [<FILE>...])')
                 puts('tweezer list [<DIR>...]')
-                puts('tweezer show <OBJECT> [--part=<TYPE>]')
-                puts('tweezer put <OBJECT> [--part=<TYPE>]')
+                puts('tweezer show <OBJECT> [--part=<TYPE>] [-d]')
+                puts('tweezer put <OBJECT> [--part=<TYPE>] [-d]')
                 puts('tweezer update <OBJECT> [--part=<TYPE>]')
                 puts('tweezer (-h | --help)')
                 puts('tweezer (-v | --version)')
@@ -135,6 +138,7 @@ def start():
                 puts('-m --manual       Manual tweezer mode')
                 puts('-l --logging      Write log file')
                 puts('-p --part=<TYPE>  Part or Subclass of an object')
+                puts('-d --default      Refer to the saved default object')
                 puts('-f --file         Switch to file mode when input can be file or dir')
           
     # Checking and setting default values
@@ -181,49 +185,28 @@ def start():
     # tweezer show
     if args['show']:
 
+        if args['--part']:
+            part = args['--part']
+        else:
+            part = 'all'
+
         # Check objects with special meaning
         if 'setting' in args['<OBJECT>']:
 
             has_settings = os.path.isfile('settings.json')
 
-            if args['--part']:
-                part = args['--part']
-            else:
-                part = 'all'
-
             if has_settings:
 
                 settings = parse_json('settings.json')
 
-                if part != 'all':
-                    puts('These are the settings of type {}:\n'.format(colored.blue(part)))
-                    try:
-                        sections = [k for k in settings.keys() if part in k]
-                        for section in sections:
-                            if not len(sections) == 1:
-                                with indent(2):
-                                    puts('Settings of section: {}\n'.format(colored.yellow(section)))
-                            for key in settings[section]:
-                                with indent(2):
-                                    puts('{} : {}'.format(key, settings[section][key]))
+                pprint_settings(settings, part=part)
 
-                            puts('\n')
+            elif args['--default']:
 
-                    except:
-                        puts('No section with this type found in the settings')
-                else:
-                    print('These are all the settings.\n') 
-                    try:
-                        for section in settings.keys():
-                            with indent(2):
-                                puts('Settings of section: {}\n'.format(colored.yellow(section)))
-                            for key in settings[section]:
-                                with indent(2):
-                                    puts('{} : {}'.format(key, settings[section][key]))
+                settings = parse_json(_DEFAULT_SETTINGS)
 
-                            puts('\n')
-                    except:
-                        pprint(settings, indent=2)
+                pprint_settings(settings, part=part)
+
             else:
                 puts('No settings file found...\n')
                 putSettigns = raw_input('Shall I add the default settings file to this directory: ')
@@ -235,6 +218,32 @@ def start():
 
         elif 'result' in args['<OBJECT>']:
             print('These are the results:')
+
+        elif 'tweebot' in args['<OBJECT>'] or 'configuration' in args['<OBJECT>']:
+
+            has_tweebot_configs = os.path.isfile('tweebot_configuration.json')
+
+            if has_tweebot_configs:
+
+                settings = parse_json('tweebot_configuration.json')
+
+                pprint_settings(settings, part=part)
+
+            elif args['--default']:
+                puts('These are the tweebot default configurations:\n')
+                
+                settings = parse_json(_TWEEBOT_CONFIG)
+
+                pprint_settings(settings, part=part)
+
+            else:
+                puts('No tweebot configuration file found...\n')
+                putSettigns = raw_input('Shall I add the default tweebot configuration file to this directory: ')
+                if InterpretUserInput[putSettigns]:
+                    print('I am copying it over...')
+                    shutil.copy2(_TWEEBOT_CONFIG, os.path.join(DIR, 'tweebot_configuration.json'))
+                else:
+                    print('Ok, than I have nothing to show...')
 
         else:
             print('This is the content of file {}'.format(args['<OBJECT>']))

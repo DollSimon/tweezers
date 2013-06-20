@@ -4,6 +4,9 @@ import re
 from collections import defaultdict
 from itertools import izip
 
+from clint.textui import colored, puts, indent 
+from pprint import pprint
+
 from tweezer.core.parsers import classify_all, parse_tweezer_file_name
 
 
@@ -92,6 +95,55 @@ def sort_tweebot_trials(files=defaultdict(list), sort_by='bot_data'):
 
 def print_default_settings():
     pass 
+
+
+def pprint_settings(settings, part='all'):
+    """
+    Pretty terminal printing of tweezer settings stored in json files
+    
+    :param settings: (dict) with tweezer settings, basically informative key-value pairs
+    """
+    try:
+        if not 'all' in part:
+            sections = [k for k in settings.keys() if part in k]
+            if sections:
+                puts('These are the settings of type {}:\n'.format(colored.blue(part)))
+            else:
+                puts('No section with this type found in the settings')
+                puts('Available sections are: \n')
+                for key in settings:
+                    print(key)
+        else:
+            sections = settings.keys()
+            puts('These are the {} the settings.\n'.format(colored.blue('all')))
+
+        for section in sections:
+            with indent(2):
+                puts('Settings of section: {}\n'.format(colored.yellow(section)))
+
+            items = [i for i in settings[section].keys() if 'units' not in i]
+
+            for pos, key in enumerate(items):
+                try:
+                    this_unit = settings[section]['units'][key]
+                    unit = this_unit if this_unit is not None else ''
+                    with indent(2):
+                        if pos % 2 == 0:
+                            puts('{} : {} {}'.format(key, settings[section][key], unit))
+                        else:
+                            puts('{} : {} {}'.format(colored.white(key), colored.white(settings[section][key]), colored.white(unit)))
+
+                except:
+                    with indent(2):
+                        if pos % 2 == 0:
+                            puts('{} : {}'.format(key, settings[section][key]))
+                        else:
+                            puts('{} : {}'.format(colored.white(key), colored.white(settings[section][key])))
+
+            puts('\n')
+    except:
+        pprint(settings, indent=2)
+
 
 
 

@@ -21,6 +21,8 @@ _DEFAULT_SETTINGS = os.path.join(_ROOT, 'data', 'settings', 'default_settings.js
 
 _TWEEBOT_CONFIG_TXT = os.path.join(_ROOT, 'data', 'settings', 'default.config.txt')
 
+_TWEEBOT_CONFIG = os.path.join(_ROOT, 'data', 'settings', 'tweebot_configuration.json')
+
 def get_example_path(path, example_type='data'):
     return os.path.join(_ROOT, example_type, path)
 

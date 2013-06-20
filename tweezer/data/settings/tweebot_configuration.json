@@ -1,42 +1,48 @@
 {
   "default_host_addresses": {
-    "values": {
-      "VideoServer1Address": "dualtrap2",
-      "VideoServer2Address": "dualtrap1",
-      "StageRTSPAddress": "dualtrap1",
-      "RestRTSPAddress": "dualtrap1"
-    }
+    "VideoServer1Address": "dualtrap2",
+    "VideoServer2Address": "dualtrap1",
+    "StageRTSPAddress": "dualtrap1",
+    "RestRTSPAddress": "dualtrap1"
   },
   "fluid_and_pressure": {
-    "values": {
-      "FluidViscosity": 0.000001002,
-      "FluidEffectiveTubingViscosity": 1,
-      "FluidBrownianStdDev": 2E-12,
-      "FluidInitialPressure": 0.3,
-      "FluidGravityPressure": 1E-9,
-      "FluidNegativePressure": -1,
-      "FluidPositivePressure": 1,
-      "FluidPressureNoiseAmplitude": 0.001,
-      "FluidAlpha": 0.0001,
-      "FluidicsDefaultPressureTime": 10,
-      "TargetPressureEpsilon": 0.005,
-      "MinTargetPressure": -0.25,
-      "MaxTargetPressure": 0.45
-    },
+    "FluidViscosity": 0.000001002,
+    "FluidEffectiveTubingViscosity": 1,
+    "FluidBrownianStdDev": 2E-12,
+    "FluidInitialPressure": 0.3,
+    "FluidGravityPressure": 1E-9,
+    "FluidNegativePressure": -1,
+    "FluidPositivePressure": 1,
+    "FluidPressureNoiseAmplitude": 0.001,
+    "FluidAlpha": 0.0001,
+    "FluidicsDefaultPressureTime": 10,
+    "TargetPressureEpsilon": 0.005,
+    "MinTargetPressure": -0.25,
+    "MaxTargetPressure": 0.45,
     "units": {
-      "FluidViscosity": "Mega Poise = 1000 Pa s = 1000 pN s / nm^2"
+      "FluidViscosity": "Mega Poise = 1000 Pa s = 1000 pN s / nm^2",
+      "FluidEffectiveTubingViscosity": null,
+      "FluidBrownianStdDev": null,
+      "FluidInitialPressure": null,
+      "FluidGravityPressure": null,
+      "FluidNegativePressure": null,
+      "FluidPositivePressure": null,
+      "FluidPressureNoiseAmplitude": null,
+      "FluidAlpha": null,
+      "FluidicsDefaultPressureTime": null,
+      "TargetPressureEpsilon": null,
+      "MinTargetPressure": null,
+      "MaxTargetPressure": null
     }
   },
   "stage": {
-    "values": {
-      "StageMinX": 0,
-      "StageMaxX": 5,
-      "StageMinY": 0,
-      "StageMaxY": 3,
-      "StageMinZ": 0,
-      "StageMaxZ": 0.125,
-      "StageMaxSpeed": 0.4
-    },
+    "StageMinX": 0,
+    "StageMaxX": 5,
+    "StageMinY": 0,
+    "StageMaxY": 3,
+    "StageMinZ": 0,
+    "StageMaxZ": 0.125,
+    "StageMaxSpeed": 0.4,
     "units": {
       "StageMinX": "mm",
       "StageMaxX": "mm",
@@ -48,21 +54,19 @@
     }
   },
   "aod": {
-    "values": {
-      "AODANDORRangeX": 24.54,
-      "AODANDORRangeY": 24.16,
-      "AODANDORCenterX": 268.4,
-      "AODANDORCenterY": 265.33,
-      "AODCCDRangeX": 92.77,
-      "AODCCDRangeY": 112.43,
-      "AODCCDCenterX": 280.16,
-      "AODCCDCenterY": 226.47,
-      "AODSxy": 0.0013,
-      "AODSz": 0.002,
-      "AODK": 0.003,
-      "AODE": 0.001,
-      "AODRangeI": 1
-    },
+    "AODANDORRangeX": 24.54,
+    "AODANDORRangeY": 24.16,
+    "AODANDORCenterX": 268.4,
+    "AODANDORCenterY": 265.33,
+    "AODCCDRangeX": 92.77,
+    "AODCCDRangeY": 112.43,
+    "AODCCDCenterX": 280.16,
+    "AODCCDCenterY": 226.47,
+    "AODSxy": 0.0013,
+    "AODSz": 0.002,
+    "AODK": 0.003,
+    "AODE": 0.001,
+    "AODRangeI": 1,
     "units": {
       "AODANDORRangeX": "px",
       "AODANDORRangeY": "px",
@@ -75,21 +79,19 @@
     }
   },
   "pm": {
-    "values": {
-      "PMANDORRangeX": 14.33,
-      "PMANDORRangeY": 8.46,
-      "PMANDORCenterX": 271.85,
-      "PMANDORCenterY": 271.84,
-      "PMCCDRangeX": 54.0,
-      "PMCCDRangeY": 43.25,
-      "PMCCDCenterX": 299.9,
-      "PMCCDCenterY": 252.175,
-      "PMSxy": 0.0013,
-      "PMSz": 0.002,
-      "PMK": 0.003,
-      "PME": 0.001,
-      "PMRangeI": 0
-    },
+    "PMANDORRangeX": 14.33,
+    "PMANDORRangeY": 8.46,
+    "PMANDORCenterX": 271.85,
+    "PMANDORCenterY": 271.84,
+    "PMCCDRangeX": 54.0,
+    "PMCCDRangeY": 43.25,
+    "PMCCDCenterX": 299.9,
+    "PMCCDCenterY": 252.175,
+    "PMSxy": 0.0013,
+    "PMSz": 0.002,
+    "PMK": 0.003,
+    "PME": 0.001,
+    "PMRangeI": 0,
     "units": {
       "PMANDORRangeX": "px",
       "PMANDORRangeY": "px",
@@ -102,21 +104,17 @@
     }
   },
   "thermal_calibration": {
-    "values": {
-      "TimeNeededToPerformThemalCalibration": 5
-    },
+    "TimeNeededToPerformThemalCalibration": 5,
     "units": {
       "TimeNeededToPerformThemalCalibration": "s"
     }
   },
   "psd_detector": {
-    "values": {
-      "PSDPerBeadSAttenuationFactor": 0.95,
-      "PSDMaxS": 1,
-      "PSDNoiseXY": 0.1,
-      "PSDNoiseS": 0.005,
-      "PSDBeadDetectionNumberOfStdDev": 5
-    },
+    "PSDPerBeadSAttenuationFactor": 0.95,
+    "PSDMaxS": 1,
+    "PSDNoiseXY": 0.1,
+    "PSDNoiseS": 0.005,
+    "PSDBeadDetectionNumberOfStdDev": 5,
     "units": {
       "PSDPerBeadSAttenuationFactor": "ratio",
       "PSDMaxS": "nm",
@@ -126,30 +124,28 @@
     }
   },
   "andor_video_camera": {
-    "values": {
-      "Video1": "ANDOR",
-      "ANDORFps": 100,
-      "ANDORWidth": 512,
-      "ANDORHeight": 512,
-      "ANDORPixel2NanoX": 293.94,
-      "ANDORPixel2NanoY": 288.53,
-      "ANDORDepthOfView": 0.04,
-      "ANDOROffsetX": 0,
-      "ANDOROffsetY": 0,
-      "ANDORNumberOfTrackedBeads": 5,
-      "ANDORNoiseLevelXY": 0.00025,
-      "ANDORNoiseLevelR": 0.00025,
-      "ANDORNoiseLevelScore": 0.05,
-      "ANDORMaximalRelativeInterFrameDelay": 0.2,
-      "ANDORMaximalInterFrameSentDelay": 0.1,
-      "ANDORFootPrintIncreaseFactorForMarking": 1.4,
-      "ANDORBeadDetectorDetectionTriggerThreshold": 0.1,
-      "ANDORBeadDetectorBinaryThreshold": 0.032,
-      "ANDORBeadDetectorExponentialFilteringThreshold": 0.001,
-      "ANDORBeadDetectorExponentialFilteringAlpha": 0.97,
-      "ANDORNumberOfCenteringIterations": 3,
-      "ANDORSubPixelCentering": "false"
-    },
+    "Video1": "ANDOR",
+    "ANDORFps": 100,
+    "ANDORWidth": 512,
+    "ANDORHeight": 512,
+    "ANDORPixel2NanoX": 293.94,
+    "ANDORPixel2NanoY": 288.53,
+    "ANDORDepthOfView": 0.04,
+    "ANDOROffsetX": 0,
+    "ANDOROffsetY": 0,
+    "ANDORNumberOfTrackedBeads": 5,
+    "ANDORNoiseLevelXY": 0.00025,
+    "ANDORNoiseLevelR": 0.00025,
+    "ANDORNoiseLevelScore": 0.05,
+    "ANDORMaximalRelativeInterFrameDelay": 0.2,
+    "ANDORMaximalInterFrameSentDelay": 0.1,
+    "ANDORFootPrintIncreaseFactorForMarking": 1.4,
+    "ANDORBeadDetectorDetectionTriggerThreshold": 0.1,
+    "ANDORBeadDetectorBinaryThreshold": 0.032,
+    "ANDORBeadDetectorExponentialFilteringThreshold": 0.001,
+    "ANDORBeadDetectorExponentialFilteringAlpha": 0.97,
+    "ANDORNumberOfCenteringIterations": 3,
+    "ANDORSubPixelCentering": "false",
     "units": {
       "Video1": null,
       "ANDORFps": "px",
@@ -176,33 +172,31 @@
     }
   },
   "ccd_video_camera": {
-    "values": {
-      "Video2": "CCD",
-      "CCDFps": 25,
-      "CCDWidth": 640,
-      "CCDHeight": 480,
-      "CCDPixel2NanoX": 74.1,
-      "CCDPixel2NanoY": 61.6,
-      "CCDPixel2NanoXOther": 170.9,
-      "CCDPixel2NanoYOther": 142.7,
-      "CCDDepthOfView": 0.002,
-      "CCDFocusAmplitude": 0.005,
-      "CCDOffsetX": 0.04427,
-      "CCDOffsetY": 0.0453,
-      "CCDMaximalRelativeInterFrameDelay": 0.5,
-      "CCDMaximalInterFrameSentDelay": 0.3,
-      "CCDFootPrintIncreaseFactorForMarking": 0.8,
-      "CCDBeadDetectorDetectionTriggerThreshold": 0.15,
-      "CCDBeadDetectorBinaryThreshold": 0.04,
-      "CCDBeadDetectorExponentialFilteringThreshold": 0.001,
-      "CCDBeadDetectorExponentialFilteringAlpha": 0.97,
-      "CCDNumberOfCenteringIterations": 3,
-      "CCDSubPixelCentering": "false",
-      "CCDAbsoluteDetectionThreshold": 0.05,
-      "CCDDetectionThreshold": 0.5,
-      "CCDFillingThreshold": 0.3,
-      "CCDMinimalWidth": 10
-    },
+    "Video2": "CCD",
+    "CCDFps": 25,
+    "CCDWidth": 640,
+    "CCDHeight": 480,
+    "CCDPixel2NanoX": 74.1,
+    "CCDPixel2NanoY": 61.6,
+    "CCDPixel2NanoXOther": 170.9,
+    "CCDPixel2NanoYOther": 142.7,
+    "CCDDepthOfView": 0.002,
+    "CCDFocusAmplitude": 0.005,
+    "CCDOffsetX": 0.04427,
+    "CCDOffsetY": 0.0453,
+    "CCDMaximalRelativeInterFrameDelay": 0.5,
+    "CCDMaximalInterFrameSentDelay": 0.3,
+    "CCDFootPrintIncreaseFactorForMarking": 0.8,
+    "CCDBeadDetectorDetectionTriggerThreshold": 0.15,
+    "CCDBeadDetectorBinaryThreshold": 0.04,
+    "CCDBeadDetectorExponentialFilteringThreshold": 0.001,
+    "CCDBeadDetectorExponentialFilteringAlpha": 0.97,
+    "CCDNumberOfCenteringIterations": 3,
+    "CCDSubPixelCentering": "false",
+    "CCDAbsoluteDetectionThreshold": 0.05,
+    "CCDDetectionThreshold": 0.5,
+    "CCDFillingThreshold": 0.3,
+    "CCDMinimalWidth": 10,
     "units": {
       "Video2": "px",
       "CCDFps": "px",
@@ -232,29 +226,23 @@
     }
   },
   "in_trap_bead_tracking": {
-    "values": {
-      "InTrapThreshold": 0.5,
-      "InTrapImageAnalysisChangeThreshold": 5
-    },
+    "InTrapThreshold": 0.5,
+    "InTrapImageAnalysisChangeThreshold": 5,
     "units": {
       "InTrapThreshold": null,
       "InTrapImageAnalysisChangeThreshold": null
     }
   },
   "dna": {
-    "values": {
-      "DNALengthInNucleotides": 2500
-    },
+    "DNALengthInNucleotides": 2500,
     "units": {
       "DNALengthInNucleotides": "nt"
     }
   },
   "trapping_laser": {
-    "values": {
-      "TrapLaserCurrentMax": 17,
-      "TrapLaserCurrentMinToBeOn": 7.5,
-      "TrapLaserCurrentMinForDiodeOn": 0.5
-    },
+    "TrapLaserCurrentMax": 17,
+    "TrapLaserCurrentMinToBeOn": 7.5,
+    "TrapLaserCurrentMinForDiodeOn": 0.5,
     "units": {
       "TrapLaserCurrentMax": "A",
       "TrapLaserCurrentMinToBeOn": "A",
@@ -262,14 +250,12 @@
     }
   },
   "beads_simulation": {
-    "values": {
-      "Bead1Diameter": 0.002217,
-      "Bead1DiameterStdDev": 0.02,
-      "Bead1Density": 1.1,
-      "Bead2Diameter": 0.00162,
-      "Bead2DiameterStdDev": 0.02,
-      "Bead2Density": 1.1
-    },
+    "Bead1Diameter": 0.002217,
+    "Bead1DiameterStdDev": 0.02,
+    "Bead1Density": 1.1,
+    "Bead2Diameter": 0.00162,
+    "Bead2DiameterStdDev": 0.02,
+    "Bead2Density": 1.1,
     "units": {
       "Bead1Diameter": null,
       "Bead1DiameterStdDev": "%",
@@ -280,11 +266,9 @@
     }
   },
   "data_logging": {
-    "values": {
-      "DataLoggingFolder": "/TweeBot/DataLogs",
-      "DefaultLoggingSamplesPerChannel": 10,
-      "DefaultLoggingSamplingRate": 1000
-    },
+    "DataLoggingFolder": "/TweeBot/DataLogs",
+    "DefaultLoggingSamplesPerChannel": 10,
+    "DefaultLoggingSamplingRate": 1000,
     "units": {
       "DataLoggingFolder": null,
       "DefaultLoggingSamplesPerChannel": null,
@@ -292,24 +276,22 @@
     }
   },
   "folders_and_files": {
-    "values": {
-      "ScriptFolder": "/Volumes/dualtrapgrill/TweeBotScripts",
-      "RootFolder": "/Volumes/dualtrapgrill/data_raw",
-      "DefaultExperimentFolder": "default",
-      "SavedLocationsFolder": "SavedLocations",
-      "HardwareSettingsFolder": "HardwareSettings",
-      "TweeBotExperimentFolderExtraSubFoldersList": [
-        "data",
-        "thermal_calibration",
-        "distance_calibration",
-        "templates",
-        "videos",
-        "tracking",
-        "pictures"
-      ],
-      "FileComInputFile": "/Volumes/dualtrapgrill/TweebotCommunication/dataSentTowardsTweebotPC/Java2Labview.txt",
-      "FileComOutputFile": "/Volumes/dualtrapgrill/TweebotCommunication/dataReceivedFromTweebotPC/Labview2Java.txt"
-    },
+    "ScriptFolder": "/Volumes/dualtrapgrill/TweeBotScripts",
+    "RootFolder": "/Volumes/dualtrapgrill/data_raw",
+    "DefaultExperimentFolder": "default",
+    "SavedLocationsFolder": "SavedLocations",
+    "HardwareSettingsFolder": "HardwareSettings",
+    "TweeBotExperimentFolderExtraSubFoldersList": [
+      "data",
+      "thermal_calibration",
+      "distance_calibration",
+      "templates",
+      "videos",
+      "tracking",
+      "pictures"
+    ],
+    "FileComInputFile": "/Volumes/dualtrapgrill/TweebotCommunication/dataSentTowardsTweebotPC/Java2Labview.txt",
+    "FileComOutputFile": "/Volumes/dualtrapgrill/TweebotCommunication/dataReceivedFromTweebotPC/Labview2Java.txt",
     "units": {
       "ScriptFolder": null,
       "RootFolder": null,
@@ -322,23 +304,19 @@
     }
   },
   "email_account": {
-    "values": {
-      "TweeBotEmailUserName": "Albert.Tweebot@googlemail.com",
-      "TweeBotEmailUserPassword": "bierchen"
-    },
+    "TweeBotEmailUserName": "Albert.Tweebot@googlemail.com",
+    "TweeBotEmailUserPassword": "bierchen",
     "units": {
       "TweeBotEmailUserName": null,
       "TweeBotEmailUserPassword": null
     }
   },
   "focussing_stage": {
-    "values": {
-      "FocussingStageGoToEpsilon": 0.01,
-      "FocussingStageSpeed": 0.4,
-      "FocussingStageHome": 14,
-      "FocussingStageMin": 1,
-      "FocussingStageMax": 23
-    },
+    "FocussingStageGoToEpsilon": 0.01,
+    "FocussingStageSpeed": 0.4,
+    "FocussingStageHome": 14,
+    "FocussingStageMin": 1,
+    "FocussingStageMax": 23,
     "units": {
       "FocussingStageGoToEpsilon": "mm",
       "FocussingStageSpeed": "mm / s",
