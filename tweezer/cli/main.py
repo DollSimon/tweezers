@@ -11,7 +11,7 @@ Usage:
   tweezer overview [-t | -m] ([<DIR>...] | -f [<FILE>...])
   tweezer list [<DIR>...]
   tweezer show <OBJECT> [--part=<TYPE>] [-d]
-  tweezer update <OBJECT> [--part=<TYPE>] [-d]
+  tweezer update <OBJECT> [--part=<TYPE>]
   tweezer (-h | --help)
   tweezer (-v | --version)
 
@@ -57,7 +57,7 @@ try:
     from tweezer.cli.utils import list_tweezer_files
     from tweezer.core.overview import full_tweebot_overview, tweebot_overview
     from tweezer.cli import InterpretUserInput
-    from tweezer.cli.utils import pprint_settings
+    from tweezer.cli.utils import pprint_settings, update_settings
     from tweezer import _DEFAULT_SETTINGS
     from tweezer import _TWEEBOT_CONFIG
     from tweezer.ixo.json import parse_json
@@ -79,8 +79,8 @@ def start():
 
     args = docopt(__doc__, version=VERSION, help=False)
 
-    puts('\n{}'.format(colored.red('Development: Show arguments')))
-    print(args)
+    # puts('\n{}'.format(colored.red('Development: Show arguments')))
+    # print(args)
     puts('')
 
     # Getting help
@@ -105,7 +105,7 @@ def start():
                 puts('tweezer overview [-t | -m] ([<DIR>...] | -f [<FILE>...])')
                 puts('tweezer list [<DIR>...]')
                 puts('tweezer show <OBJECT> [--part=<TYPE>] [-d]')
-                puts('tweezer put <OBJECT> [--part=<TYPE>] [-d]')
+                # puts('tweezer put <OBJECT> [--part=<TYPE>] [-d]')
                 puts('tweezer update <OBJECT> [--part=<TYPE>]')
                 puts('tweezer (-h | --help)')
                 puts('tweezer (-v | --version)')
@@ -119,7 +119,7 @@ def start():
                 puts('overview      Produce "Overview.pdf" for data files in directory')
                 puts('list          List all files and file types in a directory recursively')
                 puts('show          Shows content of an object or file in an informative way')
-                puts('put           Saves a .json file representing an object to current directory')
+                # puts('put           Saves a .json file representing an object to current directory')
                 puts('update        Updates the content of an object, i.e. the corresponding .json file')
 
             puts('\n{}:'.format(colored.green('Arguments')))
@@ -197,15 +197,17 @@ def start():
 
             if has_settings:
 
-                settings = parse_json('settings.json')
+                if not args['--default']:
+                    settings = parse_json('settings.json')
+                    pprint_settings(settings, part=part, status='local')
 
-                pprint_settings(settings, part=part)
+                else:
+                    settings = parse_json(_DEFAULT_SETTINGS)
+                    pprint_settings(settings, part=part, status='default')
 
             elif args['--default']:
-
                 settings = parse_json(_DEFAULT_SETTINGS)
-
-                pprint_settings(settings, part=part)
+                pprint_settings(settings, part=part, status='default')
 
             else:
                 puts('No settings file found...\n')
@@ -225,16 +227,18 @@ def start():
 
             if has_tweebot_configs:
 
-                settings = parse_json('tweebot_configuration.json')
-
-                pprint_settings(settings, part=part)
-
+                if not args['--default']:
+                    settings = parse_json('tweebot_configuration.json')
+                    pprint_settings(settings, part=part, status='local')
+                else:
+                    puts('These are the tweebot default configurations:\n')
+                    settings = parse_json(_TWEEBOT_CONFIG)
+                    pprint_settings(settings, part=part, status='default')
+                    
             elif args['--default']:
                 puts('These are the tweebot default configurations:\n')
-                
                 settings = parse_json(_TWEEBOT_CONFIG)
-
-                pprint_settings(settings, part=part)
+                pprint_settings(settings, part=part, status='default')
 
             else:
                 puts('No tweebot configuration file found...\n')
@@ -247,6 +251,73 @@ def start():
 
         else:
             print('This is the content of file {}'.format(args['<OBJECT>']))
+
+    # tweezer update <OBJECT> [--part=<TYPE>]
+    if args['update']:
+
+        if args['--part']:
+            part = args['--part']
+        else:
+            part = 'all'
+
+        # check special objects
+        if 'setting' in args['<OBJECT>']:
+
+            has_settings = os.path.isfile('settings.json')
+
+            if has_settings:
+
+                old_settings = parse_json('settings.json')
+
+                update_settings('settings.json', old_settings=old_settings, part=part)                
+
+                new_settings = parse_json('settings.json')
+
+                pprint_settings(new_settings, part=part)
+
+            else:
+                puts('Update only works with local settings file, but none was found...\n')
+                putSettigns = raw_input('Shall I add the default settings file to this directory: ')
+                if InterpretUserInput[putSettigns]:
+                    print('I am copying it over...')
+                    shutil.copy2(_DEFAULT_SETTINGS, os.path.join(DIR, 'settings.json'))
+                else:
+                    print('Sorry, could not interpret your answer. Try (y | n)...')
+
+        elif 'result' in args['<OBJECT>']:
+            print('These are the results:')
+
+        elif 'tweebot' in args['<OBJECT>'] or 'configuration' in args['<OBJECT>']:
+
+            has_tweebot_configs = os.path.isfile('tweebot_configuration.json')
+
+            if has_tweebot_configs:
+
+                settings = parse_json('tweebot_configuration.json')
+
+                pprint_settings(settings, part=part)
+
+            elif args['--default']:
+                puts('These are the tweebot default configurations:\n')
+                
+                settings = parse_json(_TWEEBOT_CONFIG)
+
+                pprint_settings(settings, part=part, status='default')
+
+            else:
+                puts('No tweebot configuration file found...\n')
+                putSettigns = raw_input('Shall I add the default tweebot configuration file to this directory: ')
+                if InterpretUserInput[putSettigns]:
+                    print('I am copying it over...')
+                    shutil.copy2(_TWEEBOT_CONFIG, os.path.join(DIR, 'tweebot_configuration.json'))
+                else:
+                    print('Ok, than I have nothing to show...')
+
+        else:
+            print('This is the content of file {}'.format(args['<OBJECT>']))
+
+
+
 
     # tweezer overview
     if args['overview']:

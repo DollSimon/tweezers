@@ -22,3 +22,4 @@ sphinx-bootstrap-theme==0.1.7
 sphinxcontrib-bibtex==0.2.6
 sphinxcontrib-bitbucket==1.0
 sphinxcontrib-tikz==0.4.1
+functools32

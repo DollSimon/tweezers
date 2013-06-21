@@ -3,11 +3,13 @@ import re
 
 from collections import defaultdict
 from itertools import izip
+from copy import copy
 
 from clint.textui import colored, puts, indent 
 from pprint import pprint
 
 from tweezer.core.parsers import classify_all, parse_tweezer_file_name
+from tweezer.cli import InterpretUserInput
 
 
 def list_tweezer_files(directory):
@@ -93,11 +95,7 @@ def sort_tweebot_trials(files=defaultdict(list), sort_by='bot_data'):
     return trial_files
 
 
-def print_default_settings():
-    pass 
-
-
-def pprint_settings(settings, part='all'):
+def pprint_settings(settings, part='all', status='current'):
     """
     Pretty terminal printing of tweezer settings stored in json files
     
@@ -107,16 +105,20 @@ def pprint_settings(settings, part='all'):
         if not 'all' in part:
             sections = [k for k in settings.keys() if part in k]
             if sections:
-                puts('These are the settings of type {}:\n'.format(colored.blue(part)))
+                with indent(2):
+                    puts('These are the {s} settings of type {p}:\n'.format(p=colored.blue(part), s=status))
             else:
-                puts('No section with this type found in the settings')
-                puts('Available sections are: \n')
-                for key in settings:
-                    print(key)
+                with indent(2):
+                    puts('No section with this type found in the {} settings'.format(status))
+                    puts('Available sections are: \n')
+                    for key in settings:
+                        print(key)
         else:
             sections = settings.keys()
-            puts('These are the {} the settings.\n'.format(colored.blue('all')))
+            with indent(2):
+                puts('These are {p} the {s} settings.\n'.format(p=colored.blue('all'), s=status))
 
+        # printing
         for section in sections:
             with indent(2):
                 puts('Settings of section: {}\n'.format(colored.yellow(section)))
@@ -143,6 +145,112 @@ def pprint_settings(settings, part='all'):
             puts('\n')
     except:
         pprint(settings, indent=2)
+
+
+def update_settings(file_name='settings.json', old_settings={}, part='all', **kwargs):
+    """
+    Command line interface to update a standard tweezer .json settings or configuration file. 
+    
+    :param file_name: (path) .json file to update [default = 'settings.json']
+
+    :param old_settings: (dict) standard tweezer settings dictionary with sections and units
+
+    :param part: (str) part or section of the settings file to be exposed to the update routine [default = 'all']
+    """
+    if not 'all' in part:
+        sections = [k for k in old_settings.keys() if part in k]
+        if sections:
+            pprint_settings(old_settings, part=part, status='current')
+        else:
+            puts('No section with this type found in the current settings')
+            puts('Available sections are: \n')
+            for key in old_settings:
+                print(key)
+
+            want_new_section = raw_input('Do you want to add a new section to {}?'.format(os.path.basename(file_name)))
+
+            if InterpretUserInput[want_new_section]:
+                pass
+
+    else:
+        sections = old_settings.keys()
+        pprint_settings(old_settings, part=part, status='current')
+
+    # updating
+    try:
+        new_settings = copy(old_settings)
+        for section in sections:
+            with indent(2):
+                puts('Updating settings of section: {}\n'.format(colored.yellow(section)))
+
+            items = [i for i in new_settings[section].keys() if 'units' not in i]
+
+            for pos, key in enumerate(items):
+                try:
+                    this_unit = new_settings[section]['units'][key]
+                    unit = this_unit if this_unit is not None else ''
+                    with indent(2):
+                        puts('Update {} : {} {}'.format(key, new_settings[section][key], unit))
+                        while True:
+                            new_value = raw_input('> {} = '.format(colored.yellow(key)))
+                            puts('')
+
+                            # parse string value
+                            if re.search('^\d+$', new_value.strip()):
+                                new_value = int(new_value)
+                            elif re.search('^\d+\.\d+$', new_value.strip()) or re.search('^\d+e[-0-9]\d*$', new_value.strip()):
+                                new_value = float(new_value)
+                            else:
+                                new_value = new_value.strip()
+
+                            # assign value
+                            if new_value:
+                                if type(new_value) is type(new_settings[section][key]):
+                                    new_settings[section][key] = new_value
+                                    break
+                                else:
+                                    puts('Sorry, wrong type. {} is of type {}'.format(key, type(new_settings[section][key])))
+                                    try_again = raw_input('> Try again? (y | n): ')
+                                    if InterpretUserInput[try_again]:
+                                        continue
+                                    else:
+                                        break
+                except:
+                    with indent(2):
+                        puts('Update {} : {}'.format(key, new_settings[section][key]))
+                        while True:
+                            new_value = raw_input('> {} = '.format(colored.yellow(key)))
+                            puts('')
+
+                            # parse string value
+                            if re.search('^\d+$', new_value.strip()):
+                                new_value = int(new_value)
+                            elif re.search('^\d+\.\d+$', new_value.strip()) or re.search('^\d+e[-0-9]\d*$', new_value.strip()):
+                                new_value = float(new_value)
+                            else:
+                                new_value = new_value.strip()
+
+                            # assign value
+                            if new_value:
+                                if type(new_value) is type(new_settings[section][key]):
+                                    new_settings[section][key] = new_value
+                                    break
+                                else:
+                                    puts('Sorry, wrong type. {} is of type {}'.format(key, type(new_settings[section][key])))
+                                    try_again = raw_input('> Try again? (y | n): ')
+                                    if InterpretUserInput[try_again]:
+                                        continue
+                                    else:
+                                        break
+            puts('')
+
+    except (KeyboardInterrupt, SystemExit), e:
+        new_settings = copy(old_settings)
+        raise e
+
+    pprint_settings(new_settings, part=part, status='new')
+
+     
 
 
 
