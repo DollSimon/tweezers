@@ -14,7 +14,7 @@ from pandas.core.datetools import Micro
 import envoy
 from nptdms import TdmsFile
 
-from tweezer.tweebot.utils import simplify_tweebot_data_names
+from tweezer.bot.utils import simplify_tweebot_data_names
 from tweezer.core.parsers import parse_tweezer_file_name
 
 

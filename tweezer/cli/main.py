@@ -12,6 +12,9 @@ Usage:
   tweezer list [<DIR>...]
   tweezer show <OBJECT> [--part=<TYPE>] [-d]
   tweezer update <OBJECT> [--part=<TYPE>]
+  tweezer track [-o <OBJECT>] ([<VIDEO>...] | -i [<IMAGE>...])
+  tweezer simulate <OBJECT> [--args=<ARGS>...]
+  tweezer plot <OBJECT> [--args=<ARGS>...]
   tweezer (-h | --help)
   tweezer (-v | --version)
 
@@ -24,6 +27,9 @@ Commands:
   list          List all files and file types in a directory recursively
   show          Shows content of an object or file in an informative way 
   update        Invokes an interface to update the object in question (mainly used for settings)
+  track         Find position of features in images or videos
+  simulate      Run simulation of type "object"
+  plot          Plot examples and objects
 
 Arguments:
   FILE          Input file
@@ -32,6 +38,9 @@ Arguments:
   LANGUAGE      Preferred language or data container 
   OBJECT        Either general tweezer object (like settings) or concrete file
   TYPE          Generic classifier for general purposes
+  IMAGE         Image file (.png, or .jpg)
+  VIDEO         Video file (.avi, or .fits)
+  ARGS          Keyword arguments (like n=4 p='test'); no spaces around "="
 
 Options:
   -h --help         Show this screen
@@ -42,6 +51,8 @@ Options:
   -p --part=<TYPE>  Part or Subclass of an object
   -d --default      Refer to the saved default object
   -f --file         Switch to file mode when input can be file or dir
+  -i --image        Switch to image mode when input can be image or video
+  -a --args=<ARGS>  Additional keyword arguments to be passed to the command
 """
 import os
 import sys
@@ -61,6 +72,9 @@ try:
     from tweezer import _DEFAULT_SETTINGS
     from tweezer import _TWEEBOT_CONFIG
     from tweezer.ixo.json import parse_json
+    from tweezer.simulate.brownian_motion import simulate_naive_1D_brownian_motion
+    from tweezer.functions.utils import get_function_arguments
+    from tweezer.functions.plots import matplotlib_example
 except ImportError, err:
     puts('')
     with indent(2):
@@ -79,8 +93,8 @@ def start():
 
     args = docopt(__doc__, version=VERSION, help=False)
 
-    # puts('\n{}'.format(colored.red('Development: Show arguments')))
-    # print(args)
+    puts('\n{}'.format(colored.red('Development: Show arguments')))
+    print(args)
     puts('')
 
     # Getting help
@@ -107,6 +121,9 @@ def start():
                 puts('tweezer show <OBJECT> [--part=<TYPE>] [-d]')
                 # puts('tweezer put <OBJECT> [--part=<TYPE>] [-d]')
                 puts('tweezer update <OBJECT> [--part=<TYPE>]')
+                puts('tweezer track [-o <OBJECT>] ([<VIDEO>...] | -i [<IMAGE>...])')
+                puts('tweezer simulate <OBJECT> [--args=<ARGS>...]')
+                puts('tweezer plot <OBJECT> [--args=<ARGS>...]')
                 puts('tweezer (-h | --help)')
                 puts('tweezer (-v | --version)')
               
@@ -121,6 +138,9 @@ def start():
                 puts('show          Shows content of an object or file in an informative way')
                 # puts('put           Saves a .json file representing an object to current directory')
                 puts('update        Updates the content of an object, i.e. the corresponding .json file')
+                puts('track         Find position of features in images or videos')
+                puts('simulate      Run simulation of type "object"')
+                puts('plot          Plot examples and objects')
 
             puts('\n{}:'.format(colored.green('Arguments')))
             with indent(2):
@@ -129,6 +149,9 @@ def start():
                 puts('DIR           Input directory')
                 puts('LANGUAGE      Preferred language or data container')
                 puts('OBJECT        Either general tweezer object (like settings) or concrete file')
+                puts('IMAGE         Image file (.png, or .jpg)')
+                puts('VIDEO         Video file (.avi, or .fits)')
+                puts('ARGS          Keyword arguments (like n=4 p="test"); no spaces around "="')
 
             puts('\n{}:'.format(colored.green('Options')))
             with indent(2):
@@ -140,6 +163,8 @@ def start():
                 puts('-p --part=<TYPE>  Part or Subclass of an object')
                 puts('-d --default      Refer to the saved default object')
                 puts('-f --file         Switch to file mode when input can be file or dir')
+                puts('-i --image        Switch to image mode when input can be image or video')
+                puts('-a --args=<ARGS>  Additional keyword arguments to be passed to the command')
           
     # Checking and setting default values
     if not args['--tweebot'] and not args['--manual']:
@@ -234,7 +259,7 @@ def start():
                     puts('These are the tweebot default configurations:\n')
                     settings = parse_json(_TWEEBOT_CONFIG)
                     pprint_settings(settings, part=part, status='default')
-                    
+
             elif args['--default']:
                 puts('These are the tweebot default configurations:\n')
                 settings = parse_json(_TWEEBOT_CONFIG)
@@ -316,7 +341,47 @@ def start():
         else:
             print('This is the content of file {}'.format(args['<OBJECT>']))
 
+    # tweezer simulate
+    if args['simulate']:
 
+        simulation_mapper = {'naive_brownian_motion': simulate_naive_1D_brownian_motion}
+
+        try:
+            sys.exit(simulation_mapper[args['<OBJECT>']](4, 100))
+        except (KeyboardInterrupt, SystemExit), err:
+            raise err
+        except KeyError:
+            with indent(2):
+                puts('Could not find simulation {}\n'.format(colored.red(args['<OBJECT>'])))
+                puts('Available simulations are: \n')
+                for each in simulation_mapper:
+                    args_list = get_function_arguments(simulation_mapper[each])
+                    if args_list:
+                        arg_string = ', '.join(args_list) 
+                    else:
+                        arg_string = ''
+                    puts('{}({})\n'.format(colored.blue(each), colored.white(arg_string)))
+
+    # tweezer simulate
+    if args['plot']:
+
+        plot_mapper = {'matplotlib_example': matplotlib_example}
+
+        try:
+            sys.exit(plot_mapper[args['<OBJECT>']]())
+        except (KeyboardInterrupt, SystemExit), err:
+            raise err
+        except KeyError:
+            with indent(2):
+                puts('Could not find plot routine for {}\n'.format(colored.red(args['<OBJECT>'])))
+                puts('Available plotting examples are: \n')
+                for each in plot_mapper:
+                    args_list = get_function_arguments(plot_mapper[each])
+                    if args_list:
+                        arg_string = ', '.join(args_list) 
+                    else:
+                        arg_string = ''
+                    puts('{}({})\n'.format(colored.blue(each), colored.white(arg_string)))
 
 
     # tweezer overview
