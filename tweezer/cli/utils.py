@@ -3,10 +3,15 @@ import re
 
 from collections import defaultdict
 from itertools import izip
-from copy import copy
+from copy import deepcopy
 
 from clint.textui import colored, puts, indent 
 from pprint import pprint
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 from tweezer.core.parsers import classify_all, parse_tweezer_file_name
 from tweezer.cli import InterpretUserInput
@@ -95,11 +100,17 @@ def sort_tweebot_trials(files=defaultdict(list), sort_by='bot_data'):
     return trial_files
 
 
-def pprint_settings(settings, part='all', status='current'):
+def pprint_settings(settings, part='all', status='current', other_settings={}, other_status='default'):
     """
     Pretty terminal printing of tweezer settings stored in json files
     
     :param settings: (dict) with tweezer settings, basically informative key-value pairs
+
+    :param part: (str) which signifies sections of overall settings
+
+    :param status: (str) to be used in display information
+
+    :param other_settings: (dict) of different tweezer settings to be compared with the values in settings
     """
     try:
         if not 'all' in part:
@@ -129,18 +140,44 @@ def pprint_settings(settings, part='all', status='current'):
                 try:
                     this_unit = settings[section]['units'][key]
                     unit = this_unit if this_unit is not None else ''
-                    with indent(2):
-                        if pos % 2 == 0:
-                            puts('{} : {} {}'.format(key, settings[section][key], unit))
-                        else:
-                            puts('{} : {} {}'.format(colored.white(key), colored.white(settings[section][key]), colored.white(unit)))
 
+                    if not other_settings:
+                        with indent(2):
+                            if pos % 2 == 0:
+                                puts('{} : {} {}'.format(key, settings[section][key], unit))
+                            else:
+                                puts('{} : {} {}'.format(colored.white(key), colored.white(settings[section][key]), colored.white(unit)))
+                    else:
+                        with indent(2):
+                            if pos % 2 == 0:
+                                try:
+                                    puts('{} : {} {} \t\t({}: {})'.format(key, settings[section][key], unit, colored.yellow(other_status), colored.yellow(other_settings[section][key])))
+                                except:
+                                    puts('{} : {} {}'.format(key, settings[section][key], unit))
+                            else:
+                                try:
+                                    puts('{} : {} {} \t\t({}: {})'.format(colored.white(key), colored.white(settings[section][key]), colored.white(unit), colored.yellow(other_status), colored.yellow(other_settings[section][key])))
+                                except:
+                                    puts('{} : {} {}'.format(colored.white(key), colored.white(settings[section][key]), colored.white(unit)))
                 except:
-                    with indent(2):
-                        if pos % 2 == 0:
-                            puts('{} : {}'.format(key, settings[section][key]))
-                        else:
-                            puts('{} : {}'.format(colored.white(key), colored.white(settings[section][key])))
+                    if not other_settings:
+                        with indent(2):
+                            if pos % 2 == 0:
+                                puts('{} : {}'.format(key, settings[section][key]))
+                            else:
+                                puts('{} : {}'.format(colored.white(key), colored.white(settings[section][key])))
+                    else:
+                        with indent(2):
+                            if pos % 2 == 0:
+                                try:
+                                    puts('{} : {} \t\t({}: {})'.format(key, settings[section][key], colored.yellow(other_status), colored.yellow(other_settings[section][key])))
+                                except:
+                                    puts('{} : {}'.format(key, settings[section][key]))
+                            else:
+                                try:
+                                    puts('{} : {} \t\t({}: {})'.format(colored.white(key), colored.white(settings[section][key]), colored.yellow(other_status), colored.yellow(other_settings[section][key])))
+                                except:
+                                    puts('{} : {}'.format(colored.white(key), colored.white(settings[section][key])))
 
             puts('\n')
     except:
@@ -178,7 +215,7 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
 
     # updating
     try:
-        new_settings = copy(old_settings)
+        new_settings = deepcopy(old_settings)
         for section in sections:
             with indent(2):
                 puts('Updating settings of section: {}\n'.format(colored.yellow(section)))
@@ -245,12 +282,14 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
             puts('')
 
     except (KeyboardInterrupt, SystemExit), e:
-        new_settings = copy(old_settings)
+        new_settings = deepcopy(old_settings)
         raise e
 
-    pprint_settings(new_settings, part=part, status='new')
+    # persistence
+    pprint_settings(new_settings, part=part, status='new', other_settings=old_settings, other_status='old')
 
-     
+    with open(file_name, 'w') as f:
+        f.write(json.dumps(new_settings, indent=2, separators=(',', ': ')))
 
 
 

@@ -296,9 +296,11 @@ def start():
 
                 update_settings('settings.json', old_settings=old_settings, part=part)                
 
-                new_settings = parse_json('settings.json')
+                # new_settings = parse_json('settings.json')
 
-                pprint_settings(new_settings, part=part)
+                default_settings = parse_json(_DEFAULT_SETTINGS)
+
+                pprint_settings(old_settings, part=part, other_settings=default_settings)
 
             else:
                 puts('Update only works with local settings file, but none was found...\n')
