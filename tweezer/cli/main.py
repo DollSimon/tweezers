@@ -201,11 +201,9 @@ def start():
 
         puts('Calling tweezer list from {}'.format(colored.green(DIR)))
         files = list_tweezer_files(DIR)
-        print('The sun is rising!')
         print('There are {} file types'.format(len(files)))
         print('There are the following types: {} '.format(len(files)))
         puts('Here is the result: {}'.format(colored.blue(files)))
-        print('The sun sets!')
 
     # tweezer show
     if args['show']:
@@ -222,18 +220,24 @@ def start():
 
             if has_settings:
 
+                settings = parse_json('settings.json')
+
                 if not args['--default']:
-                    settings = parse_json('settings.json')
                     pprint_settings(settings, part=part, status='local')
 
                 else:
-                    settings = parse_json(_DEFAULT_SETTINGS)
-                    pprint_settings(settings, part=part, status='default')
+                    default_settings = parse_json(_DEFAULT_SETTINGS)
+                    pprint_settings(default_settings, part=part, 
+                        status='default', other_settings=settings, other_status='locally')
 
             elif args['--default']:
-                settings = parse_json(_DEFAULT_SETTINGS)
-                pprint_settings(settings, part=part, status='default')
-
+                default_settings = parse_json(_DEFAULT_SETTINGS)
+                if has_settings:
+                    settings = parse_json('settings.json')
+                    pprint_settings(default_settings, part=part, 
+                        status='default', other_settings=settings, other_status='locally')
+                else:
+                    pprint_settings(default_settings, part=part, status='default')
             else:
                 puts('No settings file found...\n')
                 putSettigns = raw_input('Shall I add the default settings file to this directory: ')

@@ -5,6 +5,7 @@ Package for data analysis of optical trap experiments
 """
 
 import os
+import re
 import glob
 
 from functools import partial
@@ -35,43 +36,36 @@ def path_to_sample_data(data_type = 'MAN_DATA'):
     :return example_file: archetype of the specified file type
     
     """
-    data_type = data_type.upper()
-
     def to_file(path, location=-1):
         return os.path.join(path, os.listdir(path)[location])
 
-    if data_type == 'MAN_DATA':
-        example_file = to_file(get_example_path('man_data'), location=-2)
-    elif data_type == 'BAD_MAN_DATA':
-        example_file = to_file(get_example_path('man_data'))
-    elif data_type == 'BOT_DATA':
-        example_file = to_file(get_example_path('bot_data'))
-    elif data_type == 'BOT_STATS':
-        example_file = to_file(get_example_path('bot_stats'))
-    elif data_type == 'BOT_LOG':
-        example_file = to_file(get_example_path('bot_logs'))
-    elif data_type == 'BOT_FOCUS':
-        example_file = to_file(get_example_path('bot_focus'))
-    elif data_type == 'BOT_ANDOR':
-        example_file = to_file(get_example_path('bot_andor'))
-    elif data_type == 'BOT_TDMS':
-        example_file = to_file(get_example_path('bot_tdms'))
-        if '.tdms_index' in os.path.splitext(example_file)[1]:
-            example_file = "".join([os.path.splitext(example_file)[0], '.tdms'])
-    elif data_type == 'MAN_DIST_CAL_':
-        example_file = to_file(get_example_path('man_dist_cal'))
-    elif data_type == 'TC_TS':
-        example_file = to_file(get_example_path('thermal_calibration'))
-    elif data_type == 'TC_PSD':
-        example_file = to_file(get_example_path('thermal_calibration'), location=-2)
-    elif data_type == 'MAN_TRACK':
-        example_file = to_file(get_example_path('man_track'))
-    elif data_type == 'MAN_FLOW':
-        example_file = to_file(get_example_path('man_flow'))
-    else:
-        example_file = "unknown"
+    def find_file(path, name):
+        files = [f for f in os.listdir(path) if re.search('^.+\.\w+$', f)]
+        target = [f for f in files if name in f]
+        if target:
+            return os.path.join(path, target[0])
+        else:
+            return None
 
-    return example_file
+    file_mapper = {'man_data': to_file(get_example_path('man_data'), location=-2),
+        'bad_man_data': to_file(get_example_path('man_data')),
+        'bot_data': to_file(get_example_path('bot_data')), 
+        'bot_stats': to_file(get_example_path('bot_stats'), location=-2),
+        'bot_log': to_file(get_example_path('bot_logs')),
+        'bot_focus': to_file(get_example_path('bot_focus')),
+        'bot_tdms': to_file(get_example_path('bot_tdms'), location=-2),
+        'bot_tdms_index': to_file(get_example_path('bot_tdms'), location=-2),
+        'tc_ts': to_file(get_example_path('thermal_calibration')),
+        'tc_psd': to_file(get_example_path('thermal_calibration'), location=-2),
+        'man_track': to_file(get_example_path('man_track')),
+        'dist_cal_pm_mat': find_file(get_example_path('man_dist_cal'), name='PM_calibration_pm2p'),
+        'dist_cal_pm_res': find_file(get_example_path('man_dist_cal'), name='PM_calibration_calib_pm2pix'),
+        'dist_cal_aod_res': find_file(get_example_path('man_dist_cal'), name='AOD_calibration_calib_aod2pix'),
+        'dist_cal_aod_mat': find_file(get_example_path('man_dist_cal'), name='AOD_calibration_aod2p'),
+        'dist_cal_temp': find_file(get_example_path('man_dist_cal'), name='calibration_template_db_tb'),
+        'man_flow': to_file(get_example_path('man_flow'))}
+
+    return file_mapper.get(data_type.lower(), 'unknown')
 
 
 def path_to_sample_dir(data_type = 'MAN_DATA'):
