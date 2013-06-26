@@ -21,7 +21,7 @@ DEPENDENCIES = ['nose', 'pytest', 'docopt', 'pandas', 'tables', 'numpy',
 
 PACKAGES = ['tweezer', 'tweezer.gui', 'tweezer.core', 'tweezer.cli', 
     'tweezer.ott', 'tweezer.scripts', 'tweezer.bot', 'tweezer.ixo', 
-    'tweezer.dia', 'tweezer.functions', 'tweezer.simulate']
+    'tweezer.dia', 'tweezer.functions', 'tweezer.simulate', 'tweezer.ipython']
 
 MODULES = ['tweezer.io', 'tweezer.core.dio', 
     'tweezer.core.polymer', 'tweezer.core.geometry', 'tweezer.core.trap', 
@@ -32,7 +32,7 @@ MODULES = ['tweezer.io', 'tweezer.core.dio',
     'tweezer.ixo.decorators', 'tweezer.ixo.git', 'tweezer.ixo.hdf5', 
     'tweezer.ixo.latex', 'tweezer.ixo.opsys', 'tweezer.ixo.r',
     'tweezer.bot.utils', 'tweezer.bot.configuration', 'tweezer.dia.io', 
-    'tweezer.dia.tracking', 'tweezer.dia.utils', 
+    'tweezer.dia.tracking', 'tweezer.dia.utils', 'tweezer.ipython.utils',
     'tweezer.simulate.brownian_motion'] 
 
 setup(

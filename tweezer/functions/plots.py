@@ -4,7 +4,10 @@
 import numpy as np
 from matplotlib import rc
 from matplotlib.pyplot import figure, axes, plot, xlabel, ylabel, title, \
-     grid, savefig, show
+     grid, savefig, show, close
+
+from tweezer.core.polymer import ExtensibleWormLikeChain
+
 
 def matplotlib_example():
     rc('text', usetex=True)
@@ -22,3 +25,13 @@ def matplotlib_example():
     grid(True)
     savefig('tex_demo')
     show()
+
+
+def plot_extensible_worm_like_chain():
+    wlc = ExtensibleWormLikeChain(1000)
+    try:
+        wlc.plot_example()
+    except (KeyboardInterrupt, SystemExit), err:
+        close()
+        raise err
+

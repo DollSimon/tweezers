@@ -60,7 +60,6 @@ import shutil
 
 from docopt import docopt
 from clint.textui import colored, puts, indent 
-from pprint import pprint
 
 from tweezer import __version__
 try:
@@ -74,7 +73,7 @@ try:
     from tweezer.ixo.json import parse_json
     from tweezer.simulate.brownian_motion import simulate_naive_1D_brownian_motion
     from tweezer.functions.utils import get_function_arguments
-    from tweezer.functions.plots import matplotlib_example
+    from tweezer.functions.plots import matplotlib_example, plot_extensible_worm_like_chain
 except ImportError, err:
     puts('')
     with indent(2):
@@ -368,10 +367,14 @@ def start():
                         arg_string = ''
                     puts('{}({})\n'.format(colored.blue(each), colored.white(arg_string)))
 
-    # tweezer simulate
+    # tweezer plot
     if args['plot']:
 
-        plot_mapper = {'matplotlib_example': matplotlib_example}
+        plot_mapper = {'matplotlib_example': matplotlib_example, 
+            'wlc': plot_extensible_worm_like_chain,
+            'eWLC': plot_extensible_worm_like_chain,
+            'WLC': plot_extensible_worm_like_chain,
+            'worm-like-chain': plot_extensible_worm_like_chain}
 
         try:
             sys.exit(plot_mapper[args['<OBJECT>']]())
