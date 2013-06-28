@@ -28,4 +28,3 @@ def get_function_arguments(function):
     if A.keywords:
         arguments.append('**' + A.keywords)
     return arguments
-    

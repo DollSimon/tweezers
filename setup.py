@@ -21,19 +21,19 @@ DEPENDENCIES = ['nose', 'pytest', 'docopt', 'pandas', 'tables', 'numpy',
 
 PACKAGES = ['tweezer', 'tweezer.gui', 'tweezer.core', 'tweezer.cli', 
     'tweezer.ott', 'tweezer.scripts', 'tweezer.bot', 'tweezer.ixo', 
-    'tweezer.dia', 'tweezer.functions', 'tweezer.simulate', 'tweezer.ipython']
+    'tweezer.dia', 'tweezer.simulate', 'tweezer.noise']
 
 MODULES = ['tweezer.io', 'tweezer.core.dio', 
     'tweezer.core.polymer', 'tweezer.core.geometry', 'tweezer.core.trap', 
     'tweezer.core.watcher', 'tweezer.core.visualisation', 
     'tweezer.core.simulations', 'tweezer.core.trap_calibration', 
     'tweezer.core.datatypes', 'tweezer.core.analysis', 'tweezer.core.parsers', 
-    'tweezer.core.overview', 'tweezer.cli.utils', 'tweezer.ixo.json', 
-    'tweezer.ixo.decorators', 'tweezer.ixo.git', 'tweezer.ixo.hdf5', 
-    'tweezer.ixo.latex', 'tweezer.ixo.opsys', 'tweezer.ixo.r',
-    'tweezer.bot.utils', 'tweezer.bot.configuration', 'tweezer.dia.io', 
-    'tweezer.dia.tracking', 'tweezer.dia.utils', 'tweezer.ipython.utils',
-    'tweezer.simulate.brownian_motion'] 
+    'tweezer.core.overview', 'tweezer.cli.utils', 'tweezer.cli.plots',
+    'tweezer.ixo.json', 'tweezer.ixo.decorators', 'tweezer.ixo.git', 
+    'tweezer.ixo.hdf5', 'tweezer.ixo.latex', 'tweezer.ixo.opsys', 'tweezer.ixo.r',
+    'tweezer.ixo.functions', 'tweezer.ixo.math', 'tweezer.bot.utils', 
+    'tweezer.bot.configuration', 'tweezer.dia.io', 'tweezer.dia.tracking', 
+    'tweezer.dia.utils', 'tweezer.simulate.brownian_motion',] 
 
 setup(
     name='tweezer',

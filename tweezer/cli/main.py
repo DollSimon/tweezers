@@ -72,8 +72,8 @@ try:
     from tweezer import _TWEEBOT_CONFIG
     from tweezer.ixo.json import parse_json
     from tweezer.simulate.brownian_motion import simulate_naive_1D_brownian_motion
-    from tweezer.functions.utils import get_function_arguments
-    from tweezer.functions.plots import matplotlib_example, plot_extensible_worm_like_chain
+    from tweezer.ixo.functions import get_function_arguments
+    from tweezer.cli.plots import matplotlib_example, plot_extensible_worm_like_chain
 except ImportError, err:
     puts('')
     with indent(2):

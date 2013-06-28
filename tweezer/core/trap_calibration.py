@@ -11,7 +11,6 @@ class SingleTrapPowerSpectrum(object):
     """
     Analytic form for fitting the power spectrum of a microsphere trapped in a single optical trap
 
-
     Parameter:
         D - diffusion_coefficient (µm^2 / s)
         fc - corner_frequency (500 Hz)

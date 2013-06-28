@@ -274,6 +274,12 @@ class ExtensibleWormLikeChain(object):
         plt.ylabel('Force [pN]')
         plt.axvline(self._L, linewidth=1.0, linestyle='--', color='#d33682') 
         plt.show()
+        return plt.gcf() 
+
+
+class TwistedWormLikeChain(object):
+    def __init__(self):
+        raise NotImplementedError('Nope')
 
 
 class LengthDependentPersistenceLength(object):

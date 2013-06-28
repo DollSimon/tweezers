@@ -7,7 +7,7 @@ from matplotlib.pyplot import figure, axes, plot, xlabel, ylabel, title, \
      grid, savefig, show, close
 
 from tweezer.core.polymer import ExtensibleWormLikeChain
-
+# from tweezer.cli import InterpretUserInput
 
 def matplotlib_example():
     rc('text', usetex=True)
@@ -30,8 +30,8 @@ def matplotlib_example():
 def plot_extensible_worm_like_chain():
     wlc = ExtensibleWormLikeChain(1000)
     try:
-        wlc.plot_example()
+        fig = wlc.plot_example()
     except (KeyboardInterrupt, SystemExit), err:
-        close()
+        close(fig)
         raise err
 
