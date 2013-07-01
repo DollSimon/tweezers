@@ -41,7 +41,12 @@ def read_distance_calibration_matrix(file_name):
 
     setup = list(chain.from_iterable(setup))
 
+    df = pd.DataFrame(data)
     # trap_steps = np.linspace(s)
+
+    # split data in the middle
+
+    # create steps for the 
     
     return lines, data, setup, trap
 

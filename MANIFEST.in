@@ -25,3 +25,6 @@ recursive-include features *.feature
 recursive-include features *.py
 recursive-include tests *.py
 recursive-include tweezer *.tex
+
+# added by check_manifest.py
+recursive-include tweezer *.enaml

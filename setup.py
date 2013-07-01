@@ -20,10 +20,10 @@ DEPENDENCIES = ['nose', 'pytest', 'docopt', 'pandas', 'tables', 'numpy',
     'scipy', 'termcolor', 'parsley', 'clint']
 
 PACKAGES = ['tweezer', 'tweezer.gui', 'tweezer.core', 'tweezer.cli', 
-    'tweezer.ott', 'tweezer.scripts', 'tweezer.bot', 'tweezer.ixo', 
-    'tweezer.dia', 'tweezer.simulate', 'tweezer.noise']
+    'tweezer.scripts', 'tweezer.bot', 'tweezer.ixo', 'tweezer.dia', 
+    'tweezer.simulate', 'tweezer.noise']
 
-MODULES = ['tweezer.io', 'tweezer.core.dio', 
+MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
     'tweezer.core.polymer', 'tweezer.core.geometry', 'tweezer.core.trap', 
     'tweezer.core.watcher', 'tweezer.core.visualisation', 
     'tweezer.core.simulations', 'tweezer.core.trap_calibration', 
