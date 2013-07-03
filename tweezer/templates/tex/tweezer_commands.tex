@@ -1,0 +1,183 @@
+% These commands are used for the overview pages of a dual-trap experiment
+
+% Commands to align the section and subsection headiungs to the centre
+% actually, this should work with [centering] as a titlesec option
+
+% Commands for adjusting the look of tables
+\newcommand{\otoprule}{\midrule[\heavyrulewidth]}
+\setlength{\heavyrulewidth}{0.1em}
+
+% Command to choose text according to the individual experiment
+\def\dtHeadline#1{
+    \ifcase#1
+        \or \section*{Overview of Dual-Trap Transcription Experiment} 
+        \or \section*{Overview of Dual-Trap DNA Stetching Experiment} 
+        \or \section*{Overview of Dual-Trap Fluorescence Experiment} 
+        \or \section*{Overview of Dual-Trap Membrane Experiment} 
+        \or \section*{Overview of Dual-Trap Calibration Experiment} 
+        \or \section*{Overview of Dual-Trap Optics Experiment} 
+        \or \section*{Overview of Another Dual-Trap Experiment} 
+    \fi
+}
+        
+\def\dtExp#1{%
+    \ifcase#1%
+        \or Transcription %
+        \or DNA Stretching %
+        \or Fluorescence Measurement %
+        \or Membrane Project %
+        \or Calibration %
+        \or Optics %
+        \or Another %
+    \fi %
+}
+\def\dtTable#1{%
+    \ifcase#1%
+        \or \begin{table}[!h] % Transcription experiment 
+                \centering
+                \begin{tabularx}{0.42\textwidth}{>{\bfseries}l>{\raggedleft\arraybackslash\bfseries}X}
+                \toprule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Methods}} \\
+                \otoprule
+                RNA Polymerase                         & \Sexpr{methods$rnap} \\
+                Force Mode                             & \Sexpr{methods$mode} \\
+                DNA Tether (\si{\nano\meter})          & \Sexpr{0.34*methods$dnaTether} (\Sexpr{methods$dnaTether} bp)\\
+                DNA Template (\si{\nano\meter})        & \Sexpr{0.34*methods$dnaTemplate} (\Sexpr{methods$dnaTemplate} bp)\\
+                RNAP Linker                            & \Sexpr{methods$linkerRnap} \\
+                DNA Linker                             & \Sexpr{methods$linkerDna} \\
+                NTP conc. (\si{\milli\mole\per\liter}) & \Sexpr{methods$ntp} \\
+                Buffer                                 & \Sexpr{toString(methods$buffer)} \\
+                Additional Protein                     & \Sexpr{methods$additionalprotein} \\
+                \midrule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Other Information}} \\
+                \midrule   
+                Date          & \Sexpr{ref$dateString} \\
+                Original File & \Sexpr{ref$originalFileName} \\
+                Comment       & \Sexpr{ref$comment} \\
+                \bottomrule
+                \end{tabularx}
+                \caption*{Experimental Metadata}
+                \label{tab:calibData}
+            \end{table}
+        \or \begin{table}[!h] % DNA Stretching experiments
+                \centering
+                \begin{tabularx}{0.42\textwidth}{>{\bfseries}l>{\raggedleft\arraybackslash\bfseries}X}
+                \toprule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Methods}} \\
+                \otoprule
+                DNA Tether (\si{\nano\meter}) & \Sexpr{0.34*methods$dnaTether} (\Sexpr{methods$dnaTether} bp)\\
+                DNA Origin                    & \Sexpr{methods$dnaOrigin} \\
+                DNA Extraction                & \Sexpr{methods$dnaExtraction} \\
+                DNA Linker T1                 & \Sexpr{methods$dnaLinkerT1} \\
+                DNA Linker T2                 & \Sexpr{methods$dnaLinkerT2} \\
+                Buffer                        & \Sexpr{methods$buffer} \\
+                Additional Protein            & \Sexpr{methods$additionalprotein} \\
+                \midrule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Other Information}} \\
+                \midrule   
+                Date          & \Sexpr{ref$dateString} \\
+                Original File & \Sexpr{ref$originalFileName} \\
+                Comment       & \Sexpr{ref$comment} \\
+                \bottomrule
+                \end{tabularx}
+                \caption*{Experimental Metadata}
+                \label{tab:calibData}
+            \end{table}                           
+        \or \begin{table}[!h] % Fluorescence Experiment
+                \centering
+                \begin{tabularx}{0.42\textwidth}{>{\bfseries}l>{\raggedleft\arraybackslash\bfseries}X}
+                \toprule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Methods}} \\
+                \otoprule
+                Fluorophore                              & \Sexpr{methods$fluorophore} \\
+                Excitation Wavelength (\si{\nano\meter}) & \Sexpr{methods$fluorophoreExcitation} \\
+                Emission Wavelength (\si{\nano\meter})   & \Sexpr{methods$fluorophoreEmission} \\
+                Buffer                                   & \Sexpr{methods$buffer} \\
+                \midrule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Other Information}} \\
+                \midrule   
+                Date          & \Sexpr{ref$dateString} \\
+                Original File & \Sexpr{ref$originalFileName} \\
+                Comment       & \Sexpr{ref$comment} \\
+                \bottomrule
+                \end{tabularx}
+                \caption*{Experimental Metadata}
+                \label{tab:calibData}
+            \end{table}                           
+        \or \begin{table}[!h] % Membrane Project experiments
+                \centering
+                \begin{tabularx}{0.42\textwidth}{>{\bfseries}l>{\raggedleft\arraybackslash\bfseries}X}
+                \toprule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Methods}} \\
+                \otoprule
+                Membrane structure & \Sexpr{methods$membrane} \\
+                Buffer             & \Sexpr{methods$buffer} \\
+                Additional Protein & \Sexpr{methods$additionalprotein} \\
+                \midrule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Other Information}} \\
+                \midrule   
+                Date          & \Sexpr{ref$dateString} \\
+                Original File & \Sexpr{ref$originalFileName} \\
+                Comment       & \Sexpr{ref$comment} \\
+                \bottomrule
+                \end{tabularx}
+                \caption*{Experimental Metadata}
+                \label{tab:calibData}
+            \end{table}                           
+        \or \begin{table}[!h] % Calibration experiments
+                \centering
+                \begin{tabularx}{0.42\textwidth}{>{\bfseries}l>{\raggedleft\arraybackslash\bfseries}X}
+                \toprule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Methods}} \\
+                \otoprule
+                Buffer & \Sexpr{methods$buffer} \\
+                \midrule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Other Information}} \\
+                \midrule   
+                Date          & \Sexpr{ref$dateString} \\
+                Original File & \Sexpr{ref$originalFileName} \\
+                Comment       & \Sexpr{ref$comment} \\
+                \bottomrule
+                \end{tabularx}
+                \caption*{Experimental Metadata}
+                \label{tab:calibData}
+            \end{table}                           
+        \or \begin{table}[!h] % Optics experiments
+                \centering
+                \begin{tabularx}{0.42\textwidth}{>{\bfseries}l>{\raggedleft\arraybackslash\bfseries}X}
+                \toprule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Methods}} \\
+                \otoprule
+                Buffer & \Sexpr{methods$buffer} \\
+                \midrule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Other Information}} \\
+                \midrule   
+                Date          & \Sexpr{ref$dateString} \\
+                Original File & \Sexpr{ref$originalFileName} \\
+                Comment       & \Sexpr{ref$comment} \\
+                \bottomrule
+                \end{tabularx}
+                \caption*{Experimental Metadata}
+                \label{tab:calibData}
+            \end{table}                           
+        \or \begin{table}[!h] % Another experiments
+                \centering
+                \begin{tabularx}{0.42\textwidth}{>{\bfseries}l>{\raggedleft\arraybackslash\bfseries}X}
+                \toprule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Methods}} \\
+                \otoprule
+                Buffer & \Sexpr{methods$buffer} \\
+                \midrule
+                \multicolumn{2}{>{\columncolor[gray]{0.9}}c}{\bfseries{Other Information}} \\
+                \midrule   
+                Date          & \Sexpr{ref$dateString} \\
+                Original File & \Sexpr{ref$originalFileName} \\
+                Comment       & \Sexpr{ref$comment} \\
+                \bottomrule
+                \end{tabularx}
+                \caption*{Experimental Metadata}
+                \label{tab:calibData}
+            \end{table}                           
+    \fi
+}
+                  

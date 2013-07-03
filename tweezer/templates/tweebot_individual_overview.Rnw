@@ -39,6 +39,19 @@
 \author{Marcus Jahnel}
 
 \begin{document}
+<<setup,echo=F>>= 
+setCacheDir("cache") 
+@ 
+
+<<loadingData, echo=FALSE, results=hide>>=
+library(tweezR)
+
+@                   
+
+
+
+
+
 \section*{Tweebot Experiment}
 
 Here is a code chunk. this is this $\Sexpr{4}$ 

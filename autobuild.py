@@ -19,7 +19,11 @@ import time
 from watchdog.observers.fsevents import FSEventsObserver as Observer
 from watchdog.events import FileSystemEventHandler
 
+import envoy
+from clint.textui import colored, puts, indent 
+
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
+
 print >> sys.stdout, "Watching changes to the base directory {}".format(BASEDIR)
 
 def get_now():
@@ -50,13 +54,17 @@ def run_unittests():
     os.chdir(BASEDIR)
     subprocess.call(r'python -m unittest discover -b')
 
-def run_behave():
+def run_build():
     '''
-    Run BDD tests with behave.
+    Run the setup.py build command
     '''
-    print >> sys.stderr, "Running behave at %s" % get_now()
+    puts('Running build at {}'.format(get_now()))
     os.chdir(BASEDIR)
-    subprocess.call(r'behave')
+    shell_call= envoy.run('python setup.py install')
+    if not shell_call.status_code:
+        puts('{}'.format(colored.red('Project build successfully...')))
+    else:
+        print(shell_call.std_err)
 
 def getext(filename):
     '''
@@ -77,7 +85,10 @@ class ChangeHandler(FileSystemEventHandler):
         if event.is_directory:
             return
         if getext(event.src_path) == '.py':
-            run_behave()
+            if not 'build' in event.src_path:
+                puts('Build triggered by {}'.format(colored.yellow(event.src_path)))
+                run_build()
+
         elif getext(event.src_path) == '.rst':
             build_docs()
         

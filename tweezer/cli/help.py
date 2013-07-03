@@ -74,6 +74,47 @@ def show_tweezer_help_pages():
             puts('-i --image        Switch to image mode when input can be image or video')
             puts('-a --args=<ARGS>  Additional keyword arguments to be passed to the command') 
 
-def show_plot_help():
+
+def print_plot_help():
     with indent(2):
-        puts(colored.white('Help for tweezer plot command:'))
+        puts('Help for {} command:\n'.format(colored.white('tweezer plot')))
+
+
+def print_overview_help():
+    with indent(2):
+        puts('Help for {} command:\n'.format(colored.white('tweezer overview')))
+
+def print_simulate_help():
+    with indent(2):
+        puts('Help for {} command:\n'.format(colored.white('tweezer simulate')))
+
+
+def print_show_help():
+    with indent(2):
+        puts('Help for {} command:\n'.format(colored.white('tweezer show')))
+
+
+def print_analyse_help():
+    with indent(2):
+        puts('Help for {} command:\n'.format(colored.white('tweezer analyse')))
+
+
+def print_watch_help():
+    with indent(2):
+        puts('Help for {} command:\n'.format(colored.white('tweezer watch')))
+
+
+def print_track_help():
+    with indent(2):
+        puts('Help for {} command:\n'.format(colored.white('tweezer track')))
+
+
+def print_update_help():
+    with indent(2):
+        puts('Help for {} command:\n'.format(colored.white('tweezer update')))
+
+
+def print_list_help():
+    with indent(2):
+        puts('Help for {} command:\n'.format(colored.white('tweezer list')))
+

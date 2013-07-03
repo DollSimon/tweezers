@@ -29,10 +29,11 @@ MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
     'tweezer.core.simulations', 'tweezer.core.trap_calibration', 
     'tweezer.core.datatypes', 'tweezer.core.analysis', 'tweezer.core.parsers', 
     'tweezer.core.overview', 'tweezer.cli.utils', 'tweezer.cli.plots',
-    'tweezer.ixo.json', 'tweezer.ixo.decorators', 'tweezer.ixo.git', 
-    'tweezer.ixo.hdf5', 'tweezer.ixo.latex', 'tweezer.ixo.opsys', 'tweezer.ixo.r',
-    'tweezer.ixo.functions', 'tweezer.ixo.math', 'tweezer.bot.utils', 
-    'tweezer.bot.configuration', 'tweezer.dia.io', 'tweezer.dia.tracking', 
+    'tweezer.ixo.json_', 'tweezer.ixo.decorators', 'tweezer.ixo.git_', 
+    'tweezer.ixo.hdf5', 'tweezer.ixo.pandas_', 'tweezer.ixo.latex', 
+    'tweezer.ixo.os_', 'tweezer.ixo.r', 'tweezer.ixo.functions', 
+    'tweezer.ixo.math_', 'tweezer.bot.utils', 'tweezer.bot.configuration', 
+    'tweezer.dia.io', 'tweezer.dia.tracking', 'tweezer.ixo.ipython_',
     'tweezer.dia.utils', 'tweezer.simulate.brownian_motion',] 
 
 setup(

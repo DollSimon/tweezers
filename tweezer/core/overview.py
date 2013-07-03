@@ -14,7 +14,7 @@ def full_tweebot_overview(path):
     print('Hurray')
 
 
-def tweebot_overview(data_file):
+def generate_tweebot_overview(data_file):
     """
     Top level routine for producing Tweebot overviews.
     

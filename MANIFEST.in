@@ -28,3 +28,7 @@ recursive-include tweezer *.tex
 
 # added by check_manifest.py
 recursive-include tweezer *.enaml
+
+# added by check_manifest.py
+recursive-include tweezer *.Rnw
+recursive-include tweezer *.py
