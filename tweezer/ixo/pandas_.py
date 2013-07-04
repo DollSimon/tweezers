@@ -4,10 +4,28 @@ import os
 
 import pandas as pd
 
+from clint.textui import puts, indent, colored
+
 try:
     import simplejson as json
 except:
     import json
+
+try:
+    from rpy2.robjects import r
+    import pandas.rpy.common as com
+except:
+    raise ImportError('Probably the rpy2 library is not working...')
+
+try:
+    from tweezer.ixo.collections_ import flatten_dictionary
+except ImportError, err:
+    puts('')
+    with indent(2):
+        puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
+        puts('')
+        puts('The following import error occurred: {}'.format(colored.red(err))) 
+        puts('')
 
 
 def h5_save(data_frame=None, h5_file='test.h5', append_data=False):
@@ -38,6 +56,7 @@ def h5_save(data_frame=None, h5_file='test.h5', append_data=False):
 
         json_dic = {}
         json_dic['attributes'] = attributes
+        json_dic['keys'] = str(data_frame.keys())
 
         for attribute in attributes:
             json_dic[attribute] = data_frame.__getattribute__(attribute)
@@ -61,7 +80,6 @@ def h5_save(data_frame=None, h5_file='test.h5', append_data=False):
                 json.dump(json_dic, f)
         else:
             print('File already exists')
-
 
 
 def h5_load(h5_file):
@@ -99,24 +117,56 @@ def h5_load(h5_file):
     return data 
 
 
+def rdata_save(data_frame=None, rdata_file='test.RData', append_data=False):
+    """
+    Saves pandas DataFrame with additional attributes to RData file format. Since custom attributes can't be stored like this yet, these are recognised and saved as json file format with the same name.
+    
+    Parameter:
+    ----------
 
-def main():
-    data = pd.DataFrame({'x': [1, 2, 3, 4, 5], 'y': [5, 4, 3, 2, 1]})
-    data.units = {'x': 'm', 'y': 'pN'}
-    h5file = os.path.join(os.getcwd(), 'pandas_export.h5')
-    current_dir = os.getcwd()
-    print(current_dir)
-    os.mkdir("testDir")
-    os.chdir("testDir")
-    h5_save(data, h5file)
+    :param data_frame:(pandas.DataFrame) that might carry additional custom attributes
+    :param rdata_file: (path) where to save the data
+    :param append_data: (Boolean) whether the data should be appended to an existing file
+    
+    """
+    if not rdata_file.endswith('.RData'):
+        raise IOError('Please specify an RData file with extension .RData')
 
+    if not isinstance(data_frame, pd.DataFrame):
+        raise TypeError('Provided data is not of type pandas.DataFrame, but {}'.format(type(data_frame)))
 
-if __name__ == '__main__':
-    import tempfile
-    import shutil
-    TEMPDIR = tempfile.mkdtemp()
-    try:
-        main()
-    finally:
-        shutil.rmtree(TEMPDIR)
+    # get attributes if any
+    EMPTY_FRAME = pd.DataFrame() 
+
+    attributes = list(set(dir(EMPTY_FRAME)) ^ set(dir(data_frame)))
+
+    # write files 
+    if not os.path.exists(rdata_file):
+        try:
+            r_data_frame = com.convert_to_r_dataframe(data_frame)
+            r.assign('data', r_data_frame)
+
+            if attributes:
+
+                r_dic = {}
+                r_dic['attributes'] = attributes
+                r_dic['keys'] = str(data_frame.keys())
+
+                for attribute in attributes:
+                    r_dic[attribute] = data_frame.__getattribute__(attribute)
+
+                flatten = lambda d: {'_'.join(k):v for k,v in flatten_dictionary(d).items()}
+
+                for key, value in flatten(r_dic).iteritems():
+                    try:
+                        r.assign('{}'.format(key), value)
+                    except:
+                        print('Could not export {} to R...'.format(key))
+
+            r("save.image(file = '{}')".format(rdata_file))
+
+        except:
+            raise 
+    else:
+        print('File already exists')
 

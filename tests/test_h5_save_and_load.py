@@ -1,23 +1,39 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
+import os, shutil
+
 import sure
 import unittest
 import nose
 
-import os, shutil
-
 import pandas as pd
 
-from tweezer.ixo.pandas_ import h5_save, h5_load
+from clint.textui import colored, puts, indent
 
 try:
     import simplejson as json
 except:
     import json
 
+try:
+    from rpy2.robjects import r
+    import pandas.rpy.common as com
+except:
+    raise ImportError('Probably the rpy2 library is not working...')
 
-class TestPandasDataFrameSaving:
+try:
+    from tweezer.ixo.pandas_ import (h5_save, h5_load, rdata_save)
+except ImportError, err:
+    puts('')
+    with indent(2):
+        puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
+        puts('')
+        puts('The following import error occurred: {}'.format(colored.red(err))) 
+        puts('')
+
+
+class TestPandasDataFrameIO:
 
     def setUp(self):
         self.current_dir = os.getcwd()
@@ -32,6 +48,7 @@ class TestPandasDataFrameSaving:
 
         self.file = os.path.join(os.getcwd(), 'pandas_export.h5')
         self.file_b = os.path.join(os.getcwd(), 'pandas_export_b.h5')
+        self.r_file = os.path.join(os.getcwd(), 'pandas_export.RData')
 
 
     def tearDown(self):
@@ -76,6 +93,22 @@ class TestPandasDataFrameSaving:
         data.x[1].should.equal(2) 
         data.units['x'].should.be('m')
         
+    def test_rdata_saving(self):
+        rdata_save(data_frame = self.data, rdata_file = self.r_file)
+        files = os.listdir(os.getcwd()) 
+        ('pandas_export.RData').should.be.within(files)
+
+        # read contents of RData file
+        rd = r.load(file='pandas_export.RData')
+        str(rd.rx(1)).should.equal('[1] "attributes"\n') 
+        str(rd.rx(2)).should.equal('[1] "data"\n') 
+        str(rd.rx(3)).should.equal('[1] "keys"\n') 
+        str(rd.rx(4)).should.equal('[1] "units_x"\n') 
+        str(rd.rx(5)).should.equal('[1] "units_y"\n') 
+        
+
+
+
         
 
 

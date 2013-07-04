@@ -4,7 +4,7 @@ from __future__ import print_function, division
 
 import numpy as np
 
-from tweezer.ixo.math import map_array_to_range
+from tweezer.ixo.math_ import map_array_to_range
 
 
 def generate_power_noise(alpha=1, nSamples=1e5, normalize=False, deterministic_spectrum=True):

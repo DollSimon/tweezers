@@ -9,6 +9,7 @@ try:
 except:
     import json
 
+
 def parse_json(file_name):
     """ 
     Parse a JSON file
@@ -42,7 +43,3 @@ def parse_json(file_name):
         # Return json file
         return json.loads(content)
 
-
-class JSONObject:
-    def __init__(self, d):
-        self.__dict__ = d
