@@ -40,3 +40,7 @@ tweezer/templates/pytex/*
 
 # profile files
 *.profile
+
+# files from nose testing
+setup.json
+tests.json
