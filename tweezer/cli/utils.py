@@ -13,9 +13,17 @@ try:
 except ImportError:
     import json
 
-from tweezer.core.parsers import classify_all, parse_tweezer_file_name
-from tweezer.cli import InterpretUserInput
-
+try:
+    from tweezer.ixo.os_ import generate_file_tree_of
+    from tweezer.core.parsers import classify_all, parse_tweezer_file_name
+    from tweezer.cli import InterpretUserInput
+except ImportError, err:
+    puts('')
+    with indent(2):
+        puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
+        puts('')
+        puts('The following import error occurred: {}'.format(colored.red(err))) 
+        puts('')
 
 def list_tweezer_files(directory):
     """ 
@@ -27,11 +35,11 @@ def list_tweezer_files(directory):
 
     """
     files = defaultdict(list)
+    file_names = list(generate_file_tree_of(directory))
 
-    for (path, dirs, file_names) in os.walk(directory):
-        types = classify_all(file_names)
-        for t, f in izip(types, file_names):
-            files[t.lower()].append(os.path.join(directory, path, f))
+    types = classify_all(file_names)
+    for t, f in izip(types, file_names):
+        files[t.lower()].append(f)
 
     return files
 

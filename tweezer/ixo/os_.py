@@ -42,3 +42,16 @@ def get_parent_directory(file_name):
     :return parent_dir: (String) name of parent directory
     """
     return get_subdirs(file_name)[-1]
+
+
+def generate_file_tree_of(directory):
+    """
+    Generator for all files contained in a directory
+    
+    :param directory: (path) root directory
+    """
+    for paths, dirs, files in os.walk(directory):
+        for f in files:
+            yield os.path.abspath(os.path.join(paths, f))
+    
+

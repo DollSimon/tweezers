@@ -50,7 +50,6 @@ class TestPandasDataFrameIO:
         self.file_b = os.path.join(os.getcwd(), 'pandas_export_b.h5')
         self.r_file = os.path.join(os.getcwd(), 'pandas_export.RData')
 
-
     def tearDown(self):
         os.chdir(self.current_dir)
         shutil.rmtree("testDir")
