@@ -9,6 +9,8 @@ import nose
 
 import pandas as pd
 
+from collections import namedtuple
+
 from clint.textui import colored, puts, indent
 
 try:
@@ -28,6 +30,7 @@ try:
     from tweezer import path_to_sample_data
     from tweezer import read
     from tweezer.cli.utils import list_tweezer_files, sort_files_by_trial
+    from tweezer.cli.utils import collect_data_per_trial
 except ImportError, err:
     puts('')
     with indent(2):
@@ -77,13 +80,15 @@ class TestSimpleOverviewPage:
         files = self.__class__.files
         tf = sort_files_by_trial(files=files)
         ('4_c').should.be.within(tf.keys())
+        len(tf['4_c']).should.be(4)
         ('2').should.be.within(tf.keys())
         ('4_f').should.be.within(tf.keys())
         ('2_c').should.be.within(tf.keys())
         tf['4_c']['tc_psd'].shouldnot.equal([None]) 
         
-    def test_read_data_per_trial(self):
-        pass
-
-    def test_dose(self):
-        (1).should.equal(1) 
+    # def test_read_data_per_trial(self):
+    #     files = self.__class__.files
+    #     tf = sort_files_by_trial(files=files)
+    #     TD = collect_data_per_trial(tf['4_c'])
+    #     TD.man_data.should.be.a(namedtuple) 
+        

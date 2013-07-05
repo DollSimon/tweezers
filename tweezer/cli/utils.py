@@ -17,6 +17,7 @@ try:
     from tweezer.ixo.os_ import generate_file_tree_of
     from tweezer.core.parsers import classify_all, parse_tweezer_file_name
     from tweezer.cli import InterpretUserInput
+    from tweezer import read
 except ImportError, err:
     puts('')
     with indent(2):
@@ -86,7 +87,7 @@ def collect_files_per_trial(files=defaultdict(list), trial=1, subtrial=None):
     return trial_files
 
 
-def sort_files_by_trial(files=defaultdict(list), sort_by=None):
+def sort_files_by_trial(files=defaultdict(list), sort_by=None, clean=True):
     """
     Sorts a dictionary of all tweezer files into a dictionary that splits 
     according to all files found for specified key
@@ -119,28 +120,50 @@ def sort_files_by_trial(files=defaultdict(list), sort_by=None):
         else:
             trial_files["_".join([t[0], t[1]])] = collect_files_per_trial(files=files, trial=int(t[0]), subtrial=t[1])
 
+    if clean:
+        cleaned_trials = {}
+
+        for trial, files in trial_files.iteritems():
+
+            cleaned_files = {}
+
+            for ftype, fpaths in dict(files).iteritems():
+                if fpaths:
+                    if fpaths[0] is not None:
+                        cleaned_files[ftype] = fpaths
+
+            cleaned_trials[trial] = cleaned_files 
+
+        trial_files = cleaned_trials
 
     return trial_files
 
 
-def collect_data_per_trial(files_per_trial):
+def collect_data_per_trial(trial_files):
     """
     Collects most important data for one trial
 
-    :param files_per_trial: (defaultdict) that holds the files collected per trial
+    :param trial_files: (defaultdict) that holds the files collected per trial
 
     :return TrialData: (namedtuple) that holds relevant data
     """
-
-
     def namedtuple_factory(files, data):
         fields = [k for k in files]
         TrialData = namedtuple('TrialData', fields) 
         return TrialData(*data)
 
+    try:
+        files = []
+        data = []
+        for ftype, fpath in trial_files.iteritems():
+            files.append(ftype)
+            data.append(read(fpath))
 
+        TrialData = namedtuple_factory(files, data)
+    except:
+        raise
 
-
+    return TrialData
 
 
 def pprint_settings(settings, part='all', status='current', other_settings={}, other_status='default'):
