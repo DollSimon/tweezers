@@ -22,14 +22,19 @@ def parse_tweezer_file_name(file_name, parser='bot_data'):
     file_info = namedtuple('FileInfo', ['trial', 'subtrial', 'date'])
 
     base_grammar = makeGrammar("""
+        # date related patterns
         y = <digit{4}>:year -> int(year)
         mo = <digit{2}>:month -> int(month)
         d = <digit{2}>:day -> int(day)
         h = <digit{2}>:hour -> int(hour)
         mi = <digit{2}>:minute -> int(minute)
         sc = <digit{2}>:second -> int(second)
+
+        # trial and subtrial information
         t = <digit+>:trial -> str(trial)
         sub = <letter{1}>:subtrial -> str(subtrial)
+
+        # separator
         s = '.' | '_' | ' '
     """, {})
 
@@ -66,6 +71,24 @@ def parse_tweezer_file_name(file_name, parser='bot_data'):
             ssh = <('S' | 's') 'n' 'a' 'p' 's' 'h' 'o' 't'> 
             ext = '.' <'p' 'n' 'g'>:ext -> str(ext)
             pattern = (<t '_' sub> | t):name s ssh s{2} y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s ms:ms s ccd ext -> (name, y, mo, d, h, mi, sc, ms)
+            """, {}, extends = base_grammar)
+    elif parser is 'man_data':
+        name_parser = makeGrammar("""
+            # ending 
+            txt = <'t' 'x' 't'>:txt -> str(txt)
+            gro = <'g' 'r' 'o' 'o' 'v' 'y'>:groovy -> str(groovy)
+            wgr = <'w' 'h' 'o' 'l' 'e' '.' gro>
+            png = <'p' 'n' 'g'>:png -> str(png)
+            jpg = <('j' 'e' 'p' 'g' | 'j' 'p' 'g')>:jpg -> str(jpg)
+            avi = <'a' 'v' 'i'>:avi -> str(avi)
+            csv = <'c' 's' 'v'>:csv -> str(csv)
+            fts = <'f' 'i' 't' 's'>:fts -> str(fts)
+            tif = <'t' 'i' ('f' 'f' | 'f')>:tif -> str(tif)
+            tdms = <'t' 'd' 'm' 's'>:tdms -> str(tdms)
+            tdms_index = <'t' 'd' 'm' 's' '_' 'i' 'n' 'd' 'e' 'x'>:tdms_index -> str(tdms_index)
+            end = '.' (txt | gro | png | jpg | wgr | tdms | avi | tif | csv | tdms_index)
+ 
+            pattern = (<t '_' sub> | t):name end:ext -> (name, ext)
             """, {}, extends = base_grammar)
 
     try:

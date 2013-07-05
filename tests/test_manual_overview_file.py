@@ -27,7 +27,7 @@ try:
     from tweezer import _TWEEBOT_CONFIG
     from tweezer import path_to_sample_data
     from tweezer import read
-    from tweezer.cli.utils import list_tweezer_files
+    from tweezer.cli.utils import list_tweezer_files, sort_files_by_trial
 except ImportError, err:
     puts('')
     with indent(2):
@@ -73,9 +73,17 @@ class TestSimpleOverviewPage:
         ('/Users/jahnel/code/example_data/manual/thermal_calibration/PSD_4_e.txt').shouldnot.be.within(files)
         'man_data'.should.be.within(files)
 
-
+    def test_files_per_trial(self):
+        files = self.__class__.files
+        tf = sort_files_by_trial(files=files)
+        ('4_c').should.be.within(tf.keys())
+        ('2').should.be.within(tf.keys())
+        ('4_f').should.be.within(tf.keys())
+        ('2_c').should.be.within(tf.keys())
+        tf['4_c']['tc_psd'].shouldnot.equal([None]) 
         
-        
+    def test_read_data_per_trial(self):
+        pass
 
     def test_dose(self):
         (1).should.equal(1) 

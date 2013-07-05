@@ -1,7 +1,7 @@
 import os
 import re
 
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from itertools import izip
 from copy import deepcopy
 
@@ -71,13 +71,13 @@ def collect_files_per_trial(files=defaultdict(list), trial=1, subtrial=None):
     trial_files = defaultdict(list)
 
     if subtrial:
-        trial_name = "_".join(str(trial), str(subtrial))
+        trial_name = "_".join([str(trial), str(subtrial)])
     else:
         trial_name = str(trial)
 
     for t, f in files.iteritems():
         for x in f:
-            if re.search('^\s*{}\W'.format(trial_name), os.path.basename(x)):
+            if re.search('^\s*[a-zA-Z_]*{}\W'.format(trial_name), os.path.basename(x)):
                 trial_files[t].append(x)
         else:
             if not trial_files.has_key(t):
@@ -86,9 +86,10 @@ def collect_files_per_trial(files=defaultdict(list), trial=1, subtrial=None):
     return trial_files
 
 
-def sort_tweebot_trials(files=defaultdict(list), sort_by='bot_data'):
+def sort_files_by_trial(files=defaultdict(list), sort_by=None):
     """
-    Sorts a dictionary of all tweezer files into a dictionary that splits according to all files found for specified key
+    Sorts a dictionary of all tweezer files into a dictionary that splits 
+    according to all files found for specified key
     
     :param files: (defaultdict) of all files found in the current directory tree
     :param sort_by: (str) specifying the file type to use for the sorting 
@@ -97,15 +98,49 @@ def sort_tweebot_trials(files=defaultdict(list), sort_by='bot_data'):
     
     .. note::
 
-        The reason for this is that there are many more log files written than data files. Like this you can either look at the successful trials or all trials, depending on your needs
+        The reason for this is that there are many more log files written than 
+        data files. Like this you can either look at the successful trials or 
+        all trials, depending on your needs
     """
-    trials = [int(parse_tweezer_file_name(f, parser=sort_by).trial) for f in files[sort_by]]
+    # try to infer the sorting key
+    if not sort_by:
+        if len(files.get('man_data', [])) >= len(files.get('bot_data', [])):
+            sort_by = 'man_data'
+        else:
+            sort_by = 'bot_data'
+         
+    FileInfos = [parse_tweezer_file_name(f, parser=sort_by) for f in files[sort_by]]
+    trials = [(f.trial, f.subtrial) for f in FileInfos]
 
     trial_files = {}
     for t in trials:
-        trial_files[t] = collect_files_per_trial(files=files, trial=t)
+        if t[1] is None:
+            trial_files[t[0]] = collect_files_per_trial(files=files, trial=int(t[0]))
+        else:
+            trial_files["_".join([t[0], t[1]])] = collect_files_per_trial(files=files, trial=int(t[0]), subtrial=t[1])
+
 
     return trial_files
+
+
+def collect_data_per_trial(files_per_trial):
+    """
+    Collects most important data for one trial
+
+    :param files_per_trial: (defaultdict) that holds the files collected per trial
+
+    :return TrialData: (namedtuple) that holds relevant data
+    """
+
+
+    def namedtuple_factory(files, data):
+        fields = [k for k in files]
+        TrialData = namedtuple('TrialData', fields) 
+        return TrialData(*data)
+
+
+
+
 
 
 def pprint_settings(settings, part='all', status='current', other_settings={}, other_status='default'):

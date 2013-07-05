@@ -1,12 +1,14 @@
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
+
 import unittest
 from nose.tools import *
 import sure
 
 from collections import namedtuple
+from itertools import izip
 
-from tweezer.core.polymer import ExtensibleWormLikeChain
-from tweezer.core.parsers import classify
-
+from tweezer.core.parsers import classify, classify_all, parse_tweezer_file_name
 
 # Valid TweeBot files
 BOT_DATA = ['path/39.Datalog.2013.02.20.04.14.20.datalog.txt','39.Datalog.2013.02.20.04.14.20.datalog.txt']
@@ -49,59 +51,98 @@ MAN_FILES = namedtuple('MAN_FILES', ['data', 'pm_dist_cal_res', 'pm_dist_cal_mat
 
 man = MAN_FILES(MAN_DATA, MAN_PM_DIST_CAL_RES, MAN_PM_DIST_CAL_MAT, MAN_PM_DIST_CAL_VID, MAN_DIST_CAL_TMP, MAN_AOD_DIST_CAL_RES, MAN_AOD_DIST_CAL_MAT, MAN_AOD_DIST_CAL_VID, MAN_VID, MAN_PICS, MAN_FLOW, MAN_TRACK, MAN_TMP)
 
-def test_tweebot_files():
-    # infer valid files correctly
-    classify(bot.data[0]).should.equal('BOT_DATA') 
-    classify(bot.data[1]).should.equal('BOT_DATA') 
-    classify(bot.log).should.equal('BOT_LOG') 
-    classify(bot.stats).should.equal('BOT_STATS') 
-    classify(bot.focus).should.equal('BOT_FOCUS') 
-    classify(bot.script).should.equal('BOT_SCRIPT') 
-    classify(bot.ccd).should.equal('BOT_CCD') 
-    classify(bot.andor).should.equal('BOT_ANDOR') 
-    classify(bot.tdms).should.equal('BOT_TDMS') 
+files = [f for f in man if not isinstance(f, list)] + [f for f in bot if not isinstance(f, list)]
+files = files + [f for sublist in man for f in sublist if isinstance(sublist, list)]
+files = files + [f for sublist in bot for f in sublist if isinstance(sublist, list)]
+files = files + [f for f in TC_PSD]
+files = files + [f for f in TC_TS]
+files = files + [f for f in ANDOR_VID]
 
-    # don't get confused on files that are not valid
-    classify(bot.log).shouldnot.equal('BOT_DATA') 
-    classify(bot.stats).shouldnot.equal('BOT_DATA') 
-    classify(bot.focus).shouldnot.equal('BOT_DATA') 
-    classify('path/tst.t').shouldnot.equal('BOT_DATA') 
+class TestFileParsing:
+
+    @classmethod
+    def setup_class(cls):
+        print ("setup_class() before any methods in this class")
+        types = classify_all(files)
+        cls.mapping = {f:t for f, t in izip(files, types)}
+
+    def test_tweebot_files(self):
+        # infer valid files correctly
+        mapping = self.__class__.mapping
+
+        mapping[bot.data[0]].should.equal('BOT_DATA') 
+        mapping[bot.data[1]].should.equal('BOT_DATA') 
+        mapping[bot.log].should.equal('BOT_LOG') 
+        mapping[bot.stats].should.equal('BOT_STATS') 
+        mapping[bot.focus].should.equal('BOT_FOCUS') 
+        mapping[bot.script].should.equal('BOT_SCRIPT') 
+        mapping[bot.ccd].should.equal('BOT_CCD') 
+        mapping[bot.andor].should.equal('BOT_ANDOR') 
+        mapping[bot.tdms].should.equal('BOT_TDMS') 
+
+        # don't get confused on files that are not valid
+        mapping[bot.log].shouldnot.equal('BOT_DATA') 
+        mapping[bot.stats].shouldnot.equal('BOT_DATA') 
+        mapping[bot.focus].shouldnot.equal('BOT_DATA') 
+
+    def test_manunal_files(self):
+        # infer valid files correctly
+        mapping = self.__class__.mapping
+
+        mapping[man.data[0]].should.equal('MAN_DATA')
+        mapping[man.data[1]].should.equal('MAN_DATA')
+        mapping[man.data[2]].should.equal('MAN_DATA')
+
+        mapping[man.pm_dist_cal_res].should.equal('MAN_PM_DIST_CAL_RES')
+        mapping[man.pm_dist_cal_mat].should.equal('MAN_PM_DIST_CAL_MAT')
+        mapping[man.pm_dist_cal_vid].should.equal('MAN_PM_DIST_CAL_VID')
+
+        mapping[man.aod_dist_cal_res].should.equal('MAN_AOD_DIST_CAL_RES')
+        mapping[man.aod_dist_cal_mat].should.equal('MAN_AOD_DIST_CAL_MAT')
+        mapping[man.aod_dist_cal_vid].should.equal('MAN_AOD_DIST_CAL_VID')
+
+        mapping[man.dist_cal_temp].should.equal('MAN_DIST_CAL_TMP')
+        mapping[man.vid[0]].should.equal('MAN_VID')
+        mapping[man.vid[1]].should.equal('MAN_VID')
+        mapping[man.flow[0]].should.equal('MAN_FLOW')
+        mapping[man.flow[1]].should.equal('MAN_FLOW')
+        mapping[man.pics[0]].should.equal('MAN_PICS')
+        mapping[man.pics[1]].should.equal('MAN_PICS')
+        mapping[man.track[0]].should.equal('MAN_TRACK')
+        mapping[man.track[1]].should.equal('MAN_TRACK')
+        mapping[man.tmp[0]].should.equal('MAN_TMP')
+        mapping[man.tmp[1]].should.equal('MAN_TMP')
 
 
-def test_manunal_files():
-    # infer valid files correctly
-    classify(man.data[0]).should.equal('MAN_DATA')
-    classify(man.data[1]).should.equal('MAN_DATA')
-    classify(man.data[2]).should.equal('MAN_DATA')
+    def test_general_files(self):
+        # infer valid files correctly
+        mapping = self.__class__.mapping
 
-    classify(man.pm_dist_cal_res).should.equal('MAN_PM_DIST_CAL_RES')
-    classify(man.pm_dist_cal_mat).should.equal('MAN_PM_DIST_CAL_MAT')
-    classify(man.pm_dist_cal_vid).should.equal('MAN_PM_DIST_CAL_VID')
+        mapping[TC_PSD[0]].should.equal('TC_PSD')
+        mapping[TC_PSD[1]].should.equal('TC_PSD')
+        mapping[TC_PSD[2]].should.equal('TC_PSD')
+        mapping[TC_TS[0]].should.equal('TC_TS')
+        mapping[TC_TS[1]].should.equal('TC_TS')
+        mapping[TC_TS[2]].should.equal('TC_TS')
+        mapping[ANDOR_VID[0]].should.equal('ANDOR_VID')
+        mapping[ANDOR_VID[1]].should.equal('ANDOR_VID')
 
-    classify(man.aod_dist_cal_res).should.equal('MAN_AOD_DIST_CAL_RES')
-    classify(man.aod_dist_cal_mat).should.equal('MAN_AOD_DIST_CAL_MAT')
-    classify(man.aod_dist_cal_vid).should.equal('MAN_AOD_DIST_CAL_VID')
+    def test_bot_file_info_extraction(self):
+        FI = parse_tweezer_file_name(bot.data[0])
+        int(FI.trial).should.equal(39) 
 
-    classify(man.dist_cal_temp).should.equal('MAN_DIST_CAL_TMP')
-    classify(man.vid[0]).should.equal('MAN_VID')
-    classify(man.vid[1]).should.equal('MAN_VID')
-    classify(man.flow[0]).should.equal('MAN_FLOW')
-    classify(man.flow[1]).should.equal('MAN_FLOW')
-    classify(man.pics[0]).should.equal('MAN_PICS')
-    classify(man.pics[1]).should.equal('MAN_PICS')
-    classify(man.track[0]).should.equal('MAN_TRACK')
-    classify(man.track[1]).should.equal('MAN_TRACK')
-    classify(man.tmp[0]).should.equal('MAN_TMP')
-    classify(man.tmp[1]).should.equal('MAN_TMP')
+    def test_manual_file_info_extraction(self):
+        FI = parse_tweezer_file_name(man.data[0], parser='man_data')
+        int(FI.trial).should.equal(2) 
+        FI.subtrial.should.equal('c') 
+
+        FI = parse_tweezer_file_name(man.flow[1], parser='man_data')
+        int(FI.trial).should.equal(3) 
+        FI.subtrial.should.equal('t') 
+        
+        
 
 
-def test_general_files():
-    # infer valid files correctly
-    classify(TC_PSD[0]).should.equal('TC_PSD')
-    classify(TC_PSD[1]).should.equal('TC_PSD')
-    classify(TC_PSD[2]).should.equal('TC_PSD')
-    classify(TC_TS[0]).should.equal('TC_TS')
-    classify(TC_TS[1]).should.equal('TC_TS')
-    classify(TC_TS[2]).should.equal('TC_TS')
-    classify(ANDOR_VID[0]).should.equal('ANDOR_VID')
-    classify(ANDOR_VID[1]).should.equal('ANDOR_VID')
+        
+        
+

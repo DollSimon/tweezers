@@ -1,9 +1,12 @@
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
 """
 Classes and Functions used for handling various data input and output tasks.
 """
 
 import pandas as pd
 import sure
+
 
 class DataReader(object):
     """docstring for DataReader"""
