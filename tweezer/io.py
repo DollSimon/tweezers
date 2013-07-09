@@ -17,6 +17,12 @@ from nptdms import TdmsFile
 from tweezer.bot.utils import simplify_tweebot_data_names
 from tweezer.core.parsers import parse_tweezer_file_name
 
+try:
+    from PIL import Image
+except ImportError:
+    print('Somehow PIL could not be imported correctly...')
+    raise
+
 
 def read_tweezer_txt(file_name):
     """
@@ -175,6 +181,7 @@ def read_tweebot_data(file_name):
     data.units.update(HeaderInfo.units)
 
     data.meta['timeStep'] = timeStep
+    data.meta['original_file'] = file_name
 
     return data
 
@@ -248,44 +255,7 @@ def read_tweezer_power_spectrum(file_name):
     # parsing header information
     comments = [line.strip().strip("# ") for line in fl[0:40] if line.strip().startswith('#')] 
 
-    units = {}
-    fit_results = {}
-
-    for line in comments:
-        if 'Date' in line:
-            try:
-                date_string = line.split(": ")[-1].replace("\t", " ")
-                date = datetime.strptime(date_string, '%m/%d/%Y %H:%M %p') 
-            except:
-                date = datetime.now()
-        elif 'nSamples' in line:
-            try:
-                nSamples = int(float(line.strip().split(": ")[-1]))
-            except:
-                nSamples = 2**20
-        elif 'nBlocks' in line:
-            try:
-                nBlocks = int(float(line.strip().split(": ")[-1]))
-            except:
-                nBlocks = 128
-        elif 'sampleRate' in line:
-            try:
-                sampleRate = int(float(line.strip().split(": ")[-1]))
-            except:
-                sampleRate = 80000
-        else:
-            if ":" in line:
-                parts = line.split(": ")
-            elif re.search('\w\s(\d|-\d)', line):
-                parts = line.split(" ")
-
-            if "." in parts[0]:
-                var, unit, value = parts[0].split(".")[0], parts[0].split(".")[1], float(parts[1])
-            else:
-                var, unit, value = parts[0], None, float(parts[1])
-
-            units[var] = unit
-            fit_results[var] = value
+    CommentInfo = extract_meta_and_units(comments)
 
     # getting header and data
     header_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[a-zA-Z]', line.strip())][-1]
@@ -298,18 +268,21 @@ def read_tweezer_power_spectrum(file_name):
     psd = pd.read_table(file_name, sep='\t', skiprows=data_pos, 
         names=columns, header=None, dtype=np.float64)
 
-    psd.date = date
-    psd.nSamples = nSamples
-    psd.nBlocks = nBlocks
-    psd.sampleRate = sampleRate
-
-    for k, v in fit_results.iteritems():
+    for k, v in CommentInfo.metadata.iteritems():
         psd.__setattr__(k, v)
 
-    psd.units = units
+    psd.units = CommentInfo.units
 
     return psd
 
+def parse_older_tweezer_comments(comments):
+    """
+    Extract fit and l
+    
+    :param input: Description
+    """
+    pass
+    
 
 def read_tdms(file_name, frequency=1000):
     """
@@ -445,6 +418,34 @@ def read_tweebot_data_header(datalog_file):
     H = HeaderInfo(column_names, meta, units, header_pos, data_pos)
 
     return H
+
+
+def read_tweezer_image_info(file_name, file_type='man_pics'):
+    """
+    Extracts basic information about an image
+
+    :param file_name: (path) to the image 
+
+    :return name: Description
+    """
+    try:
+        im = Image.open(file_name)
+    except IOError:
+        print('Could not open the image {}'.format(file_name))
+        raise
+
+    info = {}
+    info['original_file'] = file_name
+    info['file_type'] = file_type
+    info['file_type'] = 'image'
+    info['size'] = im.size
+    info['format'] = im.format
+    try:
+        info['FileInfo'] = parse_tweezer_file_name(file_name, parser=file_type)
+    except:
+        print('Could not extract file information from the file name.')
+
+    return info
 
 
 def gather_tweebot_data(trial=1, subtrial=None):
@@ -604,6 +605,8 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
     meta['nSamples'] = None
     meta['deltaTime'] = None
 
+    time_string = None
+
     for line in comment_list:
         if 'Date' in line:
             date_string = line.split(": ")[-1].replace("\t", " ")
@@ -644,11 +647,13 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
         elif 'sample rate' in line:
             try:
-                samplingRate = int(float(line.strip().split(": ")[-1]))
+                match = re.search('(sample\srate)\s*\.*[:\s]+(\d+\.*\d*)', line) 
+                samplingRate = int(float(match.group(2)))
             except:
                 samplingRate = 10000
 
             meta['samplingRate'] = samplingRate
+            units['samplingRate'] = 'Hz'
 
         elif 'rate of while-loop' in line:
             try:
@@ -1028,16 +1033,35 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             meta['laserDiodeTemp'] = laserDiodeTemp
             units['laserDiodeTemp'] = 'C'
 
+        elif 'number of blocks' in line:
+            try:
+                nBlocks = int(line.strip().split(": ")[-1])
+            except:
+                nBlocks = 128
+
+            meta['nBlocks'] = nBlocks
+            units['nBlocks'] = 'int'
+
         else:
             if ":" in line:
                 parts = line.split(": ")
             elif re.search('\w\s(\d|-\d)', line):
                 parts = line.split(" ")
 
-            if "." in parts[0]:
-                var, unit, value = parts[0].split(".")[0], parts[0].split(".")[1], float(parts[1])
-            else:
-                var, unit, value = parts[0], None, float(parts[1])
+            try:
+                if "." in parts[0]:
+                    var, unit, value = parts[0].split(".")[0], parts[0].split(".")[1], float(parts[1])
+                else:
+                    var, unit, value = parts[0], None, float(parts[1])
+            except:
+                m = re.search('^(\w+(\s\w+)*)\s(\d+\.\d+)$', line)
+                value = float(m.group(3))
+                if 'AOD vertical corner frequency' in m.group(1):
+                    var = 'aodCornerFreqY'
+                    unit = 'Hz'
+                elif 'PM vertical corner frequency' in m.group(1):
+                    var = 'pmCornerFreqY'
+                    unit = 'Hz'
 
             units[var] = unit
             meta[var] = value
@@ -1046,6 +1070,8 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
     if date_string and time_string:
         combined_date = " ".join([date_string.strip(), time_string.strip()])
         date = datetime.strptime(combined_date, '%m/%d/%Y %I:%M %p')
+    elif date_string and not time_string:
+        date = datetime.strptime(date_string, '%m/%d/%Y %I:%M %p')
     else:
         date = datetime.now()
 
@@ -1055,3 +1081,334 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
     C = CommentInfo(meta, units)
 
     return C
+
+
+def standardized_name_of(variable):
+    """
+    Maps various variable names onto a common pattern
+    
+    :param variable: (str) input variable
+
+    """
+    variable_mapper = {
+        # general stuff
+        'data averaged to while-loop': 'isDataAveraged',
+
+        'number of samples': 'nSamples',
+        'nSamples': 'nSamples',
+
+        'sample rate' : 'samplingRate',
+        'sampleRate.Hz': 'samplingRate',
+
+        'rate of while-loop': 'recordingRate',
+        'duration of measurement': 'duration',
+        'dt ': 'timeStep',
+
+        'nBlocks': 'nBlocks',
+
+        'Viscosity': 'viscosity',
+        'viscosity': 'viscosity',
+
+        'Laser Diode Temp': 'laserDiodeTemp',
+        'Laser Diode Operating Hours': 'laserDiodeHours',
+        'Laser Diode Current': 'laserDiodeCurrent',
+
+        # pm variables
+        'PM horizontal corner frequency': 'pmCornerFreqX',
+        'PM vertical corner frequency': 'pmCornerFreqY',
+
+        'xCornerFreqT1.Hz': 'pmCornerFreqX',
+        'yCornerFreqT1.Hz': 'pmCornerFreqY',
+
+        'PM detector horizontal offset': 'pmDetectorOffsetX',
+        'PM detector vertical offset': 'pmDetectorOffsetY',
+
+        'xOffsetT1.V': 'pmDetectorOffsetX',
+        'yOffsetT1.V': 'pmDetectorOffsetY',
+
+        'PM horizontal trap stiffness': 'pmStiffnessX',
+        'PM vertical trap stiffness': 'pmStiffnessY',
+
+        'xStiffnessT1.pNperNm': 'pmStiffnessX',
+        'yStiffnessT1.pNperNm': 'pmStiffnessY',
+
+        'PM horizontal OLS': 'pmDisplacementSensitivityX', 
+        # 'PM horizontal OLS': 'pmDistanceConversionX',
+        'PM vertical OLS': 'pmDisplacementSensitivityY',
+        # 'PM vertical OLS': 'pmDistanceConversionY',
+
+        'xDistConversionT1.VperNm': 'pmDisplacementSensitivityX', 
+        'yDistConversionT1.VperNm': 'pmDisplacementSensitivityY',
+
+        # pm tweebot names    
+        'PM detector x offset': 'pmDetectorOffsetX',
+        'PM detector y offset': 'pmDetectorOffsetY',
+        'zOffsetT1.V': 'pmDetectorOffsetZ',
+
+        'PM trap stiffness x': 'pmStiffnessX',
+        'PM trap stiffness y': 'pmStiffnessY',
+
+        'PM trap distance conversion x': 'pmDisplacementSensitivityX',
+        'PM trap distance conversion y': 'pmDisplacementSensitivityY',
+
+        # pm tweebot camera variables
+        'PM ANDOR center x': 'andorPmCenterX',
+        'PM ANDOR center y': 'andorPmCenterY',
+        'PM ANDOR range x': 'andorPmRangeX',
+        'PM ANDOR range y': 'andorPmRangeY',
+
+        'PM CCD center x': 'ccdPmCenterX',
+        'PM CCD center y': 'ccdPmCenterY',
+        'PM CCD range x': 'ccdPmRangeX',
+        'PM CCD range y': 'ccdPmRangeY',
+
+        'PM bead diameter': 'pmBeadDiameter',
+        'diameterT1.um': 'pmBeadDiameter',
+
+        # aod variables
+        'AOD horizontal corner frequency': 'aodCornerFreqX',
+        'AOD vertical corner frequency': 'aodCornerFreqY',
+
+        'AOD detector horizontal offset': 'aodDetectorOffsetX',
+        'AOD detector vertical offset': 'aodDetectorOffsetY',
+
+        'AOD horizontal trap stiffness': 'aodStiffnessX',
+        'AOD vertical trap stiffness': 'aodStiffnessY',
+            
+        'AOD horizontal OLS': 'aodDisplacementSensitivityX',
+        # 'AOD horizontal OLS': 'aodDistanceConversionX',
+        'AOD vertical OLS': 'aodDisplacementSensitivityY',
+        # 'AOD vertical OLS': 'aodDistanceConversionY',
+            
+        # tweebot variables
+        'AOD detector x offset': 'aodDetectorOffsetX',
+        'AOD detector y offset': 'aodDetectorOffsetY',
+
+        'AOD trap stiffness x': 'aodStiffnessX',
+        'AOD trap stiffness y': 'aodStiffnessY',
+
+        'xStiffnessT2.pNperNm': 'aodStiffnessX',
+        'yStiffnessT2.pNperNm': 'aodStiffnessY',
+
+        'AOD trap distance conversion x': 'aodDisplacementSensitivityX',
+        'AOD trap distance conversion y': 'aodDisplacementSensitivityY',
+
+        'xDistConversionT2.VperNm': 'aodDisplacementSensitivityX',
+        'yDistConversionT2.VperNm': 'aodDisplacementSensitivityY',
+
+        'AOD horizontal corner frequency': 'aodCornerFreqX',
+        'AOD vertical corner frequency': 'aodCornerFreqY',
+
+        'xCornerFreqT2.Hz': 'aodCornerFreqX',
+        'yCornerFreqT2.Hz': 'aodCornerFreqY',
+
+        'AOD detector horizontal offset': 'aodDetectorOffsetX',
+        'AOD detector vertical offset': 'aodDetectorOffsetY',
+
+        'AOD horizontal trap stiffness': 'aodStiffnessX',
+        'AOD vertical trap stiffness': 'aodStiffnessY',
+            
+        'AOD horizontal OLS': 'aodDisplacementSensitivityX',
+        # 'AOD horizontal OLS': 'aodDistanceConversionX',
+        'AOD vertical OLS': 'aodDisplacementSensitivityY',
+        # 'AOD vertical OLS': 'aodDistanceConversionY',
+
+        # tweebot variables
+        'xOffsetT2.V': 'aodDetectorOffsetX',
+        'yOffsetT2.V': 'aodDetectorOffsetY',
+        'zOffsetT2.V': 'aodDetectorOffsetZ',
+
+        'AOD trap stiffness x': 'aodStiffnessX',
+        'AOD trap stiffness y': 'aodStiffnessY',
+
+        'AOD trap distance conversion x': 'aodDistanceConversionX',
+        'AOD trap distance conversion y': 'aodDistanceConversionY',
+
+        # aod tweebot camera variables
+        'AOD ANDOR center x': 'andorAodCenterX',
+        'AOD ANDOR center y': 'andorAodCenterY',
+        'AOD ANDOR range x': 'andorAodRangeX',
+        'AOD ANDOR range y': 'andorAodRangeY',
+
+        'AOD CCD center x': 'ccdAodCenterX',
+        'AOD CCD center y': 'ccdAodCenterY',
+        'AOD CCD range x': 'ccdAodRangeX',
+        'AOD CCD range y': 'ccdAodRangeY',
+
+        'AOD bead diameter': 'aodBeadDiameter',
+        'diameterT2.um': 'aodBeadDiameter',
+
+        # andor camera specifics
+        'ANDOR pixel size x': 'andorPixelSizeX',
+        'ANDOR pixel size y': 'andorPixelSizeY',
+
+        # ccd camera specifics
+        'CCD pixel size x': 'ccdPixelSizeX',
+        'CCD pixel size y': 'ccdPixelSizeY'
+
+    }
+
+    return variable_mapper.get(variable, None)
+    
+
+def standardized_unit_of(variable):
+    """
+    Maps various variable names onto their unit
+    
+    :param variable: (str) input variable
+
+    """
+    variable_mapper = {
+        # general stuff
+        'data averaged to while-loop': None,
+
+        'number of samples': None,
+        'nSamples': None,
+
+        'sample rate' : 'Hz',
+        'sampleRate.Hz': 'Hz',
+
+        'rate of while-loop': 'Hz',
+        'duration of measurement': 's',
+        'dt ': 's',
+
+        'nBlocks': 'int',
+
+        'Viscosity': 'pN s / nm^2',
+        'viscosity': 'pN s / nm^2',
+
+        'Laser Diode Temp': 'C',
+        'Laser Diode Operating Hours': 'h',
+        'Laser Diode Current': 'A',
+
+        # pm variables
+        'PM horizontal corner frequency': 'Hz',
+        'PM vertical corner frequency': 'Hz',
+
+        'xCornerFreqT1.Hz': 'Hz',
+        'yCornerFreqT1.Hz': 'Hz',
+
+        'PM detector horizontal offset': 'V',
+        'PM detector vertical offset': 'V',
+
+        'xOffsetT1.V': 'V',
+        'yOffsetT1.V': 'V',
+
+        'PM horizontal trap stiffness': 'pN/nm',
+        'PM vertical trap stiffness': 'pN/nm',
+
+        'xStiffnessT1.pNperNm': 'pN/nm',
+        'yStiffnessT1.pNperNm': 'pN/nm',
+
+        'PM horizontal OLS': 'V/nm', 
+        'PM vertical OLS': 'V/nm',
+
+        'xDistConversionT1.VperNm': 'V/nm', 
+        'yDistConversionT1.VperNm': 'V/nm',
+
+        # pm tweebot names    
+        'PM detector x offset': 'V',
+        'PM detector y offset': 'V',
+        'zOffsetT1.V': 'V',
+
+        'PM trap stiffness x': 'pN/nm',
+        'PM trap stiffness y': 'pN/nm',
+
+        'PM trap distance conversion x': 'V/nm',
+        'PM trap distance conversion y': 'V/nm',
+
+        # pm tweebot camera variables
+        'PM ANDOR center x': 'px',
+        'PM ANDOR center y': 'px',
+        'PM ANDOR range x': 'px',
+        'PM ANDOR range y': 'px',
+
+        'PM CCD center x': 'px',
+        'PM CCD center y': 'px',
+        'PM CCD range x': 'px',
+        'PM CCD range y': 'px',
+
+        'PM bead diameter': 'nm',
+        'diameterT1.um': 'nm',
+
+        # aod variables
+        'AOD horizontal corner frequency': 'Hz',
+        'AOD vertical corner frequency': 'Hz',
+
+        'AOD detector horizontal offset': 'V',
+        'AOD detector vertical offset': 'V',
+
+        'AOD horizontal trap stiffness': 'pN/nm',
+        'AOD vertical trap stiffness': 'pN/nm',
+            
+        'AOD horizontal OLS': 'V/nm',
+        'AOD vertical OLS': 'V/nm',
+            
+        # tweebot variables
+        'AOD detector x offset': 'V',
+        'AOD detector y offset': 'V',
+
+        'AOD trap stiffness x': 'pN/nm',
+        'AOD trap stiffness y': 'pN/nm',
+
+        'xStiffnessT2.pNperNm': 'pN/nm',
+        'yStiffnessT2.pNperNm': 'pN/nm',
+
+        'AOD trap distance conversion x': 'V/nm',
+        'AOD trap distance conversion y': 'V/nm',
+
+        'xDistConversionT2.VperNm': 'V/nm',
+        'yDistConversionT2.VperNm': 'V/nm',
+
+        'AOD horizontal corner frequency': 'Hz',
+        'AOD vertical corner frequency': 'Hz',
+
+        'xCornerFreqT2.Hz': 'Hz',
+        'yCornerFreqT2.Hz': 'Hz',
+
+        'AOD detector horizontal offset': 'V',
+        'AOD detector vertical offset': 'V',
+
+        'AOD horizontal trap stiffness': 'pN/nm',
+        'AOD vertical trap stiffness': 'pN/nm',
+            
+        'AOD horizontal OLS': 'V/nm',
+        'AOD vertical OLS': 'V/nm',
+
+        # tweebot variables
+        'xOffsetT2.V': 'V',
+        'yOffsetT2.V': 'V',
+        'zOffsetT2.V': 'V',
+
+        'AOD trap stiffness x': 'pN/nm',
+        'AOD trap stiffness y': 'pN/nm',
+
+        'AOD trap distance conversion x': 'V/nm',
+        'AOD trap distance conversion y': 'V/nm',
+
+        # aod tweebot camera variables
+        'AOD ANDOR center x': 'px',
+        'AOD ANDOR center y': 'px',
+        'AOD ANDOR range x': 'px',
+        'AOD ANDOR range y': 'px',
+
+        'AOD CCD center x': 'px',
+        'AOD CCD center y': 'px',
+        'AOD CCD range x': 'px',
+        'AOD CCD range y': 'px',
+
+        'AOD bead diameter': 'nm',
+        'diameterT2.um': 'nm',
+
+        # andor camera specifics
+        'ANDOR pixel size x': 'nm/px',
+        'ANDOR pixel size y': 'nm/px',
+
+        # ccd camera specifics
+        'CCD pixel size x': 'nm/px',
+        'CCD pixel size y': 'nm/px'
+
+    }
+
+    return variable_mapper.get(variable, None)
+    

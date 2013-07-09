@@ -90,7 +90,60 @@ def parse_tweezer_file_name(file_name, parser='bot_data'):
  
             pattern = (<t '_' sub> | t):name end:ext -> (name, ext)
             """, {}, extends = base_grammar)
-
+    elif parser is 'man_pics':
+        name_parser = makeGrammar("""
+            # ending 
+            txt = <'t' 'x' 't'>:txt -> str(txt)
+            gro = <'g' 'r' 'o' 'o' 'v' 'y'>:groovy -> str(groovy)
+            wgr = <'w' 'h' 'o' 'l' 'e' '.' gro>
+            png = <'p' 'n' 'g'>:png -> str(png)
+            jpg = <('j' 'e' 'p' 'g' | 'j' 'p' 'g')>:jpg -> str(jpg)
+            avi = <'a' 'v' 'i'>:avi -> str(avi)
+            csv = <'c' 's' 'v'>:csv -> str(csv)
+            fts = <'f' 'i' 't' 's'>:fts -> str(fts)
+            tif = <'t' 'i' ('f' 'f' | 'f')>:tif -> str(tif)
+            tdms = <'t' 'd' 'm' 's'>:tdms -> str(tdms)
+            tdms_index = <'t' 'd' 'm' 's' '_' 'i' 'n' 'd' 'e' 'x'>:tdms_index -> str(tdms_index)
+            end = '.' (txt | gro | png | jpg | wgr | tdms | avi | tif | csv | tdms_index)
+ 
+            pattern = (<t '_' sub> | t):name end:ext -> (name, ext)
+            """, {}, extends = base_grammar)
+    elif parser is 'tc_psd':
+        name_parser = makeGrammar("""
+            # ending 
+            txt = <'t' 'x' 't'>:txt -> str(txt)
+            gro = <'g' 'r' 'o' 'o' 'v' 'y'>:groovy -> str(groovy)
+            wgr = <'w' 'h' 'o' 'l' 'e' '.' gro>
+            png = <'p' 'n' 'g'>:png -> str(png)
+            jpg = <('j' 'e' 'p' 'g' | 'j' 'p' 'g')>:jpg -> str(jpg)
+            avi = <'a' 'v' 'i'>:avi -> str(avi)
+            csv = <'c' 's' 'v'>:csv -> str(csv)
+            fts = <'f' 'i' 't' 's'>:fts -> str(fts)
+            tif = <'t' 'i' ('f' 'f' | 'f')>:tif -> str(tif)
+            tdms = <'t' 'd' 'm' 's'>:tdms -> str(tdms)
+            tdms_index = <'t' 'd' 'm' 's' '_' 'i' 'n' 'd' 'e' 'x'>:tdms_index -> str(tdms_index)
+            end = '.' (txt | gro | png | jpg | wgr | tdms | avi | tif | csv | tdms_index)
+ 
+            pattern = 'P' 'S' 'D' s <t '_' sub> | t):name end:ext -> (name, ext)
+            """, {}, extends = base_grammar)
+    elif parser is 'man_track':
+        name_parser = makeGrammar("""
+            # ending 
+            txt = <'t' 'x' 't'>:txt -> str(txt)
+            gro = <'g' 'r' 'o' 'o' 'v' 'y'>:groovy -> str(groovy)
+            wgr = <'w' 'h' 'o' 'l' 'e' '.' gro>
+            png = <'p' 'n' 'g'>:png -> str(png)
+            jpg = <('j' 'e' 'p' 'g' | 'j' 'p' 'g')>:jpg -> str(jpg)
+            avi = <'a' 'v' 'i'>:avi -> str(avi)
+            csv = <'c' 's' 'v'>:csv -> str(csv)
+            fts = <'f' 'i' 't' 's'>:fts -> str(fts)
+            tif = <'t' 'i' ('f' 'f' | 'f')>:tif -> str(tif)
+            tdms = <'t' 'd' 'm' 's'>:tdms -> str(tdms)
+            tdms_index = <'t' 'd' 'm' 's' '_' 'i' 'n' 'd' 'e' 'x'>:tdms_index -> str(tdms_index)
+            end = '.' (txt | gro | png | jpg | wgr | tdms | avi | tif | csv | tdms_index)
+ 
+            pattern = <t '_' sub> | t):name end:ext -> (name, ext)
+            """, {}, extends = base_grammar)
     try:
         infos = name_parser(name).pattern()
         if '_' in infos[0]:

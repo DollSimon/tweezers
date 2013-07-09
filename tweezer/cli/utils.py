@@ -130,7 +130,10 @@ def sort_files_by_trial(files=defaultdict(list), sort_by=None, clean=True):
             for ftype, fpaths in dict(files).iteritems():
                 if fpaths:
                     if fpaths[0] is not None:
-                        cleaned_files[ftype] = fpaths
+                        if len(fpaths) == 1:
+                            cleaned_files[ftype] = fpaths[0]
+                        else:
+                            cleaned_files[ftype] = fpaths
 
             cleaned_trials[trial] = cleaned_files 
 

@@ -37,7 +37,7 @@ except ImportError, err:
         puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
         puts('')
         puts('The following import error occurred: {}'.format(colored.red(err))) 
-        puts('')
+            puts('')
 
 
 class TestSimpleOverviewPage:
@@ -86,9 +86,9 @@ class TestSimpleOverviewPage:
         ('2_c').should.be.within(tf.keys())
         tf['4_c']['tc_psd'].shouldnot.equal([None]) 
         
-    # def test_read_data_per_trial(self):
-    #     files = self.__class__.files
-    #     tf = sort_files_by_trial(files=files)
-    #     TD = collect_data_per_trial(tf['4_c'])
-    #     TD.man_data.should.be.a(namedtuple) 
+    def test_read_data_per_trial(self):
+        files = self.__class__.files
+        tf = sort_files_by_trial(files=files)
+        TD = collect_data_per_trial(tf['4_c'])
+        TD.man_data.should.be.a(namedtuple) 
         

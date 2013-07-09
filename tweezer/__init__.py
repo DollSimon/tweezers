@@ -141,8 +141,14 @@ def read(file_name, file_type='man_data', **kwargs):
 
     :return data: (pandas.DataFrame) If applicable this return type contains the time series data in a DataFrame and any metadata as its attributes
     """
-    from tweezer.io import (read_tdms, read_tweebot_data, read_tweebot_logs, 
-        read_tweezer_txt, read_thermal_calibration, read_tweezer_power_spectrum)  
+    from tweezer.io import (read_tdms, 
+        read_tweebot_data, 
+        read_tweebot_logs, 
+        read_tweezer_image_info,
+        read_tracking_data,
+        read_tweezer_txt, 
+        read_thermal_calibration, 
+        read_tweezer_power_spectrum)  
 
     # classify file
     try:
@@ -159,9 +165,16 @@ def read(file_name, file_type='man_data', **kwargs):
         read_tdms = partial(read_tdms, frequency=f)
 
     # use dictionary to dispatch the appropriate function (functions are first-class citizens!)
-    read_mapper = {'man_data': read_tweezer_txt, 'bot_data': read_tweebot_data, 
-        'bot_tdms': read_tdms, 'tc_psd': read_tweezer_power_spectrum, 
-        'tc_ts': read_thermal_calibration, 'bot_log': read_tweebot_logs}
+    read_mapper = {
+        'man_data': read_tweezer_txt, 
+        'man_pics': read_tweezer_image_info, 
+        'man_track': read_tracking_data, 
+        'tc_psd': read_tweezer_power_spectrum, 
+        'tc_ts': read_thermal_calibration, 
+        'bot_data': read_tweebot_data, 
+        'bot_tdms': read_tdms, 
+        'bot_log': read_tweebot_logs
+        }
 
     data = read_mapper[ftype.lower()](file_name)
 
