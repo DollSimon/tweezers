@@ -624,7 +624,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             else:
                 isDataAveraged = True
 
-            meta['isDataAveraged'] = isDataAveraged
+            meta[standardized_name_of('data averaged to while-loop')] = isDataAveraged
 
         elif 'errors' in line:
             error_string = line.split(": ")[-1]
@@ -637,23 +637,23 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             meta['errors'] = errors
             meta['hasErrors'] = hasErrors
 
-        elif 'number of samples' in line:
+        elif 'number of samples' in line or 'nSamples' in line:
             try:
                 nSamples = int(float(line.strip().split(": ")[-1]))
             except:
                 nSamples = 1
 
-            meta['nSamples'] = nSamples
+            meta[standardized_name_of('nSamples')] = nSamples
 
-        elif 'sample rate' in line:
+        elif 'sample rate' in line or 'sampleRate.Hz' in line:
             try:
-                match = re.search('(sample\srate)\s*\.*[:\s]+(\d+\.*\d*)', line) 
+                match = re.search('(sample\srate|sampleRate\.Hz)\s*\.*[:\s]+(\d+\.*\d*)', line) 
                 samplingRate = int(float(match.group(2)))
             except:
                 samplingRate = 10000
 
-            meta['samplingRate'] = samplingRate
-            units['samplingRate'] = 'Hz'
+            meta[standardized_name_of('sample rate')] = samplingRate
+            units[standardized_name_of('sample rate')] = standardized_unit_of('sample rate')
 
         elif 'rate of while-loop' in line:
             try:
@@ -661,7 +661,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             except:
                 recordingRate = 10000
 
-            meta['recordingRate'] = recordingRate
+            meta[standardized_name_of('rate of while-loop')] = recordingRate
 
         elif 'duration of measurement' in line:
             try:
@@ -672,118 +672,122 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             units['duration'] = 's'
             meta['duration'] = duration
 
-        elif 'AOD detector horizontal offset' in line:
+        elif 'AOD detector horizontal offset' in line or 'xOffsetT2' in line:
             try:
                 aodDetectorOffsetX = float(line.strip().split(": ")[-1])
             except:
                 aodDetectorOffsetX = 0
 
-            units['aodDetectorOffsetX'] = 'V'
-            meta['aodDetectorOffsetX'] = aodDetectorOffsetX
+            meta[standardized_name_of('AOD detector horizontal offset')] = aodDetectorOffsetX
+            units[standardized_name_of('AOD detector horizontal offset')] = standardized_unit_of('AOD detector horizontal offset')
 
-        elif 'AOD detector vertical offset' in line:
+        elif 'AOD detector vertical offset' in line or 'yOffsetT2' in line:
             try:
                 aodDetectorOffsetY = float(line.strip().split(": ")[-1])
             except:
                 aodDetectorOffsetY = 0
 
-            units['aodDetectorOffsetY'] = 'V'
-            meta['aodDetectorOffsetY'] = aodDetectorOffsetY
+            meta[standardized_name_of('AOD detector vertical offset')] = aodDetectorOffsetY
+            units[standardized_name_of('AOD detector vertical offset')] = standardized_unit_of('AOD detector vertical offset')
 
-        elif 'PM detector horizontal offset' in line:
+        elif 'PM detector horizontal offset' in line or 'xOffsetT1' in line:
             try:
                 pmDetectorOffsetX = float(line.strip().split(": ")[-1])
             except:
                 pmDetectorOffsetX = 0
 
-            units['pmDetectorOffsetX'] = 'V'
-            meta['pmDetectorOffsetX'] = pmDetectorOffsetX
+            meta[standardized_name_of('PM detector horizontal offset')] = pmDetectorOffsetX
+            units[standardized_name_of('PM detector horizontal offset')] = standardized_unit_of('PM detector horizontal offset')
 
-        elif 'PM detector vertical offset' in line:
+        elif 'PM detector vertical offset' in line or 'yOffsetT1' in line:
             try:
                 pmDetectorOffsetY = float(line.strip().split(": ")[-1])
             except:
                 pmDetectorOffsetY = 0
 
-            units['pmDetectorOffsetY'] = 'V'
-            meta['pmDetectorOffsetY'] = pmDetectorOffsetY
+            meta[standardized_name_of('PM detector vertical offset')] = pmDetectorOffsetY
+            units[standardized_name_of('PM detector vertical offset')] = standardized_unit_of('PM detector vertical offset')
 
-        elif 'PM horizontal trap stiffness' in line:
+        elif 'PM horizontal trap stiffness' in line or 'xStiffnessT1' in line:
             try:
                 pmStiffnessX = float(line.strip().split(": ")[-1])
             except:
                 pmStiffnessX = None
 
-            meta['pmStiffnessX'] = pmStiffnessX
+            meta[standardized_name_of('PM horizontal trap stiffness')] = pmStiffnessX
+            units[standardized_name_of('PM horizontal trap stiffness')] = standardized_unit_of('PM horizontal trap stiffness')
 
-        elif 'PM vertical trap stiffness' in line:
+        elif 'PM vertical trap stiffness' in line or 'yStiffnessT1' in line:
             try:
                 pmStiffnessY = float(line.strip().split(": ")[-1])
             except:
                 pmStiffnessY = None
 
-            meta['pmStiffnessY'] = pmStiffnessY
+            meta[standardized_name_of('PM vertical trap stiffness')] = pmStiffnessY
+            units[standardized_name_of('PM vertical trap stiffness')] = standardized_unit_of('PM vertical trap stiffness')
             
-        elif 'AOD horizontal trap stiffness' in line:
+        elif 'AOD horizontal trap stiffness' in line or 'xStiffnessT2' in line:
             try:
                 aodStiffnessX = float(line.strip().split(": ")[-1])
             except:
                 aodStiffnessX = None
 
-            meta['aodStiffnessX'] = aodStiffnessX
+            meta[standardized_name_of('AOD horizontal trap stiffness')] = aodStiffnessX
+            units[standardized_name_of('AOD horizontal trap stiffness')] = standardized_unit_of('AOD horizontal trap stiffness')
             
-        elif 'AOD vertical trap stiffness' in line:
+        elif 'AOD vertical trap stiffness' in line or 'yStiffnessT2' in line:
             try:
                 aodStiffnessY = float(line.strip().split(": ")[-1])
             except:
                 aodStiffnessY = None
 
-            meta['aodStiffnessY'] = aodStiffnessY
+            meta[standardized_name_of('AOD vertical trap stiffness')] = aodStiffnessY
+            units[standardized_name_of('AOD vertical trap stiffness')] = standardized_unit_of('AOD vertical trap stiffness')
             
-        elif 'PM horizontal OLS' in line:
+        elif 'PM horizontal OLS' in line or 'xDistConversionT1' in line:
             try:
                 pmDisplacementSensitivityX = float(line.strip().split(": ")[-1])
             except:
                 pmDisplacementSensitivityX = None
 
-            meta['pmDisplacementSensitivityX'] = pmDisplacementSensitivityX
-            meta['pmDistanceConversionX'] = pmDisplacementSensitivityX
+            meta[standardized_name_of('PM horizontal OLS')] = pmDisplacementSensitivityX
+            units[standardized_name_of('PM horizontal OLS')] = standardized_unit_of('PM horizontal OLS')
             
-        elif 'PM vertical OLS' in line:
+        elif 'PM vertical OLS' in line or 'yDistConversionT1' in line:
             try:
                 pmDisplacementSensitivityY = float(line.strip().split(": ")[-1])
             except:
                 pmDisplacementSensitivityY = None
 
-            meta['pmDisplacementSensitivityY'] = pmDisplacementSensitivityY
-            meta['pmDistanceConversionY'] = pmDisplacementSensitivityY
+            meta[standardized_name_of('PM vertical OLS')] = pmDisplacementSensitivityY
+            meta[standardized_name_of('PM vertical OLS')] = pmDisplacementSensitivityY
             
-        elif 'AOD horizontal OLS' in line:
+        elif 'AOD horizontal OLS' in line or 'xDistConversionT2' in line:
             try:
                 aodDisplacementSensitivityX = float(line.strip().split(": ")[-1])
             except:
                 aodDisplacementSensitivityX = None
 
-            meta['aodDisplacementSensitivityX'] = aodDisplacementSensitivityX
-            meta['aodDistanceConversionX'] = aodDisplacementSensitivityX
+            meta[standardized_name_of('AOD horizontal OLS')] = aodDisplacementSensitivityX
+            meta[standardized_name_of('AOD horizontal OLS')] = aodDisplacementSensitivityX
             
-        elif 'AOD vertical OLS' in line:
+        elif 'AOD vertical OLS' in line or 'yDistConversionT2' in line:
             try:
                 aodDisplacementSensitivityY = float(line.strip().split(": ")[-1])
             except:
                 aodDisplacementSensitivityY = None
 
-            meta['aodDisplacementSensitivityY'] = aodDisplacementSensitivityY
-            meta['aodDistanceConversionY'] = aodDisplacementSensitivityY
+            meta[standardized_name_of('AOD vertical OLS')] = aodDisplacementSensitivityY
+            meta[standardized_name_of('AOD vertical OLS')] = aodDisplacementSensitivityY
             
-        elif 'Viscosity' in line:
+        elif 'Viscosity' in line or 'viscosity' in line:
             try:
                 viscosity = float(line.strip().split(": ")[-1])
             except:
                 viscosity = 0.8902e-9 # viscosity of water @ 25C
 
             units['viscosity'] = 'pN s / nm^2'
-            meta['viscosity'] = viscosity
+            meta[standardized_name_of('viscosity')] = viscosity
 
         elif 'dt ' in line:
             try:
@@ -792,7 +796,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
                 dt = 0.0010
 
             units['dt'] = units['timeStep'] = 's'
-            meta['dt'] = meta['timeStep'] = dt 
+            meta[standardized_name_of('dt')] = meta[standardized_name_of('timeStep')] = dt 
 
         elif 'PM bead diameter' in line:
             try:
@@ -806,8 +810,8 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             pmBeadRadius = pmBeadDiameter / 2.0
 
-            meta['pmBeadDiameter'] = pmBeadDiameter
-            meta['pmBeadRadius'] = pmBeadRadius
+            meta[standardized_name_of('PM bead diameter')] = pmBeadDiameter
+            meta[standardized_name_of('PM bead radius')] = pmBeadRadius
 
         elif 'AOD bead diameter' in line:
             try:
@@ -821,148 +825,148 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             aodBeadRadius = aodBeadDiameter / 2.0
 
-            meta['aodBeadDiameter'] = aodBeadDiameter
-            meta['aodBeadRadius'] = aodBeadRadius
+            meta[standardized_name_of('AOD bead diameter')] = aodBeadDiameter
+            meta[standardized_name_of('AOD bead radius')] = aodBeadRadius
 
         elif 'Laser Diode Temp' in line:
             laserDiodeTemp = float(line.strip().split(": ")[-1])
-            meta['laserDiodeTemp'] = laserDiodeTemp
+            meta[standardized_name_of('Laser Diode Temp')] = laserDiodeTemp
 
         elif 'Laser Diode Operating Hours' in line:
             laserDiodeHours = float(line.strip().split(": ")[-1])
-            meta['laserDiodeHours'] = laserDiodeHours
+            meta[standardized_name_of('Laser Diode Operating Hours')] = laserDiodeHours
 
         elif 'Laser Diode Current' in line:
             laserDiodeCurrent = float(line.strip().split(": ")[-1])
-            meta['laserDiodeCurrent'] = laserDiodeCurrent
+            meta[standardized_name_of('Laser Diode Current')] = laserDiodeCurrent
 
         elif 'AOD ANDOR center x' in line:
             andorAodCenterX = float(line.strip().split(": ")[-1])
-            meta['andorAodCenterX'] = andorAodCenterX
+            meta[standardized_name_of('AOD ANDOR center x')] = andorAodCenterX
 
         elif 'AOD ANDOR center y' in line:
             andorAodCenterY = float(line.strip().split(": ")[-1])
-            meta['andorAodCenterY'] = andorAodCenterY
+            meta[standardized_name_of('AOD ANDOR center y')] = andorAodCenterY
 
         elif 'AOD ANDOR range x' in line:
             andorAodRangeX = float(line.strip().split(": ")[-1])
-            meta['andorAodRangeX'] = andorAodRangeX
+            meta[standardized_name_of('AOD ANDOR range x')] = andorAodRangeX
 
         elif 'AOD ANDOR range y' in line:
             andorAodRangeY = float(line.strip().split(": ")[-1])
-            meta['andorAodRangeY'] = andorAodRangeY
+            meta[standardized_name_of('AOD ANDOR range y')] = andorAodRangeY
 
         elif 'AOD CCD center x' in line:
             ccdAodCenterX = float(line.strip().split(": ")[-1])
-            meta['ccdAodCenterX'] = ccdAodCenterX
+            meta[standardized_name_of('AOD CCD center x')] = ccdAodCenterX
 
         elif 'AOD CCD center y' in line:
             ccdAodCenterY = float(line.strip().split(": ")[-1])
-            meta['ccdAodCenterY'] = ccdAodCenterY
+            meta[standardized_name_of('AOD CCD center y')] = ccdAodCenterY
 
         elif 'AOD CCD range x' in line:
             ccdAodRangeX = float(line.strip().split(": ")[-1])
-            meta['ccdAodRangeX'] = ccdAodRangeX
+            meta[standardized_name_of('AOD CCD range x')] = ccdAodRangeX
 
         elif 'AOD CCD range y' in line:
             ccdAodRangeY = float(line.strip().split(": ")[-1])
-            meta['ccdAodRangeY'] = ccdAodRangeY
+            meta[standardized_name_of('AOD CCD range y')] = ccdAodRangeY
 
         elif 'PM ANDOR center x' in line:
             andorPmCenterX = float(line.strip().split(": ")[-1])
-            meta['andorPmCenterX'] = andorPmCenterX
+            meta[standardized_name_of('PM ANDOR center x')] = andorPmCenterX
 
         elif 'PM ANDOR center y' in line:
             andorPmCenterY = float(line.strip().split(": ")[-1])
-            meta['andorPmCenterY'] = andorPmCenterY
+            meta[standardized_name_of('PM ANDOR center y')] = andorPmCenterY
 
         elif 'PM ANDOR range x' in line:
             andorPmRangeX = float(line.strip().split(": ")[-1])
-            meta['andorPmRangeX'] = andorPmRangeX
+            meta[standardized_name_of('PM ANDOR range x')] = andorPmRangeX
 
         elif 'PM ANDOR range y' in line:
             andorPmRangeY = float(line.strip().split(": ")[-1])
-            meta['andorPmRangeY'] = andorPmRangeY
+            meta[standardized_name_of('PM ANDOR range y')] = andorPmRangeY
 
         elif 'PM CCD center x' in line:
             ccdPmCenterX = float(line.strip().split(": ")[-1])
-            meta['ccdPmCenterX'] = ccdPmCenterX
+            meta[standardized_name_of('PM CCD center x')] = ccdPmCenterX
 
         elif 'PM CCD center y' in line:
             ccdPmCenterY = float(line.strip().split(": ")[-1])
-            meta['ccdPmCenterY'] = ccdPmCenterY
+            meta[standardized_name_of('PM CCD center y')] = ccdPmCenterY
 
         elif 'PM CCD range x' in line:
             ccdPmRangeX = float(line.strip().split(": ")[-1])
-            meta['ccdPmRangeX'] = ccdPmRangeX
+            meta[standardized_name_of('PM CCD range x')] = ccdPmRangeX
 
         elif 'PM CCD range y' in line:
             ccdPmRangeY = float(line.strip().split(": ")[-1])
-            meta['ccdPmRangeY'] = ccdPmRangeY
+            meta[standardized_name_of('PM CCD range y')] = ccdPmRangeY
 
         elif 'ANDOR pixel size x' in line:
             andorPixelSizeX = float(line.strip().split(": ")[-1])
-            meta['andorPixelSizeX'] = andorPixelSizeX
+            meta[standardized_name_of('ANDOR pixel size x')] = andorPixelSizeX
 
         elif 'ANDOR pixel size y' in line:
             andorPixelSizeY = float(line.strip().split(": ")[-1])
-            meta['andorPixelSizeY'] = andorPixelSizeY
+            meta[standardized_name_of('ANDOR pixel size y')] = andorPixelSizeY
 
         elif 'CCD pixel size x' in line:
             ccdPixelSizeX = float(line.strip().split(": ")[-1])
-            meta['ccdPixelSizeX'] = ccdPixelSizeX
+            meta[standardized_name_of('CCD pixel size x')] = ccdPixelSizeX
 
         elif 'CCD pixel size y' in line:
             ccdPixelSizeY = float(line.strip().split(": ")[-1])
-            meta['ccdPixelSizeY'] = ccdPixelSizeY
+            meta[standardized_name_of('CCD pixel size y')] = ccdPixelSizeY
 
         elif 'AOD detector x offset' in line:
             aodDetectorOffsetX = float(line.strip().split(": ")[-1])
-            meta['aodDetectorOffsetX'] = aodDetectorOffsetX
+            meta[standardized_name_of('AOD detector x offset')] = aodDetectorOffsetX
 
         elif 'AOD detector y offset' in line:
             aodDetectorOffsetY = float(line.strip().split(": ")[-1])
-            meta['aodDetectorOffsetY'] = aodDetectorOffsetY
+            meta[standardized_name_of('AOD detector y offset')] = aodDetectorOffsetY
 
         elif 'AOD trap stiffness x' in line:
             aodStiffnessX = float(line.strip().split(": ")[-1])
-            meta['aodStiffnessX'] = aodStiffnessX
+            meta[standardized_name_of('AOD trap stiffness x')] = aodStiffnessX
 
         elif 'AOD trap stiffness y' in line:
             aodStiffnessY = float(line.strip().split(": ")[-1])
-            meta['aodStiffnessY'] = aodStiffnessY
+            meta[standardized_name_of('AOD trap stiffness y')] = aodStiffnessY
 
         elif 'AOD trap distance conversion x' in line:
             aodDistanceConversionX = float(line.strip().split(": ")[-1])
-            meta['aodDistanceConversionX'] = aodDistanceConversionX
+            meta[standardized_name_of('AOD trap distance conversion x')] = aodDistanceConversionX
 
         elif 'AOD trap distance conversion y' in line:
             aodDistanceConversionY = float(line.strip().split(": ")[-1])
-            meta['aodDistanceConversionY'] = aodDistanceConversionY
+            meta[standardized_name_of('AOD trap distance conversion y')] = aodDistanceConversionY
 
         elif 'PM detector x offset' in line:
             pmDetectorOffsetX = float(line.strip().split(": ")[-1])
-            meta['pmDetectorOffsetX'] = pmDetectorOffsetX
+            meta[standardized_name_of('PM detector x offset')] = pmDetectorOffsetX
 
         elif 'PM detector y offset' in line:
             pmDetectorOffsetY = float(line.strip().split(": ")[-1])
-            meta['pmDetectorOffsetY'] = pmDetectorOffsetY
+            meta[standardized_name_of('PM detector y offset')] = pmDetectorOffsetY
 
         elif 'PM trap stiffness x' in line:
             pmStiffnessX = float(line.strip().split(": ")[-1])
-            meta['pmStiffnessX'] = pmStiffnessX
+            meta[standardized_name_of('PM trap stiffness x')] = pmStiffnessX
 
         elif 'PM trap stiffness y' in line:
             pmStiffnessY = float(line.strip().split(": ")[-1])
-            meta['pmStiffnessY'] = pmStiffnessY
+            meta[standardized_name_of('PM trap stiffness y')] = pmStiffnessY
 
         elif 'PM trap distance conversion x' in line:
             pmDistanceConversionX = float(line.strip().split(": ")[-1])
-            meta['pmDistanceConversionX'] = pmDistanceConversionX
+            meta[standardized_name_of('PM trap distance conversion x')] = pmDistanceConversionX
 
         elif 'PM trap distance conversion y' in line:
             pmDistanceConversionY = float(line.strip().split(": ")[-1])
-            meta['pmDistanceConversionY'] = pmDistanceConversionY
+            meta[standardized_name_of('PM trap distance conversion y')] = pmDistanceConversionY
 
         elif 'AOD bead radius' in line:
             try:
@@ -976,10 +980,10 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             aodBeadDiameter = 2.0 * aodBeadRadius
 
-            meta['aodBeadDiameter'] = round(aodBeadDiameter, 2)
-            meta['aodBeadRadius'] = round(aodBeadRadius, 2)
+            meta[standardized_name_of('AOD bead diameter')] = round(aodBeadDiameter, 2)
+            meta[standardized_name_of('AOD bead radius')] = round(aodBeadRadius, 2)
 
-        elif 'PM bead radius ' in line:
+        elif 'PM bead radius' in line:
             try:
                 pmBeadRadius = float(line.strip().split(": ")[-1])
                 if pmBeadRadius < 20:
@@ -991,20 +995,20 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             pmBeadDiameter = 2.0 * pmBeadRadius
 
-            meta['pmBeadDiameter'] = round(pmBeadDiameter, 2)
-            meta['pmBeadRadius'] = round(pmBeadRadius, 2)
+            meta[standardized_name_of('PM bead diameter')] = round(pmBeadDiameter, 2)
+            meta[standardized_name_of('PM bead radius')] = round(pmBeadRadius, 2)
 
         elif 'Sample rate' in line:
             samplingRate = float(line.strip().split(": ")[-1])
-            meta['samplingRate'] = samplingRate
+            meta[standardized_name_of('Sample rate')] = samplingRate
 
         elif 'Number of samples' in line:
             nSamples = float(line.strip().split(": ")[-1])
-            meta['nSamples'] = nSamples
+            meta[standardized_name_of('Number of samples')] = nSamples
 
         elif 'Delta time' in line:
             deltaTime = float(line.strip().split(": ")[-1])
-            meta['deltaTime'] = deltaTime
+            meta[standardized_name_of('Delta time')] = deltaTime
 
         elif 'Laser Diode Operating Hours' in line:
             try:
@@ -1012,7 +1016,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             except:
                 laserDiodeHours = 0
 
-            meta['laserDiodeHours'] = laserDiodeHours
+            meta[standardized_name_of('Laser Diode Operating Hours')] = laserDiodeHours
             units['laserDiodeHours'] = 'h'
 
         elif 'Laser Diode Current' in line:
@@ -1021,7 +1025,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             except:
                 laserDiodeCurrent = 0
 
-            meta['laserDiodeCurrent'] = laserDiodeCurrent
+            meta[standardized_name_of('Laser Diode Current')] = laserDiodeCurrent
             units['laserDiodeCurrent'] = 'A'
 
         elif 'Laser Diode Temp' in line:
@@ -1030,7 +1034,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             except:
                 laserDiodeTemp = 0
 
-            meta['laserDiodeTemp'] = laserDiodeTemp
+            meta[standardized_name_of('Laser Diode Temp')] = laserDiodeTemp
             units['laserDiodeTemp'] = 'C'
 
         elif 'number of blocks' in line:
@@ -1039,7 +1043,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             except:
                 nBlocks = 128
 
-            meta['nBlocks'] = nBlocks
+            meta[standardized_name_of('number of blocks')] = nBlocks
             units['nBlocks'] = 'int'
 
         else:
@@ -1164,6 +1168,7 @@ def standardized_name_of(variable):
 
         'PM bead diameter': 'pmBeadDiameter',
         'diameterT1.um': 'pmBeadDiameter',
+        'PM bead radius': 'pmBeadRadius',
 
         # aod variables
         'AOD horizontal corner frequency': 'aodCornerFreqX',
@@ -1237,6 +1242,7 @@ def standardized_name_of(variable):
 
         'AOD bead diameter': 'aodBeadDiameter',
         'diameterT2.um': 'aodBeadDiameter',
+        'AOD bead radius': 'aodBeadRadius',
 
         # andor camera specifics
         'ANDOR pixel size x': 'andorPixelSizeX',
