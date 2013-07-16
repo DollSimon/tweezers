@@ -253,7 +253,7 @@ def read_tweezer_power_spectrum(file_name):
         fl = f.readlines(1000)
 
     # parsing header information
-    comments = [line.strip().strip("# ") for line in fl[0:40] if line.strip().startswith('#')] 
+    comments = [line.strip().strip("#").strip() for line in fl[0:40] if line.strip().startswith('#')] 
 
     CommentInfo = extract_meta_and_units(comments)
 
@@ -269,7 +269,11 @@ def read_tweezer_power_spectrum(file_name):
         names=columns, header=None, dtype=np.float64)
 
     for k, v in CommentInfo.metadata.iteritems():
-        psd.__setattr__(k, v)
+        try:
+            psd.__setattr__(str(k), v)
+        except TypeError as err:
+            print(err)
+            raise
 
     psd.units = CommentInfo.units
 
@@ -798,7 +802,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             units['dt'] = units['timeStep'] = 's'
             meta[standardized_name_of('dt')] = meta[standardized_name_of('timeStep')] = dt 
 
-        elif 'PM bead diameter' in line:
+        elif 'PM bead diameter' in line or 'diameterT1.um' in line:
             try:
                 pmBeadDiameter = float(line.strip().split(": ")[-1])
                 if pmBeadDiameter < 20:
@@ -813,7 +817,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             meta[standardized_name_of('PM bead diameter')] = pmBeadDiameter
             meta[standardized_name_of('PM bead radius')] = pmBeadRadius
 
-        elif 'AOD bead diameter' in line:
+        elif 'AOD bead diameter' in line or 'diameterT2.um' in line:
             try:
                 aodBeadDiameter = float(line.strip().split(": ")[-1])
                 if aodBeadDiameter < 20:
@@ -1037,14 +1041,44 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             meta[standardized_name_of('Laser Diode Temp')] = laserDiodeTemp
             units['laserDiodeTemp'] = 'C'
 
-        elif 'number of blocks' in line:
+        elif 'number of blocks' in line or 'nBlocks' in line:
             try:
                 nBlocks = int(line.strip().split(": ")[-1])
             except:
                 nBlocks = 128
 
             meta[standardized_name_of('number of blocks')] = nBlocks
-            units['nBlocks'] = 'int'
+            units['nBlocks'] = None
+
+        elif 'AOD vertical corner frequency' in line or 'yCornerFreqT2' in line:
+            try:
+                m = re.search('^(\w+(\s\w+)*)\s(\d+\.\d+)$', line.strip().strip('#').strip())
+                value = float(m.group(3))
+                meta[standardized_name_of('yCornerFreqT2')] = value
+                units[standardized_name_of('yCornerFreqT2')] = standardized_unit_of('yCornerFreqT2')
+            except:
+                meta[standardized_name_of('yCornerFreqT2')] = None
+                units[standardized_name_of('yCornerFreqT2')] = standardized_unit_of('yCornerFreqT2')
+
+        elif 'PM vertical corner frequency' in line or 'yCornerFreqT1' in line:
+            try:
+                m = re.search('^(\w+(\s\w+)*)\s(\d+\.\d+)$', line.strip().strip('#').strip())
+                value = float(m.group(3))
+                meta[standardized_name_of('yCornerFreqT1')] = value
+                units[standardized_name_of('yCornerFreqT1')] = standardized_unit_of('yCornerFreqT1')
+            except:
+                meta[standardized_name_of('yCornerFreqT1')] = None
+                units[standardized_name_of('yCornerFreqT1')] = standardized_unit_of('yCornerFreqT1')
+
+        elif 'xCornerFreqT1' in line or 'PM horizontal corner frequency' in line:
+            value = float(line.strip().split(": ")[-1])
+            meta[standardized_name_of('xCornerFreqT1')] = value
+            units[standardized_name_of('xCornerFreqT1')] = standardized_unit_of('xCornerFreqT1')
+
+        elif 'xCornerFreqT2' in line or 'AOD horizontal corner frequency' in line:
+            value = float(line.strip().split(": ")[-1])
+            meta[standardized_name_of('xCornerFreqT2')] = value
+            units[standardized_name_of('xCornerFreqT2')] = standardized_unit_of('xCornerFreqT2')
 
         else:
             if ":" in line:
@@ -1058,14 +1092,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
                 else:
                     var, unit, value = parts[0], None, float(parts[1])
             except:
-                m = re.search('^(\w+(\s\w+)*)\s(\d+\.\d+)$', line)
-                value = float(m.group(3))
-                if 'AOD vertical corner frequency' in m.group(1):
-                    var = 'aodCornerFreqY'
-                    unit = 'Hz'
-                elif 'PM vertical corner frequency' in m.group(1):
-                    var = 'pmCornerFreqY'
-                    unit = 'Hz'
+                print()
 
             units[var] = unit
             meta[var] = value
@@ -1108,6 +1135,7 @@ def standardized_name_of(variable):
         'duration of measurement': 'duration',
         'dt ': 'timeStep',
 
+        'number of blocks': 'nBlocks',
         'nBlocks': 'nBlocks',
 
         'Viscosity': 'viscosity',
@@ -1122,13 +1150,17 @@ def standardized_name_of(variable):
         'PM vertical corner frequency': 'pmCornerFreqY',
 
         'xCornerFreqT1.Hz': 'pmCornerFreqX',
+        'xCornerFreqT1': 'pmCornerFreqX',
         'yCornerFreqT1.Hz': 'pmCornerFreqY',
+        'yCornerFreqT1': 'pmCornerFreqY',
 
         'PM detector horizontal offset': 'pmDetectorOffsetX',
         'PM detector vertical offset': 'pmDetectorOffsetY',
 
         'xOffsetT1.V': 'pmDetectorOffsetX',
+        'xOffsetT1': 'pmDetectorOffsetX',
         'yOffsetT1.V': 'pmDetectorOffsetY',
+        'yOffsetT1': 'pmDetectorOffsetY',
 
         'PM horizontal trap stiffness': 'pmStiffnessX',
         'PM vertical trap stiffness': 'pmStiffnessY',
@@ -1205,7 +1237,9 @@ def standardized_name_of(variable):
         'AOD vertical corner frequency': 'aodCornerFreqY',
 
         'xCornerFreqT2.Hz': 'aodCornerFreqX',
+        'xCornerFreqT2': 'aodCornerFreqX',
         'yCornerFreqT2.Hz': 'aodCornerFreqY',
+        'yCornerFreqT2': 'aodCornerFreqY',
 
         'AOD detector horizontal offset': 'aodDetectorOffsetX',
         'AOD detector vertical offset': 'aodDetectorOffsetY',
@@ -1292,7 +1326,9 @@ def standardized_unit_of(variable):
         'PM vertical corner frequency': 'Hz',
 
         'xCornerFreqT1.Hz': 'Hz',
+        'xCornerFreqT1': 'Hz',
         'yCornerFreqT1.Hz': 'Hz',
+        'yCornerFreqT1': 'Hz',
 
         'PM detector horizontal offset': 'V',
         'PM detector vertical offset': 'V',
@@ -1370,7 +1406,9 @@ def standardized_unit_of(variable):
         'AOD vertical corner frequency': 'Hz',
 
         'xCornerFreqT2.Hz': 'Hz',
+        'xCornerFreqT2': 'Hz',
         'yCornerFreqT2.Hz': 'Hz',
+        'yCornerFreqT2': 'Hz',
 
         'AOD detector horizontal offset': 'V',
         'AOD detector vertical offset': 'V',

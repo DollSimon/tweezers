@@ -35,7 +35,7 @@ class TestReadingThermalCalibrationData:
         psd.date.should.equal(datetime.datetime(2013, 5, 19, 2, 34))
         psd.nSamples.should.equal(2**20) 
         psd.nBlocks.should.equal(128) 
-        psd.sampleRate.should.equal(80000) 
+        psd.samplingRate.should.equal(80000) 
 
         # units
         psd.units["pmDetectorOffsetY"].should.equal("V") 
@@ -91,43 +91,44 @@ class TestReadingThermalCalibrationData:
         psd.pmDisplacementSensitivityX.should.be(0.000854)
         # xDistConversionT1.VperNm: 0.000854
 
-        psd.pmBeadDiamter.should.be(2.160000)
+        psd.pmBeadDiameter.should.be(2160)
         # diameterT1.um: 2.160000
 
-        psd.aodBeadDiamter.should.be(2.000000)
+        psd.aodBeadDiameter.should.be(2000)
+        psd.aodBeadRadius.should.be(1000)
         # diameterT2.um: 2.000000
 
-    # def test_read_old_manual_power_spectrum(self):
-    #     psd_file = self.__class__.man_psd
-    #     psd = read_tweezer_power_spectrum(psd_file)
+    def test_read_old_manual_power_spectrum(self):
+        psd_file = self.__class__.man_psd
+        psd = read_tweezer_power_spectrum(psd_file)
         
-    #     # units
-    #     psd.units["pmDetectorOffsetY"].should.equal("V") 
+        # units
+        psd.units["pmDetectorOffsetY"].should.equal("V") 
 
-    #     # values
-    #     psd.nBlocks.should.equal(128) 
-    #     psd.nSamples.should.equal(2**20) 
-    #     psd.samplingRate.should.equal(80000) 
-    #     psd.date.should.equal(datetime.datetime(2013, 2, 22, 16, 21))
+        # values
+        psd.nBlocks.should.equal(128) 
+        psd.nSamples.should.equal(2**20) 
+        psd.samplingRate.should.equal(80000) 
+        psd.date.should.equal(datetime.datetime(2013, 2, 22, 16, 21))
 
-    #     psd.aodDetectorOffsetY.should.be(0.571595)
-    #     psd.aodDetectorOffsetX.should.be(-0.074555)
-    #     psd.aodCornerFreqY.should.be(131.916394)
-    #     psd.aodCornerFreqX.should.be(190.906543)
-    #     psd.aodStiffnessY.should.be(0.050094)
-    #     psd.aodStiffnessX.should.be(0.072495)
-    #     psd.aodDisplacementSensitivityY.should.be(0.000349)
-    #     psd.aodDisplacementSensitivityX.should.be(0.000424)
+        psd.aodDetectorOffsetY.should.be(0.571595)
+        psd.aodDetectorOffsetX.should.be(-0.074555)
+        psd.aodCornerFreqY.should.be(131.916394)
+        psd.aodCornerFreqX.should.be(190.906543)
+        psd.aodStiffnessY.should.be(0.050094)
+        psd.aodStiffnessX.should.be(0.072495)
+        psd.aodDisplacementSensitivityY.should.be(0.000349)
+        psd.aodDisplacementSensitivityX.should.be(0.000424)
 
-    #     psd.pmDetectorOffsetY.should.be(0.091648)
-    #     psd.pmDetectorOffsetX.should.be(-0.075828)
-    #     psd.pmCornerFreqY.should.be(152.806556)
-    #     psd.pmCornerFreqX.should.be(161.970405)
-    #     psd.pmStiffnessY.should.be(0.058027)
-    #     psd.pmStiffnessX.should.be(0.061506)
-    #     psd.pmDisplacementSensitivityY.should.be(0.000367)
-    #     psd.pmDisplacementSensitivityX.should.be(0.000384)
+        psd.pmDetectorOffsetY.should.be(0.091648)
+        psd.pmDetectorOffsetX.should.be(-0.075828)
+        psd.pmCornerFreqY.should.be(152.806556)
+        psd.pmCornerFreqX.should.be(161.970405)
+        psd.pmStiffnessY.should.be(0.058027)
+        psd.pmStiffnessX.should.be(0.061506)
+        psd.pmDisplacementSensitivityY.should.be(0.000367)
+        psd.pmDisplacementSensitivityX.should.be(0.000384)
 
-    #     psd.pmBeadDiamter.should.be(2000)
-    #     psd.aodBeadDiamter.should.be(2000)
+        psd.pmBeadDiameter.should.be(2000)
+        psd.aodBeadDiameter.should.be(2000)
 
