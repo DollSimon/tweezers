@@ -144,7 +144,26 @@ def start():
         files = list_tweezer_files(DIR)
         print('There are {} file types'.format(len(files)))
         print('There are the following types: {} '.format(len(files)))
-        puts('Here is the result: {}'.format(colored.blue(files)))
+        puts('Here is the result: ')
+
+        for key, val in files.iteritems():
+            if not 'directory_state' in key:
+                with indent(2):
+                    puts('These are the files of type {}:'.format(colored.yellow(key)))
+                    puts('') 
+                    for v in val: 
+                        with indent(2):
+                            if DIR in v:
+                                puts('{}'.format(v.replace(DIR, '...'))) 
+                            else:
+                                puts('{}'.format(v)) 
+            else:
+                with indent(2):
+                    puts('The {} is described by:'.format(colored.yellow('directory_state')))
+                    puts('') 
+                    with indent(2):
+                        puts('{}'.format(files['directory_state']))
+            puts('') 
 
     # tweezer show
     if args['show']:
@@ -243,13 +262,14 @@ def start():
                         else:
                             with indent(2):
                                 puts('The {} is described by:'.format(colored.yellow('directory_state')))
+                                puts('') 
                                 with indent(2):
                                     puts('{}'.format(files['directory_state']))
                         puts('') 
 
                 else:
                     try:
-                        if not 'directory_state' in kind:
+                        if kind not in ['directory_state', 'state']:
                             with indent(2):
                                 puts('These are the files of type {}:'.format(colored.yellow(kind)))
                                 puts('') 
@@ -262,6 +282,7 @@ def start():
                         else:
                             with indent(2):
                                 puts('The {} is described by:'.format(colored.yellow('directory_state')))
+                                puts('') 
                                 with indent(2):
                                     puts('{}'.format(files['directory_state']))
                         puts('') 
