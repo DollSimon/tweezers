@@ -1,5 +1,9 @@
-import os
+import os, sys
 import re
+
+import hashlib
+
+import envoy
 
 from collections import defaultdict, namedtuple
 from itertools import izip
@@ -26,6 +30,8 @@ except ImportError, err:
         puts('The following import error occurred: {}'.format(colored.red(err))) 
         puts('')
 
+CACHING_FILE = 'cached_file_listing.json'
+
 def list_tweezer_files(directory):
     """ 
     Walks a directory structure top-down, registering known tweezer file types along the way. 
@@ -35,12 +41,48 @@ def list_tweezer_files(directory):
     :return files: (defaultdict) where keys are file types and values are corresponding files specified by their full path
 
     """
-    files = defaultdict(list)
-    file_names = list(generate_file_tree_of(directory))
+    cached_results_file = os.path.join(directory, CACHING_FILE)  
 
-    types = classify_all(file_names)
-    for t, f in izip(types, file_names):
-        files[t.lower()].append(f)
+    files = defaultdict(list)
+
+    if os.path.exists(cached_results_file):
+
+        # check if length of files in cache equals length os files found. 
+        current_directory_state = get_directory_state(directory)
+
+        with open(cached_results_file, 'r') as f:
+            cached_data = json.load(f)
+
+        if current_directory_state == cached_data['directory_state']:
+            for k, v in cached_data.iteritems():
+                files[k] = v   
+        else:
+            current_directory_state = get_directory_state(directory)
+
+            file_names = list(generate_file_tree_of(directory))
+
+            types = classify_all(file_names)
+            for t, f in izip(types, file_names):
+                files[t.lower()].append(f)
+
+            files['directory_state'] = current_directory_state
+
+            with open(cached_results_file, 'w') as f:
+                json.dump(files, f, indent=2)
+
+    else:
+        directory_state = get_directory_state(directory)
+
+        file_names = list(generate_file_tree_of(directory))
+
+        types = classify_all(file_names)
+        for t, f in izip(types, file_names):
+            files[t.lower()].append(f)
+
+        files['directory_state'] = directory_state
+
+        with open(cached_results_file, 'w') as f:
+            json.dump(files, f, indent=2)
 
     return files
 
@@ -220,12 +262,26 @@ def pprint_settings(settings, part='all', status='current', other_settings={}, o
                         with indent(2):
                             if pos % 2 == 0:
                                 try:
-                                    puts('{} : {} {} \t\t({}: {})'.format(key, settings[section][key], unit, colored.yellow(other_status), colored.yellow(other_settings[section][key])))
+                                    value = settings[section][key]
+                                    puts('{key} : {value} {unit} {spacing}({other_setting}: {other_value})'.format(
+                                        key = key, 
+                                        value = settings[section][key], 
+                                        unit = unit, 
+                                        spacing = flexible_tab(' '.join([' : '.join([key, str(value)]), unit])), 
+                                        other_setting = colored.yellow(other_status), 
+                                        other_value = colored.yellow(other_settings[section][key])))
                                 except:
                                     puts('{} : {} {}'.format(key, settings[section][key], unit))
                             else:
                                 try:
-                                    puts('{} : {} {} \t\t({}: {})'.format(colored.white(key), colored.white(settings[section][key]), colored.white(unit), colored.yellow(other_status), colored.yellow(other_settings[section][key])))
+                                    value = settings[section][key]
+                                    puts('{key} : {value} {unit} {spacing}({other_setting}: {other_value})'.format(
+                                        key = colored.white(key), 
+                                        value = colored.white(settings[section][key]), 
+                                        unit = colored.white(unit), 
+                                        spacing = flexible_tab(' '.join([' : '.join([key, str(value)]), unit])), 
+                                        other_setting = colored.yellow(other_status), 
+                                        other_value = colored.yellow(other_settings[section][key])))
                                 except:
                                     puts('{} : {} {}'.format(colored.white(key), colored.white(settings[section][key]), colored.white(unit)))
                 except:
@@ -239,12 +295,24 @@ def pprint_settings(settings, part='all', status='current', other_settings={}, o
                         with indent(2):
                             if pos % 2 == 0:
                                 try:
-                                    puts('{} : {} \t\t({}: {})'.format(key, settings[section][key], colored.yellow(other_status), colored.yellow(other_settings[section][key])))
+                                    value = settings[section][key]
+                                    puts('{key} : {value} {spacing}({other_setting}: {other_value})'.format(
+                                        key = key, 
+                                        value = settings[section][key], 
+                                        spacing = flexible_tab(' : '.join([key, str(value)])), 
+                                        other_setting = colored.yellow(other_status), 
+                                        other_value = colored.yellow(other_settings[section][key])))
                                 except:
                                     puts('{} : {}'.format(key, settings[section][key]))
                             else:
                                 try:
-                                    puts('{} : {} \t\t({}: {})'.format(colored.white(key), colored.white(settings[section][key]), colored.yellow(other_status), colored.yellow(other_settings[section][key])))
+                                    value = settings[section][key]
+                                    puts('{key} : {value} {spacing}({other_setting}: {other_value})'.format(
+                                        key = colored.white(key), 
+                                        value = colored.white(settings[section][key]), 
+                                        spacing = flexible_tab(' : '.join([key, str(value)])), 
+                                        other_setting = colored.yellow(other_status), 
+                                        other_value = colored.yellow(other_settings[section][key])))
                                 except:
                                     puts('{} : {}'.format(colored.white(key), colored.white(settings[section][key])))
 
@@ -301,6 +369,9 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
                             new_value = raw_input('> {} = '.format(colored.yellow(key)))
                             puts('')
 
+                            if not new_value:
+                                break
+
                             # parse string value
                             if re.search('^\d+$', new_value.strip()):
                                 new_value = int(new_value)
@@ -327,6 +398,9 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
                         while True:
                             new_value = raw_input('> {} = '.format(colored.yellow(key)))
                             puts('')
+
+                            if not new_value:
+                                break
 
                             # parse string value
                             if re.search('^\d+$', new_value.strip()):
@@ -361,5 +435,65 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
         f.write(json.dumps(new_settings, indent=2, separators=(',', ': ')))
 
 
+def flexible_tab(key):
+    if len(key) in range(63, 300):
+        spacing = ''
+    if len(key) in range(56, 63):
+        spacing = '\t'
+    elif len(key) in range(49, 56):
+        spacing = '\t\t'
+    elif len(key) in range(42, 49):
+        spacing = '\t\t\t'
+    elif len(key) in range(35, 42):
+        spacing = '\t\t\t\t'
+    elif len(key) in range(28, 35):
+        spacing = '\t\t\t\t\t'
+    elif len(key) in range(21, 28):
+        spacing = '\t\t\t\t\t\t'
+    elif len(key) in range(14, 21):
+        spacing = '\t\t\t\t\t\t\t'
+    elif len(key) in range(2, 14):
+        spacing = '\t\t\t\t\t\t\t\t'
+    else:
+        spacing = ''
+
+    return spacing
 
 
+def get_directory_state(directory=None):
+    """
+    Calls the underlying os to get a unique number for the content of the directory.
+
+    :param (directory): (path) of the directory to be studied recursively
+
+    :return md5: (md5) unique sha number that encrypts the directory state
+    """
+    if not directory:
+        directory = os.getcwd()
+
+    names_call = envoy.run('find {dir} -type f -exec stat -f "%N" {placeholder} \\;'.format(
+        dir = directory, 
+        placeholder ='{}'))
+
+    sizes_call = envoy.run('find {dir} -type f -exec stat -f "%z" {placeholder} \\;'.format(
+        dir = directory, 
+        placeholder ='{}'))
+
+    names = names_call.std_out
+    sizes = sizes_call.std_out
+
+    try:
+        return hashlib.sha256(names + sizes).hexdigest()
+    except:
+        raise
+
+
+def main():
+    os.chdir('/Users/jahnel/code/example_data/manual/')
+    directory = os.getcwd()
+    files = list_tweezer_files(directory)
+    print(len(files))
+
+
+if __name__ == '__main__':
+    sys.exit(main())

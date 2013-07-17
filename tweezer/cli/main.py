@@ -9,9 +9,9 @@ Usage:
   tweezer (analyse | analyze) [-t | -m] [<FILE>...]
   tweezer convert [<FILE>...] <LANGUAGE>
   tweezer overview [-t | -m] ([<DIR>...] | -f [<FILE>...])
-  tweezer list [<DIR>...]
-  tweezer show <OBJECT> [--part=<TYPE>] [-d]
-  tweezer update <OBJECT> [--part=<TYPE>]
+  tweezer list [<DIR>...] [--kind=<TYPE>]
+  tweezer show <OBJECT> [--kind=<TYPE>] [-d]
+  tweezer update <OBJECT> [--kind=<TYPE>]
   tweezer track [-o <OBJECT>] ([<VIDEO>...] | -i [<IMAGE>...])
   tweezer simulate <OBJECT> [--args=<ARGS>...]
   tweezer plot <OBJECT> [--args=<ARGS>...]
@@ -51,7 +51,7 @@ Options:
   -t --tweebot      Tweebot tweezer mode
   -m --manual       Manual tweezer mode
   -l --logging      Write log file
-  -p --part=<TYPE>  Part or Subclass of an object
+  -k --kind=<TYPE>  Kind, type, part or subclass of an object
   -d --default      Refer to the saved default object
   -f --file         Switch to file mode when input can be file or dir
   -i --image        Switch to image mode when input can be image or video
@@ -149,10 +149,10 @@ def start():
     # tweezer show
     if args['show']:
 
-        if args['--part']:
-            part = args['--part']
+        if args['--kind']:
+            kind = args['--kind']
         else:
-            part = 'all'
+            kind = 'all'
 
         # Check objects with special meaning
         if 'setting' in args['<OBJECT>']:
@@ -164,21 +164,21 @@ def start():
                 settings = parse_json('settings.json')
 
                 if not args['--default']:
-                    pprint_settings(settings, part=part, status='local')
+                    pprint_settings(settings, part=kind, status='local')
 
                 else:
                     default_settings = parse_json(_DEFAULT_SETTINGS)
-                    pprint_settings(default_settings, part=part, 
+                    pprint_settings(default_settings, part=kind, 
                         status='default', other_settings=settings, other_status='locally')
 
             elif args['--default']:
                 default_settings = parse_json(_DEFAULT_SETTINGS)
                 if has_settings:
                     settings = parse_json('settings.json')
-                    pprint_settings(default_settings, part=part, 
+                    pprint_settings(default_settings, part=kind, 
                         status='default', other_settings=settings, other_status='locally')
                 else:
-                    pprint_settings(default_settings, part=part, status='default')
+                    pprint_settings(default_settings, part=kind, status='default')
             else:
                 puts('No settings file found...\n')
                 putSettigns = raw_input('Shall I add the default settings file to this directory: ')
@@ -199,16 +199,16 @@ def start():
 
                 if not args['--default']:
                     settings = parse_json('tweebot_configuration.json')
-                    pprint_settings(settings, part=part, status='local')
+                    pprint_settings(settings, part=kind, status='local')
                 else:
                     puts('These are the tweebot default configurations:\n')
                     settings = parse_json(_TWEEBOT_CONFIG)
-                    pprint_settings(settings, part=part, status='default')
+                    pprint_settings(settings, part=kind, status='default')
 
             elif args['--default']:
                 puts('These are the tweebot default configurations:\n')
                 settings = parse_json(_TWEEBOT_CONFIG)
-                pprint_settings(settings, part=part, status='default')
+                pprint_settings(settings, part=kind, status='default')
 
             else:
                 puts('No tweebot configuration file found...\n')
@@ -219,16 +219,74 @@ def start():
                 else:
                     print('Ok, than I have nothing to show...')
 
+        elif 'files' in args['<OBJECT>']:
+
+            CACHED_FILES = 'cached_file_listing.json' 
+
+            has_cached_file_listing = os.path.isfile(CACHED_FILES)
+
+            if has_cached_file_listing:
+                files = parse_json(CACHED_FILES)
+
+                if kind is 'all':
+                    for key, val in files.iteritems():
+                        if not 'directory_state' in key:
+                            with indent(2):
+                                puts('These are the files of type {}:'.format(colored.yellow(key)))
+                                puts('') 
+                                for v in val: 
+                                    with indent(2):
+                                        if DIR in v:
+                                            puts('{}'.format(v.replace(DIR, '...'))) 
+                                        else:
+                                            puts('{}'.format(v)) 
+                        else:
+                            with indent(2):
+                                puts('The {} is described by:'.format(colored.yellow('directory_state')))
+                                with indent(2):
+                                    puts('{}'.format(files['directory_state']))
+                        puts('') 
+
+                else:
+                    try:
+                        if not 'directory_state' in kind:
+                            with indent(2):
+                                puts('These are the files of type {}:'.format(colored.yellow(kind)))
+                                puts('') 
+                                for v in files[kind]: 
+                                    with indent(2):
+                                        if DIR in v:
+                                            puts('{}'.format(v.replace(DIR, '...'))) 
+                                        else:
+                                            puts('{}'.format(v)) 
+                        else:
+                            with indent(2):
+                                puts('The {} is described by:'.format(colored.yellow('directory_state')))
+                                with indent(2):
+                                    puts('{}'.format(files['directory_state']))
+                        puts('') 
+                    except KeyError:
+                        print('No such file type found')
+
+            else:
+                puts('No files listing found...\n')
+                putSettigns = raw_input('Shall I search the current directory for known file types: ')
+                if InterpretUserInput[putSettigns]:
+                    print("I'm classifying the files here. Might take a minute...")
+                    files = list_tweezer_files(DIR)
+                else:
+                    print('Ok, than I have nothing to show...')
+
         else:
             print('This is the content of file {}'.format(args['<OBJECT>']))
 
-    # tweezer update <OBJECT> [--part=<TYPE>]
+    # tweezer update <OBJECT> [--kind=<TYPE>]
     if args['update']:
 
-        if args['--part']:
-            part = args['--part']
+        if args['--kind']:
+            kind = args['--kind']
         else:
-            part = 'all'
+            kind = 'all'
 
         # check special objects
         if 'setting' in args['<OBJECT>']:
@@ -239,13 +297,13 @@ def start():
 
                 old_settings = parse_json('settings.json')
 
-                update_settings('settings.json', old_settings=old_settings, part=part)                
+                update_settings('settings.json', old_settings=old_settings, part=kind)                
 
                 # new_settings = parse_json('settings.json')
 
                 default_settings = parse_json(_DEFAULT_SETTINGS)
 
-                pprint_settings(old_settings, part=part, other_settings=default_settings)
+                pprint_settings(old_settings, part=kind, other_settings=default_settings)
 
             else:
                 puts('Update only works with local settings file, but none was found...\n')
@@ -267,14 +325,14 @@ def start():
 
                 settings = parse_json('tweebot_configuration.json')
 
-                pprint_settings(settings, part=part)
+                pprint_settings(settings, part=kind)
 
             elif args['--default']:
                 puts('These are the tweebot default configurations:\n')
                 
                 settings = parse_json(_TWEEBOT_CONFIG)
 
-                pprint_settings(settings, part=part, status='default')
+                pprint_settings(settings, part=kind, status='default')
 
             else:
                 puts('No tweebot configuration file found...\n')
@@ -356,7 +414,7 @@ def start():
                 print(path)
                 # tweebot_overview(path)
 
-        puts('Calling tweezer overview from {}'.format(colored.green(DIR)))
+        puts('Calling {} from {}'.format(colored.white('tweezer overview'), colored.green(DIR)))
         # full_tweebot_overview(DIR)
 
     # tweezer help
