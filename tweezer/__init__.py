@@ -28,13 +28,14 @@ def get_example_path(path, example_type='data'):
     return os.path.join(_ROOT, example_type, path)
 
 
-def path_to_sample_data(data_type = 'MAN_DATA'):
+def path_to_sample_data(data_type = 'MAN_DATA', info = False):
     """
     Points to tweezer example data of a given data type.
 
     :param data_type: (Str) that represents the type of the data, like 'MAN_DATA', 'BOT_LOGS' or 'TC'
-    :return example_file: archetype of the specified file type
+    :param info: (Boolean) if true just prints the available files
     
+    :return example_file: archetype of the specified file type
     """
     def to_file(path, location=-1):
         return os.path.join(path, os.listdir(path)[location])
@@ -80,7 +81,12 @@ def path_to_sample_data(data_type = 'MAN_DATA'):
         'template': find_file(get_example_path('man_dist_cal'), name='calibration_template_db_tb'),
         'man_flow': to_file(get_example_path('man_flow'))}
 
-    return file_mapper.get(data_type.lower(), 'unknown')
+    if not info:
+        return file_mapper.get(data_type.lower(), 'unknown')
+    else:
+        print('The following file types are available:\n')
+        for k in file_mapper:
+            print(k)
 
 
 def path_to_sample_dir(data_type = 'MAN_DATA'):

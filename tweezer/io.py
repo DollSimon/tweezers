@@ -279,7 +279,8 @@ def read_tweezer_power_spectrum(file_name):
 
     return psd
 
-def parse_older_tweezer_comments(comments):
+
+def read_distance_calibration_data(comments):
     """
     Extract fit and l
     

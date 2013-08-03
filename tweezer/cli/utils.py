@@ -32,7 +32,7 @@ except ImportError, err:
 
 CACHING_FILE = 'cached_file_listing.json'
 
-def list_tweezer_files(directory):
+def list_tweezer_files(directory, cache_results=True):
     """ 
     Walks a directory structure top-down, registering known tweezer file types along the way. 
 
@@ -81,8 +81,9 @@ def list_tweezer_files(directory):
 
         files['directory_state'] = directory_state
 
-        with open(cached_results_file, 'w') as f:
-            json.dump(files, f, indent=2)
+        if cache_results:
+            with open(cached_results_file, 'w') as f:
+                json.dump(files, f, indent=2)
 
     return files
 

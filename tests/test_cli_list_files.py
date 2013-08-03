@@ -86,6 +86,8 @@ class TestTweezerListFiles:
         files.should.be.a('collections.defaultdict')
         ('man_data').should.be.within(files)
         ('directory_state').should.be.within(files)
+        ('man_aod_dist_cal_mat').should.be.within(files)
+        ('man_pm_dist_cal_mat').should.be.within(files)
         
         
     
