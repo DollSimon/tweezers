@@ -1,0 +1,1043 @@
+Sun May 19 01:50:21 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.01.50.21.914.andor.png
+Sun May 19 01:50:22 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.01.50.21.998.ccd.png
+Sun May 19 01:50:22 CEST 2013	TIMING	takesnapshots	0.19695305824279785
+Sun May 19 01:50:22 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to 0.2
+Sun May 19 01:50:28 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 01:50:30 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.355479
+Sun May 19 01:50:30 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.207000
+Sun May 19 01:50:38 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to -0.05709197558497191
+Sun May 19 01:50:47 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 01:50:47 CEST 2013	EVENT	grabtwobeadstether.capture	Going after two beads
+Sun May 19 01:50:47 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to -0.05709197558497191
+Sun May 19 01:50:47 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 01:50:47 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to active
+Sun May 19 01:51:06 CEST 2013	EVENT	backgroundcalibration.begin	Background acquisition begins.
+Sun May 19 01:51:06 CEST 2013	INFO	tweebot.andor	Aquiring background image is on
+Sun May 19 01:51:06 CEST 2013	INFO	tweebot.ccd	Aquiring background image is on
+Sun May 19 01:51:12 CEST 2013	INFO	tweebot.andor	Aquiring background image is off
+Sun May 19 01:51:12 CEST 2013	INFO	tweebot.ccd	Aquiring background image is off
+Sun May 19 01:51:13 CEST 2013	EVENT	backgroundcalibration.end	Background acquisition ends.
+Sun May 19 01:51:13 CEST 2013	EVENT	grabtwobeads.begin	Two bead capture routine begin...
+Sun May 19 01:51:13 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.01.51.12.946.andor.png
+Sun May 19 01:51:13 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.01.51.13.019.ccd.png
+Sun May 19 01:51:13 CEST 2013	TIMING	takesnapshots	0.14453601837158203
+Sun May 19 01:51:13 CEST 2013	EVENT	grabtwobeads.resettracking	Resetting tracking.
+Sun May 19 01:51:14 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.310097
+Sun May 19 01:51:15 CEST 2013	EVENT	grabtwobeads.grab1stbead	Capturing first bead...
+Sun May 19 01:51:15 CEST 2013	EVENT	grabbead.begin	Bead capture routine begins
+Sun May 19 01:51:15 CEST 2013	STAGE	grabbead.begin	(-0.147410,-1.24091,-0.140230)
+Sun May 19 01:51:15 CEST 2013	EVENT	grabbead.try	Bead capture try 1
+Sun May 19 01:51:15 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 1.0 (0.3 mm/s)
+Sun May 19 01:51:15 CEST 2013	EVENT	grabbead.gotolocation.begin	Starting to move towards location: (0.10957, 1.34321, -0.14043) at speed 0.3 mm/s
+Sun May 19 01:51:15 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.180000
+Sun May 19 01:51:18 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to unactive
+Sun May 19 01:51:24 CEST 2013	EVENT	grabbead.gotolocation.end	Arrived at location: (0.10957, 1.34321, -0.14043)
+Sun May 19 01:51:24 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to 0.2
+Sun May 19 01:51:31 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 01:51:33 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to -0.05709197558497191
+Sun May 19 01:51:35 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.359476
+Sun May 19 01:51:36 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.246000
+Sun May 19 01:51:43 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 01:51:43 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to active
+Sun May 19 01:51:43 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:51:43 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.0024714200915747224, -0.0017003134903383833, -3.188676111010115E-5) 
+Sun May 19 01:51:43 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:51:45 CEST 2013	EVENT	grabbead.isbeadgood.badradius	Bead radius = 13.44
+Sun May 19 01:51:45 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:51:45 CEST 2013	EVENT	grabbead.try	Bead capture try 2
+Sun May 19 01:51:45 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:51:45 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.002519349925810106, -0.0016286203560094325, -2.171836348170613E-5) 
+Sun May 19 01:51:46 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:51:46 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:51:46 CEST 2013	EVENT	grabbead.try	Bead capture try 3
+Sun May 19 01:51:46 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:51:46 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.0025396002107621746, -0.0015968693781514569, -2.0951339310406513E-5) 
+Sun May 19 01:51:46 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:51:47 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:51:47 CEST 2013	EVENT	grabbead.escape.begin	Escaping
+Sun May 19 01:51:47 CEST 2013	EVENT	grabbead.escape.beadcaptured	Doing carefull escape since we have at least one bead
+Sun May 19 01:51:47 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:51:47 CEST 2013	EVENT	grabbead.gotolocationzonly.begin	Starting to move in towards to: z=-0.14043 at speed 0.06 mm/s
+Sun May 19 01:51:47 CEST 2013	EVENT	grabbead.gotolocationzonly.end	Arrived at : z=-0.14043
+Sun May 19 01:51:47 CEST 2013	EVENT	grabbead.carefullgoto.begin	Carefull got to location: (0.11323, -1.24931, -0.14043)
+Sun May 19 01:51:47 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:51:47 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:51:47 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:51:54 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.274440
+Sun May 19 01:51:57 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:52:07 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:52:10 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.777119
+Sun May 19 01:52:10 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 0.754632
+Sun May 19 01:52:10 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:52:10 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.641000
+Sun May 19 01:52:10 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.609000
+Sun May 19 01:52:13 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to unactive
+Sun May 19 01:52:28 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.269430
+Sun May 19 01:52:39 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:52:39 CEST 2013	EVENT	grabbead.gotolocation.begin	Starting to move towards location: (0.11323, -1.24931, -0.14043) at speed 0.06 mm/s
+Sun May 19 01:52:39 CEST 2013	EVENT	grabbead.gotolocation.end	Arrived at location: (0.11323, -1.24931, -0.14043)
+Sun May 19 01:52:39 CEST 2013	EVENT	grabbead.carefullgoto.end	Done
+Sun May 19 01:52:39 CEST 2013	EVENT	grabbead.escape.end	Done
+Sun May 19 01:52:39 CEST 2013	TIMING	grabbead	84.49910187721252
+Sun May 19 01:52:39 CEST 2013	SUCCESS	grabbead.success	Bead capture succeeded!
+Sun May 19 01:52:39 CEST 2013	STAGE	grabbead.end	(0.112940,-1.23955,-0.140430)
+Sun May 19 01:52:39 CEST 2013	EVENT	grabbead.end	Bead capture routine ends.
+Sun May 19 01:52:39 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to active
+Sun May 19 01:52:41 CEST 2013	EVENT	beadquality.begin	Checking the quality of the bead in AOD trap 
+Sun May 19 01:52:45 CEST 2013	EVENT	beadquality.quality	q=0.5685755908208374
+Sun May 19 01:52:45 CEST 2013	EVENT	beadquality.isgood?	The bead in AOD trap is bad
+Sun May 19 01:52:45 CEST 2013	EVENT	beadquality.end	Done evaluating the quality of the beads.
+Sun May 19 01:52:45 CEST 2013	EVENT	grabtwobeadstether.refocus	Refocussing closeup view
+Sun May 19 01:52:45 CEST 2013	EVENT	grabtwobeadstether.trapposcal.test	Are trap positions off?
+Sun May 19 01:52:45 CEST 2013	EVENT	trapexchange.begin	exchanging bead between AOD and PM
+Sun May 19 01:52:46 CEST 2013	EVENT	trapexchange.end	exchanged bead between AOD and PM
+Sun May 19 01:52:46 CEST 2013	EVENT	trapexchange.begin	exchanging bead between PM and AOD
+Sun May 19 01:52:46 CEST 2013	EVENT	trapexchange.end	exchanged bead between PM and AOD
+Sun May 19 01:52:46 CEST 2013	EVENT	grabtwobeadstether.trapposcal.trap1.d	Distance between estimated trap 1 position and bead: d=5.031060268808068)
+Sun May 19 01:52:46 CEST 2013	EVENT	grabtwobeadstether.trapposcal.trap2.d	Distance between estimated trap 2 position and bead: d=7.110890858711174)
+Sun May 19 01:52:46 CEST 2013	EVENT	grabtwobeadstether.trapposcal.cal	Trap positions need calibration
+Sun May 19 01:52:46 CEST 2013	EVENT	calibratetrappositions.begin	Trap positions calibration begins.
+Sun May 19 01:52:46 CEST 2013	EVENT	calibratetrappositions.movetraps.begin	Start moving traps on grid
+Sun May 19 01:52:52 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.521419
+Sun May 19 01:52:52 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.320000
+Sun May 19 01:52:52 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.395000
+Sun May 19 01:52:59 CEST 2013	EVENT	calibratetrappositions.movetraps.end	Finished moving traps on grid
+Sun May 19 01:52:59 CEST 2013	EVENT	calibratetrappositions.error	Max error for fit: e=2.3125
+Sun May 19 01:52:59 CEST 2013	EVENT	calibratetrappositions.end	Trap positions calibration ends.
+Sun May 19 01:52:59 CEST 2013	EVENT	trapexchange.begin	exchanging bead between AOD and PM
+Sun May 19 01:53:00 CEST 2013	EVENT	trapexchange.end	exchanged bead between AOD and PM
+Sun May 19 01:53:00 CEST 2013	EVENT	calibratetrappositions.begin	Trap positions calibration begins.
+Sun May 19 01:53:00 CEST 2013	EVENT	calibratetrappositions.movetraps.begin	Start moving traps on grid
+Sun May 19 01:53:09 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to unactive
+Sun May 19 01:53:11 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 0.815751
+Sun May 19 01:53:11 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.835914
+Sun May 19 01:53:11 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.681000
+Sun May 19 01:53:11 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.642000
+Sun May 19 01:53:13 CEST 2013	EVENT	calibratetrappositions.movetraps.end	Finished moving traps on grid
+Sun May 19 01:53:13 CEST 2013	EVENT	calibratetrappositions.error	Max error for fit: e=2.0
+Sun May 19 01:53:13 CEST 2013	EVENT	calibratetrappositions.end	Trap positions calibration ends.
+Sun May 19 01:53:13 CEST 2013	EVENT	trapexchange.begin	exchanging bead between PM and AOD
+Sun May 19 01:53:13 CEST 2013	EVENT	trapexchange.end	exchanged bead between PM and AOD
+Sun May 19 01:53:13 CEST 2013	EVENT	beadquality.begin	Checking the quality of the bead in AOD trap 
+Sun May 19 01:53:17 CEST 2013	EVENT	beadquality.quality	q=0.5837595901060326
+Sun May 19 01:53:17 CEST 2013	EVENT	beadquality.isgood?	The bead in AOD trap is bad
+Sun May 19 01:53:17 CEST 2013	EVENT	beadquality.end	Done evaluating the quality of the beads.
+Sun May 19 01:53:17 CEST 2013	FAILURE	grabtwobeadstether.badbead1	Bead one (aod) did not pass the quality check!
+Sun May 19 01:53:18 CEST 2013	FAILURE	grabtwobeads.beadisnull	bead is null!
+Sun May 19 01:53:18 CEST 2013	TIMING	grabtwobeads.try	124.89671802520752
+Sun May 19 01:53:18 CEST 2013	EVENT	grabtwobeads.resettracking	Resetting tracking.
+Sun May 19 01:53:20 CEST 2013	EVENT	grabtwobeads.grab1stbead	Capturing first bead...
+Sun May 19 01:53:20 CEST 2013	EVENT	grabbead.begin	Bead capture routine begins
+Sun May 19 01:53:20 CEST 2013	STAGE	grabbead.begin	(0.112940,-1.24062,-0.140430)
+Sun May 19 01:53:20 CEST 2013	EVENT	grabbead.try	Bead capture try 1
+Sun May 19 01:53:20 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 1.0 (0.3 mm/s)
+Sun May 19 01:53:20 CEST 2013	EVENT	grabbead.gotolocation.begin	Starting to move towards location: (0.10957, 1.34321, -0.14043) at speed 0.3 mm/s
+Sun May 19 01:53:29 CEST 2013	EVENT	grabbead.gotolocation.end	Arrived at location: (0.10957, 1.34321, -0.14043)
+Sun May 19 01:53:29 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to 0.2
+Sun May 19 01:53:35 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.445805
+Sun May 19 01:53:35 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.155000
+Sun May 19 01:53:36 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 01:53:38 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to -0.05709197558497191
+Sun May 19 01:53:47 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 01:53:47 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to active
+Sun May 19 01:53:47 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:53:47 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.0024300905749451694, -0.0017588865044898354, -3.1273980977525025E-5) 
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.gotolocation.circularity	Bead is not circular enough: c=-0.7398442667726141
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.try	Bead capture try 2
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.002491589346126597, -0.0016706509646245335, -3.01311245650367E-5) 
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.gotolocation.circularity	Bead is not circular enough: c=-0.7585016376458578
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.try	Bead capture try 3
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (2.51079267003134E-4, -1.641648505937477E-4, -3.0172024627822073E-6) 
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.gotolocation.circularity	Bead is not circular enough: c=-0.7562382577948388
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.try	Bead capture try 4
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (2.5163861783319085E-4, -1.6330594808251198E-4, -3.0287515370558106E-6) 
+Sun May 19 01:53:49 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:53:50 CEST 2013	EVENT	grabbead.gotolocation.circularity	Bead is not circular enough: c=-0.7205006899062333
+Sun May 19 01:53:50 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:53:50 CEST 2013	EVENT	grabbead.try	Bead capture try 5
+Sun May 19 01:53:50 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:53:50 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (2.534698929160024E-4, -1.6044920963826997E-4, -3.010732735523118E-6) 
+Sun May 19 01:53:50 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:53:51 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:53:51 CEST 2013	EVENT	grabbead.escape.begin	Escaping
+Sun May 19 01:53:51 CEST 2013	EVENT	grabbead.escape.beadcaptured	Doing carefull escape since we have at least one bead
+Sun May 19 01:53:51 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:53:51 CEST 2013	EVENT	grabbead.gotolocationzonly.begin	Starting to move in towards to: z=-0.14043 at speed 0.06 mm/s
+Sun May 19 01:53:51 CEST 2013	EVENT	grabbead.gotolocationzonly.end	Arrived at : z=-0.14043
+Sun May 19 01:53:51 CEST 2013	EVENT	grabbead.carefullgoto.begin	Carefull got to location: (0.11323, -1.24931, -0.14043)
+Sun May 19 01:53:51 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:53:55 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 1.06422
+Sun May 19 01:53:55 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 1.09547
+Sun May 19 01:53:55 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:53:55 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.960000
+Sun May 19 01:53:55 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.949000
+Sun May 19 01:53:57 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:53:59 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:54:02 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:54:09 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:54:14 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.263760
+Sun May 19 01:54:17 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to unactive
+Sun May 19 01:54:19 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:54:36 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.271379
+Sun May 19 01:54:42 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:54:42 CEST 2013	EVENT	grabbead.gotolocation.begin	Starting to move towards location: (0.11323, -1.24931, -0.14043) at speed 0.06 mm/s
+Sun May 19 01:54:42 CEST 2013	EVENT	grabbead.gotolocation.end	Arrived at location: (0.11323, -1.24931, -0.14043)
+Sun May 19 01:54:42 CEST 2013	EVENT	grabbead.carefullgoto.end	Done
+Sun May 19 01:54:42 CEST 2013	EVENT	grabbead.escape.end	Done
+Sun May 19 01:54:42 CEST 2013	TIMING	grabbead	82.54115200042725
+Sun May 19 01:54:42 CEST 2013	SUCCESS	grabbead.success	Bead capture succeeded!
+Sun May 19 01:54:42 CEST 2013	STAGE	grabbead.end	(0.112450,-1.24048,-0.140430)
+Sun May 19 01:54:42 CEST 2013	EVENT	grabbead.end	Bead capture routine ends.
+Sun May 19 01:54:42 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to active
+Sun May 19 01:54:44 CEST 2013	EVENT	beadquality.begin	Checking the quality of the bead in AOD trap 
+Sun May 19 01:54:48 CEST 2013	EVENT	beadquality.quality	q=0.6285658865863647
+Sun May 19 01:54:48 CEST 2013	EVENT	beadquality.isgood?	The bead in AOD trap is bad
+Sun May 19 01:54:48 CEST 2013	EVENT	beadquality.end	Done evaluating the quality of the beads.
+Sun May 19 01:54:48 CEST 2013	EVENT	grabtwobeadstether.refocus	Refocussing closeup view
+Sun May 19 01:54:48 CEST 2013	EVENT	grabtwobeadstether.trapposcal.test	Are trap positions off?
+Sun May 19 01:54:48 CEST 2013	EVENT	trapexchange.begin	exchanging bead between AOD and PM
+Sun May 19 01:54:49 CEST 2013	EVENT	trapexchange.end	exchanged bead between AOD and PM
+Sun May 19 01:54:49 CEST 2013	EVENT	trapexchange.begin	exchanging bead between PM and AOD
+Sun May 19 01:54:49 CEST 2013	EVENT	trapexchange.trapnoton	Trap PM is not on!
+Sun May 19 01:54:49 CEST 2013	EVENT	trapexchange.end	exchanged bead between PM and AOD
+Sun May 19 01:54:49 CEST 2013	EVENT	grabtwobeadstether.trapposcal.trap1.d	Distance between estimated trap 1 position and bead: d=2.614470361537092)
+Sun May 19 01:54:49 CEST 2013	EVENT	grabtwobeadstether.trapposcal.trap2.d	Distance between estimated trap 2 position and bead: d=11.598144134989967)
+Sun May 19 01:54:49 CEST 2013	EVENT	grabtwobeadstether.trapposcal.off	Trap positions are off!
+Sun May 19 01:54:49 CEST 2013	EVENT	beadquality.begin	Checking the quality of the bead in AOD trap 
+Sun May 19 01:54:53 CEST 2013	EVENT	beadquality.quality	q=0.6088961391587697
+Sun May 19 01:54:53 CEST 2013	EVENT	beadquality.isgood?	The bead in AOD trap is bad
+Sun May 19 01:54:53 CEST 2013	EVENT	beadquality.end	Done evaluating the quality of the beads.
+Sun May 19 01:54:53 CEST 2013	FAILURE	grabtwobeadstether.badbead1	Bead one (aod) did not pass the quality check!
+Sun May 19 01:54:53 CEST 2013	FAILURE	grabtwobeads.beadisnull	bead is null!
+Sun May 19 01:54:53 CEST 2013	TIMING	grabtwobeads.try	95.677973985672
+Sun May 19 01:54:53 CEST 2013	EVENT	grabtwobeads.resettracking	Resetting tracking.
+Sun May 19 01:54:55 CEST 2013	EVENT	grabtwobeads.grab1stbead	Capturing first bead...
+Sun May 19 01:54:55 CEST 2013	EVENT	grabbead.begin	Bead capture routine begins
+Sun May 19 01:54:55 CEST 2013	STAGE	grabbead.begin	(0.112600,-1.24218,-0.140430)
+Sun May 19 01:54:55 CEST 2013	EVENT	grabbead.try	Bead capture try 1
+Sun May 19 01:54:55 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 1.0 (0.3 mm/s)
+Sun May 19 01:54:55 CEST 2013	EVENT	grabbead.gotolocation.begin	Starting to move towards location: (0.10957, 1.34321, -0.14043) at speed 0.3 mm/s
+Sun May 19 01:55:03 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 1.18055
+Sun May 19 01:55:03 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 1.19688
+Sun May 19 01:55:03 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 1.03900
+Sun May 19 01:55:03 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 1.02800
+Sun May 19 01:55:05 CEST 2013	EVENT	grabbead.gotolocation.end	Arrived at location: (0.10957, 1.34321, -0.14043)
+Sun May 19 01:55:05 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to 0.2
+Sun May 19 01:55:11 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 01:55:12 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to unactive
+Sun May 19 01:55:13 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to -0.05709197558497191
+Sun May 19 01:55:22 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 01:55:22 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to active
+Sun May 19 01:55:23 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:55:23 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.0024896348629428276, -0.0016735267160669382, -3.2040284484628276E-5) 
+Sun May 19 01:55:24 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.401185
+Sun May 19 01:55:24 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.250000
+Sun May 19 01:55:24 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:55:26 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:55:26 CEST 2013	EVENT	grabbead.escape.begin	Escaping
+Sun May 19 01:55:26 CEST 2013	EVENT	grabbead.escape.beadcaptured	Doing carefull escape since we have at least one bead
+Sun May 19 01:55:26 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:55:26 CEST 2013	EVENT	grabbead.gotolocationzonly.begin	Starting to move in towards to: z=-0.14043 at speed 0.06 mm/s
+Sun May 19 01:55:26 CEST 2013	EVENT	grabbead.gotolocationzonly.end	Arrived at : z=-0.14043
+Sun May 19 01:55:26 CEST 2013	EVENT	grabbead.carefullgoto.begin	Carefull got to location: (0.11323, -1.24931, -0.14043)
+Sun May 19 01:55:26 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:55:28 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:55:29 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:55:40 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 0.617884
+Sun May 19 01:55:40 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.610450
+Sun May 19 01:55:40 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:55:40 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.481000
+Sun May 19 01:55:40 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.466000
+Sun May 19 01:55:43 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:55:52 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to unactive
+Sun May 19 01:55:53 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:56:16 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.237123
+Sun May 19 01:56:21 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:56:21 CEST 2013	EVENT	grabbead.gotolocation.begin	Starting to move towards location: (0.11323, -1.24931, -0.14043) at speed 0.06 mm/s
+Sun May 19 01:56:21 CEST 2013	EVENT	grabbead.gotolocation.end	Arrived at location: (0.11323, -1.24931, -0.14043)
+Sun May 19 01:56:21 CEST 2013	EVENT	grabbead.carefullgoto.end	Done
+Sun May 19 01:56:21 CEST 2013	EVENT	grabbead.escape.end	Done
+Sun May 19 01:56:21 CEST 2013	TIMING	grabbead	85.6852879524231
+Sun May 19 01:56:21 CEST 2013	SUCCESS	grabbead.success	Bead capture succeeded!
+Sun May 19 01:56:21 CEST 2013	STAGE	grabbead.end	(0.113090,-1.23994,-0.140430)
+Sun May 19 01:56:21 CEST 2013	EVENT	grabbead.end	Bead capture routine ends.
+Sun May 19 01:56:21 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to active
+Sun May 19 01:56:23 CEST 2013	EVENT	beadquality.begin	Checking the quality of the bead in AOD trap 
+Sun May 19 01:56:27 CEST 2013	EVENT	beadquality.quality	q=0.5940992104908116
+Sun May 19 01:56:27 CEST 2013	EVENT	beadquality.isgood?	The bead in AOD trap is bad
+Sun May 19 01:56:27 CEST 2013	EVENT	beadquality.end	Done evaluating the quality of the beads.
+Sun May 19 01:56:27 CEST 2013	EVENT	grabtwobeadstether.refocus	Refocussing closeup view
+Sun May 19 01:56:27 CEST 2013	EVENT	grabtwobeadstether.trapposcal.test	Are trap positions off?
+Sun May 19 01:56:27 CEST 2013	EVENT	trapexchange.begin	exchanging bead between AOD and PM
+Sun May 19 01:56:28 CEST 2013	EVENT	trapexchange.end	exchanged bead between AOD and PM
+Sun May 19 01:56:28 CEST 2013	EVENT	trapexchange.begin	exchanging bead between PM and AOD
+Sun May 19 01:56:28 CEST 2013	EVENT	trapexchange.trapnoton	Trap PM is not on!
+Sun May 19 01:56:28 CEST 2013	EVENT	trapexchange.end	exchanged bead between PM and AOD
+Sun May 19 01:56:28 CEST 2013	EVENT	grabtwobeadstether.trapposcal.trap1.d	Distance between estimated trap 1 position and bead: d=2.8261337391689803)
+Sun May 19 01:56:28 CEST 2013	EVENT	grabtwobeadstether.trapposcal.trap2.d	Distance between estimated trap 2 position and bead: d=11.958641713069838)
+Sun May 19 01:56:28 CEST 2013	EVENT	grabtwobeadstether.trapposcal.off	Trap positions are off!
+Sun May 19 01:56:28 CEST 2013	EVENT	beadquality.begin	Checking the quality of the bead in AOD trap 
+Sun May 19 01:56:32 CEST 2013	EVENT	beadquality.quality	q=0.5912964759245872
+Sun May 19 01:56:32 CEST 2013	EVENT	beadquality.isgood?	The bead in AOD trap is bad
+Sun May 19 01:56:32 CEST 2013	EVENT	beadquality.end	Done evaluating the quality of the beads.
+Sun May 19 01:56:32 CEST 2013	FAILURE	grabtwobeadstether.badbead1	Bead one (aod) did not pass the quality check!
+Sun May 19 01:56:32 CEST 2013	FAILURE	grabtwobeads.beadisnull	bead is null!
+Sun May 19 01:56:32 CEST 2013	TIMING	grabtwobeads.try	98.76412177085876
+Sun May 19 01:56:32 CEST 2013	EVENT	grabtwobeads.resettracking	Resetting tracking.
+Sun May 19 01:56:34 CEST 2013	EVENT	grabtwobeads.grab1stbead	Capturing first bead...
+Sun May 19 01:56:34 CEST 2013	EVENT	grabbead.begin	Bead capture routine begins
+Sun May 19 01:56:34 CEST 2013	STAGE	grabbead.begin	(0.113090,-1.24131,-0.140430)
+Sun May 19 01:56:34 CEST 2013	EVENT	grabbead.try	Bead capture try 1
+Sun May 19 01:56:34 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 1.0 (0.3 mm/s)
+Sun May 19 01:56:34 CEST 2013	EVENT	grabbead.gotolocation.begin	Starting to move towards location: (0.10957, 1.34321, -0.14043) at speed 0.3 mm/s
+Sun May 19 01:56:43 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 0.969701
+Sun May 19 01:56:43 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.967779
+Sun May 19 01:56:43 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.800000
+Sun May 19 01:56:43 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.788000
+Sun May 19 01:56:43 CEST 2013	EVENT	grabbead.gotolocation.end	Arrived at location: (0.10957, 1.34321, -0.14043)
+Sun May 19 01:56:43 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to 0.2
+Sun May 19 01:56:50 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 01:56:51 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to unactive
+Sun May 19 01:56:52 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to -0.05709197558497191
+Sun May 19 01:57:02 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 01:57:02 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to active
+Sun May 19 01:57:02 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:57:02 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.002472873012321424, -0.0016982009607128098, -3.182077884746633E-5) 
+Sun May 19 01:57:03 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.430096
+Sun May 19 01:57:03 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.313000
+Sun May 19 01:57:04 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:57:04 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:57:04 CEST 2013	EVENT	grabbead.try	Bead capture try 2
+Sun May 19 01:57:04 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:57:04 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.0024858717053740254, -0.001679120327127994, -3.157200415578613E-5) 
+Sun May 19 01:57:04 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:57:04 CEST 2013	EVENT	grabbead.gotolocation.circularity	Bead is not circular enough: c=-0.7319960050453146
+Sun May 19 01:57:04 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:57:04 CEST 2013	EVENT	grabbead.try	Bead capture try 3
+Sun May 19 01:57:04 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:57:04 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.002492304147966926, -0.0016695597796543586, -3.14670651212673E-5) 
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.gotolocation.circularity	Bead is not circular enough: c=-0.7848509392498513
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.try	Bead capture try 4
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.0025004128632859944, -0.001657394121733956, -3.130875844974121E-5) 
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.gotolocation.circularity	Bead is not circular enough: c=-0.7600092857142859
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.try	Bead capture try 5
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.002504637684212172, -0.0016510057606016102, -3.1145614211144335E-5) 
+Sun May 19 01:57:05 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:57:06 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:57:06 CEST 2013	EVENT	grabbead.escape.begin	Escaping
+Sun May 19 01:57:06 CEST 2013	EVENT	grabbead.escape.beadcaptured	Doing carefull escape since we have at least one bead
+Sun May 19 01:57:06 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:57:06 CEST 2013	EVENT	grabbead.gotolocationzonly.begin	Starting to move in towards to: z=-0.14043 at speed 0.06 mm/s
+Sun May 19 01:57:06 CEST 2013	EVENT	grabbead.gotolocationzonly.end	Arrived at : z=-0.14043
+Sun May 19 01:57:06 CEST 2013	EVENT	grabbead.carefullgoto.begin	Carefull got to location: (0.11323, -1.24931, -0.14043)
+Sun May 19 01:57:06 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:57:08 CEST 2013	EVENT	grabbead.try	Bead capture try 6
+Sun May 19 01:57:08 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:57:08 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.0025342312221743215, -0.0016053068061287674, -2.5732678708270016E-5) 
+Sun May 19 01:57:08 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:57:09 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:57:09 CEST 2013	EVENT	grabbead.try	Bead capture try 7
+Sun May 19 01:57:09 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:57:09 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.002496908745387097, -0.0016629183365825524, -1.221978178819134E-5) 
+Sun May 19 01:57:09 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:57:10 CEST 2013	EVENT	grabbead.isbeadgood.neidistance	Closest neighbor too close: d=35.656811958918816
+Sun May 19 01:57:10 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:57:10 CEST 2013	EVENT	grabbead.try	Bead capture try 8
+Sun May 19 01:57:10 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:57:10 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.0024883256856434977, -0.0016757769233658626, -2.64296826686381E-6) 
+Sun May 19 01:57:10 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:57:10 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:57:10 CEST 2013	EVENT	grabbead.try	Bead capture try 9
+Sun May 19 01:57:10 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:57:10 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.002488549629409768, -0.001675445990747813, 1.2141052625071696E-6) 
+Sun May 19 01:57:10 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:57:11 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:57:11 CEST 2013	EVENT	grabbead.try	Bead capture try 10
+Sun May 19 01:57:11 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (1.36914, 0.49687, -0.15664)
+Sun May 19 01:57:11 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.002489111002160838, -0.0016745997254007901, 6.494506098855724E-6) 
+Sun May 19 01:57:11 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 01:57:12 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 01:57:12 CEST 2013	EVENT	grabbead.escape.begin	Escaping
+Sun May 19 01:57:12 CEST 2013	EVENT	grabbead.escape.beadcaptured	Doing carefull escape since we have at least one bead
+Sun May 19 01:57:12 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:57:12 CEST 2013	EVENT	grabbead.gotolocationzonly.begin	Starting to move in towards to: z=-0.14043 at speed 0.06 mm/s
+Sun May 19 01:57:12 CEST 2013	EVENT	grabbead.escape.begin	Escaping
+Sun May 19 01:57:12 CEST 2013	EVENT	grabbead.escape.beadcaptured	Doing carefull escape since we have at least one bead
+Sun May 19 01:57:12 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:57:12 CEST 2013	EVENT	grabbead.gotolocationzonly.begin	Starting to move in towards to: z=-0.14043 at speed 0.06 mm/s
+Sun May 19 01:57:13 CEST 2013	EVENT	grabbead.gotolocationzonly.end	Arrived at : z=-0.14043
+Sun May 19 01:57:13 CEST 2013	EVENT	grabbead.carefullgoto.begin	Carefull got to location: (0.11323, -1.24931, -0.14043)
+Sun May 19 01:57:13 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:57:14 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:57:17 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:57:22 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:57:23 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 0.524480
+Sun May 19 01:57:23 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.555045
+Sun May 19 01:57:23 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.400000
+Sun May 19 01:57:24 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.410000
+Sun May 19 01:57:26 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:57:30 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:57:32 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to unactive
+Sun May 19 01:57:33 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:57:37 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:57:44 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (0.11323, -1.24931, -0.14043) watching out for potential collisions
+Sun May 19 01:58:04 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 0.507519
+Sun May 19 01:58:04 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.528639
+Sun May 19 01:58:04 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.361000
+Sun May 19 01:58:04 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.379000
+Sun May 19 01:58:09 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:58:09 CEST 2013	EVENT	grabbead.gotolocation.begin	Starting to move towards location: (0.11323, -1.24931, -0.14043) at speed 0.06 mm/s
+Sun May 19 01:58:09 CEST 2013	EVENT	grabbead.gotolocation.end	Arrived at location: (0.11323, -1.24931, -0.14043)
+Sun May 19 01:58:09 CEST 2013	EVENT	grabbead.carefullgoto.end	Done
+Sun May 19 01:58:09 CEST 2013	EVENT	grabbead.escape.end	Done
+Sun May 19 01:58:09 CEST 2013	TIMING	grabbead	95.08919191360474
+Sun May 19 01:58:09 CEST 2013	SUCCESS	grabbead.success	Bead capture succeeded!
+Sun May 19 01:58:09 CEST 2013	STAGE	grabbead.end	(0.113040,-1.24853,-0.140430)
+Sun May 19 01:58:09 CEST 2013	EVENT	grabbead.end	Bead capture routine ends.
+Sun May 19 01:58:09 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to active
+Sun May 19 01:58:11 CEST 2013	EVENT	beadquality.begin	Checking the quality of the bead in AOD trap 
+Sun May 19 01:58:16 CEST 2013	EVENT	beadquality.quality	q=0.7974642889071442
+Sun May 19 01:58:16 CEST 2013	EVENT	beadquality.isgood?	The bead in AOD trap is bad
+Sun May 19 01:58:16 CEST 2013	EVENT	beadquality.end	Done evaluating the quality of the beads.
+Sun May 19 01:58:16 CEST 2013	EVENT	grabtwobeadstether.refocus	Refocussing closeup view
+Sun May 19 01:58:16 CEST 2013	EVENT	grabtwobeadstether.trapposcal.test	Are trap positions off?
+Sun May 19 01:58:16 CEST 2013	EVENT	trapexchange.begin	exchanging bead between AOD and PM
+Sun May 19 01:58:16 CEST 2013	EVENT	trapexchange.end	exchanged bead between AOD and PM
+Sun May 19 01:58:16 CEST 2013	EVENT	trapexchange.begin	exchanging bead between PM and AOD
+Sun May 19 01:58:16 CEST 2013	EVENT	trapexchange.trapnoton	Trap PM is not on!
+Sun May 19 01:58:16 CEST 2013	EVENT	trapexchange.end	exchanged bead between PM and AOD
+Sun May 19 01:58:16 CEST 2013	EVENT	grabtwobeadstether.trapposcal.trap1.d	Distance between estimated trap 1 position and bead: d=1.8903665642297909)
+Sun May 19 01:58:16 CEST 2013	EVENT	grabtwobeadstether.trapposcal.trap2.d	Distance between estimated trap 2 position and bead: d=14.13328787905618)
+Sun May 19 01:58:16 CEST 2013	EVENT	grabtwobeadstether.trapposcal.off	Trap positions are off!
+Sun May 19 01:58:16 CEST 2013	EVENT	beadquality.begin	Checking the quality of the bead in AOD trap 
+Sun May 19 01:58:20 CEST 2013	EVENT	beadquality.quality	q=0.8115965272733825
+Sun May 19 01:58:20 CEST 2013	EVENT	beadquality.isgood?	The bead in AOD trap is good
+Sun May 19 01:58:20 CEST 2013	EVENT	beadquality.end	Done evaluating the quality of the beads.
+Sun May 19 01:58:20 CEST 2013	SUCCESS	grabtwobeadstether.goodbead1	Bead one (aod) did pass the quality check!
+Sun May 19 01:58:20 CEST 2013	SUCCESS	grabtwobeads.grab1stbead.success	First bead captured.
+Sun May 19 01:58:20 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.01.58.20.857.andor.png
+Sun May 19 01:58:21 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.01.58.20.969.ccd.png
+Sun May 19 01:58:21 CEST 2013	TIMING	takesnapshots	0.22016692161560059
+Sun May 19 01:58:21 CEST 2013	EVENT	trapexchange.begin	exchanging bead between AOD and PM
+Sun May 19 01:58:21 CEST 2013	EVENT	trapexchange.end	exchanged bead between AOD and PM
+Sun May 19 01:58:21 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.01.58.21.407.andor.png
+Sun May 19 01:58:21 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.01.58.21.476.ccd.png
+Sun May 19 01:58:21 CEST 2013	TIMING	takesnapshots	0.1466381549835205
+Sun May 19 01:58:21 CEST 2013	EVENT	grabtwobeads.gotohome	Going to position (0.11323, -1.24931, -0.14043) after capturing first bead.
+Sun May 19 01:58:22 CEST 2013	EVENT	grabtwobeads.grab2ndbead	Capturing second bead...
+Sun May 19 01:58:22 CEST 2013	EVENT	grabbead.begin	Bead capture routine begins
+Sun May 19 01:58:22 CEST 2013	STAGE	grabbead.begin	(0.113040,-1.24863,-0.140430)
+Sun May 19 01:58:22 CEST 2013	EVENT	grabbead.try	Bead capture try 1
+Sun May 19 01:58:22 CEST 2013	EVENT	grabbead.carefullgoto.begin	Carefull got to location: (-5.03422, -1.62397, -0.13061)
+Sun May 19 01:58:22 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (-5.03422, -1.62397, -0.13061) watching out for potential collisions
+Sun May 19 01:58:22 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:58:30 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.491812
+Sun May 19 01:58:30 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.320000
+Sun May 19 01:58:30 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.393000
+Sun May 19 01:58:40 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to unactive
+Sun May 19 01:58:53 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.749055
+Sun May 19 01:58:53 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 0.740200
+Sun May 19 01:58:53 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.602000
+Sun May 19 01:58:53 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.594000
+Sun May 19 01:59:15 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.255815
+Sun May 19 01:59:38 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.262751
+Sun May 19 01:59:51 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 01:59:51 CEST 2013	EVENT	grabbead.gotolocation.begin	Starting to move towards location: (-5.03422, -1.62397, -0.13061) at speed 0.06 mm/s
+Sun May 19 01:59:51 CEST 2013	EVENT	grabbead.gotolocation.end	Arrived at location: (-5.03422, -1.62397, -0.13061)
+Sun May 19 01:59:51 CEST 2013	EVENT	grabbead.carefullgoto.end	Done
+Sun May 19 01:59:51 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to 0.2
+Sun May 19 01:59:58 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 02:00:00 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to -0.04933328397227334
+Sun May 19 02:00:01 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.684952
+Sun May 19 02:00:01 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 0.659055
+Sun May 19 02:00:01 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.559000
+Sun May 19 02:00:02 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.539000
+Sun May 19 02:00:10 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 02:00:10 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to active
+Sun May 19 02:00:10 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (-4.14589, -3.73578, -0.16064)
+Sun May 19 02:00:10 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.011547963288837778, -0.027685550448987267, -3.9349741579252934E-4) 
+Sun May 19 02:00:21 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.260370
+Sun May 19 02:00:22 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.156000
+Sun May 19 02:00:40 CEST 2013	INFO	tweebot.fluidics	Setting Objective dripper state to unactive
+Sun May 19 02:00:47 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 02:00:49 CEST 2013	EVENT	grabbead.isbeadgood.badradius	Bead radius = 13.568
+Sun May 19 02:00:49 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 02:00:49 CEST 2013	EVENT	grabbead.try	Bead capture try 2
+Sun May 19 02:00:49 CEST 2013	EVENT	grabbead.divein.begin	Diving in towards location: (-4.14589, -3.73578, -0.16064)
+Sun May 19 02:00:49 CEST 2013	EVENT	grabbead.divein.divevelocity	Diving in at velocity: (0.0011488531422234186, -0.002771119158744669, -3.2172436053537214E-5) 
+Sun May 19 02:00:50 CEST 2013	EVENT	grabbead.meetbead.end	Meeting bead
+Sun May 19 02:00:51 CEST 2013	EVENT	grabbead.meetbead.end	Bead capture done
+Sun May 19 02:00:51 CEST 2013	EVENT	grabbead.escape.begin	Escaping
+Sun May 19 02:00:51 CEST 2013	EVENT	grabbead.escape.beadcaptured	Doing carefull escape since we have at least one bead
+Sun May 19 02:00:51 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 02:00:51 CEST 2013	EVENT	grabbead.gotolocationzonly.begin	Starting to move in towards to: z=-0.12988 at speed 0.06 mm/s
+Sun May 19 02:00:52 CEST 2013	EVENT	grabbead.gotolocationzonly.end	Arrived at : z=-0.12988
+Sun May 19 02:00:52 CEST 2013	EVENT	grabbead.carefullgoto.begin	Carefull got to location: (-4.32133, -1.87133, -0.12988)
+Sun May 19 02:00:52 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (-4.32133, -1.87133, -0.12988) watching out for potential collisions
+Sun May 19 02:00:52 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 02:00:55 CEST 2013	EVENT	grabbead.carefullgoto.gotowatching	Moving towards location (-4.32133, -1.87133, -0.12988) watching out for potential collisions
+Sun May 19 02:01:00 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 0.529148
+Sun May 19 02:01:00 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.521977
+Sun May 19 02:01:00 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.401000
+Sun May 19 02:01:00 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.346000
+Sun May 19 02:01:10 CEST 2013	EVENT	grabbead.setgotospeed	Setting stage goto speed to 0.2 (0.06 mm/s)
+Sun May 19 02:01:10 CEST 2013	EVENT	grabbead.gotolocation.begin	Starting to move towards location: (-4.32133, -1.87133, -0.12988) at speed 0.06 mm/s
+Sun May 19 02:01:10 CEST 2013	EVENT	grabbead.gotolocation.end	Arrived at location: (-4.32133, -1.87133, -0.12988)
+Sun May 19 02:01:10 CEST 2013	EVENT	grabbead.carefullgoto.end	Done
+Sun May 19 02:01:10 CEST 2013	EVENT	grabbead.escape.end	Done
+Sun May 19 02:01:10 CEST 2013	TIMING	grabbead	167.9147469997406
+Sun May 19 02:01:10 CEST 2013	SUCCESS	grabbead.success	Bead capture succeeded!
+Sun May 19 02:01:10 CEST 2013	STAGE	grabbead.end	(-4.32333,-1.88076,-0.129880)
+Sun May 19 02:01:10 CEST 2013	EVENT	grabbead.end	Bead capture routine ends.
+Sun May 19 02:01:10 CEST 2013	SUCCESS	grabtwobeads.grab2ndbead.success	Second bead captured.
+Sun May 19 02:01:10 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.01.10.720.andor.png
+Sun May 19 02:01:10 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.01.10.838.ccd.png
+Sun May 19 02:01:11 CEST 2013	TIMING	takesnapshots	0.23006892204284668
+Sun May 19 02:01:11 CEST 2013	EVENT	grabtwobeads.gotohome	Going to position (-4.32133, -1.87133, -0.12988) after capturing second bead.
+Sun May 19 02:01:11 CEST 2013	SUCCESS	grabtwobeads.success	Success! Two beads captured!
+Sun May 19 02:01:11 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.01.11.099.andor.png
+Sun May 19 02:01:11 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.01.11.186.ccd.png
+Sun May 19 02:01:11 CEST 2013	TIMING	takesnapshots	0.18062686920166016
+Sun May 19 02:01:11 CEST 2013	TIMING	grabtwobeads.try	278.75282406806946
+Sun May 19 02:01:11 CEST 2013	EVENT	grabtwobeads.end	Two bead capture ends.
+Sun May 19 02:01:11 CEST 2013	TIMING	grabtwobeads	598.3526258468628
+Sun May 19 02:01:12 CEST 2013	EVENT	fluidics.releasepressure	Releasing pressure control
+Sun May 19 02:01:12 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.01.12.314.andor.png
+Sun May 19 02:01:12 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.01.12.396.ccd.png
+Sun May 19 02:01:12 CEST 2013	TIMING	takesnapshots	0.1612699031829834
+Sun May 19 02:01:17 CEST 2013	EVENT	beadquality.begin	Checking the quality of the bead in AOD trap 
+Sun May 19 02:01:21 CEST 2013	EVENT	beadquality.quality	q=0.550230543943862
+Sun May 19 02:01:21 CEST 2013	EVENT	beadquality.isgood?	The bead in AOD trap is bad
+Sun May 19 02:01:21 CEST 2013	EVENT	beadquality.end	Done evaluating the quality of the beads.
+Sun May 19 02:01:21 CEST 2013	EVENT	beadquality.begin	Checking the quality of the bead in PM trap 
+Sun May 19 02:01:25 CEST 2013	EVENT	beadquality.quality	q=0.8049794126074628
+Sun May 19 02:01:25 CEST 2013	EVENT	beadquality.isgood?	The bead in PM trap is good
+Sun May 19 02:01:25 CEST 2013	EVENT	beadquality.end	Done evaluating the quality of the beads.
+Sun May 19 02:01:25 CEST 2013	FAILURE	grabtwobeadstether.twobeadsqualitypretest.failed	One of the beads did not pass stringent quality test, need to refocus or calibrate
+Sun May 19 02:01:26 CEST 2013	EVENT	grabtwobeadstether.refocus	Refocussing closeup view
+Sun May 19 02:01:26 CEST 2013	EVENT	focussingstage.refocus.begin	Refocussing begins.
+Sun May 19 02:01:26 CEST 2013	EVENT	focussingstage.refocus.currentposition	Current position: z=14.221133
+Sun May 19 02:01:26 CEST 2013	EVENT	focussingstage.refocus.gotomin	Going to position: z=12.721133
+Sun May 19 02:01:29 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.430192
+Sun May 19 02:01:29 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.322000
+Sun May 19 02:01:29 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.132000
+Sun May 19 02:01:35 CEST 2013	EVENT	focussingstage.refocus.gotomax	Going to position: z=15.721133
+Sun May 19 02:01:41 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.680336
+Sun May 19 02:01:42 CEST 2013	WARNING	tweebot.ccd	Relative inter-frame delay too high! 0.752641
+Sun May 19 02:01:42 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.682000
+Sun May 19 02:01:42 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.880000
+Sun May 19 02:01:43 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.320722
+Sun May 19 02:01:43 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.481000
+Sun May 19 02:01:44 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.494000
+Sun May 19 02:01:44 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.151000
+Sun May 19 02:01:46 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.197000
+Sun May 19 02:01:47 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.178000
+Sun May 19 02:01:48 CEST 2013	EVENT	focussingstage.refocus.focus	Found focus position at: z=14.079998
+Sun May 19 02:01:48 CEST 2013	EVENT	focussingstage.refocus.focus.set	Setting focussing stage to best position: z=14.079998
+Sun May 19 02:01:53 CEST 2013	EVENT	focussingstage.refocus.end	Focussing ends.
+Sun May 19 02:01:53 CEST 2013	EVENT	grabtwobeadstether.trapdance	Positioning two traps
+Sun May 19 02:02:11 CEST 2013	EVENT	grabtwobeadstether.pretethering	preparing two beads positions for tethering
+Sun May 19 02:02:11 CEST 2013	EVENT	tether.prepare.begin	Preparing tether by positioning beads
+Sun May 19 02:02:12 CEST 2013	EVENT	tether.prepare.end	Done
+Sun May 19 02:02:12 CEST 2013	EVENT	grabtwobeadstether.thermcal	Thermal calibration
+Sun May 19 02:02:12 CEST 2013	EVENT	fluidics.setpressure.begin	Setting pressure to -0.061407018743138135
+Sun May 19 02:02:12 CEST 2013	EVENT	fluidics.setpressure.end	Pressure reached
+Sun May 19 02:02:12 CEST 2013	EVENT	fluidics.releasepressure	Releasing pressure control
+Sun May 19 02:02:12 CEST 2013	EVENT	thermcal.begin	Starting thermal force calibration
+Sun May 19 02:02:12 CEST 2013	EVENT	thermcal.setbeadradii	r1=1.0 microns, r2=1.08
+Sun May 19 02:02:13 CEST 2013	EVENT	thermcal.resetpsdcal	Resetting the force calibration values
+Sun May 19 02:02:16 CEST 2013	EVENT	thermcal.start	Starting thermal force calibration
+Sun May 19 02:02:19 CEST 2013	EVENT	thermcal.started	Thermal force calibration started
+Sun May 19 02:02:22 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.285394
+Sun May 19 02:02:32 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.425000
+Sun May 19 02:02:44 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.319967
+Sun May 19 02:02:52 CEST 2013	EVENT	thermcal.finished	Thermal force calibration finished
+Sun May 19 02:02:56 CEST 2013	EVENT	thermcal.update	Updating trap force calibration parameters
+Sun May 19 02:02:57 CEST 2013	EVENT	thermcal.end	Ending thermal force calibration
+Sun May 19 02:02:57 CEST 2013	EVENT	grabtwobeadstether.tethering	Tethering
+Sun May 19 02:02:57 CEST 2013	EVENT	grabtwobeadstether.startrecord	Starting to record data
+Sun May 19 02:03:02 CEST 2013	INFO	datalog.setfile	File: 32.Datalog.2013.05.19.02.03.02.datalog.txt
+Sun May 19 02:03:02 CEST 2013	INFO	datalog.setrecording.on	Recording state set to: true
+Sun May 19 02:03:02 CEST 2013	INFO	datalog.recording.start	Started recording.
+Sun May 19 02:03:04 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.04.166.andor.png
+Sun May 19 02:03:04 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.04.243.ccd.png
+Sun May 19 02:03:04 CEST 2013	TIMING	takesnapshots	0.1871497631072998
+Sun May 19 02:03:04 CEST 2013	EVENT	simpletether.begin	Tethering starts
+Sun May 19 02:03:04 CEST 2013	EVENT	simpletether.parameters	stepdistancenm = 3120.0
+Sun May 19 02:03:04 CEST 2013	EVENT	simpletether.parameters	stepdistancedeltanm = 5.0
+Sun May 19 02:03:04 CEST 2013	EVENT	simpletether.try	Try 0
+Sun May 19 02:03:04 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.04.494.andor.png
+Sun May 19 02:03:04 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.04.563.ccd.png
+Sun May 19 02:03:04 CEST 2013	TIMING	takesnapshots	0.1874101161956787
+Sun May 19 02:03:04 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:05 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.3800058623188365, avgd2:-0.05001072191011272, stddev1:0.21040408915600428, stddev2:0.21011968399395353]
+Sun May 19 02:03:05 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3120.0 nm
+Sun May 19 02:03:05 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.05.921.andor.png
+Sun May 19 02:03:06 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.05.999.ccd.png
+Sun May 19 02:03:06 CEST 2013	TIMING	takesnapshots	0.19077491760253906
+Sun May 19 02:03:06 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:03:07 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.316500
+Sun May 19 02:03:09 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.09.035.andor.png
+Sun May 19 02:03:09 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.09.114.ccd.png
+Sun May 19 02:03:09 CEST 2013	TIMING	takesnapshots	0.1571497917175293
+Sun May 19 02:03:09 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:09 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.3800058623188365, avgd2:-0.1529266769662922, stddev1:0.17966754555904574, stddev2:0.21350212728144977]
+Sun May 19 02:03:09 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=0.0
+Sun May 19 02:03:09 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=-0.10291595505617948
+Sun May 19 02:03:09 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=true
+Sun May 19 02:03:09 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.10291595505617948
+Sun May 19 02:03:09 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.21040408915600428
+Sun May 19 02:03:09 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:03:09 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.05145797752808974
+Sun May 19 02:03:09 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:03:09 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:03:10 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:10 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:10 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:03:10 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:03:10 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.09.782.andor.png
+Sun May 19 02:03:10 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.09.868.ccd.png
+Sun May 19 02:03:10 CEST 2013	TIMING	takesnapshots	0.17011308670043945
+Sun May 19 02:03:10 CEST 2013	EVENT	simpletether.try	Try 1
+Sun May 19 02:03:10 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.09.982.andor.png
+Sun May 19 02:03:10 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.10.063.ccd.png
+Sun May 19 02:03:10 CEST 2013	TIMING	takesnapshots	0.18308305740356445
+Sun May 19 02:03:10 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:10 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.38237842753623014, avgd2:-0.2222341404494384, stddev1:0.20206788421037852, stddev2:0.20992133640035712]
+Sun May 19 02:03:10 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3125.0 nm
+Sun May 19 02:03:11 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.11.420.andor.png
+Sun May 19 02:03:11 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.11.498.ccd.png
+Sun May 19 02:03:11 CEST 2013	TIMING	takesnapshots	0.1682569980621338
+Sun May 19 02:03:11 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:03:14 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.14.315.andor.png
+Sun May 19 02:03:14 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.14.389.ccd.png
+Sun May 19 02:03:14 CEST 2013	TIMING	takesnapshots	0.15308094024658203
+Sun May 19 02:03:14 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:14 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.5119798025362308, avgd2:-0.17608276685393293, stddev1:0.1846869199790124, stddev2:0.1969240972355996]
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=-0.12960137500000063
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=0.046151373595505474
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=false
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.08345000140449516
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.20992133640035712
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.08787637429775305
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:03:15 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.14.992.andor.png
+Sun May 19 02:03:15 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.15.074.ccd.png
+Sun May 19 02:03:15 CEST 2013	TIMING	takesnapshots	0.2068648338317871
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.try	Try 2
+Sun May 19 02:03:15 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.15.217.andor.png
+Sun May 19 02:03:15 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.15.304.ccd.png
+Sun May 19 02:03:15 CEST 2013	TIMING	takesnapshots	0.17921781539916992
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.6091066911231844, avgd2:-0.2106560955056183, stddev1:0.18778261002492175, stddev2:0.2338621407671506]
+Sun May 19 02:03:15 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3130.0 nm
+Sun May 19 02:03:16 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.16.653.andor.png
+Sun May 19 02:03:16 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.16.728.ccd.png
+Sun May 19 02:03:16 CEST 2013	TIMING	takesnapshots	0.17778921127319336
+Sun May 19 02:03:16 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:03:19 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.19.261.andor.png
+Sun May 19 02:03:19 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.19.350.ccd.png
+Sun May 19 02:03:19 CEST 2013	TIMING	takesnapshots	0.17258977890014648
+Sun May 19 02:03:19 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:19 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.5123752300724604, avgd2:-0.10211192415730366, stddev1:0.20612366036679955, stddev2:0.21676064588699998]
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=0.09673146105072394
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=0.10854417134831465
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=false
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.011812710297590706
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.2338621407671506
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.1026378161995193
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:03:20 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.19.980.andor.png
+Sun May 19 02:03:20 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.20.052.ccd.png
+Sun May 19 02:03:20 CEST 2013	TIMING	takesnapshots	0.17253494262695312
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.try	Try 3
+Sun May 19 02:03:20 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.20.180.andor.png
+Sun May 19 02:03:20 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.20.262.ccd.png
+Sun May 19 02:03:20 CEST 2013	TIMING	takesnapshots	0.18053412437438965
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.5371883079710139, avgd2:-0.13491638483146087, stddev1:0.21636670323968482, stddev2:0.20270188665967706]
+Sun May 19 02:03:20 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3135.0 nm
+Sun May 19 02:03:21 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.21.608.andor.png
+Sun May 19 02:03:21 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.21.684.ccd.png
+Sun May 19 02:03:21 CEST 2013	TIMING	takesnapshots	0.14632868766784668
+Sun May 19 02:03:21 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:03:24 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.24.187.andor.png
+Sun May 19 02:03:24 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.24.286.ccd.png
+Sun May 19 02:03:24 CEST 2013	TIMING	takesnapshots	0.24848008155822754
+Sun May 19 02:03:24 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:24 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.4763913242753586, avgd2:-0.17286664325842688, stddev1:0.2080801673223566, stddev2:0.23840058751660584]
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=0.06079698369565534
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=-0.037950258426966005
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=true
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.022846725268689333
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.21636670323968482
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.04937362106131067
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:03:25 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.24.974.andor.png
+Sun May 19 02:03:25 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.25.054.ccd.png
+Sun May 19 02:03:25 CEST 2013	TIMING	takesnapshots	0.19188570976257324
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.try	Try 4
+Sun May 19 02:03:25 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.25.190.andor.png
+Sun May 19 02:03:25 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.25.279.ccd.png
+Sun May 19 02:03:25 CEST 2013	TIMING	takesnapshots	0.16271400451660156
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.4471296865942028, avgd2:-0.26983276966292175, stddev1:0.2117268075883586, stddev2:0.2124357928106215]
+Sun May 19 02:03:25 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3140.0 nm
+Sun May 19 02:03:26 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.26.634.andor.png
+Sun May 19 02:03:26 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.26.725.ccd.png
+Sun May 19 02:03:26 CEST 2013	TIMING	takesnapshots	0.16193008422851562
+Sun May 19 02:03:26 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:03:29 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.29.424.andor.png
+Sun May 19 02:03:29 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.29.510.ccd.png
+Sun May 19 02:03:29 CEST 2013	TIMING	takesnapshots	0.16991519927978516
+Sun May 19 02:03:29 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.4230580353260834, avgd2:-0.2505360280898877, stddev1:0.2360243690208181, stddev2:0.22857757879224136]
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=0.024071651268119443
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=0.01929674157303407
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=false
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.004774909695085372
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.2124357928106215
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.021684196420576757
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:03:30 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.30.137.andor.png
+Sun May 19 02:03:30 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.30.245.ccd.png
+Sun May 19 02:03:30 CEST 2013	TIMING	takesnapshots	0.18081402778625488
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.try	Try 5
+Sun May 19 02:03:30 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.30.355.andor.png
+Sun May 19 02:03:30 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.30.437.ccd.png
+Sun May 19 02:03:30 CEST 2013	TIMING	takesnapshots	0.16344022750854492
+Sun May 19 02:03:30 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:31 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.3728881666666664, avgd2:-0.26082762359550593, stddev1:0.19787800107446712, stddev2:0.20170761411396596]
+Sun May 19 02:03:31 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3145.0 nm
+Sun May 19 02:03:31 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.238610
+Sun May 19 02:03:32 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.32.051.andor.png
+Sun May 19 02:03:32 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.32.187.ccd.png
+Sun May 19 02:03:32 CEST 2013	TIMING	takesnapshots	0.22261404991149902
+Sun May 19 02:03:32 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:03:35 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.35.307.andor.png
+Sun May 19 02:03:35 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.35.401.ccd.png
+Sun May 19 02:03:35 CEST 2013	TIMING	takesnapshots	0.21000123023986816
+Sun May 19 02:03:35 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.4514793894927524, avgd2:-0.1965051516853934, stddev1:0.19674959056859104, stddev2:0.1969400916016001]
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=-0.078591222826086
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=0.06432247191011253
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=false
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.01426875091597346
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.20170761411396596
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.07145684736809926
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:03:36 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.36.060.andor.png
+Sun May 19 02:03:36 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.36.193.ccd.png
+Sun May 19 02:03:36 CEST 2013	TIMING	takesnapshots	0.21641206741333008
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.try	Try 6
+Sun May 19 02:03:36 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.36.346.andor.png
+Sun May 19 02:03:36 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.36.431.ccd.png
+Sun May 19 02:03:36 CEST 2013	TIMING	takesnapshots	0.16312599182128906
+Sun May 19 02:03:36 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:37 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.4273583097826053, avgd2:-0.2595411741573035, stddev1:0.23758491659143943, stddev2:0.21758874240858797]
+Sun May 19 02:03:37 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3150.0 nm
+Sun May 19 02:03:37 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.37.807.andor.png
+Sun May 19 02:03:38 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.37.896.ccd.png
+Sun May 19 02:03:38 CEST 2013	TIMING	takesnapshots	0.22957777976989746
+Sun May 19 02:03:38 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:03:40 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.40.535.andor.png
+Sun May 19 02:03:40 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.40.611.ccd.png
+Sun May 19 02:03:40 CEST 2013	TIMING	takesnapshots	0.1771860122680664
+Sun May 19 02:03:40 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.5284889021739093, avgd2:-0.09117710393258452, stddev1:0.24133534846052385, stddev2:0.21230338920062358]
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=-0.10113059239130401
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=0.16836407022471897
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=false
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.06723347783341496
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.23758491659143943
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.13474733130801148
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:03:41 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.41.261.andor.png
+Sun May 19 02:03:41 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.41.329.ccd.png
+Sun May 19 02:03:41 CEST 2013	TIMING	takesnapshots	0.174116849899292
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.try	Try 7
+Sun May 19 02:03:41 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.41.465.andor.png
+Sun May 19 02:03:41 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.41.552.ccd.png
+Sun May 19 02:03:41 CEST 2013	TIMING	takesnapshots	0.16810297966003418
+Sun May 19 02:03:41 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:42 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.6103424021739116, avgd2:-0.02637221348314622, stddev1:0.19514139509491207, stddev2:0.22405640339471897]
+Sun May 19 02:03:42 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3155.0 nm
+Sun May 19 02:03:43 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.42.931.andor.png
+Sun May 19 02:03:43 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.43.012.ccd.png
+Sun May 19 02:03:43 CEST 2013	TIMING	takesnapshots	0.17888092994689941
+Sun May 19 02:03:43 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:03:45 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.45.427.andor.png
+Sun May 19 02:03:45 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.45.505.ccd.png
+Sun May 19 02:03:45 CEST 2013	TIMING	takesnapshots	0.17321276664733887
+Sun May 19 02:03:45 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.6217109438405787, avgd2:-0.10918739606741613, stddev1:0.22350025881186486, stddev2:0.18849002600597536]
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=-0.01136854166666712
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=-0.08281518258426991
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=false
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.07144664091760279
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.22405640339471897
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.047091862125468516
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:03:46 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.46.141.andor.png
+Sun May 19 02:03:46 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.46.229.ccd.png
+Sun May 19 02:03:46 CEST 2013	TIMING	takesnapshots	0.20828700065612793
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.try	Try 8
+Sun May 19 02:03:46 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.46.442.andor.png
+Sun May 19 02:03:46 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.46.528.ccd.png
+Sun May 19 02:03:46 CEST 2013	TIMING	takesnapshots	0.20458698272705078
+Sun May 19 02:03:46 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:47 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.5719859311594161, avgd2:-0.11304674438202283, stddev1:0.19940944761006318, stddev2:0.22108108378216187]
+Sun May 19 02:03:47 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3160.0 nm
+Sun May 19 02:03:48 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.47.974.andor.png
+Sun May 19 02:03:48 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.48.068.ccd.png
+Sun May 19 02:03:48 CEST 2013	TIMING	takesnapshots	0.18297886848449707
+Sun May 19 02:03:48 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:03:50 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.50.838.andor.png
+Sun May 19 02:03:50 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.50.913.ccd.png
+Sun May 19 02:03:51 CEST 2013	TIMING	takesnapshots	0.15077614784240723
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.5862213224637672, avgd2:-0.2042238483146068, stddev1:0.2300647649700609, stddev2:0.20543583470524174]
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=-0.014235391304351142
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=-0.09117710393258396
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=false
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.07694171262823282
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.22108108378216187
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.05270624761846755
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:03:51 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.51.531.andor.png
+Sun May 19 02:03:51 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.51.625.ccd.png
+Sun May 19 02:03:51 CEST 2013	TIMING	takesnapshots	0.18276095390319824
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.try	Try 9
+Sun May 19 02:03:51 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.51.740.andor.png
+Sun May 19 02:03:51 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.51.826.ccd.png
+Sun May 19 02:03:51 CEST 2013	TIMING	takesnapshots	0.17746520042419434
+Sun May 19 02:03:51 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:52 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.5783127717391271, avgd2:-0.13877573314606756, stddev1:0.22876883265396064, stddev2:0.19817428903717538]
+Sun May 19 02:03:52 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3165.0 nm
+Sun May 19 02:03:53 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.53.224.andor.png
+Sun May 19 02:03:53 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.53.306.ccd.png
+Sun May 19 02:03:53 CEST 2013	TIMING	takesnapshots	0.17381000518798828
+Sun May 19 02:03:53 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:03:55 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.55.770.andor.png
+Sun May 19 02:03:55 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.55.847.ccd.png
+Sun May 19 02:03:55 CEST 2013	TIMING	takesnapshots	0.18340182304382324
+Sun May 19 02:03:56 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:56 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.7007964510869522, avgd2:0.13813250842696606, stddev1:0.2170813256981813, stddev2:0.24194115491032264]
+Sun May 19 02:03:56 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=-0.12248367934782511
+Sun May 19 02:03:56 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=0.2769082415730336
+Sun May 19 02:03:56 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=false
+Sun May 19 02:03:56 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.1544245622252085
+Sun May 19 02:03:56 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.22876883265396064
+Sun May 19 02:03:56 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:03:56 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.19969596046042937
+Sun May 19 02:03:56 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:03:56 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:03:57 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:57 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:03:57 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:03:57 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:03:57 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.242473
+Sun May 19 02:03:57 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.56.547.andor.png
+Sun May 19 02:03:57 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.56.637.ccd.png
+Sun May 19 02:03:57 CEST 2013	TIMING	takesnapshots	0.16951394081115723
+Sun May 19 02:03:57 CEST 2013	EVENT	simpletether.try	Try 10
+Sun May 19 02:03:57 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.56.864.andor.png
+Sun May 19 02:03:57 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.56.951.ccd.png
+Sun May 19 02:03:57 CEST 2013	TIMING	takesnapshots	0.18331527709960938
+Sun May 19 02:03:57 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:03:57 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.7449854782608683, avgd2:0.1973091825842695, stddev1:0.18803667987593062, stddev2:0.23450696843874036]
+Sun May 19 02:03:57 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3170.0 nm
+Sun May 19 02:03:58 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.58.372.andor.png
+Sun May 19 02:03:58 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.03.58.452.ccd.png
+Sun May 19 02:03:58 CEST 2013	TIMING	takesnapshots	0.1765730381011963
+Sun May 19 02:03:58 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:04:00 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.00.691.andor.png
+Sun May 19 02:04:00 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.00.798.ccd.png
+Sun May 19 02:04:00 CEST 2013	TIMING	takesnapshots	0.17999005317687988
+Sun May 19 02:04:00 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.8548154764492715, avgd2:0.2955617584269662, stddev1:0.18850421322568325, stddev2:0.1976479460419707]
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=-0.10982999818840322
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=0.0982525758426967
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=false
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.011577422345706523
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.23450696843874036
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.10404128701554996
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:04:01 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.01.402.andor.png
+Sun May 19 02:04:01 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.01.482.ccd.png
+Sun May 19 02:04:01 CEST 2013	TIMING	takesnapshots	0.15408110618591309
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.try	Try 11
+Sun May 19 02:04:01 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.01.569.andor.png
+Sun May 19 02:04:01 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.01.650.ccd.png
+Sun May 19 02:04:01 CEST 2013	TIMING	takesnapshots	0.17897319793701172
+Sun May 19 02:04:01 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:04:02 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.8524429112318832, avgd2:0.3084262528089887, stddev1:0.19154328980056298, stddev2:0.23214300617619377]
+Sun May 19 02:04:02 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3175.0 nm
+Sun May 19 02:04:03 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.03.072.andor.png
+Sun May 19 02:04:03 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.03.154.ccd.png
+Sun May 19 02:04:03 CEST 2013	TIMING	takesnapshots	0.15678787231445312
+Sun May 19 02:04:03 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:04:05 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.05.380.andor.png
+Sun May 19 02:04:05 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.05.474.ccd.png
+Sun May 19 02:04:05 CEST 2013	TIMING	takesnapshots	0.17838478088378906
+Sun May 19 02:04:05 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.7157238405797071, avgd2:0.0495283033707864, stddev1:0.21183362725025098, stddev2:0.23705834112285207]
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=0.13671907065217614
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=-0.2588979494382023
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=true
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.12217887878602618
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.23214300617619377
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.19780851004518923
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:04:06 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.06.083.andor.png
+Sun May 19 02:04:06 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.06.168.ccd.png
+Sun May 19 02:04:06 CEST 2013	TIMING	takesnapshots	0.18596196174621582
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.try	Try 12
+Sun May 19 02:04:06 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.06.299.andor.png
+Sun May 19 02:04:06 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.06.376.ccd.png
+Sun May 19 02:04:06 CEST 2013	TIMING	takesnapshots	0.18093204498291016
+Sun May 19 02:04:06 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:04:07 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.7742471159420268, avgd2:0.07332761797752778, stddev1:0.1925521361471069, stddev2:0.19690227043858718]
+Sun May 19 02:04:07 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3180.0 nm
+Sun May 19 02:04:07 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.07.838.andor.png
+Sun May 19 02:04:07 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.07.913.ccd.png
+Sun May 19 02:04:08 CEST 2013	TIMING	takesnapshots	0.1544032096862793
+Sun May 19 02:04:08 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:04:08 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.08.747.andor.png
+Sun May 19 02:04:08 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.08.830.ccd.png
+Sun May 19 02:04:08 CEST 2013	TIMING	takesnapshots	0.16077399253845215
+Sun May 19 02:04:08 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:-0.8152727228260819, avgd2:1.087210581460674, stddev1:0.2112023214391159, stddev2:0.20150939450628977]
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=-0.0410256068840551
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=1.0138829634831463
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=false
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=0.9728573565990912
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.19690227043858718
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=true
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=0.5274542851836007
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=false
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=false
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.test	We did not find that: difference>threshold -> No tether
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.increment	Trying again but closer by 5.0 nm
+Sun May 19 02:04:09 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.09.449.andor.png
+Sun May 19 02:04:09 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.09.530.ccd.png
+Sun May 19 02:04:09 CEST 2013	TIMING	takesnapshots	0.1815197467803955
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.try	Try 13
+Sun May 19 02:04:09 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.09.663.andor.png
+Sun May 19 02:04:09 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.09.752.ccd.png
+Sun May 19 02:04:09 CEST 2013	TIMING	takesnapshots	0.17137789726257324
+Sun May 19 02:04:09 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:04:10 CEST 2013	EVENT	simpletether.before	PSD values before: [avgd1:-0.7714791231884035, avgd2:1.0794918848314607, stddev1:0.21377788003623935, stddev2:0.20230375472058792]
+Sun May 19 02:04:10 CEST 2013	EVENT	simpletether.movingcloser	Moving beads closer to each other by 3185.0 nm
+Sun May 19 02:04:11 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.11.223.andor.png
+Sun May 19 02:04:11 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.11.303.ccd.png
+Sun May 19 02:04:11 CEST 2013	TIMING	takesnapshots	0.17255187034606934
+Sun May 19 02:04:11 CEST 2013	EVENT	simpletether.movingaway	Moving away, back to previous position
+Sun May 19 02:04:11 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.11.428.andor.png
+Sun May 19 02:04:11 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.11.553.ccd.png
+Sun May 19 02:04:11 CEST 2013	TIMING	takesnapshots	0.20805668830871582
+Sun May 19 02:04:11 CEST 2013	EVENT	simpletether.gettingstats	Getting statistics about PSD signals
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.after	PSD values after: [avgd1:60.19613155434782, avgd2:-92.18149933146067, stddev1:0.2573620745839901, stddev2:0.34353569114110566]
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.calculations.diff1	diff1=60.96761067753623
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.calculations.diff2	diff2=-93.26099121629213
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.calculations.correctforcesign	correctforcesign=true
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.calculations.diffforcemagnitude	diffforcemagnitude=32.2933805387559
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.calculations.forcestddev	Math.max(before.stddev1, before.stddev2)=0.21377788003623935
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.calculations.sameforcemagnitude	sameforcemagnitude=false
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.calculations.averageforce	averageforce=77.11430094691417
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.calculations.forceThreshold	forceThreshold=1.5
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.calculations.forceabovethreshold	forceabovethreshold=true
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=true
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.calculations.forceabovebumpingthreshold	forceabovebumpingthreshold=true
+Sun May 19 02:04:12 CEST 2013	FAILURE	simpletether.test.anomalousforce	Force is too high!
+Sun May 19 02:04:12 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.12.293.andor.png
+Sun May 19 02:04:12 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.12.374.ccd.png
+Sun May 19 02:04:12 CEST 2013	TIMING	takesnapshots	0.18991899490356445
+Sun May 19 02:04:12 CEST 2013	FAILURE	simpletether.failure	Failed to establish Tether
+Sun May 19 02:04:12 CEST 2013	EVENT	simpletether.end	Done
+Sun May 19 02:04:12 CEST 2013	INFO	tweebot.andor	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.12.528.andor.png
+Sun May 19 02:04:12 CEST 2013	INFO	tweebot.ccd	Saving snapshot to file: 32.Snapshot..2013.05.19.02.04.12.604.ccd.png
+Sun May 19 02:04:12 CEST 2013	TIMING	takesnapshots	0.15432190895080566
+Sun May 19 02:04:12 CEST 2013	INFO	datalog.setrecording.off	Recording state set to: false
+Sun May 19 02:04:13 CEST 2013	INFO	datalog.recording.writing.spawn	Saving data to file on dedicated thread...
+Sun May 19 02:04:13 CEST 2013	INFO	datalog.recording.stop	Stopped recording.
+Sun May 19 02:04:16 CEST 2013	WARNING	tweebot.andor	Relative inter-frame delay too high! 0.499645
+Sun May 19 02:04:17 CEST 2013	WARNING	tweebot.ccd	Unsufficient frame rate 0.440000
+Sun May 19 02:04:17 CEST 2013	WARNING	tweebot.andor	Unsufficient frame rate 0.367000

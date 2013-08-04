@@ -184,13 +184,12 @@ class Box(object):
     """
     Box in 3D space, constructed from 6 points.
 
-    Parameter:
-        xmin - minimum x component
-        xmax - maximum x component
-        ymin - minimum y component
-        ymax - maximum y component
-        zmin - minimum z component
-        zmax - maximum z component
+    :param xmin: minimum x component
+    :param xmax: maximum x component
+    :param ymin: minimum y component
+    :param ymax: maximum y component
+    :param zmin: minimum z component
+    :param zmax: maximum z component
     """
 
     def __init__(self, xmin=0, xmax=10, ymin=0, ymax=10, zmin=0, zmax=10):

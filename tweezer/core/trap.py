@@ -1,15 +1,12 @@
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
+
 """
 Trap
 ----
 
-An abstract representation of an optical trap for use in data analysis.
+Routines, classes and functions related to optical traps.
 """
 
 
-class Trap():
-    """
-    Representation of an optical trap.
-    """
 
-    def __init__(self):
-        self.detector

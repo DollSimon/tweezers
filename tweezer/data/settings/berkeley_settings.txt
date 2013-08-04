@@ -1,0 +1,26 @@
+10      %avtime in ms
+25      %lptime in ms
+9830    %L0 in nt
+4.14    %kbT in pNnm
+1200    %S in pN
+53      %P in nt
+0.338   %nmPbp in nm
+2       %HM: How many velocities per window for LP-filter
+2       %vhbinsize in nt/s: Velocity-Histogram binsize
+-5      %vhlow in nt/s:     Velocity-Histogram low limit
+31      %vhhigh in nt/s:    Velocity-Histogram high limit
+1.3     %spPDtimeSD: Anything above the mean dwelltime + spPDtimeSD standatd deviations is a SHORT pause
+0.8     %spPDtime in s : ALTERNATIVE: Anything above spPDtime is a SHORT pause
+5       %lpPDtimeSD: Anything above the mean dwelltime + lpPDtimeSD standatd deviations is a LONG pause
+3        %lpPDtime in s: ALTERNATIVE: Anything above lpPDtime is a LONG pause
+4       %IntoFinP in s: Time we will extend the fv-analysis into the last pause
+1       %fbinsize in pN: Force binsize for force-velocity curve
+0       %flow in pN:     Force low limit
+13      %fhigh in pN:    Force high limit
+0.03    %nfbinsize: normalized binsize for normalized force-velocity curve 
+0.4     %nflow: normalized force low limit 
+1.2     %nfhigh: normalized force high limit 
+1       %removedrift: adds constant drift to data if one
+0.68269 %confint: confidence interval for statistical analysis
+0       %mindL: minimum distance to next pause. Any pauses that are less than mindL apart will be merged
+10      %dtinterval: How many nucleotides for residency time calculation

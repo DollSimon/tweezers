@@ -6,8 +6,41 @@ examples/
 
 build/
 dist/
+sandbox/
 
 convert.log
 tox.ini
 
 tweezer.egg-info/
+
+# certain ipython notebook files
+Sandbox.ipynb
+
+# sublime project files
+*.sublime-project
+*.sublime-workspace
+
+# files related to python testing system
+.coverage
+setup.cfg
+bento.info
+
+# ignore all files related to pythontex except the template itself
+tweezer/templates/pytex/*
+!tweezer/templates/pytex/*.tex
+
+# all TODO files
+*.TODO
+
+# Latex extra files
+*.aux
+*.out
+*.log
+*template.pdf
+
+# profile files
+*.profile
+
+# files from nose testing
+setup.json
+tests.json

@@ -16,11 +16,14 @@ import sys, os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath(os.path.join('..','..')))
+sys.path.insert(0, os.path.abspath(os.path.join('..','..', 'tweezer')))
 
 # Tikz extesnion
 # sys.path.append(os.path.expanduser('~/Sphinx/tikz/'))
 sys.path.append(os.path.expanduser('../tools/sphinxext'))
+sys.path.append(os.path.expanduser('sphinxext'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -50,11 +53,14 @@ extensions = ['sphinx.ext.autodoc',
               'matplotlib.sphinxext.mathmpl',
               'matplotlib.sphinxext.only_directives',
               'matplotlib.sphinxext.plot_directive',
+              'sphinxcontrib.tikz',
               # 'matplotlib.sphinxext.ipython_directive',
               # 'ipython_console_highlighting',
               # 'inheritance_diagram',
               # 'numpydoc',
+              'rst2pdf.pdfbuilder',
               # 'tikz',
+              'sphinxcontrib.bitbucket',
               'sphinx.ext.mathjax',
               'sphinx.ext.ifconfig',
               'sphinx.ext.viewcode']
@@ -119,18 +125,30 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+# Extension specific settings
+# Connect to Bitbucket
+bitbucket_project_url = 'http://bitbucket.org/majahn/tweezer'
+
+# Include Todos during development
+todo_include_todos = True
 
 # -- Options for HTML output ---------------------------------------------------
 # import Cloud
-import cloud_sptheme as csp
+# import cloud_sptheme as csp
 
-html_theme = 'redcloud'
+# html_theme = 'redcloud'
 
 # set the theme path to point to cloud's theme data
-html_theme_path = [csp.get_theme_dir()]
+# html_theme_path = [csp.get_theme_dir()]
 
 # [optional] set some of the options listed above...
-html_theme_options = { "roottarget": "index" }
+# html_theme_options = { "roottarget": "index" }
+
+# Bootstrap theme
+import sphinx_bootstrap_theme
+
+html_theme = 'bootstrap'
+html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -212,7 +230,7 @@ htmlhelp_basename = 'Tweezerdoc'
 
 # -- Options for LaTeX output --------------------------------------------------
 
-latex_elements = {
+# latex_elements = {
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',
 
@@ -221,6 +239,14 @@ latex_elements = {
 
 # Additional stuff for the LaTeX preamble.
 #'preamble': '',
+# }
+
+latex_elements = {
+# ‹...›
+# 'preamble': '\\usepackage{tikz}'
+'preamble': '''\usepackage{tikz}''' + '''
+\usetikzlibrary{''' + 'arrows' + '''}'''
+# ‹...›
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -230,6 +256,7 @@ latex_documents = [
    u'Marcus Jahnel', 'manual'),
 ]
 
+ 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
 #latex_logo = None
