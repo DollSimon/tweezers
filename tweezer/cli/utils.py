@@ -127,6 +127,10 @@ def collect_files_per_trial(files=defaultdict(list), trial=1, subtrial=None):
             if not trial_files.has_key(t):
                 trial_files[t].append(None)
 
+    for file_type in trial_files:
+        if len(trial_files[file_type]) == 1:
+            trial_files[file_type] = trial_files[file_type][0]
+
     return trial_files
 
 

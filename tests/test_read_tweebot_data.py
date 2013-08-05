@@ -55,14 +55,14 @@ def test_return_values():
     data.units['aodDetectorOffsetY'].should.equal('V')
     data.units['aodStiffnessX'].should.equal('pN/nm')
     data.units['aodStiffnessY'].should.equal('pN/nm')
-    data.units['aodDistanceConversionX'].should.equal('V/nm')
-    data.units['aodDistanceConversionY'].should.equal('V/nm')
+    data.units['aodDisplacementSensitivityX'].should.equal('V/nm')
+    data.units['aodDisplacementSensitivityY'].should.equal('V/nm')
     data.units['pmDetectorOffsetX'].should.equal('V')
     data.units['pmDetectorOffsetY'].should.equal('V')
     data.units['pmStiffnessX'].should.equal('pN/nm')
     data.units['pmStiffnessY'].should.equal('pN/nm')
-    data.units['pmDistanceConversionX'].should.equal('V/nm')
-    data.units['pmDistanceConversionY'].should.equal('V/nm')
+    data.units['pmDisplacementSensitivityX'].should.equal('V/nm')
+    data.units['pmDisplacementSensitivityY'].should.equal('V/nm')
     data.units['aodBeadRadius'].should.equal('nm')
     data.units['pmBeadRadius'].should.equal('nm')
     data.units['samplingRate'].should.equal('Hz')
@@ -96,14 +96,14 @@ def test_return_values():
     data.meta['aodDetectorOffsetY'].should.equal(0.725181)
     data.meta['aodStiffnessX'].should.equal(0.166681)
     data.meta['aodStiffnessY'].should.equal(0.163667)
-    data.meta['aodDistanceConversionX'].should.equal(0.00102400)
-    data.meta['aodDistanceConversionY'].should.equal(0.00108100)
+    data.meta['aodDisplacementSensitivityX'].should.equal(0.00102400)
+    data.meta['aodDisplacementSensitivityY'].should.equal(0.00108100)
     data.meta['pmDetectorOffsetX'].should.equal(-0.0493670)
     data.meta['pmDetectorOffsetY'].should.equal(0.0642740)
     data.meta['pmStiffnessX'].should.equal(0.194668)
     data.meta['pmStiffnessY'].should.equal(0.158991)
-    data.meta['pmDistanceConversionX'].should.equal(0.000937000)
-    data.meta['pmDistanceConversionY'].should.equal(0.000821000)
+    data.meta['pmDisplacementSensitivityX'].should.equal(0.000937000)
+    data.meta['pmDisplacementSensitivityY'].should.equal(0.000821000)
     data.meta['aodBeadRadius'].should.equal(1015)
     data.meta['pmBeadRadius'].should.equal(1080)
     data.meta['samplingRate'].should.equal(1000)
@@ -111,7 +111,7 @@ def test_return_values():
     data.meta['deltaTime'].should.equal(0.001)
 
 
-real_file = '/Users/jahnel/code/example_data/tweebot/RNA_POL_II_19_02_2013/datalog/18.Datalog.2013.02.19.23.09.24.datalog.txt'
+real_file = '/Users/jahnel/code/example_data/tweebot/datalog/18.Datalog.2013.02.19.23.09.24.datalog.txt'
 
 def test_real_file():
     df = read_tweebot_data(real_file)

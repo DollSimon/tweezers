@@ -35,21 +35,21 @@ class TestTweebotOverview():
 
     def test_collect_files_of_nonexistent_trial(self):
         trial_files = collect_files_per_trial(trial=4, files=self.files)
-        trial_files['bot_data'].should.equal(None) 
-        trial_files['bot_logs'].should.equal(None) 
-        trial_files['bot_stats'].should.equal(None) 
-        trial_files['bot_tdms'].should.equal(None) 
-        trial_files['bot_focus'].should.equal(None) 
-        trial_files['bot_andor'].should.equal(None) 
-        trial_files['bot_ccd'].should.equal(None) 
+        trial_files['bot_data'].should.be.none 
+        # trial_files['bot_logs'].should.be.none 
+        trial_files['bot_stats'].should.be.none 
+        trial_files['bot_tdms'].should.be.none 
+        trial_files['bot_focus'].should.be.none 
+        trial_files['bot_andor'].should.be.empty 
+        trial_files['bot_ccd'].should.be.empty 
         
     def test_collect_files_of_existent_trial(self):
         trial_files = collect_files_per_trial(trial=18, files=self.files)
-        trial_files['bot_data'].should.equal(['datalog/18.Datalog.2013.02.19.23.09.24.datalog.txt']) 
-        trial_files['bot_logs'].should.equal(None) 
-        trial_files['bot_stats'].should.equal(None) 
+        trial_files['bot_data'].should.equal('/Users/jahnel/code/example_data/tweebot/datalog/18.Datalog.2013.02.19.23.09.24.datalog.txt') 
+        trial_files['bot_logs'].should.be.empty 
+        trial_files['bot_stats'].should.equal('/Users/jahnel/code/example_data/tweebot/stats/18.TweeBotStats.txt') 
         trial_files['bot_tdms'].should.equal(None) 
         trial_files['bot_focus'].should.equal(None) 
-        trial_files['bot_andor'].should.equal(None) 
-        trial_files['bot_ccd'].should.equal(None) 
+        trial_files['bot_andor'].should.be.empty 
+        trial_files['bot_ccd'].should.be.empty
     

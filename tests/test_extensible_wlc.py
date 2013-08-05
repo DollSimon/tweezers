@@ -1,5 +1,20 @@
-from tweezer.core.polymer import ExtensibleWormLikeChain
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
 
+import unittest
+import sure
+
+from clint.textui import colored, puts, indent
+
+try:
+    from tweezer.core.polymer import ExtensibleWormLikeChain
+except ImportError, err:
+    puts('')
+    with indent(2):
+        puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
+        puts('')
+        puts('The following import error occurred: {}'.format(colored.red(err))) 
+        puts('')
 
 def test_default_values():
     wlc = ExtensibleWormLikeChain(1000)
