@@ -592,7 +592,7 @@ def main():
         'path/1.SavedTweeBotScript.2013.02.19.17.04.25.whole.groovy',
         'path/18.SavedTweeBotScript.2013.02.19.17.04.25.whole.groovy', 
         '/Users/jahnel/code/example_data/tweebot/snapshots.andor/20.Snapshot..2013.02.19.23.32.30.254.andor.png',
-        'path/TS_4_d.txt', 'path/TS_5.txt', 'path/TS_10.txt']
+        'path/TS_4_d.txt', 'path/TS_5.txt', 'path/TS_10.txt', 'data/18_2013_05_19_17_18_07.tdms']
 
     for f in files:
         print(classify(f))
