@@ -310,7 +310,8 @@ def classify(file_path):
         # separator
         s = '.' | '_' | ' '
         ps = '/'
-        path = <(letterOrDigit | '_' | ' ')*>:path -> str(path) 
+        path = <(letterOrDigit | '_' | ' ' | '.')*>:path -> str(path) 
+        andor_path = <(letterOrDigit | '_' | ' ' )*>:andor_path -> str(andor_path) 
 
         # beginning
         t = <digit+>:trial -> int(trial)
@@ -395,7 +396,7 @@ def classify(file_path):
         # general file patterns
         tc_ts = <path ps 'T' 'S' s (t '_' <letter+> | t) '.' 'txt'> -> 'TC_TS'
         tc_psd = <path ps 'P' 'S' 'D' s (t '_' <letter+> | t) '.' 'txt'> -> 'TC_PSD'
-        andor_vid = <path ps path <'.' fts>> -> 'ANDOR_VID'
+        andor_vid = <andor_path ps andor_path <'.' fts>> -> 'ANDOR_VID'
 
         type = (man_data | 
             man_pm_dc_v | 
@@ -446,7 +447,8 @@ def classify_all(files):
         # separator
         s = '.' | '_' | ' '
         ps = '/'
-        path = <(letterOrDigit | '_' | ' ')*>:path -> str(path) 
+        path = <(letterOrDigit | '_' | ' ' | '.')*>:path -> str(path) 
+        andor_path = <(letterOrDigit | '_' | ' ' )*>:andor_path -> str(andor_path) 
 
         # beginning
         t = <digit+>:trial -> int(trial)
@@ -531,7 +533,7 @@ def classify_all(files):
         # general file patterns
         tc_ts = <path ps 'T' 'S' s (t '_' <letter+> | t) '.' 'txt'> -> 'TC_TS'
         tc_psd = <path ps 'P' 'S' 'D' s (t '_' <letter+> | t) '.' 'txt'> -> 'TC_PSD'
-        andor_vid = <path ps path <'.' fts>> -> 'ANDOR_VID'
+        andor_vid = <andor_path ps andor_path <'.' fts>> -> 'ANDOR_VID'
 
         type = (man_data | 
             man_pm_dc_v | 
@@ -589,6 +591,7 @@ def main():
         'path/56.TweeBotLog.2013.02.20.08.55.15.txt', 
         'path/1.SavedTweeBotScript.2013.02.19.17.04.25.whole.groovy',
         'path/18.SavedTweeBotScript.2013.02.19.17.04.25.whole.groovy', 
+        '/Users/jahnel/code/example_data/tweebot/snapshots.andor/20.Snapshot..2013.02.19.23.32.30.254.andor.png',
         'path/TS_4_d.txt', 'path/TS_5.txt', 'path/TS_10.txt']
 
     for f in files:

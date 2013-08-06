@@ -16,8 +16,9 @@ BOT_LOG = 'path/56.TweeBotLog.2013.02.20.08.55.15.txt'
 BOT_STATS = 'path/11.TweeBotStats.txt'
 BOT_FOCUS = 'path/focussingstage.fullfocus12.focustable.txt'
 BOT_SCRIPT = 'path/1.SavedTweeBotScript.2013.02.19.17.04.25.whole.groovy'
-BOT_CCD = 'path/5.Snapshot..2013.02.19.18.26.16.584.ccd.png'
-BOT_ANDOR = 'path/1.Snapshot..2013.02.16.16.12.14.405.andor.png'
+BOT_CCD = ['path/5.Snapshot..2013.02.19.18.26.16.584.ccd.png', '/Users/jahnel/code/example_data/tweebot/snapshots.ccd/18.Snapshot..2013.02.19.23.09.45.683.ccd.png']
+BOT_ANDOR = ['path/1.Snapshot..2013.02.16.16.12.14.405.andor.png',
+    '/Users/jahnel/code/example_data/tweebot/snapshots.andor/20.Snapshot..2013.02.19.23.32.30.254.andor.png'] 
 BOT_TDMS = 'path/38_2013_05_14_16_43_43.tdms'
 
 BOT_FILES = namedtuple('BOT_FILES', ['data', 'log', 'stats', 'focus', 'script', 'ccd', 'andor', 'tdms'])
@@ -76,8 +77,10 @@ class TestFileParsing:
         mapping[bot.stats].should.equal('BOT_STATS') 
         mapping[bot.focus].should.equal('BOT_FOCUS') 
         mapping[bot.script].should.equal('BOT_SCRIPT') 
-        mapping[bot.ccd].should.equal('BOT_CCD') 
-        mapping[bot.andor].should.equal('BOT_ANDOR') 
+        mapping[bot.ccd[0]].should.equal('BOT_CCD') 
+        mapping[bot.ccd[1]].should.equal('BOT_CCD') 
+        mapping[bot.andor[0]].should.equal('BOT_ANDOR') 
+        mapping[bot.andor[1]].should.equal('BOT_ANDOR') 
         mapping[bot.tdms].should.equal('BOT_TDMS') 
 
         # don't get confused on files that are not valid

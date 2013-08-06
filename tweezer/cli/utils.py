@@ -61,6 +61,9 @@ def list_tweezer_files(directory, cache_results=True):
 
             file_names = list(generate_file_tree_of(directory))
 
+            # clean list from mac specific files
+            file_names = [f for f in file_names if not 'DS_Store' in f]
+            
             types = classify_all(file_names)
             for t, f in izip(types, file_names):
                 files[t.lower()].append(f)
@@ -74,6 +77,9 @@ def list_tweezer_files(directory, cache_results=True):
         directory_state = get_directory_state(directory)
 
         file_names = list(generate_file_tree_of(directory))
+
+        # clean list from mac specific files
+        file_names = [f for f in file_names if not 'DS_Store' in f]
 
         types = classify_all(file_names)
         for t, f in izip(types, file_names):

@@ -50,6 +50,11 @@ class TestTweebotOverviewPage:
     @classmethod
     def teardown_class(cls):
         print ("teardown_class() after any methods in this class")
+        os.chdir(cls.data_path)
+        files = os.listdir(os.getcwd()) 
+        if 'cached_file_listing.json' in files:
+            os.remove(os.path.join(os.getcwd(), 'cached_file_listing.json'))
+            
         os.chdir(cls.current_dir)
 
     def setUp(self):
@@ -72,4 +77,7 @@ class TestTweebotOverviewPage:
         ('/Users/jahnel/code/example_data/tweebot/datalog/20.Datalog.2013.02.19.23.32.22.datalog.txt').shouldnot.be.within(files)
         ('/Users/jahnel/code/example_data/tweebot/logs/20.TweeBotLog.2013.02.19.23.26.55.txt').shouldnot.be.within(files)
         'bot_data'.should.be.within(files)
+        'bot_ccd'.should.be.within(files)
+        'bot_andor'.should.be.within(files)
+        
         
