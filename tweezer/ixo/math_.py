@@ -7,7 +7,7 @@ import numpy as np
 from numba.decorators import autojit, jit
 
 @autojit
-def map_array_to_range(X, map_range=[-1, 1]):
+def map_array_to_range(X):
     """
     Maps (normalises) an array to range specified
     :param X: (numpy.array) of shape (M, N)
@@ -15,6 +15,8 @@ def map_array_to_range(X, map_range=[-1, 1]):
 
     :return S: (numpy.array) normalised array of shape (M, N), mapped to range specified
     """
+    map_range=[-1, 1]
+
     M = X.shape[0]
     N = X.shape[1]
 

@@ -20,6 +20,7 @@ def test_read_proper_man_data_file():
 
     good.meta['recordingRate'].should.equal(1000)
     good.units['recordingRate'].should.equal('Hz')
+    good.meta['timeStep'].should.be(0.001)
 
 
 def test_read_corrupted_man_data_file():
@@ -29,6 +30,7 @@ def test_read_corrupted_man_data_file():
     # check results
     bad.date.should.equal(datetime.datetime(2013, 6, 7, 12, 48))
     bad.meta['duration'].should.equal(48)
+    bad.meta['timeStep'].should.be(0.001)
     
 
     

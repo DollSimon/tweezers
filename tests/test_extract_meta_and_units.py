@@ -60,6 +60,11 @@ def test_extracting_man_comments():
     C.units['aodDistanceConversionX'].should.equal('V/nm')
     C.units['aodDistanceConversionY'].should.equal('V/nm')
 
+    C.units['pmDisplacementSensitivityX'].should.equal('V/nm')
+    C.units['pmDisplacementSensitivityY'].should.equal('V/nm')
+    C.units['aodDisplacementSensitivityX'].should.equal('V/nm')
+    C.units['aodDisplacementSensitivityY'].should.equal('V/nm')
+
     C.units['aodBeadDiameter'].should.equal('nm') 
     C.units['pmBeadDiameter'].should.equal('nm') 
     
@@ -76,7 +81,6 @@ def test_extracting_man_comments():
     C.units.should.have.key("laserDiodeCurrent")
     C.units.should.have.key("laserDiodeTemp")
     C.units.should.have.key("aodDetectorOffsetX")
-    
     
     # testing values in meta
     C.metadata['aodBeadRadius'].should.equal(1000) 
@@ -97,7 +101,6 @@ def test_extracting_man_comments():
     C.metadata['errors'].should.equal([0, 0, 0, 0, 0]) 
 
     C.metadata['pmDisplacementSensitivityX'].should.equal(0.000498)
-    C.metadata['pmDistanceConversionX'].should.equal(0.000498)
     
     
 

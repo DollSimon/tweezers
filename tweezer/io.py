@@ -72,8 +72,12 @@ def read_tweezer_txt(file_name):
 
     data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
 
-    data = pd.read_table(file_name, sep='\t', header=None, skiprows=data_pos,
-        names=columns, dtype=np.float64)
+    if isFileSane:
+        data = pd.read_table(file_name, sep='\t', header=None, skiprows=data_pos, 
+            names=columns, dtype=np.float64)
+    else:
+        data = pd.read_table(file_name, sep='\t', header=None, skiprows=data_pos, 
+            skipfooter=10, names=columns, dtype=np.float64)
 
     # drop rows with "NaN" values
     data = data.dropna()
@@ -803,6 +807,14 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             units['dt'] = units['timeStep'] = 's'
             meta[standardized_name_of('dt')] = meta[standardized_name_of('timeStep')] = dt 
 
+        elif 'Delta time ' in line:
+            try:
+                dt = float(line.strip().split(": ")[-1])
+            except:
+                dt = 0.0010
+
+            meta[standardized_name_of('Delta time')] = dt 
+
         elif 'PM bead diameter' in line or 'diameterT1.um' in line:
             try:
                 pmBeadDiameter = float(line.strip().split(": ")[-1])
@@ -1004,16 +1016,21 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             meta[standardized_name_of('PM bead radius')] = round(pmBeadRadius, 2)
 
         elif 'Sample rate' in line:
-            samplingRate = float(line.strip().split(": ")[-1])
-            meta[standardized_name_of('Sample rate')] = samplingRate
+            try:
+                samplingRate = float(line.strip().split(": ")[-1])
+                meta[standardized_name_of('Sample rate')] = samplingRate
+            except:
+                samplingRate = 1000
+                meta[standardized_name_of('Sample rate')] = samplingRate
 
         elif 'Number of samples' in line:
-            nSamples = float(line.strip().split(": ")[-1])
-            meta[standardized_name_of('Number of samples')] = nSamples
+            try:
+                nSamples = int(line.strip().split(": ")[-1])
+                meta[standardized_name_of('Number of samples')] = nSamples
+            except:
+                nSamples = 1
+                meta[standardized_name_of('Number of samples')] = nSamples
 
-        elif 'Delta time' in line:
-            deltaTime = float(line.strip().split(": ")[-1])
-            meta[standardized_name_of('Delta time')] = deltaTime
 
         elif 'Laser Diode Operating Hours' in line:
             try:
@@ -1101,9 +1118,16 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
     # parsing the date
     if date_string and time_string:
         combined_date = " ".join([date_string.strip(), time_string.strip()])
-        date = datetime.strptime(combined_date, '%m/%d/%Y %I:%M %p')
+        try:
+            date = datetime.strptime(combined_date, '%m/%d/%Y %I:%M %p')
+        except ValueError:
+            combined_date = " ".join(["1/1/1900", time_string.strip()])
+            date = datetime.strptime(combined_date, '%m/%d/%Y %I:%M %p')
     elif date_string and not time_string:
-        date = datetime.strptime(date_string, '%m/%d/%Y %I:%M %p')
+        try:
+            date = datetime.strptime(date_string, '%m/%d/%Y %I:%M %p')
+        except ValueError:
+            date = datetime(1900, 1, 1, 1, 1, 1)
     else:
         date = datetime.now()
 
@@ -1127,14 +1151,24 @@ def standardized_name_of(variable):
         'data averaged to while-loop': 'isDataAveraged',
 
         'number of samples': 'nSamples',
+        'Number of samples': 'nSamples',
         'nSamples': 'nSamples',
 
         'sample rate' : 'samplingRate',
+        'Sample rate (Hz)' : 'samplingRate',
+        'Sample rate ' : 'samplingRate',
+        'Sample rate' : 'samplingRate',
         'sampleRate.Hz': 'samplingRate',
 
         'rate of while-loop': 'recordingRate',
         'duration of measurement': 'duration',
         'dt ': 'timeStep',
+        'dt': 'timeStep',
+
+        'timeStep': 'timeStep',
+
+        'Delta time ': 'deltaTime',
+        'Delta time': 'deltaTime',
 
         'number of blocks': 'nBlocks',
         'nBlocks': 'nBlocks',
@@ -1261,8 +1295,8 @@ def standardized_name_of(variable):
         'AOD trap stiffness x': 'aodStiffnessX',
         'AOD trap stiffness y': 'aodStiffnessY',
 
-        'AOD trap distance conversion x': 'aodDistanceConversionX',
-        'AOD trap distance conversion y': 'aodDistanceConversionY',
+        # 'AOD trap distance conversion x': 'aodDistanceConversionX',
+        # 'AOD trap distance conversion y': 'aodDistanceConversionY',
 
         # aod tweebot camera variables
         'AOD ANDOR center x': 'andorAodCenterX',

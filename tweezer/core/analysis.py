@@ -1,6 +1,7 @@
 """
 Analysis of Tweezer Experiments
 """
+import os
 
 import numpy as np 
 import pandas as pd 
@@ -139,5 +140,42 @@ class TweezerExperiment(object):
 
         for keys, values in reference_units.items():
             print("{} : {}".format(keys, values))
+
+
+def set_up_directories(sorted_files, root_directory):
+    """
+    Creates directories for the analysis
+
+    :param sorted_files: Description
+    """
+    # avoid side effects for upstream functions
+    ORIGINAL_DIR = os.getcwd()
+
+    os.chdir(root_directory)
+
+    # creating main directories
+    try:
+        os.makedirs('overviews')
+        os.makedirs('analysis')
+        os.makedirs('archive')
+    except OSError as err:
+        if not os.path.isdir(err.filename):
+            raise
+
+    # creating directories for individual trials
+    for trial in sorted_files:
+        name = "trial_{}".format(trial)
+        try:
+            os.makedirs(os.path.join('overviews', name))
+            os.makedirs(os.path.join('archive', name))
+            os.makedirs(os.path.join('analysis', name))
+        except OSError as err:
+            # be happy if someone already created 
+            if not os.path.isdir(err.filename):
+                raise
+
+    # get back to where you have been
+    os.chdir(ORIGINAL_DIR)
+
 
 

@@ -61,6 +61,9 @@ def list_tweezer_files(directory, cache_results=True):
 
             file_names = list(generate_file_tree_of(directory))
 
+            # clean list from mac specific files
+            file_names = [f for f in file_names if not 'DS_Store' in f]
+
             types = classify_all(file_names)
             for t, f in izip(types, file_names):
                 files[t.lower()].append(f)
@@ -74,6 +77,9 @@ def list_tweezer_files(directory, cache_results=True):
         directory_state = get_directory_state(directory)
 
         file_names = list(generate_file_tree_of(directory))
+
+        # clean list from mac specific files
+        file_names = [f for f in file_names if not 'DS_Store' in f]
 
         types = classify_all(file_names)
         for t, f in izip(types, file_names):
@@ -121,11 +127,17 @@ def collect_files_per_trial(files=defaultdict(list), trial=1, subtrial=None):
 
     for t, f in files.iteritems():
         for x in f:
-            if re.search('^\s*[a-zA-Z_]*{}\W'.format(trial_name), os.path.basename(x)):
+            if re.search(r'^\s*[a-zA-Z_]*{}\W'.format(trial_name), os.path.basename(x)):
+                trial_files[t].append(x)
+            elif re.search(r'^\s*{}[_]'.format(trial_name), os.path.basename(x)):
                 trial_files[t].append(x)
         else:
             if not trial_files.has_key(t):
                 trial_files[t].append(None)
+
+    for file_type in trial_files:
+        if len(trial_files[file_type]) == 1:
+            trial_files[file_type] = trial_files[file_type][0]
 
     return trial_files
 
@@ -199,13 +211,23 @@ def collect_data_per_trial(trial_files):
         return TrialData(*data)
 
     try:
-        files = []
-        data = []
-        for ftype, fpath in trial_files.iteritems():
-            files.append(ftype)
-            data.append(read(fpath))
+        files = [f for f in trial_files]
 
-        TrialData = namedtuple_factory(files, data)
+        if 'bot_data' in files:
+            data_files = [f for f in files if f in ['bot_data', 'bot_tdms', 'bot_log']]
+        elif 'man_data' in files:
+            data_files = [f for f in files if f in ['man_data', 'man_track']]
+        else:
+            data_files = files
+
+        data = []
+
+        for ftype, fpath in trial_files.iteritems():
+            if ftype in data_files:
+                data.append(read(fpath))
+
+        TrialData = namedtuple_factory(data_files, data)
+
     except:
         raise
 

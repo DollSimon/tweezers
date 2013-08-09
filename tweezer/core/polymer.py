@@ -261,13 +261,21 @@ class ExtensibleWormLikeChain(object):
     def plot_example(self, force_range=[0.5, 50], **kwargs):
         force = np.linspace(min(force_range), max(force_range), 300)
         extension = self.__call__(force, **kwargs)
-        with indent(2):
-            puts('Plotting the {} with parameters:\n'.format(colored.green('extensible worm like chain model')))
-        with indent(4):
-            puts('Force range: {} - {} pN'.format(colored.yellow(min(force_range)), colored.yellow(max(force_range))))
-            puts('Persistence length, P: {} nm'.format(colored.yellow(self._P)))
-            puts('Stretch modulus, S: {} pN'.format(colored.yellow(self._S)))
-            puts('Contour length, L: {} nm'.format(colored.yellow(self._L)))
+        try:
+            with indent(2):
+                puts('Plotting the {} with parameters:\n'.format(colored.green('extensible worm like chain model')))
+            with indent(4):
+                puts('Force range: {} - {} pN'.format(colored.yellow(min(force_range)), colored.yellow(max(force_range))))
+                puts('Persistence length, P: {} nm'.format(colored.yellow(self._P)))
+                puts('Stretch modulus, S: {} pN'.format(colored.yellow(self._S)))
+                puts('Contour length, L: {} nm'.format(colored.yellow(self._L)))
+        except:
+            print('Plotting the extensible worm like chain model with parameters:\n')
+            print('Force range: {} - {} pN'.format(min(force_range), max(force_range)))
+            print('Persistence length, P: {} nm'.format(self._P))
+            print('Stretch modulus, S: {} pN'.format(self._S))
+            print('Contour length, L: {} nm'.format(self._L))
+
         plt.plot(extension, force, color='#859900', linewidth=2.0, label='eWLC')
         plt.legend(loc=2)
         plt.xlabel('Extension [nm]')

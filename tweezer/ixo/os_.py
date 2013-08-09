@@ -3,7 +3,36 @@
 
 import os
 
-def get_subdirs(path, is_file=True):
+def get_subdirs(directory):
+    """
+    Returns a list of directories contained in the parent directory
+
+    :param directory: (path)
+
+    :return subdirs: (list) of directories
+    """
+    try:
+        dirs = [d[0] for d in os.walk(directory)]
+    except TypeError:
+        print("You need to provide a directory path as a string, not {}".format(directory))
+
+    subdirs = [d for d in dirs if d != directory]
+
+    return subdirs
+
+
+def get_new_subdirs(old_directory_list, new_directory_list):
+    """
+    Gets new directories by comparing old and new stage of this directory.
+    This assumes that there are new directories added and none deleted from the the old ones.
+     
+    :param old_directory_list: (list) of directory at an earlier stage
+    :param new_directory_list: (list) of directory at a later stage
+    """
+    return list(set(new_directory_list) - set(old_directory_list))
+
+
+def split_path(path, is_file=True):
     """
     Splits a path into its subdirectories and returns a list of those
 
@@ -41,7 +70,7 @@ def get_parent_directory(file_name):
 
     :return parent_dir: (String) name of parent directory
     """
-    return get_subdirs(file_name)[-1]
+    return split_path(file_name)[-1]
 
 
 def generate_file_tree_of(directory):
