@@ -101,6 +101,7 @@ class TestCollectFilesPerTrial:
         TrialData = collect_data_per_trial(sorted_files['18'])
     
         TrialData.shouldnot.be.empty
+        
     
      
     
