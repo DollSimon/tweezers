@@ -85,8 +85,8 @@ class TweezerExperiment(object):
         """
         Contains a dictionary of all the units used in tweezer experiments.
         """
-        reference_units = dict()
-        reference_units = {   
+        units_ref = dict()
+        units_ref = {   
                     'thermal_energy': 'pN * nm',
                     'wlc_persistence_length': 'nm',
                     'wlc_stretch_modulus': 'pN',
@@ -130,28 +130,28 @@ class TweezerExperiment(object):
                     'number_of_samples': 'unitless',
                     'time_step': 's'}
 
-        return reference_units
+        return units_ref
 
     def _print_reference_units(self):
         """
         Prints the reference units of the tweezer experiments in a formatted table.
         """
-        reference_units = self._reference_units()
+        units_ref = self._reference_units()
 
-        for keys, values in reference_units.items():
+        for keys, values in units_ref.items():
             print("{} : {}".format(keys, values))
 
 
-def set_up_directories(sorted_files, root_directory):
+def set_up_directories(files_sorted_by_trial, dir_root):
     """
     Creates directories for the analysis
 
-    :param sorted_files: Description
+    :param files_sorted_by_trial: nested dictionary of trials and their related files 
     """
     # avoid side effects for upstream functions
-    ORIGINAL_DIR = os.getcwd()
+    DIR_ORIGINAL = os.getcwd()
 
-    os.chdir(root_directory)
+    os.chdir(dir_root)
 
     # creating main directories
     try:
@@ -163,19 +163,24 @@ def set_up_directories(sorted_files, root_directory):
             raise
 
     # creating directories for individual trials
-    for trial in sorted_files:
-        name = "trial_{}".format(trial)
+    for trial in files_sorted_by_trial:
+        label = "trial_{}".format(trial)
         try:
-            os.makedirs(os.path.join('overviews', name))
-            os.makedirs(os.path.join('archive', name))
-            os.makedirs(os.path.join('analysis', name))
+            os.makedirs(os.path.join('overviews', label))
+            os.makedirs(os.path.join('archive', label))
+            os.makedirs(os.path.join('analysis', label))
         except OSError as err:
             # be happy if someone already created 
             if not os.path.isdir(err.filename):
                 raise
 
     # get back to where you have been
-    os.chdir(ORIGINAL_DIR)
+    os.chdir(DIR_ORIGINAL)
+
+
+def read_data_and_save(files_sorted_by_trial, dir_root):
+    pass
+
 
 
 
