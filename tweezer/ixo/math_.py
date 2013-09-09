@@ -4,14 +4,15 @@ from __future__ import print_function, division
 
 import numpy as np
 
-from numba.decorators import autojit, jit
+from numba.decorators import autojit
+
 
 @autojit
 def map_array_to_range(X):
     """
     Maps (normalises) an array to range specified
     :param X: (numpy.array) of shape (M, N)
-    :param map_range: (list of two numbers) 
+    :param map_range: (list of two numbers)
 
     :return S: (numpy.array) normalised array of shape (M, N), mapped to range specified
     """
@@ -40,4 +41,5 @@ def map_array_to_range(X):
     return S
 
 
-    
+def isEven(number):
+    return (number) & (number - 1) == 0
