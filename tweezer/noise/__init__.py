@@ -3,12 +3,14 @@ from __future__ import print_function, division
 import os
 import glob
 
-__all__ = [ os.path.basename(f)[:-3] for f in glob.glob(os.path.dirname(__file__)+"/*.py")]
+MEMBER_FILES = glob.glob(os.path.dirname(__file__) + "/*.py")
+
+__all__ = [os.path.basename(f)[:-3] for f in MEMBER_FILES]
 
 __doc__ = """\
-Module that contains routines for noise analysis of time series 
+Module that contains routines for noise analysis of time series
 
-One key aspect is to port the Steps and Bumps Toolkit from Matlab to Python 
+One key aspect is to port the Steps and Bumps Toolkit from Matlab to Python
 
 Refs:
 

@@ -3,10 +3,10 @@ Analysis of Tweezer Experiments
 """
 import os
 
-import numpy as np 
-import pandas as pd 
-import scipy as sp 
-import matplotlib as mp 
+import numpy as np
+import pandas as pd
+import scipy as sp
+import matplotlib as mp
 
 
 class TweezerExperimentMetaData(dict):
@@ -33,10 +33,10 @@ class TweezerExperiment(object):
         """
 
         ## Set default parameters
-        
+
         # General physical parameters
-        self.thermal_energy = 4.14 
-        self.viscosity = 0.9e-9        
+        self.thermal_energy = 4.14
+        self.viscosity = 0.9e-9
 
         # Parameters for the worm like chain models
         self.wlc_stretch_modulus = 1200;
@@ -75,7 +75,7 @@ class TweezerExperiment(object):
         """
         Prints the units of the tweezer experiments in a formatted table.
         """
-        
+
         units = self.units()
 
         for keys, values in units.items():
@@ -86,7 +86,7 @@ class TweezerExperiment(object):
         Contains a dictionary of all the units used in tweezer experiments.
         """
         units_ref = dict()
-        units_ref = {   
+        units_ref = {
                     'thermal_energy': 'pN * nm',
                     'wlc_persistence_length': 'nm',
                     'wlc_stretch_modulus': 'pN',
@@ -146,7 +146,7 @@ def set_up_directories(files_sorted_by_trial, dir_root):
     """
     Creates directories for the analysis
 
-    :param files_sorted_by_trial: nested dictionary of trials and their related files 
+    :param files_sorted_by_trial: nested dictionary of trials and their related files
     """
     # avoid side effects for upstream functions
     DIR_ORIGINAL = os.getcwd()
@@ -170,7 +170,7 @@ def set_up_directories(files_sorted_by_trial, dir_root):
             os.makedirs(os.path.join('archive', label))
             os.makedirs(os.path.join('analysis', label))
         except OSError as err:
-            # be happy if someone already created 
+            # be happy if someone already created
             if not os.path.isdir(err.filename):
                 raise
 

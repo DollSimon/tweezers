@@ -36,7 +36,7 @@ def read_tweezer_txt(file_name):
         raise IOError("The file {} does not exist".format(file_name))
 
     if any([l.strip().startswith("#") for l in tail]):
-        isFileSane = False 
+        isFileSane = False
     else:
         isFileSane = True
 
@@ -133,20 +133,20 @@ def read_tweebot_data(file_name):
 
     # _data = pd.read_table(file_name, header = HeaderInfo.header_pos, dtype=np.float64)
     try:
-        _data = pd.read_csv(file_name, header = HeaderInfo.header_pos, sep='\t', dtype=np.float64)
+        _data = pd.read_csv(file_name, header=HeaderInfo.header_pos, sep='\t', dtype=np.float64)
     except:
         raise IOError("Can't read the file: {}".format(file_name))
 
     # get rid of unnamed and empty colums
-    _data = _data.dropna(axis = 1)
+    _data = _data.dropna(axis=1)
 
     # add attributes from file_name
-    FileInfo = parse_tweezer_file_name(file_name, parser='bot_data') 
+    FileInfo = parse_tweezer_file_name(file_name, parser='bot_data')
     _data.date = FileInfo.date
     _data.trial = FileInfo.trial
     _data.subtrial = FileInfo.subtrial
 
-    # set column names and index as time 
+    # set column names and index as time
     _data.columns, _data.units = simplify_tweebot_data_names(HeaderInfo.column_names)
 
     # determine timeStep as the smallest nearest-neighbour difference between sent times
@@ -700,7 +700,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             units[standardized_name_of('AOD detector vertical offset')] = standardized_unit_of('AOD detector vertical offset')
 
         elif 'PM detector horizontal offset' in line or 'xOffsetT1' in line:
-            try:
+            # try:
                 pmDetectorOffsetX = float(line.strip().split(": ")[-1])
             except:
                 pmDetectorOffsetX = 0
@@ -1161,7 +1161,7 @@ def standardized_name_of(variable):
         'sampleRate.Hz': 'samplingRate',
 
         'rate of while-loop': 'recordingRate',
-        'duration of measurement': 'duration',
+        'duration of measurement': 'measurementDuration',
         'dt ': 'timeStep',
         'dt': 'timeStep',
 
@@ -1340,7 +1340,7 @@ def standardized_unit_of(variable):
         'number of samples': None,
         'nSamples': None,
 
-        'sample rate' : 'Hz',
+        'sample rate': 'Hz',
         'sampleRate.Hz': 'Hz',
 
         'rate of while-loop': 'Hz',
@@ -1450,7 +1450,7 @@ def standardized_unit_of(variable):
 
         'AOD horizontal trap stiffness': 'pN/nm',
         'AOD vertical trap stiffness': 'pN/nm',
-            
+        
         'AOD horizontal OLS': 'V/nm',
         'AOD vertical OLS': 'V/nm',
 
@@ -1490,4 +1490,3 @@ def standardized_unit_of(variable):
     }
 
     return variable_mapper.get(variable, None)
-    
