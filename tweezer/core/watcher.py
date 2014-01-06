@@ -12,13 +12,18 @@ import subprocess
 import datetime
 import time
 import re
+import platform
 
 import macropy.core.macros
 
 from collections import deque
 from Queue import Queue
 
-from watchdog.observers.fsevents import FSEventsObserver as Observer
+if platform.system() is 'Darwin':
+    from watchdog.observers.fsevents import FSEventsObserver as Observer
+else:
+    from watchdog.observers import Observer
+
 from watchdog.events import FileSystemEventHandler
 
 from clint.textui import colored, puts, indent 

@@ -15,8 +15,13 @@ import sys
 import subprocess
 import datetime
 import time
+import platform
 
-from watchdog.observers.fsevents import FSEventsObserver as Observer
+if platform.system() is 'Darwin':
+    from watchdog.observers.fsevents import FSEventsObserver as Observer
+else:
+    from watchdog.observers import Observer
+
 from watchdog.events import FileSystemEventHandler
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
