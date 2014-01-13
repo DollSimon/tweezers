@@ -3,8 +3,5 @@
 
 import sure
 
-(self):
-    assertion
-
 from pandas import DataFrame
 df = DataFrame({'rocket': range(3)})

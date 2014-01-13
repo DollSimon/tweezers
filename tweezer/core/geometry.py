@@ -2,7 +2,6 @@
 Geometry classes and functions
 """
 
-
 from math import sqrt
 import numpy as np
 from numpy.linalg import norm

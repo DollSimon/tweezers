@@ -700,7 +700,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             units[standardized_name_of('AOD detector vertical offset')] = standardized_unit_of('AOD detector vertical offset')
 
         elif 'PM detector horizontal offset' in line or 'xOffsetT1' in line:
-            # try:
+            try:
                 pmDetectorOffsetX = float(line.strip().split(": ")[-1])
             except:
                 pmDetectorOffsetX = 0
