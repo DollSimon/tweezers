@@ -5,8 +5,6 @@ import hashlib
 
 import envoy
 
-from colorama import init
-
 from collections import defaultdict, namedtuple
 from itertools import izip
 from copy import deepcopy
@@ -31,8 +29,6 @@ except ImportError, err:
         puts('')
         puts('The following import error occurred: {}'.format(colored.red(err))) 
         puts('')
-
-init()
 
 CACHING_FILE = 'cached_file_listing.json'
 

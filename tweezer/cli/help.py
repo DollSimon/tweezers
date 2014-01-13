@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-from clint.textui import colored, puts, indent 
+from clint.textui import colored, puts, indent
 
 from tweezer import __version__
 
@@ -118,3 +118,9 @@ def print_list_help():
     with indent(2):
         puts('Help for {} command:\n'.format(colored.white('tweezer list')))
 
+
+def main():
+    show_tweezer_help_pages()
+
+if __name__ == '__main__':
+    main()
