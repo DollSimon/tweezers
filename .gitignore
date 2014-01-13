@@ -44,6 +44,7 @@ tweezer.egg-info/
 
 # certain ipython notebook files
 Sandbox.ipynb
+*.ipynb
 
 # sublime project files
 *.sublime-project
