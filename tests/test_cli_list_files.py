@@ -8,6 +8,8 @@ from sure import expect
 import os
 import envoy
 
+from colorama import init
+
 from collections import defaultdict
 
 from clint.textui import puts, indent, colored
@@ -23,6 +25,7 @@ except ImportError, err:
         puts('The following import error occurred: {}'.format(colored.red(err))) 
         puts('')
 
+init()
 
 class TestTweezerListFiles:
     """
