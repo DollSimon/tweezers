@@ -36,7 +36,7 @@ MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
            'tweezer.ixo.functions', 'tweezer.ixo.math_', 'tweezer.bot.utils',
            'tweezer.bot.configuration', 'tweezer.dia.io',
            'tweezer.dia.tracking', 'tweezer.ixo.ipython_', 'tweezer.dia.utils',
-           'tweezer.simulate.brownian_motion']
+           'tweezer.simulate.brownian_motion', 'tweezer.ixo.viscosity']
 
 setup(
     name='tweezer',
