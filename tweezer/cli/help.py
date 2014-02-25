@@ -30,6 +30,7 @@ def show_tweezer_help_pages():
             puts('tweezer track [-o <OBJECT>] ([<VIDEO>...] | -i [<IMAGE>...])')
             puts('tweezer simulate <OBJECT> [--args=<ARGS>...]')
             puts('tweezer plot <OBJECT> [--args=<ARGS>...]')
+            puts('tweezer calculate <OBJECT> [-c] [-h] [--args=<ARGS>...]...')
             puts('tweezer help [<COMMAND>]')
             puts('tweezer (-h | --help)')
             puts('tweezer (-v | --version)')
@@ -43,7 +44,8 @@ def show_tweezer_help_pages():
             puts('overview      Produce "Overview.pdf" for data files in directory')
             puts('list          List all files and file types in a directory recursively')
             puts('show          Shows content of an object or file in an informative way')
-            puts('update        Updates the content of an object, i.e. the corresponding .json file')
+            puts('update        Updates the object in question (mainly used for settings)')
+            puts('calculate     Perform calculations on the command line')
             puts('track         Find position of features in images or videos')
             puts('simulate      Run simulation of type "object"')
             puts('plot          Plot examples and objects')
@@ -73,6 +75,7 @@ def show_tweezer_help_pages():
             puts('-f --file         Switch to file mode when input can be file or dir')
             puts('-i --image        Switch to image mode when input can be image or video')
             puts('-a --args=<ARGS>  Additional keyword arguments to be passed to the command') 
+            puts('-c --clean        Suppress terminal output of extra information')
 
 
 def print_plot_help():

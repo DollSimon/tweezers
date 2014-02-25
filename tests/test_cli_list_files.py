@@ -85,17 +85,9 @@ class TestTweezerListFiles:
 
     def test_file_listing_exists(self):
         files = self.__class__.files
-    
+
         files.should.be.a('collections.defaultdict')
         ('man_data').should.be.within(files)
         ('directory_state').should.be.within(files)
         ('man_aod_dist_cal_mat').should.be.within(files)
         ('man_pm_dist_cal_mat').should.be.within(files)
-        
-        
-    
-    
-    
-    
-     
-    

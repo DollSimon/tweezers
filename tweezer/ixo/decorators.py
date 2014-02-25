@@ -106,11 +106,11 @@ class TerminalInformation:
     >>> fn.showInfos = True
     >>> fn()
     """
-    def __init__(self, fn):
+    def __init__(self, fn, showInfos=True):
         wraps(fn)(self)
         self.fn = fn
         self.ncalls = 0
-        self.showInfos = False
+        self.showInfos = showInfos
 
     def __call__(self, *args, **kwargs):
         self.ncalls += 1

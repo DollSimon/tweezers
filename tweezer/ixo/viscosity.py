@@ -10,12 +10,17 @@ The following variables are used:
 Temperature T: [0, 100] in [C]
 
 """
+import sys
+import numpy as np
+import pandas as pd
+
 from math import exp
+from itertools import chain
 
 
-def dynamic_viscosity_of_mixture(waterVolume,
-                                 glycerolVolume,
-                                 temperature=25):
+def calc_dynamic_viscosity_of_mixture(waterVolume=1,
+                                      glycerolVolume=0,
+                                      temperature=25):
     """
     Power law equation for the dynamic viscosity of a water \
     to glycerol mixture according to:
@@ -24,8 +29,8 @@ def dynamic_viscosity_of_mixture(waterVolume,
 
     """
     T = float(temperature)
-    wV = waterVolume
-    gV = glycerolVolume
+    wV = float(waterVolume)
+    gV = float(glycerolVolume)
     mu_w = calc_water_dynamic_viscosity(temperature)
     mu_g = calc_glycerol_dynamic_viscosity(temperature)
     Cm = calc_glycerol_fraction_by_mass(wV, gV, T)
@@ -246,6 +251,34 @@ def calc_mass(volume, density):
     return mass
 
 
+def plot_dynamic_viscosity():
+    """
+    Plot the dynamic viscosity
+    """
+    # make a list of viscosities
+    T = np.round(np.linspace(0, 100, 1001), 4)
+    W = [n / 10.0 for n in range(0, 11)]
+    G = [n / 10.0 for n in range(0, 11)]
+    G = G.reverse()
+
+    V = [(a, b, c, calc_dynamic_viscosity_of_mixture(a, b, c)) for a, b, c
+         in zip(list(chain(*([W] * 10))), list(chain(*([G] * 10))), T)]
+
+    A = [n[0] for n in V]
+    B = [n[1] for n in V]
+    C = [n[2] for n in V]
+    D = [n[3] for n in V]
+
+    df = pd.DataFrame({'waterVolume': A, 'glycerolVolume': B,
+                       'temperature': C, 'dynamicViscosity': D})
+
+    # from ggplot import *
+
+    # ggplot(data = df, aes())
+
+    return V, df
+
+
 def main():
     T = 20
     W = 4
@@ -282,11 +315,17 @@ def main():
     print("{}\n".format(calc_glycerol_dynamic_viscosity(T)))
 
     print("Dynamic Viscosity of Mixture [Ns/m^2]:")
-    print("{}\n".format(dynamic_viscosity_of_mixture(W, G, T)))
+    print("{}\n".format(calc_dynamic_viscosity_of_mixture(W, G, T)))
 
     print("Power law exponent:")
-    print("{}\n".format(calc_alpha(calc_glycerol_fraction_by_mass(W, G, T), T)))
+    Cm = calc_glycerol_fraction_by_mass(W, G, T)
+    alpha = calc_alpha(Cm, T)
+    print("{}\n".format(alpha))
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\nCTRL-C detected, shutting down....")
+        sys.exit(0)

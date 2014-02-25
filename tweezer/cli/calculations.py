@@ -6,7 +6,7 @@ from clint.textui import colored, puts
 from tweezer.ixo.viscosity import calc_dynamic_viscosity_of_mixture
 
 
-def calc_example(clean=False, *args, **kwargsi):
+def calc_example(clean=False, *args, **kwargs):
     """
     This is an example calculation
     """
@@ -32,14 +32,15 @@ def calc_viscosity(clean=False, *args, **kwargs):
     mixtures.
     """
     try:
-        dynamicViscosity = calc_dynamic_viscosity_of_mixture(1, 2)
+        result = calc_dynamic_viscosity_of_mixture(1, 2)
+        funcArgs = None
         if clean:
-            print(dynamicViscosity)
-            return dynamicViscosity
+            print(result)
         else:
-            dynamicViscosity = round(dynamicViscosity, 6)
+            dynamicViscosity = round(result, 6)
             puts('Calculating the dynamic viscosity of Water-Glycerol mixture')
             puts('Dynamic viscosity: {} {}'.format(colored.red(dynamicViscosity),
-                                                   'pN s / m^2'))
+                                                   'N s / m^2'))
+        return result, funcArgs
     except (KeyboardInterrupt, SystemExit), err:
         raise err
