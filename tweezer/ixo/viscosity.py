@@ -143,7 +143,7 @@ def calc_glycerol_density(temperature):
 
     :param temperature: in Celsius in the range [0, 100]
 
-    :return waterDensity: Density of Glycerol in kg/m^3
+    :return glycerolDensity: Density of Glycerol in kg/m^3
     """
     rho = 1277 - 0.654 * temperature
     glycerolDensity = rho

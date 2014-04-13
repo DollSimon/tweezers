@@ -15,8 +15,10 @@ import pandas as pd
 def read_image(file_name):
     pass
 
+
 def read_andor_fits_stack(file_name):
     pass
+
 
 def read_tweezer_avi(file_name):
     pass
@@ -25,8 +27,8 @@ def read_tweezer_avi(file_name):
 def read_distance_calibration_results(file_name):
     """
     Reads distance calibration results
-    
-    :param file_name: (path) to the distance calibration file 
+
+    :param file_name: (path) to the distance calibration file
     
     """
     trap = 'pm' if 'pm' in os.path.basename(file_name).lower() else 'aod'

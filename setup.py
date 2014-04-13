@@ -36,7 +36,9 @@ MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
            'tweezer.ixo.functions', 'tweezer.ixo.math_', 'tweezer.bot.utils',
            'tweezer.bot.configuration', 'tweezer.dia.io',
            'tweezer.dia.tracking', 'tweezer.ixo.ipython_', 'tweezer.dia.utils',
-           'tweezer.simulate.brownian_motion', 'tweezer.ixo.viscosity']
+           'tweezer.simulate.brownian_motion', 'tweezer.ixo.viscosity',
+           'tweezer.noise.pwc', 'tweezer.noise.filter',
+           'tweezer.noise.ocl_filter']
 
 setup(
     name='tweezer',
@@ -47,7 +49,7 @@ setup(
     author_email='jahnel@mpi-cbg.de',
     install_requires=DEPENDENCIES,
     packages=PACKAGES,
-    package_data={'tweezer': ['data/*/*', 'templates/*/*',
+    package_data={'tweezer': ['data/*/*', 'templates/*/*', 'kernel/*/*',
         'data/settings/default_settings.json',
         'data/settings/default.config.txt']},
     entry_points={
