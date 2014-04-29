@@ -102,11 +102,12 @@ def read_tweebot_data(file_name):
 
     :param file_name: Path to the TweeBot datalog file.
 
-    :return data: (pandas.DataFrame) contains redorded data and also meta data and units as attributes.
+    :return data: (pandas.DataFrame) contains redorded data and also meta \
+    data  and units as attributes.
 
     .. note::
 
-        Try things like data.units or data.meta to see what's available. Be
+        Test things like 'data.units' or data.meta to see what's available. Be
         aware that pandas.DataFrames can mutate when certain actions and
         computations are performed (for example shape changes). It's not clear
         whether the units and meta attributes persist.
@@ -121,19 +122,23 @@ def read_tweebot_data(file_name):
 
     .. note::
 
-        This function so far only works for TweeBot data files in the form of 2013
+        This function so far only works for TweeBot data files in the form of \
+        2013
 
     .. warning::
 
-        Currently this function removes duplicates in the *timeSent* column of the TweeBot datalog files.
+        Currently this function removes duplicates in the *timeSent* column \
+        of the TweeBot datalog files.
 
     """
-    # column_names, calibration, header_line = read_tweebot_data_header(file_name)
+    # columnNames, calibration, header = read_tweebot_data_header(file_name)
     HeaderInfo = read_tweebot_data_header(file_name)
 
-    # _data = pd.read_table(file_name, header = HeaderInfo.header_pos, dtype=np.float64)
     try:
-        _data = pd.read_csv(file_name, header=HeaderInfo.header_pos, sep='\t', dtype=np.float64)
+        _data = pd.read_csv(file_name,
+                            header=HeaderInfo.header_pos,
+                            sep='\t',
+                            dtype=np.float64)
     except:
         raise IOError("Can't read the file: {}".format(file_name))
 
@@ -1119,17 +1124,17 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
     if date_string and time_string:
         combined_date = " ".join([date_string.strip(), time_string.strip()])
         try:
-            date = datetime.strptime(combined_date, '%m/%d/%Y %I:%M %p')
+            date = pd.to_datetime(combined_date)
         except ValueError:
             combined_date = " ".join(["1/1/1900", time_string.strip()])
-            date = datetime.strptime(combined_date, '%m/%d/%Y %I:%M %p')
+            date = pd.to_datetime(combined_date)
     elif date_string and not time_string:
         try:
-            date = datetime.strptime(date_string, '%m/%d/%Y %I:%M %p')
+            date = pd.to_datetime(date_string)
         except ValueError:
-            date = datetime(1900, 1, 1, 1, 1, 1)
+            date = pd.to_datetime(datetime(1900, 1, 1, 1, 1, 1))
     else:
-        date = datetime.now()
+        date = pd.to_datetime(datetime.now())
 
     meta['date'] = date
 
@@ -1142,7 +1147,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 def standardized_name_of(variable):
     """
     Maps various variable names onto a common pattern
-    
+
     :param variable: (str) input variable
 
     """
@@ -1154,10 +1159,10 @@ def standardized_name_of(variable):
         'Number of samples': 'nSamples',
         'nSamples': 'nSamples',
 
-        'sample rate' : 'samplingRate',
-        'Sample rate (Hz)' : 'samplingRate',
-        'Sample rate ' : 'samplingRate',
-        'Sample rate' : 'samplingRate',
+        'sample rate': 'samplingRate',
+        'Sample rate (Hz)': 'samplingRate',
+        'Sample rate ': 'samplingRate',
+        'Sample rate': 'samplingRate',
         'sampleRate.Hz': 'samplingRate',
 
         'rate of while-loop': 'recordingRate',
@@ -1203,15 +1208,15 @@ def standardized_name_of(variable):
         'xStiffnessT1.pNperNm': 'pmStiffnessX',
         'yStiffnessT1.pNperNm': 'pmStiffnessY',
 
-        'PM horizontal OLS': 'pmDisplacementSensitivityX', 
+        'PM horizontal OLS': 'pmDisplacementSensitivityX',
         # 'PM horizontal OLS': 'pmDistanceConversionX',
         'PM vertical OLS': 'pmDisplacementSensitivityY',
         # 'PM vertical OLS': 'pmDistanceConversionY',
 
-        'xDistConversionT1.VperNm': 'pmDisplacementSensitivityX', 
+        'xDistConversionT1.VperNm': 'pmDisplacementSensitivityX',
         'yDistConversionT1.VperNm': 'pmDisplacementSensitivityY',
 
-        # pm tweebot names    
+        # pm tweebot names
         'PM detector x offset': 'pmDetectorOffsetX',
         'PM detector y offset': 'pmDetectorOffsetY',
         'zOffsetT1.V': 'pmDetectorOffsetZ',
@@ -1246,12 +1251,12 @@ def standardized_name_of(variable):
 
         'AOD horizontal trap stiffness': 'aodStiffnessX',
         'AOD vertical trap stiffness': 'aodStiffnessY',
-            
+
         'AOD horizontal OLS': 'aodDisplacementSensitivityX',
         # 'AOD horizontal OLS': 'aodDistanceConversionX',
         'AOD vertical OLS': 'aodDisplacementSensitivityY',
         # 'AOD vertical OLS': 'aodDistanceConversionY',
-            
+
         # tweebot variables
         'AOD detector x offset': 'aodDetectorOffsetX',
         'AOD detector y offset': 'aodDetectorOffsetY',
@@ -1281,7 +1286,7 @@ def standardized_name_of(variable):
 
         'AOD horizontal trap stiffness': 'aodStiffnessX',
         'AOD vertical trap stiffness': 'aodStiffnessY',
-            
+
         'AOD horizontal OLS': 'aodDisplacementSensitivityX',
         # 'AOD horizontal OLS': 'aodDistanceConversionX',
         'AOD vertical OLS': 'aodDisplacementSensitivityY',
@@ -1324,12 +1329,12 @@ def standardized_name_of(variable):
     }
 
     return variable_mapper.get(variable, None)
-    
+
 
 def standardized_unit_of(variable):
     """
     Maps various variable names onto their unit
-    
+
     :param variable: (str) input variable
 
     """
@@ -1377,13 +1382,13 @@ def standardized_unit_of(variable):
         'xStiffnessT1.pNperNm': 'pN/nm',
         'yStiffnessT1.pNperNm': 'pN/nm',
 
-        'PM horizontal OLS': 'V/nm', 
+        'PM horizontal OLS': 'V/nm',
         'PM vertical OLS': 'V/nm',
 
-        'xDistConversionT1.VperNm': 'V/nm', 
+        'xDistConversionT1.VperNm': 'V/nm',
         'yDistConversionT1.VperNm': 'V/nm',
 
-        # pm tweebot names    
+        # pm tweebot names
         'PM detector x offset': 'V',
         'PM detector y offset': 'V',
         'zOffsetT1.V': 'V',
@@ -1417,10 +1422,10 @@ def standardized_unit_of(variable):
 
         'AOD horizontal trap stiffness': 'pN/nm',
         'AOD vertical trap stiffness': 'pN/nm',
-            
+
         'AOD horizontal OLS': 'V/nm',
         'AOD vertical OLS': 'V/nm',
-            
+
         # tweebot variables
         'AOD detector x offset': 'V',
         'AOD detector y offset': 'V',
@@ -1450,7 +1455,7 @@ def standardized_unit_of(variable):
 
         'AOD horizontal trap stiffness': 'pN/nm',
         'AOD vertical trap stiffness': 'pN/nm',
-        
+
         'AOD horizontal OLS': 'V/nm',
         'AOD vertical OLS': 'V/nm',
 
