@@ -91,7 +91,7 @@ try:
                                    plot_extensible_worm_like_chain)
     from tweezer.cli.calculations import calc_example, calc_viscosity
 
-except ImportError, err:
+except ImportError as err:
     puts('')
     with indent(2):
         puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
@@ -152,11 +152,11 @@ def start():
 
         puts('Calling tweezer list from {}'.format(colored.green(DIR)))
         files = list_tweezer_files(DIR)
-        print('There are {} file types'.format(len(files)))
-        print('There are the following types: {} '.format(len(files)))
+        print(('There are {} file types'.format(len(files))))
+        print(('There are the following types: {} '.format(len(files))))
         puts('Here is the result: ')
 
-        for key, val in files.iteritems():
+        for key, val in files.items():
             if not 'directory_state' in key:
                 with indent(2):
                     puts('These are the files of type {}:'.format(colored.yellow(key)))
@@ -210,7 +210,7 @@ def start():
                     pprint_settings(default_settings, part=kind, status='default')
             else:
                 puts('No settings file found...\n')
-                putSettigns = raw_input('Shall I add the default settings file to this directory: ')
+                putSettigns = input('Shall I add the default settings file to this directory: ')
                 if InterpretUserInput[putSettigns]:
                     print('I am copying it over...')
                     shutil.copy2(_DEFAULT_SETTINGS, os.path.join(DIR, 'settings.json'))
@@ -241,7 +241,7 @@ def start():
 
             else:
                 puts('No tweebot configuration file found...\n')
-                putSettigns = raw_input('Shall I add the default tweebot configuration file to this directory: ')
+                putSettigns = input('Shall I add the default tweebot configuration file to this directory: ')
                 if InterpretUserInput[putSettigns]:
                     print('I am copying it over...')
                     shutil.copy2(_TWEEBOT_CONFIG, os.path.join(DIR, 'tweebot_configuration.json'))
@@ -258,7 +258,7 @@ def start():
                 files = parse_json(CACHED_FILES)
 
                 if kind is 'all':
-                    for key, val in files.iteritems():
+                    for key, val in files.items():
                         if not 'directory_state' in key:
                             with indent(2):
                                 puts('These are the files of type {}:'.format(colored.yellow(key)))
@@ -301,7 +301,7 @@ def start():
 
             else:
                 puts('No files listing found...\n')
-                putSettigns = raw_input('Shall I search the current directory for known file types: ')
+                putSettigns = input('Shall I search the current directory for known file types: ')
                 if InterpretUserInput[putSettigns]:
                     print("I'm classifying the files here. Might take a minute...")
                     files = list_tweezer_files(DIR)
@@ -309,7 +309,7 @@ def start():
                     print('Ok, than I have nothing to show...')
 
         else:
-            print('This is the content of file {}'.format(args['<OBJECT>']))
+            print(('This is the content of file {}'.format(args['<OBJECT>'])))
 
     # tweezer update <OBJECT> [--kind=<TYPE>]
     if args['update']:
@@ -338,7 +338,7 @@ def start():
 
             else:
                 puts('Update only works with local settings file, but none was found...\n')
-                putSettigns = raw_input('Shall I add the default settings file to this directory: ')
+                putSettigns = input('Shall I add the default settings file to this directory: ')
                 if InterpretUserInput[putSettigns]:
                     print('I am copying it over...')
                     shutil.copy2(_DEFAULT_SETTINGS, os.path.join(DIR, 'settings.json'))
@@ -367,7 +367,7 @@ def start():
 
             else:
                 puts('No tweebot configuration file found...\n')
-                putSettigns = raw_input('Shall I add the default tweebot configuration file to this directory: ')
+                putSettigns = input('Shall I add the default tweebot configuration file to this directory: ')
                 if InterpretUserInput[putSettigns]:
                     print('I am copying it over...')
                     shutil.copy2(_TWEEBOT_CONFIG, os.path.join(DIR, 'tweebot_configuration.json'))
@@ -375,7 +375,7 @@ def start():
                     print('Ok, than I have nothing to show...')
 
         else:
-            print('This is the content of file {}'.format(args['<OBJECT>']))
+            print(('This is the content of file {}'.format(args['<OBJECT>'])))
 
     # tweezer simulate
     if args['simulate']:
@@ -384,7 +384,7 @@ def start():
 
         try:
             sys.exit(simulation_mapper[args['<OBJECT>']](4, 100))
-        except (KeyboardInterrupt, SystemExit), err:
+        except (KeyboardInterrupt, SystemExit) as err:
             raise err
         except KeyError:
             with indent(2):
@@ -409,7 +409,7 @@ def start():
 
         try:
             sys.exit(plot_mapper[args['<OBJECT>']]())
-        except (KeyboardInterrupt, SystemExit), err:
+        except (KeyboardInterrupt, SystemExit) as err:
             raise err
         except KeyError:
             with indent(2):
@@ -432,11 +432,11 @@ def start():
 
         try:
             if args['--args']:
-                print(args['--args'])
+                print((args['--args']))
                 sys.exit(calc_mapper[args['<OBJECT>']]())
             else:
                 sys.exit(calc_mapper[args['<OBJECT>']]())
-        except (KeyboardInterrupt, SystemExit), err:
+        except (KeyboardInterrupt, SystemExit) as err:
             raise err
         except KeyError:
             with indent(2):
