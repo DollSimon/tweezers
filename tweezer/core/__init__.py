@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 
-__modules__ = ['polymer', 'geometry', 'trap', 'simulations', 'trap_calibration', 
+__modules__ = ['polymer', 'geometry', 'trap', 'simulations', 'trap_calibration',
     'datatypes', 'analysis', 'watcher', 'visualisation', 'parsers', 'overview']
 
 __doc__ = """\

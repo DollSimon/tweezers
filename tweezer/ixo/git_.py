@@ -8,11 +8,11 @@ import envoy
 from tempfile import mkdtemp
 
 
-def get_latest_file_from_git_repo(file_name, repo_name='tweezer', 
+def get_latest_file_from_git_repo(file_name, repo_name='tweezer',
     host='bitbucket', user='majahn', saving_directory=os.getcwd()):
     """
     Retrieve one file from a remote git repository
-    
+
     :param file_name: (path) file to retrieve from the repo_name
 
     :param repo_name: (url) of the git repo
@@ -32,7 +32,7 @@ def get_latest_file_from_git_repo(file_name, repo_name='tweezer',
     else:
         repo_address = '{}{}/{}.git'.format(host, user, repo_name)
 
-    # clone repo and get file 
+    # clone repo and get file
     clone = envoy.run('git clone -n {} --depth 1'.format(repo_address))
 
     if not clone.status_code:
@@ -46,12 +46,12 @@ def get_latest_file_from_git_repo(file_name, repo_name='tweezer',
             except:
                 raise StandardError('Copying {} to {} did not work...'.format(src, dst))
         else:
-            raise StandardError('Checking out {} from {} did not work...'.format(file_name, repo_address)) 
+            raise StandardError('Checking out {} from {} did not work...'.format(file_name, repo_address))
     else:
         raise StandardError('Cloning of {} did not work...'.format(repo_address))
 
     # clean up
     os.chdir(DIR)
-    
+
     # remove temp_dir
     shutil.rmtree(temp_dir)

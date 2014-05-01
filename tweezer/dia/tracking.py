@@ -92,7 +92,6 @@ def find_properties(inputImg, verbose=True):
 def uncrop_image(croppedImg, croppingFrame):
 
     # check that size of croppedImg and croppingFrame interior match
-    
 
     return combinedImg
 

@@ -44,8 +44,8 @@ def read_tweezer_txt(file_name):
         fl = f.readlines(1000)
 
     # parsing header information
-    header_comments = [line.strip().strip("# ") for line in fl[0:40] if line.strip().startswith('#')] 
-    tail_comments = [line.strip().strip("# ") for line in tail[-10:] if line.strip().startswith('#')] 
+    header_comments = [line.strip().strip("# ") for line in fl[0:40] if line.strip().startswith('#')]
+    tail_comments = [line.strip().strip("# ") for line in tail[-10:] if line.strip().startswith('#')]
     comments = header_comments + tail_comments
 
     CommentInfo = extract_meta_and_units(comments)
@@ -73,10 +73,10 @@ def read_tweezer_txt(file_name):
     data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
 
     if isFileSane:
-        data = pd.read_table(file_name, sep='\t', header=None, skiprows=data_pos, 
+        data = pd.read_table(file_name, sep='\t', header=None, skiprows=data_pos,
             names=columns, dtype=np.float64)
     else:
-        data = pd.read_table(file_name, sep='\t', header=None, skiprows=data_pos, 
+        data = pd.read_table(file_name, sep='\t', header=None, skiprows=data_pos,
             skipfooter=10, names=columns, dtype=np.float64)
 
     # drop rows with "NaN" values
@@ -170,7 +170,7 @@ def read_tweebot_data(file_name):
 
     _data['relativeTime'] = np.float64(_data.timeSent) - round(min(_data.timeSent), 6)
     _data['time'] = [_data.date + timedelta(seconds=round(s, rounding_precision)) for s in _data.relativeTime.values]
-    
+
     _data.drop_duplicates(cols='timeSent', inplace=True)
 
     _data.index = _data.time.values
@@ -202,16 +202,16 @@ def read_thermal_calibration(file_name, frequency=80000):
     :param file_name: (path) to the tweezer time series file containing the raw values of the PSD signals
 
     :param frequency: (int) sampling frequency of time series
-    
+
     :return ts: (pandas.DataFrame) with the raw thermal calibration data. The index is time.
-    
+
     """
     # get header information
     with open(file_name, 'r') as f:
         fl = f.readlines(1000)
 
     # finding the date; if any error occurs take the current date and time
-    comments = [line for line in fl[0:15] if line.strip().startswith('#')] 
+    comments = [line for line in fl[0:15] if line.strip().startswith('#')]
 
     try:
         date_string = [l.strip().replace("\t", " ").split(": ")[-1] for l in comments if 'Date' in l][0]
@@ -235,14 +235,14 @@ def read_thermal_calibration(file_name, frequency=80000):
 
     data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
     # read file data
-    ts = pd.read_table(file_name, sep='\t', skiprows=data_pos, 
+    ts = pd.read_table(file_name, sep='\t', skiprows=data_pos,
         names=columns, header=None, dtype=np.float64)
 
     # setting time as a data column and an index to be on the safe side
     ts['time'] = time
     ts.index = time
 
-    # pass date as an attribute 
+    # pass date as an attribute
     ts.date = date
     ts.nSamples = nSamples
 
@@ -252,7 +252,7 @@ def read_thermal_calibration(file_name, frequency=80000):
 def read_tweezer_power_spectrum(file_name):
     """
     Reads data from tweezer power spectrum file. These files are produced by LabView and contain the raw PSDs and the fits used to extract trap calibration results
-    
+
     :param file_name: (path) file path to the tweezer power spectrum file
 
     :return psd: (pandas.DataFrame) with all the raw and fitted data as well as the fit results
@@ -262,7 +262,7 @@ def read_tweezer_power_spectrum(file_name):
         fl = f.readlines(1000)
 
     # parsing header information
-    comments = [line.strip().strip("#").strip() for line in fl[0:40] if line.strip().startswith('#')] 
+    comments = [line.strip().strip("#").strip() for line in fl[0:40] if line.strip().startswith('#')]
 
     CommentInfo = extract_meta_and_units(comments)
 
@@ -274,7 +274,7 @@ def read_tweezer_power_spectrum(file_name):
     data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
 
     # read file data
-    psd = pd.read_table(file_name, sep='\t', skiprows=data_pos, 
+    psd = pd.read_table(file_name, sep='\t', skiprows=data_pos,
         names=columns, header=None, dtype=np.float64)
 
     for k, v in CommentInfo.metadata.iteritems():
@@ -292,11 +292,11 @@ def read_tweezer_power_spectrum(file_name):
 def read_distance_calibration_data(comments):
     """
     Extract fit and l
-    
+
     :param input: Description
     """
     pass
-    
+
 
 def read_tdms(file_name, frequency=1000):
     """
@@ -307,7 +307,7 @@ def read_tdms(file_name, frequency=1000):
     :param frequency: (int) sampling frequency in Hz (default is 1000 Hz, i.e. data taken at 1 ms time resolution)
 
     :return data: (pd.DataFrame) with the channels as columns and index based on file_name infos
-    
+
     """
     info = parse_tweezer_file_name(file_name, parser='bot_tdms')
 
@@ -329,7 +329,7 @@ def read_tdms(file_name, frequency=1000):
         data['fbX'] = tf.channel_data(g, 'Untitled 9')
         data['fbY'] = tf.channel_data(g, 'Untitled 10')
         data['pressure'] = tf.channel_data(g, 'Untitled 11')
-        
+
     # setting the units
     units = {}
     units['pmY'] = 'V'
@@ -355,7 +355,7 @@ def read_tdms(file_name, frequency=1000):
 
     data.units = units
 
-    return data 
+    return data
 
 
 def read_tweebot_stats(file_name):
@@ -370,7 +370,7 @@ def read_tweebot_logs(file_name):
     Reads data from TweeBot log files.
 
     :param file_name: (path) Tweebot log file to be parsed
-    
+
     :return log: (pd.DataFrame) with the logging data
     """
     log = pd.read_table(file_name)
@@ -406,7 +406,7 @@ def read_tweebot_data_header(datalog_file):
         fl = f.readlines(1000)
 
     # parsing header information
-    comments = [line.strip().strip("# ") for line in fl[0:50] if line.strip().startswith('#')] 
+    comments = [line.strip().strip("# ") for line in fl[0:50] if line.strip().startswith('#')]
 
     CommentInfo = extract_meta_and_units(comments)
 
@@ -426,7 +426,7 @@ def read_tweebot_data_header(datalog_file):
 
     data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
 
-    HeaderInfo = namedtuple('HeaderInfo', ['column_names', 'metadata', 'units', 
+    HeaderInfo = namedtuple('HeaderInfo', ['column_names', 'metadata', 'units',
         'header_pos', 'data_pos'])
 
     H = HeaderInfo(column_names, meta, units, header_pos, data_pos)
@@ -438,7 +438,7 @@ def read_tweezer_image_info(file_name, file_type='man_pics'):
     """
     Extracts basic information about an image
 
-    :param file_name: (path) to the image 
+    :param file_name: (path) to the image
 
     :return name: Description
     """
@@ -514,7 +514,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
     units['pmBeadRadius'] = 'nm'
     units['aodBeadRadius'] = 'nm'
 
-    units['laserDiodeTemp'] = 'C' 
+    units['laserDiodeTemp'] = 'C'
     units['laserDiodeHours'] = 'h'
     units['laserDiodeCurrent'] = 'A'
     units['andorAodCenterX'] = 'px'
@@ -661,7 +661,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
         elif 'sample rate' in line or 'sampleRate.Hz' in line:
             try:
-                match = re.search('(sample\srate|sampleRate\.Hz)\s*\.*[:\s]+(\d+\.*\d*)', line) 
+                match = re.search('(sample\srate|sampleRate\.Hz)\s*\.*[:\s]+(\d+\.*\d*)', line)
                 samplingRate = int(float(match.group(2)))
             except:
                 samplingRate = 10000
@@ -739,7 +739,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             meta[standardized_name_of('PM vertical trap stiffness')] = pmStiffnessY
             units[standardized_name_of('PM vertical trap stiffness')] = standardized_unit_of('PM vertical trap stiffness')
-            
+
         elif 'AOD horizontal trap stiffness' in line or 'xStiffnessT2' in line:
             try:
                 aodStiffnessX = float(line.strip().split(": ")[-1])
@@ -748,7 +748,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             meta[standardized_name_of('AOD horizontal trap stiffness')] = aodStiffnessX
             units[standardized_name_of('AOD horizontal trap stiffness')] = standardized_unit_of('AOD horizontal trap stiffness')
-            
+
         elif 'AOD vertical trap stiffness' in line or 'yStiffnessT2' in line:
             try:
                 aodStiffnessY = float(line.strip().split(": ")[-1])
@@ -757,7 +757,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             meta[standardized_name_of('AOD vertical trap stiffness')] = aodStiffnessY
             units[standardized_name_of('AOD vertical trap stiffness')] = standardized_unit_of('AOD vertical trap stiffness')
-            
+
         elif 'PM horizontal OLS' in line or 'xDistConversionT1' in line:
             try:
                 pmDisplacementSensitivityX = float(line.strip().split(": ")[-1])
@@ -766,7 +766,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             meta[standardized_name_of('PM horizontal OLS')] = pmDisplacementSensitivityX
             units[standardized_name_of('PM horizontal OLS')] = standardized_unit_of('PM horizontal OLS')
-            
+
         elif 'PM vertical OLS' in line or 'yDistConversionT1' in line:
             try:
                 pmDisplacementSensitivityY = float(line.strip().split(": ")[-1])
@@ -775,7 +775,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             meta[standardized_name_of('PM vertical OLS')] = pmDisplacementSensitivityY
             meta[standardized_name_of('PM vertical OLS')] = pmDisplacementSensitivityY
-            
+
         elif 'AOD horizontal OLS' in line or 'xDistConversionT2' in line:
             try:
                 aodDisplacementSensitivityX = float(line.strip().split(": ")[-1])
@@ -784,7 +784,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             meta[standardized_name_of('AOD horizontal OLS')] = aodDisplacementSensitivityX
             meta[standardized_name_of('AOD horizontal OLS')] = aodDisplacementSensitivityX
-            
+
         elif 'AOD vertical OLS' in line or 'yDistConversionT2' in line:
             try:
                 aodDisplacementSensitivityY = float(line.strip().split(": ")[-1])
@@ -793,7 +793,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
             meta[standardized_name_of('AOD vertical OLS')] = aodDisplacementSensitivityY
             meta[standardized_name_of('AOD vertical OLS')] = aodDisplacementSensitivityY
-            
+
         elif 'Viscosity' in line or 'viscosity' in line:
             try:
                 viscosity = float(line.strip().split(": ")[-1])
@@ -810,7 +810,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
                 dt = 0.0010
 
             units['dt'] = units['timeStep'] = 's'
-            meta[standardized_name_of('dt')] = meta[standardized_name_of('timeStep')] = dt 
+            meta[standardized_name_of('dt')] = meta[standardized_name_of('timeStep')] = dt
 
         elif 'Delta time ' in line:
             try:
@@ -818,7 +818,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             except:
                 dt = 0.0010
 
-            meta[standardized_name_of('Delta time')] = dt 
+            meta[standardized_name_of('Delta time')] = dt
 
         elif 'PM bead diameter' in line or 'diameterT1.um' in line:
             try:

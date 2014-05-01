@@ -9,12 +9,12 @@ from enaml.widgets.api import (
 )
 
 enamldef VariableForm(Form):
-    attr variable 
+    attr variable
 
-    Label: 
-        text = "{}".format(variable.name) 
+    Label:
+        text = "{}".format(variable.name)
     Field:
-        text := variable.value 
+        text := variable.value
 
 
 enamldef SettingsView(Window): main:

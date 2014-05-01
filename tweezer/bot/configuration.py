@@ -10,12 +10,12 @@ import numpy as np
 def parse_tweebot_configuration_file(file_name='default.config.txt'):
     """
     Extracts configuration data from Tweebot Config File
-    
+
     :param file_name: (path) to tweebot configuration file
 
     :return TweebotConfigData: (namedtuple) with configuration values and units as OrderedDicts
     """
-    
+
     with open(file_name, 'r') as f:
         lines = f.readlines()
         lines = [l.strip() for l in lines if l.strip()]

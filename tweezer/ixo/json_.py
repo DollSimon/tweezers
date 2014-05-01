@@ -11,7 +11,7 @@ except:
 
 
 def parse_json(file_name):
-    """ 
+    """
     Parse a JSON file
     First remove comments and then use the json module package
     Comments look like :

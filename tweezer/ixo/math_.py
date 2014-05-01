@@ -14,9 +14,10 @@ def map_array_to_range(X):
     :param X: (numpy.array) of shape (M, N)
     :param map_range: (list of two numbers)
 
-    :return S: (numpy.array) normalised array of shape (M, N), mapped to range specified
+    :return S: (numpy.array) normalised array of shape (M, N), mapped to \
+    range specified
     """
-    map_range=[-1, 1]
+    map_range = [-1, 1]
 
     M = X.shape[0]
     N = X.shape[1]

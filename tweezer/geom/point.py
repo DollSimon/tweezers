@@ -8,4 +8,4 @@ class Point(object):
         self.x = x
         self.y = y
         self.z = z
-        
+
