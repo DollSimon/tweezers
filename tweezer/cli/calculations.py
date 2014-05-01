@@ -22,7 +22,7 @@ def calc_example(clean=False, *args, **kwargs):
             puts('Result: {}'.format(result))
 
         return result
-    except (KeyboardInterrupt, SystemExit), err:
+    except (KeyboardInterrupt, SystemExit) as err:
         raise err
 
 
@@ -37,10 +37,10 @@ def calc_viscosity(clean=False, *args, **kwargs):
         if clean:
             print(result)
         else:
-            dynamicViscosity = round(result, 6)
+            viscosity = round(result, 6)
             puts('Calculating the dynamic viscosity of Water-Glycerol mixture')
-            puts('Dynamic viscosity: {} {}'.format(colored.red(dynamicViscosity),
+            puts('Dynamic viscosity: {} {}'.format(colored.red(viscosity),
                                                    'N s / m^2'))
         return result, funcArgs
-    except (KeyboardInterrupt, SystemExit), err:
+    except (KeyboardInterrupt, SystemExit) as err:
         raise err
