@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os, sys
 import re
 
@@ -11,6 +12,7 @@ from copy import deepcopy
 
 from clint.textui import colored, puts, indent 
 from pprint import pprint
+import six
 
 try:
     import simplejson as json
@@ -22,7 +24,7 @@ try:
     from tweezer.core.parsers import classify_all, parse_tweezer_file_name
     from tweezer.cli import InterpretUserInput
     from tweezer import read
-except ImportError, err:
+except ImportError as err:
     puts('')
     with indent(2):
         puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
@@ -54,7 +56,7 @@ def list_tweezer_files(directory, cache_results=True):
             cached_data = json.load(f)
 
         if current_directory_state == cached_data['directory_state']:
-            for k, v in cached_data.iteritems():
+            for k, v in six.iteritems(cached_data):
                 files[k] = v   
         else:
             current_directory_state = get_directory_state(directory)
@@ -125,14 +127,14 @@ def collect_files_per_trial(files=defaultdict(list), trial=1, subtrial=None):
     else:
         trial_name = str(trial)
 
-    for t, f in files.iteritems():
+    for t, f in six.iteritems(files):
         for x in f:
             if re.search(r'^\s*[a-zA-Z_]*{}\W'.format(trial_name), os.path.basename(x)):
                 trial_files[t].append(x)
             elif re.search(r'^\s*{}[_]'.format(trial_name), os.path.basename(x)):
                 trial_files[t].append(x)
         else:
-            if not trial_files.has_key(t):
+            if t not in trial_files:
                 trial_files[t].append(None)
 
     for file_type in trial_files:
@@ -178,11 +180,11 @@ def sort_files_by_trial(files=defaultdict(list), sort_by=None, clean=True):
     if clean:
         cleaned_trials = {}
 
-        for trial, files in trial_files.iteritems():
+        for trial, files in six.iteritems(trial_files):
 
             cleaned_files = {}
 
-            for ftype, fpaths in dict(files).iteritems():
+            for ftype, fpaths in six.iteritems(dict(files)):
                 if fpaths:
                     if fpaths[0] is not None:
                         if len(fpaths) == 1:
@@ -222,7 +224,7 @@ def collect_data_per_trial(trial_files):
 
         data = []
 
-        for ftype, fpath in trial_files.iteritems():
+        for ftype, fpath in six.iteritems(trial_files):
             if ftype in data_files:
                 data.append(read(fpath))
 
@@ -447,7 +449,7 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
                                         break
             puts('')
 
-    except (KeyboardInterrupt, SystemExit), e:
+    except (KeyboardInterrupt, SystemExit) as e:
         new_settings = deepcopy(old_settings)
         raise e
 
@@ -515,7 +517,7 @@ def main():
     os.chdir('/Users/jahnel/code/example_data/manual/')
     directory = os.getcwd()
     files = list_tweezer_files(directory)
-    print(len(files))
+    print((len(files)))
 
 
 if __name__ == '__main__':
