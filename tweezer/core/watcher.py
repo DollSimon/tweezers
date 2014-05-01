@@ -15,7 +15,10 @@ import re
 import platform
 
 from collections import deque
-from Queue import Queue
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
 
 if platform.system() is 'Darwin':
     from watchdog.observers.fsevents import FSEventsObserver as Observer
