@@ -3,6 +3,7 @@
 
 import os
 
+
 def get_subdirs(directory):
     """
     Returns a list of directories contained in the parent directory
@@ -14,7 +15,8 @@ def get_subdirs(directory):
     try:
         dirs = [d[0] for d in os.walk(directory)]
     except TypeError:
-        print("You need to provide a directory path as a string, not {}".format(directory))
+        print("You need to provide a directory path as a string, \
+            not {}".format(directory))
 
     subdirs = [d for d in dirs if d != directory]
 
@@ -24,8 +26,9 @@ def get_subdirs(directory):
 def get_new_subdirs(old_directory_list, new_directory_list):
     """
     Gets new directories by comparing old and new stage of this directory.
-    This assumes that there are new directories added and none deleted from the the old ones.
-     
+    This assumes that there are new directories added and none deleted from
+    the the old ones.
+
     :param old_directory_list: (list) of directory at an earlier stage
     :param new_directory_list: (list) of directory at a later stage
     """
@@ -50,10 +53,10 @@ def split_path(path, is_file=True):
     while True:
         _path, folder = os.path.split(_path)
 
-        if folder!="":
+        if folder != "":
             subdirs.append(folder)
         else:
-            if _path!="":
+            if _path != "":
                 subdirs.append(_path)
             break
 
@@ -76,11 +79,9 @@ def get_parent_directory(file_name):
 def generate_file_tree_of(directory):
     """
     Generator for all files contained in a directory
-    
+
     :param directory: (path) root directory
     """
     for paths, dirs, files in os.walk(directory):
         for f in files:
             yield os.path.abspath(os.path.join(paths, f))
-    
-

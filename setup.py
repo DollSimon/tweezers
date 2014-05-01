@@ -38,7 +38,7 @@ MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
            'tweezer.dia.tracking', 'tweezer.ixo.ipython_', 'tweezer.dia.utils',
            'tweezer.simulate.brownian_motion', 'tweezer.ixo.viscosity',
            'tweezer.noise.pwc', 'tweezer.noise.filter',
-           'tweezer.noise.ocl_filter']
+           'tweezer.noise.ocl_filter', 'tweezer.dia.interactive']
 
 setup(
     name='tweezer',

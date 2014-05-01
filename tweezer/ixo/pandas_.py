@@ -114,7 +114,7 @@ def h5_load(h5_file):
         except:
             raise
 
-    return data 
+    return data
 
 
 def rdata_save(data_frame=None, rdata_file='test.RData', append_data=False):
