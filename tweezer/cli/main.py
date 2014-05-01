@@ -94,9 +94,9 @@ try:
 except ImportError as err:
     puts('')
     with indent(2):
-        puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
+        puts(colored.red('The tweezer package has not been correctly installed or updated.'))
         puts('')
-        puts('The following import error occurred: {}'.format(colored.red(err))) 
+        puts('The following import error occurred: {}'.format(colored.red(err)))
         puts('')
         puts('Please check installation instructions @ {}'.format(colored.yellow('http://bitbucket.org/majahn/tweezer')))
     exit()
@@ -197,14 +197,14 @@ def start():
 
                 else:
                     default_settings = parse_json(_DEFAULT_SETTINGS)
-                    pprint_settings(default_settings, part=kind, 
+                    pprint_settings(default_settings, part=kind,
                         status='default', other_settings=settings, other_status='locally')
 
             elif args['--default']:
                 default_settings = parse_json(_DEFAULT_SETTINGS)
                 if has_settings:
                     settings = parse_json('settings.json')
-                    pprint_settings(default_settings, part=kind, 
+                    pprint_settings(default_settings, part=kind,
                         status='default', other_settings=settings, other_status='locally')
                 else:
                     pprint_settings(default_settings, part=kind, status='default')
@@ -262,7 +262,7 @@ def start():
                         if not 'directory_state' in key:
                             with indent(2):
                                 puts('These are the files of type {}:'.format(colored.yellow(key)))
-                                puts('') 
+                                puts('')
                                 for v in val:
                                     with indent(2):
                                         if DIR in v:
@@ -282,20 +282,20 @@ def start():
                         if kind not in ['directory_state', 'state']:
                             with indent(2):
                                 puts('These are the files of type {}:'.format(colored.yellow(kind)))
-                                puts('') 
-                                for v in files[kind]: 
+                                puts('')
+                                for v in files[kind]:
                                     with indent(2):
                                         if DIR in v:
-                                            puts('{}'.format(v.replace(DIR, '...'))) 
+                                            puts('{}'.format(v.replace(DIR, '...')))
                                         else:
-                                            puts('{}'.format(v)) 
+                                            puts('{}'.format(v))
                         else:
                             with indent(2):
                                 puts('The {} is described by:'.format(colored.yellow('directory_state')))
-                                puts('') 
+                                puts('')
                                 with indent(2):
                                     puts('{}'.format(files['directory_state']))
-                        puts('') 
+                        puts('')
                     except KeyError:
                         print('No such file type found')
 
@@ -328,7 +328,7 @@ def start():
 
                 old_settings = parse_json('settings.json')
 
-                update_settings('settings.json', old_settings=old_settings, part=kind)                
+                update_settings('settings.json', old_settings=old_settings, part=kind)
 
                 # new_settings = parse_json('settings.json')
 
@@ -360,7 +360,7 @@ def start():
 
             elif args['--default']:
                 puts('These are the tweebot default configurations:\n')
-                
+
                 settings = parse_json(_TWEEBOT_CONFIG)
 
                 pprint_settings(settings, part=kind, status='default')
@@ -393,7 +393,7 @@ def start():
                 for each in simulation_mapper:
                     args_list = get_function_arguments(simulation_mapper[each])
                     if args_list:
-                        arg_string = ', '.join(args_list) 
+                        arg_string = ', '.join(args_list)
                     else:
                         arg_string = ''
                     puts('{}({})\n'.format(colored.blue(each), colored.white(arg_string)))
@@ -401,7 +401,7 @@ def start():
     # tweezer plot
     if args['plot']:
 
-        plot_mapper = {'matplotlib_example': matplotlib_example, 
+        plot_mapper = {'matplotlib_example': matplotlib_example,
             'wlc': plot_extensible_worm_like_chain,
             'eWLC': plot_extensible_worm_like_chain,
             'WLC': plot_extensible_worm_like_chain,
@@ -418,7 +418,7 @@ def start():
                 for each in plot_mapper:
                     args_list = get_function_arguments(plot_mapper[each])
                     if args_list:
-                        arg_string = ', '.join(args_list) 
+                        arg_string = ', '.join(args_list)
                     else:
                         arg_string = ''
                     puts('{}({})\n'.format(colored.blue(each), colored.white(arg_string)))
@@ -427,7 +427,7 @@ def start():
     # tweezer calculate
     if args['calculate']:
 
-        calc_mapper = {'example': calc_example, 
+        calc_mapper = {'example': calc_example,
                        'viscosity': calc_viscosity}
 
         try:
@@ -445,7 +445,7 @@ def start():
                 for each in calc_mapper:
                     args_list = get_function_arguments(calc_mapper[each])
                     if args_list:
-                        arg_string = ', '.join(args_list) 
+                        arg_string = ', '.join(args_list)
                     else:
                         arg_string = ''
                     puts('{}({})\n'.format(colored.blue(each), colored.white(arg_string)))
@@ -479,9 +479,9 @@ def start():
 
         command = args['<COMMAND>']
 
-        command_mapper = {'plot': print_plot_help, 
-            'simulate': print_simulate_help, 'update': print_update_help, 
-            'track': print_track_help, 'show': print_show_help, 
+        command_mapper = {'plot': print_plot_help,
+            'simulate': print_simulate_help, 'update': print_update_help,
+            'track': print_track_help, 'show': print_show_help,
             'list': print_list_help, 'analyse': print_analyse_help}
 
         with indent(2):

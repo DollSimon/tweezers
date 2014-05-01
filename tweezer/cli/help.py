@@ -7,8 +7,9 @@ from tweezer import __version__
 
 VERSION = ".".join(str(x) for x in __version__)
 
+
 def show_tweezer_help_pages():
-    puts('{0} : {1}'.format( colored.blue('tweezer'), 'A data analysis tool for single-molecule experiments'))
+    puts('{0} : {1}'.format(colored.blue('tweezer'), 'A data analysis tool for single-molecule experiments'))
     puts('')
     puts('{0}: http://bitbucket.org/majahn/tweezer @ version {1}'.format(
     colored.yellow('Source'),
@@ -34,7 +35,7 @@ def show_tweezer_help_pages():
             puts('tweezer help [<COMMAND>]')
             puts('tweezer (-h | --help)')
             puts('tweezer (-v | --version)')
-          
+
         puts('\n{}:'.format(colored.green('Commands')))
         with indent(2):
             puts('watch         Monitor directory for changes')
@@ -74,7 +75,7 @@ def show_tweezer_help_pages():
             puts('-d --default      Refer to the saved default object')
             puts('-f --file         Switch to file mode when input can be file or dir')
             puts('-i --image        Switch to image mode when input can be image or video')
-            puts('-a --args=<ARGS>  Additional keyword arguments to be passed to the command') 
+            puts('-a --args=<ARGS>  Additional keyword arguments to be passed to the command')
             puts('-c --clean        Suppress terminal output of extra information')
 
 

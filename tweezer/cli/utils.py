@@ -1,4 +1,6 @@
 from __future__ import print_function
+from tweezer import PY2
+
 import os, sys
 import re
 
@@ -7,10 +9,12 @@ import hashlib
 import envoy
 
 from collections import defaultdict, namedtuple
-from itertools import izip
+if PY2:
+    from itertools import izip
+
 from copy import deepcopy
 
-from clint.textui import colored, puts, indent 
+from clint.textui import colored, puts, indent
 from pprint import pprint
 import six
 
@@ -27,29 +31,33 @@ try:
 except ImportError as err:
     puts('')
     with indent(2):
-        puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
+        puts(colored.red('The tweezer package has not been correctly installed\
+             or updated.'))
         puts('')
-        puts('The following import error occurred: {}'.format(colored.red(err))) 
+        puts('The following import error occurred: {}'.format(colored.red(err)))
         puts('')
 
 CACHING_FILE = 'cached_file_listing.json'
 
+
 def list_tweezer_files(directory, cache_results=True):
-    """ 
-    Walks a directory structure top-down, registering known tweezer file types along the way. 
+    """
+    Walks a directory structure top-down, registering known tweezer file \
+    types along the way.
 
     :param directory: (Path) starting directory
 
-    :return files: (defaultdict) where keys are file types and values are corresponding files specified by their full path
+    :return files: (defaultdict) where keys are file types and values are \
+    corresponding files specified by their full path
 
     """
-    cached_results_file = os.path.join(directory, CACHING_FILE)  
+    cached_results_file = os.path.join(directory, CACHING_FILE)
 
     files = defaultdict(list)
 
     if os.path.exists(cached_results_file):
 
-        # check if length of files in cache equals length os files found. 
+        # check if length of files in cache equals length os files found.
         current_directory_state = get_directory_state(directory)
 
         with open(cached_results_file, 'r') as f:
@@ -57,18 +65,23 @@ def list_tweezer_files(directory, cache_results=True):
 
         if current_directory_state == cached_data['directory_state']:
             for k, v in six.iteritems(cached_data):
-                files[k] = v   
+                files[k] = v
         else:
             current_directory_state = get_directory_state(directory)
 
             file_names = list(generate_file_tree_of(directory))
 
             # clean list from mac specific files
-            file_names = [f for f in file_names if not 'DS_Store' in f]
+            file_names = [fi for fi in file_names if not 'DS_Store' in fi]
 
             types = classify_all(file_names)
-            for t, f in izip(types, file_names):
-                files[t.lower()].append(f)
+
+            if PY2:
+                for t, f in izip(types, file_names):
+                    files[t.lower()].append(f)
+            else:
+                for t, f in zip(types, file_names):
+                    files[t.lower()].append(f)
 
             files['directory_state'] = current_directory_state
 
@@ -84,8 +97,13 @@ def list_tweezer_files(directory, cache_results=True):
         file_names = [f for f in file_names if not 'DS_Store' in f]
 
         types = classify_all(file_names)
-        for t, f in izip(types, file_names):
-            files[t.lower()].append(f)
+
+        if PY2:
+            for t, f in izip(types, file_names):
+                files[t.lower()].append(f)
+        else:
+            for t, f in zip(types, file_names):
+                files[t.lower()].append(f)
 
         files['directory_state'] = directory_state
 
@@ -98,7 +116,7 @@ def list_tweezer_files(directory, cache_results=True):
 
 def file_cache(parameter):
     """
-    Short description 
+    Short description
 
     :param parameter: Description
 
@@ -109,16 +127,20 @@ def file_cache(parameter):
 
 def collect_files_per_trial(files=defaultdict(list), trial=1, subtrial=None):
     """
-    Collects all files corresponding to one experiment based on trial and subtrial number.
-    
-    :param files: (defaultdict) of all files found in the current directory tree
+    Collects all files corresponding to one experiment based on trial and \
+    subtrial number.
+
+    :param files: (defaultdict) of all files found in the current directory \
+    tree
 
     :param trial: (int) specifies the trial number
 
-    :param subtrial: (str) specifies the subtrial in a file name pattern such as '1_a...'
-    
-    :return trial_files: (defaultdict) that stores all files connected to one experiment
-    
+    :param subtrial: (str) specifies the subtrial in a file name pattern \
+    such as '1_a...'
+
+    :return trial_files: (defaultdict) that stores all files connected to one \
+    experiment
+
     """
     trial_files = defaultdict(list)
 
@@ -146,18 +168,19 @@ def collect_files_per_trial(files=defaultdict(list), trial=1, subtrial=None):
 
 def sort_files_by_trial(files=defaultdict(list), sort_by=None, clean=True):
     """
-    Sorts a dictionary of all tweezer files into a dictionary that splits 
+    Sorts a dictionary of all tweezer files into a dictionary that splits
     according to all files found for specified key
-    
-    :param files: (defaultdict) of all files found in the current directory tree
-    :param sort_by: (str) specifying the file type to use for the sorting 
 
-    :return trial_files: (dict) of 
-    
+    :param files: (defaultdict) of all files found in the current directory \
+    tree
+    :param sort_by: (str) specifying the file type to use for the sorting
+
+    :return trial_files: (dict) of
+
     .. note::
 
-        The reason for this is that there are many more log files written than 
-        data files. Like this you can either look at the successful trials or 
+        The reason for this is that there are many more log files written than
+        data files. Like this you can either look at the successful trials or
         all trials, depending on your needs
     """
     # try to infer the sorting key
@@ -166,7 +189,7 @@ def sort_files_by_trial(files=defaultdict(list), sort_by=None, clean=True):
             sort_by = 'man_data'
         else:
             sort_by = 'bot_data'
-         
+
     FileInfos = [parse_tweezer_file_name(f, parser=sort_by) for f in files[sort_by]]
     trials = [(f.trial, f.subtrial) for f in FileInfos]
 
@@ -192,7 +215,7 @@ def sort_files_by_trial(files=defaultdict(list), sort_by=None, clean=True):
                         else:
                             cleaned_files[ftype] = fpaths
 
-            cleaned_trials[trial] = cleaned_files 
+            cleaned_trials[trial] = cleaned_files
 
         trial_files = cleaned_trials
 
@@ -209,7 +232,7 @@ def collect_data_per_trial(trial_files):
     """
     def namedtuple_factory(files, data):
         fields = [k for k in files]
-        TrialData = namedtuple('TrialData', fields) 
+        TrialData = namedtuple('TrialData', fields)
         return TrialData(*data)
 
     try:
@@ -239,7 +262,7 @@ def collect_data_per_trial(trial_files):
 def pprint_settings(settings, part='all', status='current', other_settings={}, other_status='default'):
     """
     Pretty terminal printing of tweezer settings stored in json files
-    
+
     :param settings: (dict) with tweezer settings, basically informative key-value pairs
 
     :param part: (str) which signifies sections of overall settings
@@ -289,11 +312,11 @@ def pprint_settings(settings, part='all', status='current', other_settings={}, o
                                 try:
                                     value = settings[section][key]
                                     puts('{key} : {value} {unit} {spacing}({other_setting}: {other_value})'.format(
-                                        key = key, 
-                                        value = settings[section][key], 
-                                        unit = unit, 
-                                        spacing = flexible_tab(' '.join([' : '.join([key, str(value)]), unit])), 
-                                        other_setting = colored.yellow(other_status), 
+                                        key = key,
+                                        value = settings[section][key],
+                                        unit = unit,
+                                        spacing = flexible_tab(' '.join([' : '.join([key, str(value)]), unit])),
+                                        other_setting = colored.yellow(other_status),
                                         other_value = colored.yellow(other_settings[section][key])))
                                 except:
                                     puts('{} : {} {}'.format(key, settings[section][key], unit))
@@ -301,11 +324,11 @@ def pprint_settings(settings, part='all', status='current', other_settings={}, o
                                 try:
                                     value = settings[section][key]
                                     puts('{key} : {value} {unit} {spacing}({other_setting}: {other_value})'.format(
-                                        key = colored.white(key), 
-                                        value = colored.white(settings[section][key]), 
-                                        unit = colored.white(unit), 
-                                        spacing = flexible_tab(' '.join([' : '.join([key, str(value)]), unit])), 
-                                        other_setting = colored.yellow(other_status), 
+                                        key = colored.white(key),
+                                        value = colored.white(settings[section][key]),
+                                        unit = colored.white(unit),
+                                        spacing = flexible_tab(' '.join([' : '.join([key, str(value)]), unit])),
+                                        other_setting = colored.yellow(other_status),
                                         other_value = colored.yellow(other_settings[section][key])))
                                 except:
                                     puts('{} : {} {}'.format(colored.white(key), colored.white(settings[section][key]), colored.white(unit)))
@@ -322,10 +345,10 @@ def pprint_settings(settings, part='all', status='current', other_settings={}, o
                                 try:
                                     value = settings[section][key]
                                     puts('{key} : {value} {spacing}({other_setting}: {other_value})'.format(
-                                        key = key, 
-                                        value = settings[section][key], 
-                                        spacing = flexible_tab(' : '.join([key, str(value)])), 
-                                        other_setting = colored.yellow(other_status), 
+                                        key = key,
+                                        value = settings[section][key],
+                                        spacing = flexible_tab(' : '.join([key, str(value)])),
+                                        other_setting = colored.yellow(other_status),
                                         other_value = colored.yellow(other_settings[section][key])))
                                 except:
                                     puts('{} : {}'.format(key, settings[section][key]))
@@ -333,10 +356,10 @@ def pprint_settings(settings, part='all', status='current', other_settings={}, o
                                 try:
                                     value = settings[section][key]
                                     puts('{key} : {value} {spacing}({other_setting}: {other_value})'.format(
-                                        key = colored.white(key), 
-                                        value = colored.white(settings[section][key]), 
-                                        spacing = flexible_tab(' : '.join([key, str(value)])), 
-                                        other_setting = colored.yellow(other_status), 
+                                        key = colored.white(key),
+                                        value = colored.white(settings[section][key]),
+                                        spacing = flexible_tab(' : '.join([key, str(value)])),
+                                        other_setting = colored.yellow(other_status),
                                         other_value = colored.yellow(other_settings[section][key])))
                                 except:
                                     puts('{} : {}'.format(colored.white(key), colored.white(settings[section][key])))
@@ -348,8 +371,8 @@ def pprint_settings(settings, part='all', status='current', other_settings={}, o
 
 def update_settings(file_name='settings.json', old_settings={}, part='all', **kwargs):
     """
-    Command line interface to update a standard tweezer .json settings or configuration file. 
-    
+    Command line interface to update a standard tweezer .json settings or configuration file.
+
     :param file_name: (path) .json file to update [default = 'settings.json']
 
     :param old_settings: (dict) standard tweezer settings dictionary with sections and units
@@ -497,11 +520,11 @@ def get_directory_state(directory=None):
         directory = os.getcwd()
 
     names_call = envoy.run('find {dir} -type f -exec stat -f "%N" {placeholder} \\;'.format(
-        dir = directory, 
+        dir = directory,
         placeholder ='{}'))
 
     sizes_call = envoy.run('find {dir} -type f -exec stat -f "%z" {placeholder} \\;'.format(
-        dir = directory, 
+        dir = directory,
         placeholder ='{}'))
 
     names = names_call.std_out
