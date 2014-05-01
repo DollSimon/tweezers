@@ -14,8 +14,6 @@ import time
 import re
 import platform
 
-import macropy.core.macros
-
 from collections import deque
 from Queue import Queue
 
@@ -26,12 +24,12 @@ else:
 
 from watchdog.events import FileSystemEventHandler
 
-from clint.textui import colored, puts, indent 
-from termcolor import cprint
+from clint.textui import colored, puts, indent
 
 from tweezer.core.parsers import classify
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
+
 
 def find_files(files, regex_pattern, verbose=False):
     """
@@ -49,7 +47,7 @@ def find_files(files, regex_pattern, verbose=False):
 
     """
     files_found = []
-    
+
     for iFile in files:
         match = re.findall(regex_pattern, iFile)
         if match:
@@ -60,8 +58,9 @@ def find_files(files, regex_pattern, verbose=False):
         else:
             if verbose:
                 print("Pattern not found!")
-        
+
     return files_found
+
 
 def get_now():
     '''
@@ -69,11 +68,12 @@ def get_now():
     '''
     return datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
+
 def build_docs():
     '''
     Run the Sphinx build (`make html`) to make sure we have the
     latest version of the docs
-    
+
     Use `call` here so that we don't detect file changes while this
     is running...
     '''
@@ -83,6 +83,7 @@ def build_docs():
     print >> sys.stderr, "Current directory: {}".format(os.getcwd())
     subprocess.call(r'make html')
 
+
 def run_unittests():
     '''
     Run unit tests with unittest.
@@ -91,6 +92,7 @@ def run_unittests():
     os.chdir(BASEDIR)
     subprocess.call(r'python -m unittest discover -b')
 
+
 def run_behave():
     '''
     Run BDD tests with behave.
@@ -98,6 +100,7 @@ def run_behave():
     print >> sys.stderr, "Running behave at %s" % get_now()
     os.chdir(BASEDIR)
     subprocess.call(r'behave')
+
 
 def get_type(file_name):
     """
@@ -109,7 +112,8 @@ def get_type(file_name):
 
 class ChangeHandler(FileSystemEventHandler):
     """
-    Reacts to changes on the file system and dispatches the appropriate methods for the registered file system event.
+    Reacts to changes on the file system and dispatches the appropriate \
+    methods for the registered file system event.
     """
     def __init__(self):
         super(ChangeHandler, self).__init__()
@@ -123,7 +127,7 @@ class ChangeHandler(FileSystemEventHandler):
         if event.is_directory:
             print("The directory {} has been {}".format(colored.red(event.src_path), colored.blue(event.event_type)))
             return
-            
+
         file_type = classify(event.src_path)
         event_type = event.event_type
 
@@ -154,7 +158,7 @@ def run_watcher(directory):
     data_files = Queue()
 
     while True:
-    
+
         event_handler = ChangeHandler()
         observer = Observer()
         observer.schedule(event_handler, directory, recursive=True)
