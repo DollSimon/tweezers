@@ -50,7 +50,7 @@ class CSVWorker(object):
         i = 0
         for p in self.ps:
             p.join()
-            print "Done", i
+            print("Done: {}".format(i))
             i += 1
 
         self.pout.join()

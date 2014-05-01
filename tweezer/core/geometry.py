@@ -1,8 +1,9 @@
+from __future__ import print_function
+
 """
 Geometry classes and functions
 """
 
-from math import sqrt
 import numpy as np
 from numpy.linalg import norm
 
@@ -238,10 +239,10 @@ class Box(object):
 
 # Testing things
 if __name__ == "__main__":
-    print "Specifying a point at 5, 5.5, 6.3"
+    print("Specifying a point at 5, 5.5, 6.3")
     p = Point(5, 5.5, 6.3)
     q = Point(5, 2.3, 3.2)
-    print p.coordinates[2]
+    print(p.coordinates[2])
 
     # l = Line(p.coordinates, q.coordinates)
     # l.draw()
