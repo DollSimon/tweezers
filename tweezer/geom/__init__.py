@@ -7,6 +7,5 @@ Geometry module with useful classes and functions.
 import os
 import glob
 
-MEMBER_FILES = glob.glob(os.path.dirname(__file__) + "/*.py")
-
-__all__ = [os.path.basename(f)[:-3] for f in MEMBER_FILES]
+SOURCE_FILES = glob.glob(os.path.dirname(__file__) + "/*.py")
+__all__ = [os.path.basename(f)[: -3] for f in SOURCE_FILES]

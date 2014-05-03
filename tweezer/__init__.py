@@ -12,9 +12,8 @@ from functools import partial
 
 from tweezer.core.parsers import classify
 
-ALLFILES = glob.glob(os.path.dirname(__file__) + "/*.py")
-
-__all__ = [os.path.basename(f)[:-3] for f in ALLFILES]
+SOURCE_FILES = glob.glob(os.path.dirname(__file__) + "/*.py")
+__all__ = [os.path.basename(f)[: -3] for f in SOURCE_FILES]
 
 __version__ = (0, 0, 1)
 
