@@ -50,6 +50,11 @@ Sandbox.ipynb
 *.sublime-project
 *.sublime-workspace
 
+# PyCharm project files
+*.xml
+.idea
+*.iml
+
 # files related to python testing system
 .coverage
 setup.cfg
