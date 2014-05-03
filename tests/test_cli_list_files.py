@@ -17,12 +17,12 @@ from clint.textui import puts, indent, colored
 try:
     from tweezer.cli.utils import list_tweezer_files
     from tweezer.cli.utils import CACHING_FILE
-except ImportError, err:
+except ImportError as err:
     puts('')
     with indent(2):
-        puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
+        puts(colored.red('The tweezer package has not been correctly installed or updated.'))
         puts('')
-        puts('The following import error occurred: {}'.format(colored.red(err))) 
+        puts('The following import error occurred: {}'.format(colored.red(err)))
         puts('')
 
 init()
@@ -78,7 +78,7 @@ class TestTweezerListFiles:
         os.chdir(cls.current_dir)
 
     def test_correct_location(self):
-        os.getcwd().should.be(os.path.expanduser('~/code/example_data/manual')) 
+        os.getcwd().should.be(os.path.expanduser('~/code/example_data/manual'))
 
         if not self.__class__.hasCacheBefore:
             (self.__class__.hasCacheAfter).should.be.true

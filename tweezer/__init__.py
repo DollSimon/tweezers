@@ -23,6 +23,9 @@ _ROOT = os.path.abspath(os.path.dirname(__file__))
 _DEFAULT_SETTINGS = os.path.join(_ROOT, 'data', 'settings',
                                  'default_settings.json')
 
+_INSTRUMENT_SETTINGS = os.path.join(_ROOT, 'data', 'settings',
+                                    'instrument_settings.json')
+
 _TWEEBOT_CONFIG_TXT = os.path.join(_ROOT, 'data', 'settings',
                                    'default.config.txt')
 

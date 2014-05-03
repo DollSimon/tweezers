@@ -31,3 +31,8 @@ def show_images(images, titles=None):
     fig.set_size_inches(np.array(fig.get_size_inches()) * n_ims)
 
     plt.show()
+
+
+class CameraConversionFactor(object):
+    def __init__(self, camera='ccd'):
+        self.camera = camera
