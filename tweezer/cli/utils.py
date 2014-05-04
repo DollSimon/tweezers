@@ -9,6 +9,7 @@ import hashlib
 import envoy
 
 from collections import defaultdict, namedtuple
+
 if PY2:
     from itertools import izip
 
@@ -230,6 +231,7 @@ def collect_data_per_trial(trial_files):
 
     :return TrialData: (namedtuple) that holds relevant data
     """
+
     def namedtuple_factory(files, data):
         fields = [k for k in files]
         TrialData = namedtuple('TrialData', fields)
@@ -305,33 +307,35 @@ def pprint_settings(settings, part='all', status='current', other_settings={}, o
                             if pos % 2 == 0:
                                 puts('{} : {} {}'.format(key, settings[section][key], unit))
                             else:
-                                puts('{} : {} {}'.format(colored.white(key), colored.white(settings[section][key]), colored.white(unit)))
+                                puts('{} : {} {}'.format(colored.white(key), colored.white(settings[section][key]),
+                                                         colored.white(unit)))
                     else:
                         with indent(2):
                             if pos % 2 == 0:
                                 try:
                                     value = settings[section][key]
                                     puts('{key} : {value} {unit} {spacing}({other_setting}: {other_value})'.format(
-                                        key = key,
-                                        value = settings[section][key],
-                                        unit = unit,
-                                        spacing = flexible_tab(' '.join([' : '.join([key, str(value)]), unit])),
-                                        other_setting = colored.yellow(other_status),
-                                        other_value = colored.yellow(other_settings[section][key])))
+                                        key=key,
+                                        value=settings[section][key],
+                                        unit=unit,
+                                        spacing=flexible_tab(' '.join([' : '.join([key, str(value)]), unit])),
+                                        other_setting=colored.yellow(other_status),
+                                        other_value=colored.yellow(other_settings[section][key])))
                                 except:
                                     puts('{} : {} {}'.format(key, settings[section][key], unit))
                             else:
                                 try:
                                     value = settings[section][key]
                                     puts('{key} : {value} {unit} {spacing}({other_setting}: {other_value})'.format(
-                                        key = colored.white(key),
-                                        value = colored.white(settings[section][key]),
-                                        unit = colored.white(unit),
-                                        spacing = flexible_tab(' '.join([' : '.join([key, str(value)]), unit])),
-                                        other_setting = colored.yellow(other_status),
-                                        other_value = colored.yellow(other_settings[section][key])))
+                                        key=colored.white(key),
+                                        value=colored.white(settings[section][key]),
+                                        unit=colored.white(unit),
+                                        spacing=flexible_tab(' '.join([' : '.join([key, str(value)]), unit])),
+                                        other_setting=colored.yellow(other_status),
+                                        other_value=colored.yellow(other_settings[section][key])))
                                 except:
-                                    puts('{} : {} {}'.format(colored.white(key), colored.white(settings[section][key]), colored.white(unit)))
+                                    puts('{} : {} {}'.format(colored.white(key), colored.white(settings[section][key]),
+                                                             colored.white(unit)))
                 except:
                     if not other_settings:
                         with indent(2):
@@ -345,22 +349,22 @@ def pprint_settings(settings, part='all', status='current', other_settings={}, o
                                 try:
                                     value = settings[section][key]
                                     puts('{key} : {value} {spacing}({other_setting}: {other_value})'.format(
-                                        key = key,
-                                        value = settings[section][key],
-                                        spacing = flexible_tab(' : '.join([key, str(value)])),
-                                        other_setting = colored.yellow(other_status),
-                                        other_value = colored.yellow(other_settings[section][key])))
+                                        key=key,
+                                        value=settings[section][key],
+                                        spacing=flexible_tab(' : '.join([key, str(value)])),
+                                        other_setting=colored.yellow(other_status),
+                                        other_value=colored.yellow(other_settings[section][key])))
                                 except:
                                     puts('{} : {}'.format(key, settings[section][key]))
                             else:
                                 try:
                                     value = settings[section][key]
                                     puts('{key} : {value} {spacing}({other_setting}: {other_value})'.format(
-                                        key = colored.white(key),
-                                        value = colored.white(settings[section][key]),
-                                        spacing = flexible_tab(' : '.join([key, str(value)])),
-                                        other_setting = colored.yellow(other_status),
-                                        other_value = colored.yellow(other_settings[section][key])))
+                                        key=colored.white(key),
+                                        value=colored.white(settings[section][key]),
+                                        spacing=flexible_tab(' : '.join([key, str(value)])),
+                                        other_setting=colored.yellow(other_status),
+                                        other_value=colored.yellow(other_settings[section][key])))
                                 except:
                                     puts('{} : {}'.format(colored.white(key), colored.white(settings[section][key])))
 
@@ -389,7 +393,7 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
             for key in old_settings:
                 print(key)
 
-            want_new_section = raw_input('Do you want to add a new section to {}?'.format(os.path.basename(file_name)))
+            want_new_section = input('Do you want to add a new section to {}?'.format(os.path.basename(file_name)))
 
             if InterpretUserInput[want_new_section]:
                 pass
@@ -414,7 +418,7 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
                     with indent(2):
                         puts('Update {} : {} {}'.format(key, new_settings[section][key], unit))
                         while True:
-                            new_value = raw_input('> {} = '.format(colored.yellow(key)))
+                            new_value = input('> {} = '.format(colored.yellow(key)))
                             puts('')
 
                             if not new_value:
@@ -423,7 +427,8 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
                             # parse string value
                             if re.search('^\d+$', new_value.strip()):
                                 new_value = int(new_value)
-                            elif re.search('^\d+\.\d+$', new_value.strip()) or re.search('^\d+e[-0-9]\d*$', new_value.strip()):
+                            elif re.search('^\d+\.\d+$', new_value.strip()) or re.search('^\d+e[-0-9]\d*$',
+                                                                                         new_value.strip()):
                                 new_value = float(new_value)
                             else:
                                 new_value = new_value.strip()
@@ -434,8 +439,9 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
                                     new_settings[section][key] = new_value
                                     break
                                 else:
-                                    puts('Sorry, wrong type. {} is of type {}'.format(key, type(new_settings[section][key])))
-                                    try_again = raw_input('> Try again? (y | n): ')
+                                    puts('Sorry, wrong type. {} is of type {}'.format(key,
+                                                                                      type(new_settings[section][key])))
+                                    try_again = input('> Try again? (y | n): ')
                                     if InterpretUserInput[try_again]:
                                         continue
                                     else:
@@ -444,7 +450,7 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
                     with indent(2):
                         puts('Update {} : {}'.format(key, new_settings[section][key]))
                         while True:
-                            new_value = raw_input('> {} = '.format(colored.yellow(key)))
+                            new_value = input('> {} = '.format(colored.yellow(key)))
                             puts('')
 
                             if not new_value:
@@ -453,7 +459,8 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
                             # parse string value
                             if re.search('^\d+$', new_value.strip()):
                                 new_value = int(new_value)
-                            elif re.search('^\d+\.\d+$', new_value.strip()) or re.search('^\d+e[-0-9]\d*$', new_value.strip()):
+                            elif re.search('^\d+\.\d+$', new_value.strip()) or re.search('^\d+e[-0-9]\d*$',
+                                                                                         new_value.strip()):
                                 new_value = float(new_value)
                             else:
                                 new_value = new_value.strip()
@@ -464,8 +471,9 @@ def update_settings(file_name='settings.json', old_settings={}, part='all', **kw
                                     new_settings[section][key] = new_value
                                     break
                                 else:
-                                    puts('Sorry, wrong type. {} is of type {}'.format(key, type(new_settings[section][key])))
-                                    try_again = raw_input('> Try again? (y | n): ')
+                                    puts('Sorry, wrong type. {} is of type {}'.format(key,
+                                                                                      type(new_settings[section][key])))
+                                    try_again = input('> Try again? (y | n): ')
                                     if InterpretUserInput[try_again]:
                                         continue
                                     else:
@@ -520,18 +528,18 @@ def get_directory_state(directory=None):
         directory = os.getcwd()
 
     names_call = envoy.run('find {dir} -type f -exec stat -f "%N" {placeholder} \\;'.format(
-        dir = directory,
-        placeholder ='{}'))
+        dir=directory,
+        placeholder='{}'))
 
     sizes_call = envoy.run('find {dir} -type f -exec stat -f "%z" {placeholder} \\;'.format(
-        dir = directory,
-        placeholder ='{}'))
+        dir=directory,
+        placeholder='{}'))
 
     names = names_call.std_out
     sizes = sizes_call.std_out
 
     try:
-        return hashlib.sha256(names + sizes).hexdigest()
+        return hashlib.sha256((names + sizes).encode('utf-8')).hexdigest()
     except:
         raise
 
