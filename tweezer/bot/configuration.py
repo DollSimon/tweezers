@@ -32,7 +32,7 @@ def parse_tweebot_configuration_file(file_name='default.config.txt'):
         if len(parts) > 2:
             units[parts[0]] = parts[2]
 
-    for key, val in values.iteritems():
+    for key, val in values.items():
         if re.search('^(\d|-\d)', str(val)):
             if '.' in str(val):
                 val = round(np.float64(val), 12)

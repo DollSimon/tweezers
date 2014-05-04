@@ -55,8 +55,8 @@ def pwc_bilateral(Y, beta=200, width=5, maxIter=50, stopTolerance=1e-3,
     K = np.zeros(shape=(N, N))
 
     # Construct bilateral sequence kernel
-    for i in xrange(N):
-        W[i, ] = (abs(np.repeat(i, N) - xrange(N)) <= width).astype(int)
+    for i in range(N):
+        W[i, ] = (abs(np.repeat(i, N) - range(N)) <= width).astype(int)
 
     # Iterate
     count = 1

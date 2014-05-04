@@ -13,7 +13,7 @@ try:
     from tweezer.cli.utils import list_tweezer_files
     from tweezer.cli.utils import sort_files_by_trial
     from tweezer.cli.utils import collect_data_per_trial
-except ImportError, err:
+except ImportError as err:
     puts('')
     with indent(2):
         puts(colored.red('The tweezer package has not been correctly installed or updated.')) 

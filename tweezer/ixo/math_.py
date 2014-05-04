@@ -2,12 +2,14 @@
 #-*- coding: utf-8 -*-
 from __future__ import print_function, division
 
+
 import numpy as np
 
-from numba.decorators import autojit
+from numba.decorators import jit
+from toolz.functoolz import complement
 
 
-@autojit
+@jit
 def map_array_to_range(X):
     """
     Maps (normalises) an array to range specified
@@ -35,8 +37,8 @@ def map_array_to_range(X):
 
     S = np.empty((M, N), dtype=np.float)
 
-    for i in xrange(M):
-        for j in xrange(N):
+    for i in range(M):
+        for j in range(N):
             S[i, j] = ((X[i, j] - minX) * slope) + minR
 
     return S
@@ -44,3 +46,6 @@ def map_array_to_range(X):
 
 def isEven(number):
     return (number) & (number - 1) == 0
+
+
+isOdd = complement(isEven)

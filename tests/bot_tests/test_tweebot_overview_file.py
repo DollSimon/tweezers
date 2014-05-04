@@ -28,7 +28,7 @@ try:
     from tweezer import path_to_sample_data
     from tweezer import read
     from tweezer.cli.utils import list_tweezer_files
-except ImportError, err:
+except ImportError as err:
     puts('')
     with indent(2):
         puts(colored.red('The tweezer package has not been correctly installed or updated.')) 

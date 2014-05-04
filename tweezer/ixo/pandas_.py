@@ -157,7 +157,7 @@ def rdata_save(data_frame=None, rdata_file='test.RData', append_data=False):
 
                 flatten = lambda d: {'_'.join(k):v for k,v in flatten_dictionary(d).items()}
 
-                for key, value in flatten(r_dic).iteritems():
+                for key, value in flatten(r_dic).items():
                     try:
                         r.assign('{}'.format(key), value)
                     except:

@@ -138,7 +138,7 @@ class Schrodinger(object):
         if Nsteps > 0:
             self.psi_mod_x *= self.x_evolve_half
 
-        for i in xrange(Nsteps - 1):
+        for i in range(Nsteps - 1):
             self.compute_k_from_x()
             self.psi_mod_k *= self.k_evolve
             self.compute_x_from_k()
