@@ -25,7 +25,7 @@ PACKAGES = ['tweezer', 'tweezer.gui', 'tweezer.core', 'tweezer.cli',
 
 MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
            'tweezer.core.polymer', 'tweezer.core.geometry',
-           'tweezer.core.trap', 'tweezer.core.watcher',
+           'tweezer.core.trap', 'tweezer.core.watcher', 'tweezer.constants',
            'tweezer.core.visualisation', 'tweezer.core.simulations',
            'tweezer.core.trap_calibration', 'tweezer.core.datatypes',
            'tweezer.core.analysis', 'tweezer.core.parsers',
