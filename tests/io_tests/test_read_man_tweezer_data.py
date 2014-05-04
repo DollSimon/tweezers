@@ -13,12 +13,19 @@ badFile = path_to_sample_data('BAD_MAN_DATA')
 
 @pytest.fixture
 def goodData():
+    """
+    Data obtained by reading a correctly formatted file.
+    """
     data = read_tweezer_txt(dataFile)
     return data
 
 
 @pytest.fixture
 def badData():
+    """
+    Data obtained by reading a corrupted file. The task is to still recover
+    relevant data.
+    """
     data = read_tweezer_txt(badFile)
     return data
 
@@ -35,8 +42,3 @@ def test_read_corrupted_man_data_file(badData):
     assert badData.date == datetime.datetime(2013, 6, 7, 12, 48)
     assert badData.meta['duration'] == 48
     assert badData.meta['timeStep'] == 0.001
-
-
-    
-
-

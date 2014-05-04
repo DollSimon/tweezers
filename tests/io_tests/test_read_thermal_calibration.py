@@ -36,6 +36,14 @@ def botPowerSpectrum():
     return data
 
 
+def test_man_psd_file_could_be_found(manPowerSpectrum):
+    assert manPowerSpectrum is not None
+
+
+def test_bot_psd_file_could_be_found(botPowerSpectrum):
+    assert botPowerSpectrum is not None
+
+
 def test_read_tweebot_power_spectrum(botPowerSpectrum):
     assert botPowerSpectrum.date == datetime.datetime(2013, 5, 19, 2, 34)
     assert botPowerSpectrum.nSamples == 2 ** 20
@@ -78,7 +86,7 @@ def test_read_tweebot_power_spectrum(botPowerSpectrum):
     assert botPowerSpectrum.pmCornerFreqY == 618.791988
     assert botPowerSpectrum.pmCornerFreqX == 911.026211
     assert botPowerSpectrum.pmStiffnessY == 0.079150
-    assert botPowerSpectrum.pmStiffnessY == 0.116529
+    assert botPowerSpectrum.pmStiffnessX == 0.116529
     assert botPowerSpectrum.pmDisplacementSensitivityY == 0.000695
     assert botPowerSpectrum.pmDisplacementSensitivityX == 0.000854
     assert botPowerSpectrum.pmBeadDiameter == 2160

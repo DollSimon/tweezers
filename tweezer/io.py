@@ -40,8 +40,10 @@ def read_tweezer_txt(file_name):
     else:
         isFileSane = True
 
-    with open(file_name, 'r') as f:
-        fl = f.readlines(1000)
+    with open(file_name, 'r', encoding='utf-8') as f:
+        fl = []
+        for i in range(60):
+            fl.append(f.readline())
 
     # parsing header information
     header_comments = [line.strip().strip("# ") for line in fl[0:40] if line.strip().startswith('#')]
@@ -83,7 +85,7 @@ def read_tweezer_txt(file_name):
     data = data.dropna()
 
     # creating index
-    time = pd.Series(meta['timeStep'] * np.array(xrange(0, len(data))))
+    time = pd.Series(meta['timeStep'] * np.array(range(0, len(data))))
     data['time'] = time
 
     data.set_index('time', inplace=True)
@@ -207,8 +209,10 @@ def read_thermal_calibration(file_name, frequency=80000):
 
     """
     # get header information
-    with open(file_name, 'r') as f:
-        fl = f.readlines(1000)
+    with open(file_name, 'r', encoding='utf-8') as f:
+        fl = []
+        for i in range(60):
+            fl.append(f.readline())
 
     # finding the date; if any error occurs take the current date and time
     comments = [line for line in fl[0:15] if line.strip().startswith('#')]
@@ -226,7 +230,7 @@ def read_thermal_calibration(file_name, frequency=80000):
 
     # time step in seconds
     dt = 1.0/frequency
-    time = [dt*i for i in xrange(nSamples)]
+    time = [dt*i for i in range(nSamples)]
 
     # read header information
     header_pos = [ind for ind, line in enumerate(fl[0:15]) if re.match('^[a-zA-Z]', line.strip())][-1]
@@ -258,8 +262,10 @@ def read_tweezer_power_spectrum(file_name):
     :return psd: (pandas.DataFrame) with all the raw and fitted data as well as the fit results
     """
     # get header information
-    with open(file_name, 'r') as f:
-        fl = f.readlines(1000)
+    with open(file_name, 'r', encoding='utf-8') as f:
+        fl = []
+        for i in range(60):
+            fl.append(f.readline())
 
     # parsing header information
     comments = [line.strip().strip("#").strip() for line in fl[0:40] if line.strip().startswith('#')]
@@ -277,7 +283,7 @@ def read_tweezer_power_spectrum(file_name):
     psd = pd.read_table(file_name, sep='\t', skiprows=data_pos,
         names=columns, header=None, dtype=np.float64)
 
-    for k, v in CommentInfo.metadata.iteritems():
+    for k, v in CommentInfo.metadata.items():
         try:
             psd.__setattr__(str(k), v)
         except TypeError as err:
@@ -402,8 +408,11 @@ def read_tweebot_data_header(datalog_file):
     """"""
     >>> HeaderInfo = read_tweebot_data_header('27.Datalog.2013.02.17.19.42.09.datalog.txt')
     """
-    with open(datalog_file, 'r') as f:
-        fl = f.readlines(1000)
+    # get header information
+    with open(datalog_file, 'r', encoding='utf-8') as f:
+        fl = []
+        for i in range(60):
+            fl.append(f.readline())
 
     # parsing header information
     comments = [line.strip().strip("# ") for line in fl[0:50] if line.strip().startswith('#')]
@@ -1075,8 +1084,8 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
         elif 'AOD vertical corner frequency' in line or 'yCornerFreqT2' in line:
             try:
-                m = re.search('^(\w+(\s\w+)*)\s(\d+\.\d+)$', line.strip().strip('#').strip())
-                value = float(m.group(3))
+                m = re.search(r'\s(\d+\.\d+)$', line.strip().strip('#').strip())
+                value = float(m.group(1))
                 meta[standardized_name_of('yCornerFreqT2')] = value
                 units[standardized_name_of('yCornerFreqT2')] = standardized_unit_of('yCornerFreqT2')
             except:
@@ -1085,8 +1094,8 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
         elif 'PM vertical corner frequency' in line or 'yCornerFreqT1' in line:
             try:
-                m = re.search('^(\w+(\s\w+)*)\s(\d+\.\d+)$', line.strip().strip('#').strip())
-                value = float(m.group(3))
+                m = re.search(r'\s(\d+\.\d+)$', line.strip().strip('#').strip())
+                value = float(m.group(1))
                 meta[standardized_name_of('yCornerFreqT1')] = value
                 units[standardized_name_of('yCornerFreqT1')] = standardized_unit_of('yCornerFreqT1')
             except:

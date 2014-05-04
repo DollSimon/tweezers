@@ -1,30 +1,34 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import os
-import unittest
-import sure
+import pytest
+
+# import datetime
 
 from tweezer.io import read_tweebot_logs
+from tweezer import path_to_sample_data
 from tweezer.core.parsers import classify
 
-_ROOT = os.path.abspath(os.path.dirname(__file__))
-LOGFILE = os.path.join(os.path.dirname(_ROOT), 
-    'tweezer', 'data', 'bot_logs', '32.TweeBotLog.2013.05.19.01.50.21.txt')
+# get example file
+logFile = path_to_sample_data('bot_log')
 
-def test_correct_file_type():
-    classify(LOGFILE).should.equal('BOT_LOG') 
+
+@pytest.fixture
+def logData():
+    """
+    Data read from Tweebot datalog file.
+    """
+    data = read_tweebot_logs(logFile)
+    return data
+
+
+def test_file_identity():
+    assert classify(logFile) == 'BOT_LOG'
+
+
+def test_type_of_returned_data(logData):
+    assert isinstance(logData, 'pandas.core.frame.DataFrame')
     
-
-def test_read_tweebot_log_opens_file():
-    log = read_tweebot_logs(LOGFILE)
-    len(log.index).should.equal(1042) 
-
-
-def main():
-    print(_ROOT)
-    print(LOGFILE)
-
-if __name__ == '__main__':
-    main()
-
+    
+def test_read_tweebot_log_opens_file(logData):
+    assert len(logData.index) == 1042
