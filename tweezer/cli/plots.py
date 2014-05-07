@@ -31,7 +31,8 @@ def plot_extensible_worm_like_chain():
     wlc = ExtensibleWormLikeChain(1000)
     try:
         fig = wlc.plot_example()
-    except (KeyboardInterrupt, SystemExit), err:
+    except (KeyboardInterrupt, SystemExit) as err:
         close(fig)
         raise err
+
 

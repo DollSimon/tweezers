@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-from clint.textui import colored, puts, indent 
+from clint.textui import colored, puts, indent
 
 from tweezer import __version__
 
 VERSION = ".".join(str(x) for x in __version__)
 
+
 def show_tweezer_help_pages():
-    puts('{0} : {1}'.format( colored.blue('tweezer'), 'A data analysis tool for single-molecule experiments'))
+    puts('{0} : {1}'.format(colored.blue('tweezer'), 'A data analysis tool for single-molecule experiments'))
     puts('')
     puts('{0}: http://bitbucket.org/majahn/tweezer @ version {1}'.format(
     colored.yellow('Source'),
@@ -30,10 +31,11 @@ def show_tweezer_help_pages():
             puts('tweezer track [-o <OBJECT>] ([<VIDEO>...] | -i [<IMAGE>...])')
             puts('tweezer simulate <OBJECT> [--args=<ARGS>...]')
             puts('tweezer plot <OBJECT> [--args=<ARGS>...]')
+            puts('tweezer calculate <OBJECT> [-c] [-h] [--args=<ARGS>...]...')
             puts('tweezer help [<COMMAND>]')
             puts('tweezer (-h | --help)')
             puts('tweezer (-v | --version)')
-          
+
         puts('\n{}:'.format(colored.green('Commands')))
         with indent(2):
             puts('watch         Monitor directory for changes')
@@ -43,7 +45,8 @@ def show_tweezer_help_pages():
             puts('overview      Produce "Overview.pdf" for data files in directory')
             puts('list          List all files and file types in a directory recursively')
             puts('show          Shows content of an object or file in an informative way')
-            puts('update        Updates the content of an object, i.e. the corresponding .json file')
+            puts('update        Updates the object in question (mainly used for settings)')
+            puts('calculate     Perform calculations on the command line')
             puts('track         Find position of features in images or videos')
             puts('simulate      Run simulation of type "object"')
             puts('plot          Plot examples and objects')
@@ -72,7 +75,8 @@ def show_tweezer_help_pages():
             puts('-d --default      Refer to the saved default object')
             puts('-f --file         Switch to file mode when input can be file or dir')
             puts('-i --image        Switch to image mode when input can be image or video')
-            puts('-a --args=<ARGS>  Additional keyword arguments to be passed to the command') 
+            puts('-a --args=<ARGS>  Additional keyword arguments to be passed to the command')
+            puts('-c --clean        Suppress terminal output of extra information')
 
 
 def print_plot_help():
@@ -118,3 +122,9 @@ def print_list_help():
     with indent(2):
         puts('Help for {} command:\n'.format(colored.white('tweezer list')))
 
+
+def main():
+    show_tweezer_help_pages()
+
+if __name__ == '__main__':
+    main()

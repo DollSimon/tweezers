@@ -32,3 +32,7 @@ recursive-include tweezer *.enaml
 # added by check_manifest.py
 recursive-include tweezer *.Rnw
 recursive-include tweezer *.py
+
+# added by check_manifest.py
+recursive-include tweezer *.feature
+recursive-include tweezer *.md

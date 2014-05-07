@@ -19,26 +19,26 @@ except:
 
 try:
     from tweezer.ixo.collections_ import flatten_dictionary
-except ImportError, err:
+except ImportError as err:
     puts('')
     with indent(2):
-        puts(colored.red('The tweezer package has not been correctly installed or updated.')) 
+        puts(colored.red('The tweezer package has not been correctly installed or updated.'))
         puts('')
-        puts('The following import error occurred: {}'.format(colored.red(err))) 
+        puts('The following import error occurred: {}'.format(colored.red(err)))
         puts('')
 
 
 def h5_save(data_frame=None, h5_file='test.h5', append_data=False):
     """
     Saves pandas DataFrame with additional attributes to h5 file format. Since custom attributes can't be stored like this yet, these are recognised and saved as json file format with the same name.
-    
+
     Parameter:
     ----------
 
     :param data_frame:(pandas.DataFrame) that might carry additional custom attributes
     :param h5_file: (path) where to save the data
     :param append_data: (Boolean) whether the data should be appended to an existing file
-    
+
     """
     if not h5_file.endswith('.h5'):
         raise IOError('Please specify an hdf5 file with extension .h5')
@@ -47,7 +47,7 @@ def h5_save(data_frame=None, h5_file='test.h5', append_data=False):
         raise TypeError('Provided data is not of type pandas.DataFrame, but {}'.format(type(data_frame)))
 
     # get attributes if any
-    EMPTY_FRAME = pd.DataFrame() 
+    EMPTY_FRAME = pd.DataFrame()
 
     attributes = list(set(dir(EMPTY_FRAME)) ^ set(dir(data_frame)))
 
@@ -63,14 +63,14 @@ def h5_save(data_frame=None, h5_file='test.h5', append_data=False):
     else:
         json_file = None
 
-    # write files 
+    # write files
     if not os.path.exists(h5_file):
         try:
             store = pd.HDFStore(h5_file)
             store.put('data', data_frame)
             store.close()
         except:
-            raise 
+            raise
     else:
         print('File already exists')
 
@@ -85,16 +85,16 @@ def h5_save(data_frame=None, h5_file='test.h5', append_data=False):
 def h5_load(h5_file):
     """
     Load pandas DataFrame from an h5 file. If there exists a .json file of the same name in the same directory the content of that file is parsed as custom attributes attached to the DataFrame
-    
+
     :param h5_file: (path) of h5 file from which to load the data.
 
     :return data: (pandas.DataFrame) with saved attributes if they exist
-    
+
     """
     if not h5_file.endswith('.h5'):
         raise IOError('Please specify an hdf5 file with extension .h5')
 
-    # handling the data frame 
+    # handling the data frame
     store = pd.HDFStore(h5_file)
     data = store.get('data')
     store.close()
@@ -114,20 +114,20 @@ def h5_load(h5_file):
         except:
             raise
 
-    return data 
+    return data
 
 
 def rdata_save(data_frame=None, rdata_file='test.RData', append_data=False):
     """
     Saves pandas DataFrame with additional attributes to RData file format. Since custom attributes can't be stored like this yet, these are recognised and saved as json file format with the same name.
-    
+
     Parameter:
     ----------
 
     :param data_frame:(pandas.DataFrame) that might carry additional custom attributes
     :param rdata_file: (path) where to save the data
     :param append_data: (Boolean) whether the data should be appended to an existing file
-    
+
     """
     if not rdata_file.endswith('.RData'):
         raise IOError('Please specify an RData file with extension .RData')
@@ -136,11 +136,11 @@ def rdata_save(data_frame=None, rdata_file='test.RData', append_data=False):
         raise TypeError('Provided data is not of type pandas.DataFrame, but {}'.format(type(data_frame)))
 
     # get attributes if any
-    EMPTY_FRAME = pd.DataFrame() 
+    EMPTY_FRAME = pd.DataFrame()
 
     attributes = list(set(dir(EMPTY_FRAME)) ^ set(dir(data_frame)))
 
-    # write files 
+    # write files
     if not os.path.exists(rdata_file):
         try:
             r_data_frame = com.convert_to_r_dataframe(data_frame)
@@ -157,7 +157,7 @@ def rdata_save(data_frame=None, rdata_file='test.RData', append_data=False):
 
                 flatten = lambda d: {'_'.join(k):v for k,v in flatten_dictionary(d).items()}
 
-                for key, value in flatten(r_dic).iteritems():
+                for key, value in flatten(r_dic).items():
                     try:
                         r.assign('{}'.format(key), value)
                     except:
@@ -166,7 +166,7 @@ def rdata_save(data_frame=None, rdata_file='test.RData', append_data=False):
             r("save.image(file = '{}')".format(rdata_file))
 
         except:
-            raise 
+            raise
     else:
         print('File already exists')
 

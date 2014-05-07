@@ -94,9 +94,9 @@ class Schrodinger(object):
                                         * self.dk * np.arange(self.N))
 
     def _get_psi_k(self):
-        return self.psi_mod_k * np.exp(-1j * self.x[0] * 
+        return self.psi_mod_k * np.exp(-1j * self.x[0] *
                                         self.dk * np.arange(self.N))
-    
+
     def _get_dt(self):
         return self.dt_
 
@@ -108,7 +108,7 @@ class Schrodinger(object):
             self.x_evolve = self.x_evolve_half * self.x_evolve_half
             self.k_evolve = np.exp(-0.5 * 1j * self.hbar /
                                     self.m * (self.k * self.k) * dt)
-    
+
     psi_x = property(_get_psi_x, _set_psi_x)
     psi_k = property(_get_psi_k, _set_psi_k)
     dt = property(_get_dt, _set_dt)
@@ -138,7 +138,7 @@ class Schrodinger(object):
         if Nsteps > 0:
             self.psi_mod_x *= self.x_evolve_half
 
-        for i in xrange(Nsteps - 1):
+        for i in range(Nsteps - 1):
             self.compute_k_from_x()
             self.psi_mod_k *= self.k_evolve
             self.compute_x_from_k()
@@ -161,7 +161,7 @@ class Schrodinger(object):
 def gauss_x(x, a, x0, k0):
     """
     a gaussian wave packet of width a, centered at x0, with momentum k0
-    """ 
+    """
     return ((a * np.sqrt(np.pi)) ** (-0.5)
             * np.exp(-0.5 * ((x - x0) * 1. / a) ** 2 + 1j * x * k0))
 

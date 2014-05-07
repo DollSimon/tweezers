@@ -18,7 +18,7 @@ def get_script():
 
 def test_simple_rscript():
     r_script = get_script()
-    
+
     # calling envoy
     r = envoy.run('echo {}'.format(r_script))
     r.status_code.should.equal(0) 

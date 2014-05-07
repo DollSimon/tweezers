@@ -12,29 +12,38 @@ from functools import partial
 
 from tweezer.core.parsers import classify
 
-__all__ = [ os.path.basename(f)[:-3] for f in glob.glob(os.path.dirname(__file__)+"/*.py")]
+SOURCE_FILES = glob.glob(os.path.dirname(__file__) + "/*.py")
+__all__ = [os.path.basename(f)[: -3] for f in SOURCE_FILES]
 
 __version__ = (0, 0, 1)
 
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
-_DEFAULT_SETTINGS = os.path.join(_ROOT, 'data', 'settings', 'default_settings.json')
+_DEFAULT_SETTINGS = os.path.join(_ROOT, 'data', 'settings',
+                                 'default_settings.json')
 
-_TWEEBOT_CONFIG_TXT = os.path.join(_ROOT, 'data', 'settings', 'default.config.txt')
+_INSTRUMENT_SETTINGS = os.path.join(_ROOT, 'data', 'settings',
+                                    'instrument_settings.json')
 
-_TWEEBOT_CONFIG = os.path.join(_ROOT, 'data', 'settings', 'tweebot_configuration.json')
+_TWEEBOT_CONFIG_TXT = os.path.join(_ROOT, 'data', 'settings',
+                                   'default.config.txt')
+
+_TWEEBOT_CONFIG = os.path.join(_ROOT, 'data', 'settings',
+                               'tweebot_configuration.json')
+
 
 def get_example_path(path, example_type='data'):
     return os.path.join(_ROOT, example_type, path)
 
 
-def path_to_sample_data(data_type = 'MAN_DATA', info = False):
+def path_to_sample_data(data_type='MAN_DATA', info=False):
     """
     Points to tweezer example data of a given data type.
 
-    :param data_type: (Str) that represents the type of the data, like 'MAN_DATA', 'BOT_LOGS' or 'TC'
+    :param data_type: (Str) that represents the type of the data, like \
+    'MAN_DATA', 'BOT_LOGS' or 'TC'
     :param info: (Boolean) if true just prints the available files
-    
+
     :return example_file: archetype of the specified file type
     """
     def to_file(path, location=-1):
@@ -51,7 +60,7 @@ def path_to_sample_data(data_type = 'MAN_DATA', info = False):
     file_mapper = {'man_data': to_file(get_example_path('man_data'), location=-2),
         'data': to_file(get_example_path('man_data'), location=-2),
         'bad_man_data': to_file(get_example_path('man_data')),
-        'bot_data': to_file(get_example_path('bot_data')), 
+        'bot_data': to_file(get_example_path('bot_data')),
         'bot_stats': to_file(get_example_path('bot_stats'), location=-2),
         'bot_log': to_file(get_example_path('bot_logs')),
         'log': to_file(get_example_path('bot_logs')),
@@ -89,11 +98,12 @@ def path_to_sample_data(data_type = 'MAN_DATA', info = False):
             print(k)
 
 
-def path_to_sample_dir(data_type = 'MAN_DATA'):
+def path_to_sample_dir(data_type='MAN_DATA'):
     """
     Points to tweezer example data of a given data type.
 
-    :param data_type: (Str) that represents the type of the data, like 'MAN_DATA', 'BOT_LOGS' or 'TC'
+    :param data_type: (Str) that represents the type of the data, like \
+    'MAN_DATA', 'BOT_LOGS' or 'TC'
     """
     data_type = data_type.upper()
 
@@ -123,16 +133,17 @@ def path_to_sample_dir(data_type = 'MAN_DATA'):
     return path
 
 
-def path_to_templates(data_type = 'PYTEX'):
+def path_to_templates(data_type='PYTEX'):
     """
     Points to tweezer templates for automatic report generation.
 
-    :param data_type: (Str) that represents the type of the data, like 'MAN_DATA', 'BOT_LOGS' or 'TC'
+    :param data_type: (Str) that represents the type of the data, like \
+    'MAN_DATA', 'BOT_LOGS' or 'TC'
     """
     data_type = data_type.upper()
 
     if data_type == 'PYTEX':
-        path = get_example_path('pytex', example_type = 'templates')
+        path = get_example_path('pytex', example_type='templates')
     elif data_type == 'KNITR':
         path = get_example_path('knitr')
 
@@ -141,20 +152,23 @@ def path_to_templates(data_type = 'PYTEX'):
 
 def read(file_name, file_type='man_data', **kwargs):
     """
-    Convenience function to read the data from a given tweezer file name into a pandas DataFrame. It tries to make an educated guess about the file_type of the file in question and to dispatch the appropriate function call.
-    
+    Convenience function to read the data from a given tweezer file name into \
+    a pandas DataFrame. It tries to make an educated guess about the file_type\
+    of the file in question and to dispatch the appropriate function call.
+
     :param file_name: (path) to the file to be read into a pandas.DataFrame
 
-    :return data: (pandas.DataFrame) If applicable this return type contains the time series data in a DataFrame and any metadata as its attributes
+    :return data: (pandas.DataFrame) If applicable this return type contains \
+    the time series data in a DataFrame and any metadata as its attributes
     """
-    from tweezer.io import (read_tdms, 
-        read_tweebot_data, 
-        read_tweebot_logs, 
-        read_tweezer_image_info,
-        read_tracking_data,
-        read_tweezer_txt, 
-        read_thermal_calibration, 
-        read_tweezer_power_spectrum)  
+    from tweezer.io import (read_tdms,
+                            read_tweebot_data,
+                            read_tweebot_logs,
+                            read_tweezer_image_info,
+                            read_tracking_data,
+                            read_tweezer_txt,
+                            read_thermal_calibration,
+                            read_tweezer_power_spectrum)
 
     # classify file
     try:
@@ -162,27 +176,44 @@ def read(file_name, file_type='man_data', **kwargs):
         if 'unknown' in ftype.lower():
             ftype = file_type
     except:
-        print("Can't classify the file type myself. Trying the file_type default ('man_data')")
+        print("Can't classify the file type myself. Trying the file_type \
+            default ('man_data')")
         ftype = file_type
 
     if 'frequency' in kwargs:
         f = kwargs['frequency']
-        read_tweezer_power_spectrum = partial(read_tweezer_power_spectrum, frequency=f)
+        read_tweezer_power_spectrum = partial(read_tweezer_power_spectrum,
+                                              frequency=f)
+
         read_tdms = partial(read_tdms, frequency=f)
 
-    # use dictionary to dispatch the appropriate function (functions are first-class citizens!)
+    # use dictionary to dispatch the appropriate function
+    # (functions are first-class citizens!)
     read_mapper = {
-        'man_data': read_tweezer_txt, 
-        'man_pics': read_tweezer_image_info, 
-        'man_track': read_tracking_data, 
-        'tc_psd': read_tweezer_power_spectrum, 
-        'tc_ts': read_thermal_calibration, 
-        'bot_data': read_tweebot_data, 
-        'bot_tdms': read_tdms, 
+        'man_data': read_tweezer_txt,
+        'man_pics': read_tweezer_image_info,
+        'man_track': read_tracking_data,
+        'tc_psd': read_tweezer_power_spectrum,
+        'tc_ts': read_thermal_calibration,
+        'bot_data': read_tweebot_data,
+        'bot_tdms': read_tdms,
         'bot_log': read_tweebot_logs
-        }
+    }
 
     data = read_mapper[ftype.lower()](file_name)
 
     return data
-    
+
+
+## Python 2 to 3 conversion related things
+## see: http://lucumr.pocoo.org/2013/5/21/porting-to-python-3-redux/
+import sys
+PY2 = sys.version_info[0] == 2
+if not PY2:
+    text_type = str
+    string_types = (str,)
+    unichr = chr
+else:
+    text_type = unicode
+    string_types = (str, unicode)
+    unichr = unichr

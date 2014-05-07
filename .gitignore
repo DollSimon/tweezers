@@ -2,6 +2,35 @@
 */*/*.pyc
 examples/
 
+*.py[cod]
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+__pycache__
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
 .cache/
 
 build/
@@ -15,10 +44,16 @@ tweezer.egg-info/
 
 # certain ipython notebook files
 Sandbox.ipynb
+*.ipynb
 
 # sublime project files
 *.sublime-project
 *.sublime-workspace
+
+# PyCharm project files
+*.xml
+.idea
+*.iml
 
 # files related to python testing system
 .coverage

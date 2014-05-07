@@ -10,12 +10,12 @@ import numpy as np
 def parse_tweebot_configuration_file(file_name='default.config.txt'):
     """
     Extracts configuration data from Tweebot Config File
-    
+
     :param file_name: (path) to tweebot configuration file
 
     :return TweebotConfigData: (namedtuple) with configuration values and units as OrderedDicts
     """
-    
+
     with open(file_name, 'r') as f:
         lines = f.readlines()
         lines = [l.strip() for l in lines if l.strip()]
@@ -32,7 +32,7 @@ def parse_tweebot_configuration_file(file_name='default.config.txt'):
         if len(parts) > 2:
             units[parts[0]] = parts[2]
 
-    for key, val in values.iteritems():
+    for key, val in values.items():
         if re.search('^(\d|-\d)', str(val)):
             if '.' in str(val):
                 val = round(np.float64(val), 12)

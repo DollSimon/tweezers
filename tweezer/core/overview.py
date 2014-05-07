@@ -6,8 +6,8 @@ Routines related to producing experimental overview files
 """
 import os
 
-from clint import args 
-from clint.textui import colored, puts, indent 
+from clint import args
+from clint.textui import colored, puts, indent
 
 
 def full_tweebot_overview(path):
@@ -17,7 +17,7 @@ def full_tweebot_overview(path):
 def generate_tweebot_overview(data_file):
     """
     Top level routine for producing Tweebot overviews.
-    
+
     :param data_file: (Path) to Tweebot datalog file
     """
     puts('Generating overview for: \n')

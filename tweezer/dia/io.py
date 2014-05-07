@@ -15,8 +15,10 @@ import pandas as pd
 def read_image(file_name):
     pass
 
+
 def read_andor_fits_stack(file_name):
     pass
+
 
 def read_tweezer_avi(file_name):
     pass
@@ -25,15 +27,15 @@ def read_tweezer_avi(file_name):
 def read_distance_calibration_results(file_name):
     """
     Reads distance calibration results
-    
-    :param file_name: (path) to the distance calibration file 
-    
+
+    :param file_name: (path) to the distance calibration file
+
     """
     trap = 'pm' if 'pm' in os.path.basename(file_name).lower() else 'aod'
 
     with open(file_name, 'r') as f:
-        lines = [l.strip().strip('#').strip() for l in f.readlines()] 
-        lines = [l for l in lines] 
+        lines = [l.strip().strip('#').strip() for l in f.readlines()]
+        lines = [l for l in lines]
 
 
     units = {}
@@ -44,7 +46,7 @@ def read_distance_calibration_results(file_name):
             date_string = line.split(": ")[-1].replace("\t", " ")
         elif '2Pixel X (Hz/px)' in line:
             try:
-                xConversionFactor = float(line.strip().split(": ")[-1]) 
+                xConversionFactor = float(line.strip().split(": ")[-1])
             except:
                 xConversionFactor = None
 
@@ -53,7 +55,7 @@ def read_distance_calibration_results(file_name):
 
         elif '2Pixel X (V/px)' in line:
             try:
-                xConversionFactor = float(line.strip().split(": ")[-1]) 
+                xConversionFactor = float(line.strip().split(": ")[-1])
             except:
                 xConversionFactor = None
 
@@ -62,7 +64,7 @@ def read_distance_calibration_results(file_name):
 
         elif '2Pixel Y (Hz/px)' in line:
             try:
-                yConversionFactor = float(line.strip().split(": ")[-1]) 
+                yConversionFactor = float(line.strip().split(": ")[-1])
             except:
                 yConversionFactor = None
 
@@ -71,7 +73,7 @@ def read_distance_calibration_results(file_name):
 
         elif '2Pixel Y (V/px)' in line:
             try:
-                yConversionFactor = float(line.strip().split(": ")[-1]) 
+                yConversionFactor = float(line.strip().split(": ")[-1])
             except:
                 yConversionFactor = None
 
@@ -80,7 +82,7 @@ def read_distance_calibration_results(file_name):
 
         elif 'Intercept X' in line:
             try:
-                xIntercept = float(line.strip().split(": ")[-1]) 
+                xIntercept = float(line.strip().split(": ")[-1])
             except:
                 xIntercept = None
 
@@ -89,7 +91,7 @@ def read_distance_calibration_results(file_name):
 
         elif 'Intercept Y' in line:
             try:
-                yIntercept = float(line.strip().split(": ")[-1]) 
+                yIntercept = float(line.strip().split(": ")[-1])
             except:
                 yIntercept = None
 
@@ -98,7 +100,7 @@ def read_distance_calibration_results(file_name):
 
         elif 'STD X' in line:
             try:
-                xStd = float(line.strip().split(": ")[-1]) 
+                xStd = float(line.strip().split(": ")[-1])
             except:
                 xStd = None
 
@@ -110,7 +112,7 @@ def read_distance_calibration_results(file_name):
 
         elif 'STD Y' in line:
             try:
-                yStd = float(line.strip().split(": ")[-1]) 
+                yStd = float(line.strip().split(": ")[-1])
             except:
                 yStd = None
 
@@ -126,17 +128,17 @@ def read_distance_calibration_results(file_name):
     else:
         date = datetime.now()
 
-    DistanceCalibration = namedtuple('DistanceCalibrationResults', 
+    DistanceCalibration = namedtuple('DistanceCalibrationResults',
         ['trap', 'xConversionFactor', 'yConversionFactor',
         'xIntercept', 'yIntercept', 'xStd', 'yStd', 'date', 'units'])
 
-    results = DistanceCalibration(trap, 
-        data['xConversionFactor'], 
-        data['yConversionFactor'], 
-        data['xIntercept'], 
-        data['yIntercept'], 
-        data['xStd'], 
-        data['yStd'], 
+    results = DistanceCalibration(trap,
+        data['xConversionFactor'],
+        data['yConversionFactor'],
+        data['xIntercept'],
+        data['yIntercept'],
+        data['xStd'],
+        data['yStd'],
         date, units)
 
     return results
@@ -146,7 +148,7 @@ def read_distance_calibration_matrix(file_name):
     """
     Reads distance calibration matrix
 
-    :param file_name: (path) to the distance calibration file 
+    :param file_name: (path) to the distance calibration file
     :param trap: (str) designating the trap of interest, either 'pm' or 'aod'
     """
     trap = 'pm' if 'pm' in os.path.basename(file_name).lower() else 'aod'
@@ -163,8 +165,8 @@ def read_distance_calibration_matrix(file_name):
     # determine trap steps
     start = setup[0]
     step = setup[1]
-    nStepsX = int(setup[2]) 
-    nStepsY = int(setup[3]) 
+    nStepsX = int(setup[2])
+    nStepsY = int(setup[3])
 
     if nStepsX == nStepsY:
         xTrapPositions = yTrapPositions = [round(start + step * i, 6) for i in range(nStepsY)]
@@ -190,9 +192,9 @@ def read_distance_calibration_matrix(file_name):
 
     # split data in the middle
 
-    # create steps for the 
-    DistanceCalibration = namedtuple('DistanceCalibrationMatrix', 
-        ['trap', 'xDF', 'yDF']) 
+    # create steps for the
+    DistanceCalibration = namedtuple('DistanceCalibrationMatrix',
+        ['trap', 'xDF', 'yDF'])
 
     results = DistanceCalibration(trap, xDF, yDF)
 

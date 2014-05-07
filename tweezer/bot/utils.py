@@ -6,11 +6,10 @@ import copy
 import pandas as pd
 
 
-
 def simplify_tweebot_data_names(variable_names):
     """
     Extracts tweebot variable names from a list of variables and substitutes them for common tweezer nomenclature
-    
+
     :param variable_names: (list) with variable names as read by tweebot datalog reader
 
     :return names: (list) new list with simpler variable names
@@ -141,8 +140,8 @@ def simplify_tweebot_data_names(variable_names):
 def combine_tweebot_data(datalog_content=pd.DataFrame([]), tdms_content=pd.DataFrame([])):
     """
     Aligns the data from different sources, most notably from Tweebot Datalog files and from TDMS files.
-    
-    :param datalog_content: (pandas.DataFrame) of 
+
+    :param datalog_content: (pandas.DataFrame) of
     :param tdms_content: (pandas.DataFrame) of high frequency tdms data
     """
     dc = datalog_content
@@ -155,4 +154,4 @@ def combine_tweebot_data(datalog_content=pd.DataFrame([]), tdms_content=pd.DataF
     # where is dc.pressure == tc.pressure
 
     # combine attributes
-    # 
+    #
