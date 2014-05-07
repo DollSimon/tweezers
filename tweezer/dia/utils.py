@@ -36,3 +36,7 @@ def show_images(images, titles=None):
 class CameraConversionFactor(object):
     def __init__(self, camera='ccd'):
         self.camera = camera
+
+
+def create_timestamp_from_fits(fileName):
+    pass

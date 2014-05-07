@@ -24,61 +24,61 @@ except ImportError:
     raise
 
 
-def read_tweezer_txt(file_name):
+def read_tweezer_txt(fileName):
     """
     Reads dual-trap data and metadata contained in text files
     """
     # check file sanity and correct it if necessary
-    shell_call = envoy.run('tail -n 12 {}'.format(file_name), timeout=5)
+    shell_call = envoy.run('tail -n 12 {}'.format(fileName), timeout=5)
     if shell_call.status_code is 0:
         tail = shell_call.std_out.split("\n")
     else:
-        raise IOError("The file {} does not exist".format(file_name))
+        raise IOError("The file {} does not exist".format(fileName))
 
     if any([l.strip().startswith("#") for l in tail]):
         isFileSane = False
     else:
         isFileSane = True
 
-    with open(file_name, 'r', encoding='utf-8') as f:
+    with open(fileName, 'r', encoding='utf-8') as f:
         fl = []
         for i in range(60):
             fl.append(f.readline())
 
     # parsing header information
-    header_comments = [line.strip().strip("# ") for line in fl[0:40] if line.strip().startswith('#')]
-    tail_comments = [line.strip().strip("# ") for line in tail[-10:] if line.strip().startswith('#')]
-    comments = header_comments + tail_comments
+    headerComments = [line.strip().strip("# ") for line in fl[0:40] if line.strip().startswith('#')]
+    tailComments = [line.strip().strip("# ") for line in tail[-10:] if line.strip().startswith('#')]
+    comments = headerComments + tailComments
 
     CommentInfo = extract_meta_and_units(comments)
 
     units = CommentInfo.units
     meta = CommentInfo.metadata
 
-    meta['originalFile'] = file_name
+    meta['originalFile'] = fileName
     meta['isFileSane'] = isFileSane
 
     # getting header and data
-    header_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[a-zA-Z]', line.strip())][-1]
-    header = fl[header_pos]
-    column_precursor = [col.strip() for col in header.strip().split('\t')]
+    headerIndices = [ind for ind, line in enumerate(fl[0:45]) if re.match(r'^[a-zA-Z]', line.strip())][-1]
+    header = fl[headerIndices]
+    columnPrecursor = [col.strip() for col in header.strip().split('\t')]
 
     columns = []
-    for c in column_precursor:
-        if re.search('\(([a-zA-Z]+)\)', c):
-            name, unit = re.search('^(\w+)\s+\(([a-zA-Z]+)\)', c).groups()
+    for c in columnPrecursor:
+        if re.search(r'\(([a-zA-Z]+)\)', c):
+            name, unit = re.search(r'^(\w+)\s+\(([a-zA-Z]+)\)', c).groups()
             columns.append(name)
             units[name] = unit
         else:
             columns.append(c)
 
-    data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
+    firstDataLine = [ind for ind, line in enumerate(fl[0:45]) if re.match(r'^[-0-9]', line.strip())][0]
 
     if isFileSane:
-        data = pd.read_table(file_name, sep='\t', header=None, skiprows=data_pos,
+        data = pd.read_table(fileName, sep='\t', header=None, skiprows=firstDataLine,
             names=columns, dtype=np.float64)
     else:
-        data = pd.read_table(file_name, sep='\t', header=None, skiprows=data_pos,
+        data = pd.read_table(fileName, sep='\t', header=None, skiprows=firstDataLine,
             skipfooter=10, names=columns, dtype=np.float64)
 
     # drop rows with "NaN" values
@@ -98,11 +98,11 @@ def read_tweezer_txt(file_name):
     return data
 
 
-def read_tweebot_data(file_name):
+def read_tweebot_data(fileName):
     """
     Reads dual-trap data and metadata from TweeBot datalog files.
 
-    :param file_name: Path to the TweeBot datalog file.
+    :param fileName: Path to the TweeBot datalog file.
 
     :return data: (pandas.DataFrame) contains redorded data and also meta \
     data  and units as attributes.
@@ -133,22 +133,22 @@ def read_tweebot_data(file_name):
         of the TweeBot datalog files.
 
     """
-    # columnNames, calibration, header = read_tweebot_data_header(file_name)
-    HeaderInfo = read_tweebot_data_header(file_name)
+    # columnNames, calibration, header = read_tweebot_data_header(fileName)
+    HeaderInfo = read_tweebot_data_header(fileName)
 
     try:
-        _data = pd.read_csv(file_name,
-                            header=HeaderInfo.header_pos,
+        _data = pd.read_csv(fileName,
+                            header=HeaderInfo.headerIndices,
                             sep='\t',
                             dtype=np.float64)
     except:
-        raise IOError("Can't read the file: {}".format(file_name))
+        raise IOError("Can't read the file: {}".format(fileName))
 
     # get rid of unnamed and empty colums
     _data = _data.dropna(axis=1)
 
-    # add attributes from file_name
-    FileInfo = parse_tweezer_file_name(file_name, parser='bot_data')
+    # add attributes from fileName
+    FileInfo = parse_tweezer_file_name(fileName, parser='bot_data')
     _data.date = FileInfo.date
     _data.trial = FileInfo.trial
     _data.subtrial = FileInfo.subtrial
@@ -192,16 +192,16 @@ def read_tweebot_data(file_name):
     data.units.update(HeaderInfo.units)
 
     data.meta['timeStep'] = timeStep
-    data.meta['original_file'] = file_name
+    data.meta['original_file'] = fileName
 
     return data
 
 
-def read_thermal_calibration(file_name, frequency=80000):
+def read_thermal_calibration(fileName, frequency=80000):
     """
     Reads time series and calculated power spectra of a thermal calibration.
 
-    :param file_name: (path) to the tweezer time series file containing the raw values of the PSD signals
+    :param fileName: (path) to the tweezer time series file containing the raw values of the PSD signals
 
     :param frequency: (int) sampling frequency of time series
 
@@ -209,7 +209,7 @@ def read_thermal_calibration(file_name, frequency=80000):
 
     """
     # get header information
-    with open(file_name, 'r', encoding='utf-8') as f:
+    with open(fileName, 'r', encoding='utf-8') as f:
         fl = []
         for i in range(60):
             fl.append(f.readline())
@@ -218,8 +218,8 @@ def read_thermal_calibration(file_name, frequency=80000):
     comments = [line for line in fl[0:15] if line.strip().startswith('#')]
 
     try:
-        date_string = [l.strip().replace("\t", " ").split(": ")[-1] for l in comments if 'Date' in l][0]
-        date = datetime.strptime(date_string, '%m/%d/%Y %H:%M %p')
+        dateString = [l.strip().replace("\t", " ").split(": ")[-1] for l in comments if 'Date' in l][0]
+        date = datetime.strptime(dateString, '%m/%d/%Y %H:%M %p')
     except:
         date = datetime.now()
 
@@ -233,14 +233,15 @@ def read_thermal_calibration(file_name, frequency=80000):
     time = [dt*i for i in range(nSamples)]
 
     # read header information
-    header_pos = [ind for ind, line in enumerate(fl[0:15]) if re.match('^[a-zA-Z]', line.strip())][-1]
-    header = fl[header_pos]
+    headerIndices = [ind for ind, line in enumerate(fl[0:15]) if re.match(r'^[a-zA-Z]', line.strip())][-1]
+    header = fl[headerIndices]
     columns = [col.replace('.', '_').strip() for col in header.strip().split('\t')]
 
-    data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
+    firstDataLine = [ind for ind, line in enumerate(fl[0:45]) if re.match(r'^[-0-9]', line.strip())][0]
+
     # read file data
-    ts = pd.read_table(file_name, sep='\t', skiprows=data_pos,
-        names=columns, header=None, dtype=np.float64)
+    ts = pd.read_table(fileName, sep='\t', skiprows=firstDataLine,
+                       names=columns, header=None, dtype=np.float64)
 
     # setting time as a data column and an index to be on the safe side
     ts['time'] = time
@@ -253,16 +254,16 @@ def read_thermal_calibration(file_name, frequency=80000):
     return ts
 
 
-def read_tweezer_power_spectrum(file_name):
+def read_tweezer_power_spectrum(fileName):
     """
     Reads data from tweezer power spectrum file. These files are produced by LabView and contain the raw PSDs and the fits used to extract trap calibration results
 
-    :param file_name: (path) file path to the tweezer power spectrum file
+    :param fileName: (path) file path to the tweezer power spectrum file
 
     :return psd: (pandas.DataFrame) with all the raw and fitted data as well as the fit results
     """
     # get header information
-    with open(file_name, 'r', encoding='utf-8') as f:
+    with open(fileName, 'r', encoding='utf-8') as f:
         fl = []
         for i in range(60):
             fl.append(f.readline())
@@ -273,14 +274,14 @@ def read_tweezer_power_spectrum(file_name):
     CommentInfo = extract_meta_and_units(comments)
 
     # getting header and data
-    header_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[a-zA-Z]', line.strip())][-1]
-    header = fl[header_pos]
+    headerIndices = [ind for ind, line in enumerate(fl[0:45]) if re.match(r'^[a-zA-Z]', line.strip())][-1]
+    header = fl[headerIndices]
     columns = [col.replace('.', '_').strip() for col in header.strip().split('\t')]
 
-    data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
+    firstDataLine = [ind for ind, line in enumerate(fl[0:45]) if re.match(r'^[-0-9]', line.strip())][0]
 
     # read file data
-    psd = pd.read_table(file_name, sep='\t', skiprows=data_pos,
+    psd = pd.read_table(fileName, sep='\t', skiprows=firstDataLine,
         names=columns, header=None, dtype=np.float64)
 
     for k, v in CommentInfo.metadata.items():
@@ -304,21 +305,21 @@ def read_distance_calibration_data(comments):
     pass
 
 
-def read_tdms(file_name, frequency=1000):
+def read_tdms(fileName, frequency=1000):
     """
     Reads data from Labview TDMS file.
 
-    :param file_name: (path) to tdms file
+    :param fileName: (path) to tdms file
 
     :param frequency: (int) sampling frequency in Hz (default is 1000 Hz, i.e. data taken at 1 ms time resolution)
 
-    :return data: (pd.DataFrame) with the channels as columns and index based on file_name infos
+    :return data: (pd.DataFrame) with the channels as columns and index based on fileName infos
 
     """
-    info = parse_tweezer_file_name(file_name, parser='bot_tdms')
+    info = parse_tweezer_file_name(fileName, parser='bot_tdms')
 
     # open tdms connection
-    tf = TdmsFile(file_name)
+    tf = TdmsFile(fileName)
 
     # read data
     if 'Untitled' in tf.groups():
@@ -364,22 +365,22 @@ def read_tdms(file_name, frequency=1000):
     return data
 
 
-def read_tweebot_stats(file_name):
+def read_tweebot_stats(fileName):
     """
     Reads data from TweeBot statistic files.
     """
     pass
 
 
-def read_tweebot_logs(file_name):
+def read_tweebot_logs(fileName):
     """
     Reads data from TweeBot log files.
 
-    :param file_name: (path) Tweebot log file to be parsed
+    :param fileName: (path) Tweebot log file to be parsed
 
     :return log: (pd.DataFrame) with the logging data
     """
-    log = pd.read_table(file_name)
+    log = pd.read_table(fileName)
     log.columns = ['time', 'kind', 'routine', 'message']
     log.index = pd.to_datetime(log.time)
     log.tz_localize('Europe/Berlin')
@@ -388,11 +389,11 @@ def read_tweebot_logs(file_name):
     return log
 
 
-def read_tracking_data(file_name):
+def read_tracking_data(fileName):
     """
     Reads data from Tweezer Tracking files.
     """
-    data = pd.read_csv(file_name, sep = '\t', dtype=np.float64)
+    data = pd.read_csv(fileName, sep = '\t', dtype=np.float64)
     return data
 
 
@@ -402,7 +403,7 @@ def read_tweebot_data_header(datalog_file):
 
     :param datalog_file : (path) Tweebot datalog file from which the header is extracted
 
-    :return HeaderInfo: (namedtuple) info container with fields 'column_names', 'metadata', 'units', and 'header_pos', 'data_pos'
+    :return HeaderInfo: (namedtuple) info container with fields 'column_names', 'metadata', 'units', and 'headerIndices', 'firstDataLine'
 
     Usage:
     """"""
@@ -429,42 +430,42 @@ def read_tweebot_data_header(datalog_file):
     units = CommentInfo.units
 
     # getting header and data
-    header_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[a-zA-Z]', line.strip())][-1]
-    header = fl[header_pos]
+    headerIndices = [ind for ind, line in enumerate(fl[0:45]) if re.match(r'^[a-zA-Z]', line.strip())][-1]
+    header = fl[headerIndices]
     column_names = [col.strip() for col in header.strip().split('\t')]
 
-    data_pos = [ind for ind, line in enumerate(fl[0:45]) if re.match('^[-0-9]', line.strip())][0]
+    firstDataLine = [ind for ind, line in enumerate(fl[0:45]) if re.match(r'^[-0-9]', line.strip())][0]
 
     HeaderInfo = namedtuple('HeaderInfo', ['column_names', 'metadata', 'units',
-        'header_pos', 'data_pos'])
+        'headerIndices', 'firstDataLine'])
 
-    H = HeaderInfo(column_names, meta, units, header_pos, data_pos)
+    H = HeaderInfo(column_names, meta, units, headerIndices, firstDataLine)
 
     return H
 
 
-def read_tweezer_image_info(file_name, file_type='man_pics'):
+def read_tweezer_image_info(fileName, file_type='man_pics'):
     """
     Extracts basic information about an image
 
-    :param file_name: (path) to the image
+    :param fileName: (path) to the image
 
     :return name: Description
     """
     try:
-        im = Image.open(file_name)
+        im = Image.open(fileName)
     except IOError:
-        print('Could not open the image {}'.format(file_name))
+        print('Could not open the image {}'.format(fileName))
         raise
 
     info = {}
-    info['original_file'] = file_name
+    info['original_file'] = fileName
     info['file_type'] = file_type
     info['file_type'] = 'image'
     info['size'] = im.size
     info['format'] = im.format
     try:
-        info['FileInfo'] = parse_tweezer_file_name(file_name, parser=file_type)
+        info['FileInfo'] = parse_tweezer_file_name(fileName, parser=file_type)
     except:
         print('Could not extract file information from the file name.')
 
@@ -632,7 +633,7 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
 
     for line in comment_list:
         if 'Date' in line:
-            date_string = line.split(": ")[-1].replace("\t", " ")
+            dateString = line.split(": ")[-1].replace("\t", " ")
         elif 'starttime' in line:
             time_string = line.strip().split(": ")[-1]
         elif 'Time of Experiment' in line:
@@ -1130,16 +1131,16 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             meta[var] = value
 
     # parsing the date
-    if date_string and time_string:
-        combined_date = " ".join([date_string.strip(), time_string.strip()])
+    if dateString and time_string:
+        combined_date = " ".join([dateString.strip(), time_string.strip()])
         try:
             date = pd.to_datetime(combined_date)
         except ValueError:
             combined_date = " ".join(["1/1/1900", time_string.strip()])
             date = pd.to_datetime(combined_date)
-    elif date_string and not time_string:
+    elif dateString and not time_string:
         try:
-            date = pd.to_datetime(date_string)
+            date = pd.to_datetime(dateString)
         except ValueError:
             date = pd.to_datetime(datetime(1900, 1, 1, 1, 1, 1))
     else:

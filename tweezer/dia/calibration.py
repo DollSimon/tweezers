@@ -1,1 +1,5 @@
-__author__ = 'jahnel'
+#!/usr/bin/env python
+
+
+def calibrate_camera(image):
+    pass
