@@ -21,7 +21,8 @@ DEPENDENCIES = ['nose', 'pytest', 'docopt', 'pandas', 'tables', 'numpy',
 
 PACKAGES = ['tweezer', 'tweezer.gui', 'tweezer.core', 'tweezer.cli',
             'tweezer.scripts', 'tweezer.bot', 'tweezer.ixo', 'tweezer.dia',
-            'tweezer.simulate', 'tweezer.noise', 'tweezer.geom']
+            'tweezer.simulate', 'tweezer.noise', 'tweezer.geom',
+            'tweezer.physics', 'tweezer.statistics']
 
 MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
            'tweezer.core.polymer', 'tweezer.core.geometry',
@@ -38,7 +39,8 @@ MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
            'tweezer.dia.tracking', 'tweezer.ixo.ipython_', 'tweezer.dia.utils',
            'tweezer.simulate.brownian_motion', 'tweezer.ixo.viscosity',
            'tweezer.noise.pwc', 'tweezer.noise.filter',
-           'tweezer.noise.ocl_filter', 'tweezer.dia.interactive']
+           'tweezer.noise.ocl_filter', 'tweezer.dia.interactive',
+           'tweezer.physics.thermodynamics', 'tweezer.statistics.wlc_models']
 
 setup(
     name='tweezer',
