@@ -318,3 +318,5 @@ class LengthDependentPersistenceLength(object):
         P = self.P_inf / (1 + self.a * (self.P_inf / L))
 
         return P
+
+
