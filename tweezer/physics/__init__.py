@@ -12,3 +12,9 @@ __all__ = [os.path.basename(f)[: -3] for f in SOURCE_FILES]
 from .thermodynamics import thermal_energy
 
 from .hydrodynamics import drag_on_sphere
+
+from .viscosity import (dynamic_viscosity_of_mixture,
+                        water_dynamic_viscosity,
+                        water_density,
+                        glycerol_dynamic_viscosity,
+                        glycerol_density)

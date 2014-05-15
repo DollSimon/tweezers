@@ -18,9 +18,9 @@ from math import exp
 from itertools import chain
 
 
-def calc_dynamic_viscosity_of_mixture(waterVolume=1,
-                                      glycerolVolume=0,
-                                      temperature=25):
+def dynamic_viscosity_of_mixture(waterVolume=1,
+                                 glycerolVolume=0,
+                                 temperature=25):
     """
     Power law equation for the dynamic viscosity of a water \
     to glycerol mixture according to:
@@ -31,8 +31,8 @@ def calc_dynamic_viscosity_of_mixture(waterVolume=1,
     T = float(temperature)
     wV = float(waterVolume)
     gV = float(glycerolVolume)
-    mu_w = calc_water_dynamic_viscosity(temperature)
-    mu_g = calc_glycerol_dynamic_viscosity(temperature)
+    mu_w = water_dynamic_viscosity(temperature)
+    mu_g = glycerol_dynamic_viscosity(temperature)
     Cm = calc_glycerol_fraction_by_mass(wV, gV, T)
     alpha = calc_alpha(Cm, temperature)
 
@@ -87,7 +87,7 @@ def calc_alpha(glycerolMassFraction, temperature=25):
     return alpha
 
 
-def calc_water_dynamic_viscosity(temperature=25):
+def water_dynamic_viscosity(temperature=25):
     """
     Calculates *mu_w*, the dynamic viscosity of water using the\
     interpolation formula of Cheng
@@ -104,7 +104,7 @@ def calc_water_dynamic_viscosity(temperature=25):
     return waterDynamicViscosity
 
 
-def calc_glycerol_dynamic_viscosity(temperature=25):
+def glycerol_dynamic_viscosity(temperature=25):
     """
     Calculates *mu_g*, the dynamic viscosity of glycerol using the\
     interpolation formula of Cheng
@@ -121,7 +121,7 @@ def calc_glycerol_dynamic_viscosity(temperature=25):
     return glycerolDynamicViscosity
 
 
-def calc_water_density(temperature):
+def water_density(temperature):
     """
     Calculates the density of water from an interpolation by\
     Cheng (see viscosity docstring for reference.)
@@ -136,7 +136,7 @@ def calc_water_density(temperature):
     return waterDensity
 
 
-def calc_glycerol_density(temperature):
+def glycerol_density(temperature):
     """
     Calculates the density of glycerol from an interpolation by\
     Cheng (see viscosity docstring for reference.)
@@ -161,8 +161,8 @@ def calc_density_of_mixture(waterVolume, glycerolVolume, temperature=25):
     :return name: Description
     """
     T = float(temperature)
-    rW = calc_water_density(temperature)
-    rG = calc_glycerol_density(temperature)
+    rW = water_density(temperature)
+    rG = glycerol_density(temperature)
     Cm = calc_glycerol_fraction_by_mass(waterVolume, glycerolVolume, T)
 
     rho = rG * Cm + rW * (1 - Cm)
@@ -225,8 +225,8 @@ def calc_glycerol_fraction_by_mass(waterVolume, glycerolVolume, temperature):
     :return massFractionGlycerol: Fraction of glycerol by mass in [0, 1]
     """
     T = float(temperature)
-    wM = calc_mass(waterVolume, calc_water_density(T))
-    gM = calc_mass(glycerolVolume, calc_glycerol_density(T))
+    wM = calc_mass(waterVolume, water_density(T))
+    gM = calc_mass(glycerolVolume, glycerol_density(T))
 
     try:
         Cm = gM / (wM + gM)
@@ -261,7 +261,7 @@ def plot_dynamic_viscosity():
     G = [n / 10.0 for n in range(0, 11)]
     G = G.reverse()
 
-    V = [(a, b, c, calc_dynamic_viscosity_of_mixture(a, b, c)) for a, b, c
+    V = [(a, b, c, dynamic_viscosity_of_mixture(a, b, c)) for a, b, c
          in zip(list(chain(*([W] * 10))), list(chain(*([G] * 10))), T)]
 
     A = [n[0] for n in V]
@@ -291,10 +291,10 @@ def main():
     print("Parameter:\n{}\n{}\n{}\n".format(wString, gString, tString))
 
     print("Density of Water [kg/m^3]:")
-    print("{}\n".format(calc_water_density(T)))
+    print("{}\n".format(water_density(T)))
 
     print("Density of Glycerol [kg/m^3]:")
-    print("{}\n".format(calc_glycerol_density(T)))
+    print("{}\n".format(glycerol_density(T)))
 
     print("Density of Mixture [kg/m^3]:")
     print("{}\n".format(calc_density_of_mixture(W, G, T)))
@@ -309,13 +309,13 @@ def main():
     print("{}\n".format(calc_glycerol_fraction_by_mass(W, G, T)))
 
     print("Dynamic Viscosity of Water [Ns/m^2]:")
-    print("{}\n".format(calc_water_dynamic_viscosity(T)))
+    print("{}\n".format(water_dynamic_viscosity(T)))
 
     print("Dynamic Viscosity of Glycerol [Ns/m^2]:")
-    print("{}\n".format(calc_glycerol_dynamic_viscosity(T)))
+    print("{}\n".format(glycerol_dynamic_viscosity(T)))
 
     print("Dynamic Viscosity of Mixture [Ns/m^2]:")
-    print("{}\n".format(calc_dynamic_viscosity_of_mixture(W, G, T)))
+    print("{}\n".format(dynamic_viscosity_of_mixture(W, G, T)))
 
     print("Power law exponent:")
     Cm = calc_glycerol_fraction_by_mass(W, G, T)
