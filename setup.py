@@ -40,7 +40,8 @@ MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
            'tweezer.simulate.brownian_motion', 'tweezer.ixo.viscosity',
            'tweezer.noise.pwc', 'tweezer.noise.filter',
            'tweezer.noise.ocl_filter', 'tweezer.dia.interactive',
-           'tweezer.physics.thermodynamics', 'tweezer.statistics.wlc_models']
+           'tweezer.physics.thermodynamics', 'tweezer.statistics.wlc_models',
+           'tweezer.physics.hydrodynamics']
 
 setup(
     name='tweezer',

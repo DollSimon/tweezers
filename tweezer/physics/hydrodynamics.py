@@ -4,7 +4,7 @@
 import numpy as np
 
 
-def calc_drag_on_sphere(radius=1000, viscosity=0.9e-9):
+def drag_on_sphere(radius=1000, viscosity=0.9e-9):
     """
     Calculates the simple Stokes' drag coefficient of a sphere in a Newtonian fluid
 
@@ -16,13 +16,13 @@ def calc_drag_on_sphere(radius=1000, viscosity=0.9e-9):
     if not isinstance(radius, (int, float, np.float)):
         try:
             radius = np.float(radius)
-        except:
+        except ValueError:
             print('Radius must be a number, not a {}'.format(type(radius)))
 
     if not isinstance(viscosity, (int, float, np.float)):
         try:
             viscosity = np.float(viscosity)
-        except:
+        except ValueError:
             print('Viscosity must be a number, not a {}'.format(type(viscosity)))
 
     assert (radius > 0), 'Radius of sphere must be positive'

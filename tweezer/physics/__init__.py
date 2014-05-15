@@ -11,3 +11,4 @@ __all__ = [os.path.basename(f)[: -3] for f in SOURCE_FILES]
 # imports
 from .thermodynamics import thermal_energy
 
+from .hydrodynamics import drag_on_sphere
