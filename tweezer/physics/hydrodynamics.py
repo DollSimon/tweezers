@@ -9,16 +9,26 @@ def drag_on_sphere(radius=1000, dynamicViscosity=0.9e-9, verbose=False):
     Calculates the simple Stokes' drag coefficient of a sphere in a Newtonian fluid
     at low Reynolds number.
 
-    :param radius: radius of solid sphere in [nm]; default: 1000
-    :type radius: float
 
-    :param dynamicViscosity: dynamic viscosity in [pN/nm^2 s]; default: 0.9e-9
-    :type dynamicViscosity: float
+    Parameters
+    ----------
+    radius : float
+        Radius of solid sphere in [nm]
+        Default: 1000 nm
 
-    :param verbose: print parameters and results with units; default: False
+    dynamicViscosity : float
+        Dynamic viscosity in [pN/nm^2 s]
+        Default: 0.9e-9 pN/nm^s s
 
-    :return dragCoefficient: Stokes drag coefficient in [pN/nm s]
-    :rtype: float
+    verbose : bool
+        Print parameters and results with units
+        Default: False
+
+    Returns
+    -------
+    dragCoefficient : float
+        Stokes drag coefficient in [pN/nm s]
+
     """
     if not isinstance(radius, (int, float, np.float)):
         try:

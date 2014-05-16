@@ -6,10 +6,21 @@ def thermal_energy(temperature=298, units='pN nm'):
     """
     Thermal energy in units of [pN nm]
 
-    :param temperature: Temperature in units of [K]
-    :param units: change the units and value of the returned energy
+    Parameters
+    ----------
+    temperature : float
+        Temperature in units of [K]
+        Default: 298 K
 
-    :return energy: Thermal energy in [pN nm] (default)
+    units : str
+        Unit of the returned energy value
+        Choices: 'pN nm', 'J', None
+        Default: 'pN nm'
+
+    Returns
+    -------
+    energy : float
+        Thermal energy in [units] (default is [pN nm])
     """
     if units is None:
         energy = kB * temperature
