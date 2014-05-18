@@ -22,7 +22,8 @@ DEPENDENCIES = ['nose', 'pytest', 'docopt', 'pandas', 'tables', 'numpy',
 PACKAGES = ['tweezer', 'tweezer.gui', 'tweezer.core', 'tweezer.cli',
             'tweezer.scripts', 'tweezer.bot', 'tweezer.ixo', 'tweezer.dia',
             'tweezer.simulate', 'tweezer.noise', 'tweezer.geom',
-            'tweezer.physics', 'tweezer.statistics', 'tweezer.calibration']
+            'tweezer.physics', 'tweezer.statistics', 'tweezer.single',
+            'tweezer.dual']
 
 MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
            'tweezer.core.polymer', 'tweezer.core.geometry',
@@ -41,8 +42,9 @@ MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
            'tweezer.noise.pwc', 'tweezer.noise.filter',
            'tweezer.noise.ocl_filter', 'tweezer.dia.interactive',
            'tweezer.physics.thermodynamics', 'tweezer.statistics.wlc_models',
-           'tweezer.physics.hydrodynamics', 'tweezer.calibration.single_trap',
-           'tweezer.calibration.dual_trap', 'tweezer.calibration.utils']
+           'tweezer.physics.hydrodynamics', 'tweezer.single.calibration',
+           'tweezer.single.theory', 'tweezer.single.utils', 'tweezer.dual.calibration',
+           'tweezer.dual.theory', 'tweezer.dual.differential_detection']
 
 setup(
     name='tweezer',
@@ -69,7 +71,8 @@ setup(
         'Natural Language :: English',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
     ),
 )
