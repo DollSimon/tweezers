@@ -32,12 +32,12 @@ sys.path.append(os.path.expanduser('sphinxext'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-# extensions = ['sphinx.ext.autodoc', 
-#             'sphinx.ext.doctest', 
-#             'sphinx.ext.intersphinx', 
-#             'sphinx.ext.todo', 
-#             'sphinx.ext.coverage', 
-#             'sphinx.ext.mathjax', 
+# extensions = ['sphinx.ext.autodoc',
+#             'sphinx.ext.doctest',
+#             'sphinx.ext.intersphinx',
+#             'sphinx.ext.todo',
+#             'sphinx.ext.coverage',
+#             'sphinx.ext.mathjax',
 #             'sphinx.ext.viewcode']
 
 extensions = ['sphinx.ext.autodoc',
@@ -53,7 +53,7 @@ extensions = ['sphinx.ext.autodoc',
               'matplotlib.sphinxext.mathmpl',
               'matplotlib.sphinxext.only_directives',
               'matplotlib.sphinxext.plot_directive',
-              'sphinxcontrib.tikz',
+              # 'sphinxcontrib.tikz',
               # 'matplotlib.sphinxext.ipython_directive',
               # 'ipython_console_highlighting',
               # 'inheritance_diagram',
@@ -145,11 +145,17 @@ todo_include_todos = True
 # [optional] set some of the options listed above...
 # html_theme_options = { "roottarget": "index" }
 
-# Bootstrap theme
-import sphinx_bootstrap_theme
+# Read The Docs Theme
+import sphinx_rtd_theme
 
-html_theme = 'bootstrap'
-html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+# Bootstrap theme
+# import sphinx_bootstrap_theme
+
+# html_theme = 'bootstrap'
+# html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -257,7 +263,7 @@ latex_documents = [
    u'Marcus Jahnel', 'manual'),
 ]
 
- 
+
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
 #latex_logo = None
