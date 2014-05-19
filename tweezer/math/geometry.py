@@ -1,5 +1,6 @@
-#!/usr/bin/env python
-#-*- coding: utf-8 -*-
+__doc__ = """\
+Geometry module with useful classes and functions.
+"""
 
 
 class Point(object):
@@ -8,4 +9,3 @@ class Point(object):
         self.x = x
         self.y = y
         self.z = z
-
