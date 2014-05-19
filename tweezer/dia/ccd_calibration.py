@@ -5,13 +5,8 @@ from skimage import filter
 from skimage import io
 
 #set the paths of a single image or a collection of images
-imagePath = '/home/avellaneda/.gvfs/dualtrapgrill en fileserver.mpi-cbg.de/' \
-             'TweezerCalibration/Camera_Calibration_05_05_2014/CCD/pictures/' \
-             'AutoSave_2_b_2014_05_05_10_57_12.jpg'
-collectionPath = '/home/avellaneda/Escritorio/Portatil Mario 24-09-12/DATOS/' \
-                  'Mario/BIOTEC/Thesis/camera_calibration/pictures02_02/*.jpg'
-SCALE = 10000       #distance between edges in nm
 
+SCALE = 10000       #distance between edges in nm
 
 def get_edges(line, threshold=10):
     """
