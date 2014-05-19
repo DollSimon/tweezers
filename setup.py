@@ -19,32 +19,88 @@ LONG_DESCRIPTION = """
 DEPENDENCIES = ['nose', 'pytest', 'docopt', 'pandas', 'tables', 'numpy',
                 'scipy', 'termcolor', 'parsley', 'clint']
 
-PACKAGES = ['tweezer', 'tweezer.gui', 'tweezer.core', 'tweezer.cli',
-            'tweezer.scripts', 'tweezer.bot', 'tweezer.ixo', 'tweezer.dia',
-            'tweezer.simulate', 'tweezer.noise', 'tweezer.geom',
-            'tweezer.physics', 'tweezer.statistics', 'tweezer.single',
+PACKAGES = ['tweezer',
+            'tweezer.core',
+            'tweezer.cli',
+            'tweezer.scripts',
+            'tweezer.bot',
+            'tweezer.ixo',
+            'tweezer.dia',
+            'tweezer.simulate',
+            'tweezer.noise',
+            'tweezer.math',
+            'tweezer.rnap',
+            'tweezer.physics',
+            'tweezer.statistics',
+            'tweezer.single',
             'tweezer.dual']
 
-MODULES = ['tweezer.io', 'tweezer.core.dio', 'tweezer.cli.help',
-           'tweezer.core.polymer', 'tweezer.core.geometry',
-           'tweezer.core.trap', 'tweezer.core.watcher', 'tweezer.constants',
-           'tweezer.core.visualisation', 'tweezer.core.simulations',
-           'tweezer.core.trap_calibration', 'tweezer.core.datatypes',
-           'tweezer.core.analysis', 'tweezer.core.parsers',
-           'tweezer.core.overview', 'tweezer.cli.utils', 'tweezer.cli.plots',
-           'tweezer.ixo.json_', 'tweezer.ixo.decorators', 'tweezer.ixo.git_',
-           'tweezer.ixo.hdf5', 'tweezer.ixo.pandas_', 'tweezer.ixo.latex_',
-           'tweezer.ixo.collections_', 'tweezer.ixo.os_', 'tweezer.ixo.r_',
-           'tweezer.ixo.functions', 'tweezer.ixo.math_', 'tweezer.bot.utils',
-           'tweezer.bot.configuration', 'tweezer.dia.io',
-           'tweezer.dia.tracking', 'tweezer.ixo.ipython_', 'tweezer.dia.utils',
-           'tweezer.simulate.brownian_motion', 'tweezer.ixo.viscosity',
-           'tweezer.noise.pwc', 'tweezer.noise.filter',
-           'tweezer.noise.ocl_filter', 'tweezer.dia.interactive',
-           'tweezer.physics.thermodynamics', 'tweezer.statistics.wlc_models',
-           'tweezer.physics.hydrodynamics', 'tweezer.single.calibration',
-           'tweezer.single.theory', 'tweezer.single.utils', 'tweezer.dual.calibration',
-           'tweezer.dual.theory', 'tweezer.dual.differential_detection']
+MODULES = ['tweezer.io',
+           # bot (TweeBot related) modules
+           'tweezer.bot.utils',
+           'tweezer.bot.configuration',
+           # cli (command line interface) modules
+           'tweezer.cli.help',
+           'tweezer.cli.utils',
+           'tweezer.cli.plots',
+           # core modules
+           'tweezer.core.polymer',
+           'tweezer.core.dio',
+           'tweezer.core.geometry',
+           'tweezer.core.trap',
+           'tweezer.core.watcher',
+           'tweezer.constants',
+           'tweezer.core.visualisation',
+           'tweezer.core.simulations',
+           'tweezer.core.trap_calibration',
+           'tweezer.core.datatypes',
+           'tweezer.core.analysis',
+           'tweezer.core.parsers',
+           'tweezer.core.overview',
+           # dia (image processing related) modules
+           'tweezer.dia.io',
+           'tweezer.dia.tracking',
+           'tweezer.dia.interactive',
+           'tweezer.dia.utils',
+           # dual (trap) modules
+           'tweezer.dual.calibration',
+           'tweezer.dual.theory',
+           'tweezer.dual.differential_detection',
+           # ixo (general utilities) module
+           'tweezer.ixo.json_',
+           'tweezer.ixo.decorators',
+           'tweezer.ixo.git_',
+           'tweezer.ixo.hdf5',
+           'tweezer.ixo.pandas_',
+           'tweezer.ixo.latex_',
+           'tweezer.ixo.collections_',
+           'tweezer.ixo.os_',
+           'tweezer.ixo.r_',
+           'tweezer.ixo.functions',
+           'tweezer.ixo.math_',
+           'tweezer.ixo.ipython_',
+           # math modules
+           'tweezer.math.geometry',
+           # noise (fluctuations and signal processing) related modules
+           'tweezer.noise.pwc',
+           'tweezer.noise.filter',
+           'tweezer.noise.ocl_filter',
+           # physics (and chemistry and constants) modules
+           'tweezer.physics.thermodynamics',
+           'tweezer.physics.viscosity',
+           'tweezer.physics.hydrodynamics',
+           'tweezer.physics.electrostatics',
+           'tweezer.physics.constants',
+           # simulate (simulation related) modules
+           'tweezer.simulate.brownian_motion',
+           # single (trap) modules
+           'tweezer.single.calibration',
+           'tweezer.single.theory',
+           'tweezer.single.utils',
+           # statistics module
+           'tweezer.statistics.wlc_models',
+           # rnap (theory and models of transcription) modules
+           'tweezer.rnap.pausing']
 
 setup(
     name='tweezer',
