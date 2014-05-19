@@ -15,7 +15,7 @@ References:
 
 class TranscriptionModel(object):
     """
-    General container class for transcription models
+    General container class for rnap models
     """
     def __init__(self):
         self.name = "Transcription Model"

@@ -1,5 +1,5 @@
 __doc__="""\
-Collection of simulations of the transcription process by RNA Polymerases.
+Collection of simulations of the rnap process by RNA Polymerases.
 
 References:
 
@@ -12,7 +12,7 @@ References:
 
 class TranscriptionSimulation(object):
     """
-    General container class for simulations of transcription traces.
+    General container class for simulations of rnap traces.
     """
     def __init__(self):
         self.name = "Transcription Simulation"
