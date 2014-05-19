@@ -8,7 +8,7 @@ try:
     from tweezer import path_to_sample_data
     from tweezer.io import read_thermal_calibration
     from tweezer.noise.allan import allan_variance_r_port as allan_var
-    from tweezer.noise.allan import allan_variances, generate_allan_tau
+    from tweezer.noise.allan import allan_variance
 except ImportError as err:
     print('The tweezer package has not been correctly installed or updated.')
     raise err
@@ -58,8 +58,7 @@ def test_faster_allan_variance_calculation(data, rResults):
     rate = 100
     testData = np.array(data.ix[:, 0])
 
-    tau = generate_allan_tau(testData, rate)
-    results = allan_variances(testData, tau, rate)
+    results = allan_variance(testData, rate)
 
     assert results is not None
     # assert results[0] == rResults.av.iloc[0]
@@ -71,8 +70,7 @@ def test_allan_variance_on_real_data(calibrationData):
     rate = 80000
     testData = np.array(calibrationData.iloc[:, 0])
 
-    tau = generate_allan_tau(testData, rate)
-    results = allan_variances(testData, tau, rate)
+    results = allan_variance(testData, rate)
 
     assert results is not None
 

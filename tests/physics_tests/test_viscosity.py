@@ -4,7 +4,7 @@ import pytest
 
 from numpy.testing import assert_almost_equal as aae
 
-from tweezer.ixo.viscosity import dynamic_viscosity_of_mixture
+from tweezer.physics.viscosity import dynamic_viscosity_of_mixture
 
 
 @pytest.mark.algorithm
