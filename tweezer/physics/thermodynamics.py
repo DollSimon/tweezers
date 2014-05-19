@@ -1,5 +1,5 @@
-from tweezer.constants import Constant
-from tweezer.constants import kB
+from tweezer.physics.constants import Constant
+from tweezer.physics.constants import kB
 
 
 def thermal_energy(temperature=298, units='pN nm'):

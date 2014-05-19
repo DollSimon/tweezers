@@ -1,7 +1,3 @@
-from tweezer.constants import Constant
-from tweezer.constants import kB, vacuumPermittivity
-
-
 def bjerrum_length(temperature=298, units='pN nm'):
     """
     Separation at which the electrostatic interaction between two elementary charges is \

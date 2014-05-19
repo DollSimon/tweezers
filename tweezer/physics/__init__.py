@@ -18,3 +18,5 @@ from .viscosity import (dynamic_viscosity_of_mixture,
                         water_density,
                         glycerol_dynamic_viscosity,
                         glycerol_density)
+
+from .constants import (kB, h, NA, c, vacuumPermittivity)
