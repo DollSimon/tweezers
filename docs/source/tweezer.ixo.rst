@@ -1,59 +1,102 @@
-ixo Package
-===========
+tweezer.ixo package
+===================
 
-:mod:`ixo` Package
-------------------
+Submodules
+----------
 
-.. automodule:: tweezer.ixo
+tweezer.ixo.collections_ module
+-------------------------------
+
+.. automodule:: tweezer.ixo.collections_
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`decorators` Module
-------------------------
+tweezer.ixo.decorators module
+-----------------------------
 
 .. automodule:: tweezer.ixo.decorators
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`hdf5` Module
-------------------
+tweezer.ixo.functions module
+----------------------------
 
-.. automodule:: tweezer.ixo.hdf5
+.. automodule:: tweezer.ixo.functions
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`json` Module
-------------------
+tweezer.ixo.git_ module
+-----------------------
 
-.. automodule:: tweezer.ixo.json
+.. automodule:: tweezer.ixo.git_
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`latex` Module
--------------------
+tweezer.ixo.json_ module
+------------------------
 
-.. automodule:: tweezer.ixo.latex
+.. automodule:: tweezer.ixo.json_
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`os` Module
-----------------
+tweezer.ixo.latex_ module
+-------------------------
 
-.. automodule:: tweezer.ixo.os
+.. automodule:: tweezer.ixo.latex_
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`r` Module
+tweezer.ixo.math_ module
+------------------------
+
+.. automodule:: tweezer.ixo.math_
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tweezer.ixo.objects module
+--------------------------
+
+.. automodule:: tweezer.ixo.objects
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tweezer.ixo.os_ module
+----------------------
+
+.. automodule:: tweezer.ixo.os_
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tweezer.ixo.pandas_ module
+--------------------------
+
+.. automodule:: tweezer.ixo.pandas_
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tweezer.ixo.r_ module
+---------------------
+
+.. automodule:: tweezer.ixo.r_
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
 ---------------
 
-.. automodule:: tweezer.ixo.r
+.. automodule:: tweezer.ixo
     :members:
     :undoc-members:
     :show-inheritance:
-

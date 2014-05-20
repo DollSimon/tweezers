@@ -1,48 +1,43 @@
-tweezer Package
+tweezer package
 ===============
-
-:mod:`tweezer` Package
-----------------------
-
-.. automodule:: tweezer.__init__
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`io` Module
-----------------
-
-.. automodule:: tweezer.io
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`ixo` Module
------------------
-
-.. automodule:: tweezer.ixo
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`utils` Module
--------------------
-
-.. automodule:: tweezer.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 Subpackages
 -----------
 
 .. toctree::
 
+    tweezer.bot
     tweezer.cli
     tweezer.core
-    tweezer.gui
+    tweezer.dia
+    tweezer.dual
     tweezer.ixo
-    tweezer.ott
+    tweezer.labview
+    tweezer.math
+    tweezer.noise
+    tweezer.physics
+    tweezer.rnap
     tweezer.scripts
-    tweezer.tweebot
+    tweezer.simulate
+    tweezer.single
+    tweezer.statistics
 
+Submodules
+----------
+
+tweezer.io module
+-----------------
+
+.. automodule:: tweezer.io
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: tweezer
+    :members:
+    :undoc-members:
+    :show-inheritance:

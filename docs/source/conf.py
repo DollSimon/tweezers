@@ -41,6 +41,8 @@ sys.path.append(os.path.expanduser('sphinxext'))
 #             'sphinx.ext.viewcode']
 
 extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.mathjax',
+              'numpydoc',
               'sphinx.ext.doctest',
               'sphinx.ext.intersphinx',
               'sphinx.ext.todo',
@@ -59,10 +61,8 @@ extensions = ['sphinx.ext.autodoc',
               # 'inheritance_diagram',
               # 'numpydoc',
               # 'rst2pdf.pdfbuilder',
-              # 'tikz',
+              'sphinxcontrib.tikz',
               # 'sphinxcontrib.bitbucket',
-              'sphinxcontrib.bibtex',
-              'sphinx.ext.mathjax',
               'sphinx.ext.ifconfig',
               'sphinx.ext.viewcode']
 
@@ -249,11 +249,11 @@ htmlhelp_basename = 'Tweezerdoc'
 # }
 
 latex_elements = {
-# ‹...›
-# 'preamble': '\\usepackage{tikz}'
-'preamble': '''\usepackage{tikz}''' + '''
-\usetikzlibrary{''' + 'arrows' + '''}'''
-# ‹...›
+    'preamble': '''
+    \usepackage{tikz}
+    \usepackage{pgfplots}
+    \usetikzlibrary{arrows}
+    ''',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

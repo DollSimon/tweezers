@@ -1,10 +1,10 @@
-tweebot Package
+Tweebot Package
 ===============
 
-:mod:`tweebot` Package
+:mod:`bot` Package
 ----------------------
 
-.. automodule:: tweezer.tweebot
+.. automodule:: tweezer.bot
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ tweebot Package
 :mod:`configuration` Module
 ---------------------------
 
-.. automodule:: tweezer.tweebot.configuration
+.. automodule:: tweezer.bot.configuration
     :members:
     :undoc-members:
     :show-inheritance:
