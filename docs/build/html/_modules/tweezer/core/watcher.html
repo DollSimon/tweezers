@@ -1,0 +1,347 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tweezer.core.watcher &mdash; Tweezer 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Tweezer 0.1 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> Tweezer</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">tweezer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tweezer.html">tweezer package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../References.html">References</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Tweezer</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>tweezer.core.watcher</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for tweezer.core.watcher</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#-*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Monitors a tweezer directory for file changing events</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">Queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+
+<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="ow">is</span> <span class="s">&#39;Darwin&#39;</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">watchdog.observers.fsevents</span> <span class="kn">import</span> <span class="n">FSEventsObserver</span> <span class="k">as</span> <span class="n">Observer</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">watchdog.observers</span> <span class="kn">import</span> <span class="n">Observer</span>
+
+<span class="kn">from</span> <span class="nn">watchdog.events</span> <span class="kn">import</span> <span class="n">FileSystemEventHandler</span>
+
+<span class="kn">from</span> <span class="nn">clint.textui</span> <span class="kn">import</span> <span class="n">colored</span><span class="p">,</span> <span class="n">puts</span><span class="p">,</span> <span class="n">indent</span>
+
+<span class="kn">from</span> <span class="nn">tweezer.core.parsers</span> <span class="kn">import</span> <span class="n">classify</span>
+
+<span class="n">BASEDIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="find_files"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.watcher.find_files">[docs]</a><span class="k">def</span> <span class="nf">find_files</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">regex_pattern</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds all files in a list that matches a certain pattern.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">        files           : list of files</span>
+<span class="sd">        regex_pattern   : regular expression pattern</span>
+<span class="sd">        verbose         : whether or not to print extra information</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">        files_found     : list of files that matches the pattern</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">files_found</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">iFile</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">regex_pattern</span><span class="p">,</span> <span class="n">iFile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">files_found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iFile</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Found file: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iFile</span><span class="p">))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Pattern not found!&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">files_found</span>
+
+</div>
+<div class="viewcode-block" id="get_now"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.watcher.get_now">[docs]</a><span class="k">def</span> <span class="nf">get_now</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Get the current date and time as a string</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%Y/%m/</span><span class="si">%d</span><span class="s"> %H:%M:%S&quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="build_docs"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.watcher.build_docs">[docs]</a><span class="k">def</span> <span class="nf">build_docs</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Run the Sphinx build (`make html`) to make sure we have the</span>
+<span class="sd">    latest version of the docs</span>
+
+<span class="sd">    Use `call` here so that we don&#39;t detect file changes while this</span>
+<span class="sd">    is running...</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Building docs at </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">get_now</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASEDIR</span><span class="p">,</span> <span class="s">&quot;docs&quot;</span><span class="p">))</span>
+    <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Current directory: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s">r&#39;make html&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="run_unittests"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.watcher.run_unittests">[docs]</a><span class="k">def</span> <span class="nf">run_unittests</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Run unit tests with unittest.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Running unit tests at </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">get_now</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">BASEDIR</span><span class="p">)</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s">r&#39;python -m unittest discover -b&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="run_behave"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.watcher.run_behave">[docs]</a><span class="k">def</span> <span class="nf">run_behave</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Run BDD tests with behave.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Running behave at </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">get_now</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">BASEDIR</span><span class="p">)</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s">r&#39;behave&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="get_type"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.watcher.get_type">[docs]</a><span class="k">def</span> <span class="nf">get_type</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the file type and other attributes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_type</span> <span class="o">=</span> <span class="n">classify</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file_name</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="ChangeHandler"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.watcher.ChangeHandler">[docs]</a><span class="k">class</span> <span class="nc">ChangeHandler</span><span class="p">(</span><span class="n">FileSystemEventHandler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reacts to changes on the file system and dispatches the appropriate \</span>
+<span class="sd">    methods for the registered file system event.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ChangeHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataq</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logq</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ChangeHandler.on_created"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.watcher.ChangeHandler.on_created">[docs]</a>    <span class="k">def</span> <span class="nf">on_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If any file or directory is on_created</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">is_directory</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;The directory {} has been {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">red</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">),</span> <span class="n">colored</span><span class="o">.</span><span class="n">blue</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">event_type</span><span class="p">)))</span>
+            <span class="k">return</span>
+
+        <span class="n">file_type</span> <span class="o">=</span> <span class="n">classify</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+        <span class="n">event_type</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">event_type</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;A {} file has been {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">red</span><span class="p">(</span><span class="n">file_type</span><span class="p">),</span> <span class="n">colored</span><span class="o">.</span><span class="n">blue</span><span class="p">(</span><span class="n">event_type</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="n">file_type</span> <span class="o">==</span> <span class="s">&#39;BOT_DATA&#39;</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Data file event&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataq</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c"># print(list(self.dataq))</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;More than one data file registered.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">file_type</span> <span class="o">==</span> <span class="s">&#39;BOT_LOG&#39;</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Log file event&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">src_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logq</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;More than one log file registered.&quot;</span><span class="p">)</span>
+                <span class="c"># print(list(self.logq))</span>
+
+</div></div>
+<div class="viewcode-block" id="run_watcher"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.watcher.run_watcher">[docs]</a><span class="k">def</span> <span class="nf">run_watcher</span><span class="p">(</span><span class="n">directory</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Called when run as main() from the command line.</span>
+<span class="sd">    Looks for changes to the file system.</span>
+<span class="sd">    Can be stopped with CTRL+C.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">data_files</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+        <span class="n">event_handler</span> <span class="o">=</span> <span class="n">ChangeHandler</span><span class="p">()</span>
+        <span class="n">observer</span> <span class="o">=</span> <span class="n">Observer</span><span class="p">()</span>
+        <span class="n">observer</span><span class="o">.</span><span class="n">schedule</span><span class="p">(</span><span class="n">event_handler</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">observer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">event_handler</span><span class="o">.</span><span class="n">dataq</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;I&#39;m accessing the queue from outside&quot;</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">event_handler</span><span class="o">.</span><span class="n">dataq</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyboardInterrupt</span><span class="p">,</span> <span class="ne">SystemExit</span><span class="p">)</span> <span class="k">as</span> <span class="n">close</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">observer</span><span class="o">.</span><span class="n">event_queue</span>
+            <span class="n">observer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">{}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;Thanks for watching...&#39;</span><span class="p">)))</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&quot;{}</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;Finishing up...&#39;</span><span class="p">)))</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&quot;Files left in the data queue: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">magenta</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">event_handler</span><span class="o">.</span><span class="n">dataq</span><span class="p">))))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;The stored values are {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">event_handler</span><span class="o">.</span><span class="n">dataq</span><span class="p">))</span>
+            <span class="k">return</span>
+        <span class="n">observer</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">run_watcher</span><span class="p">(</span><span class="n">BASEDIR</span><span class="p">))</span>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2012, Marcus Jahnel.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

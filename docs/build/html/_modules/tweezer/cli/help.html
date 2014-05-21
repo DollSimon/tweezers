@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tweezer.cli.help &mdash; Tweezer 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Tweezer 0.1 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> Tweezer</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">tweezer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tweezer.html">tweezer package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../References.html">References</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Tweezer</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>tweezer.cli.help</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for tweezer.cli.help</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#-*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">clint.textui</span> <span class="kn">import</span> <span class="n">colored</span><span class="p">,</span> <span class="n">puts</span><span class="p">,</span> <span class="n">indent</span>
+
+<span class="kn">from</span> <span class="nn">tweezer</span> <span class="kn">import</span> <span class="n">__version__</span>
+
+<span class="n">VERSION</span> <span class="o">=</span> <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">__version__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="show_tweezer_help_pages"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.help.show_tweezer_help_pages">[docs]</a><span class="k">def</span> <span class="nf">show_tweezer_help_pages</span><span class="p">():</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{0} : {1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">blue</span><span class="p">(</span><span class="s">&#39;tweezer&#39;</span><span class="p">),</span> <span class="s">&#39;A data analysis tool for single-molecule experiments&#39;</span><span class="p">))</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{0}: http://bitbucket.org/majahn/tweezer @ version {1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">colored</span><span class="o">.</span><span class="n">yellow</span><span class="p">(</span><span class="s">&#39;Source&#39;</span><span class="p">),</span>
+    <span class="n">VERSION</span><span class="p">))</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="n">puts</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;Tweezer Data Analysis Command Line Interface&#39;</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">{}:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">green</span><span class="p">(</span><span class="s">&#39;Usage&#39;</span><span class="p">)))</span>
+        <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer watch [-t | -m] [&lt;DIR&gt;...] [-l]&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer (analyse | analyze) [-t | -m] [&lt;FILE&gt;...]&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer convert [&lt;FILE&gt;...] &lt;LANGUAGE&gt;&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer overview [-t | -m] ([&lt;DIR&gt;...] | -f [&lt;FILE&gt;...])&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer list [&lt;DIR&gt;...]&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer show &lt;OBJECT&gt; [--part=&lt;TYPE&gt;] [-d]&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer update &lt;OBJECT&gt; [--part=&lt;TYPE&gt;]&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer track [-o &lt;OBJECT&gt;] ([&lt;VIDEO&gt;...] | -i [&lt;IMAGE&gt;...])&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer simulate &lt;OBJECT&gt; [--args=&lt;ARGS&gt;...]&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer plot &lt;OBJECT&gt; [--args=&lt;ARGS&gt;...]&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer calculate &lt;OBJECT&gt; [-c] [-h] [--args=&lt;ARGS&gt;...]...&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer help [&lt;COMMAND&gt;]&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer (-h | --help)&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;tweezer (-v | --version)&#39;</span><span class="p">)</span>
+
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">{}:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">green</span><span class="p">(</span><span class="s">&#39;Commands&#39;</span><span class="p">)))</span>
+        <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;watch         Monitor directory for changes&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;analyse       perform specified data analysis&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;analyze       Perform specified data analysis&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;convert       Convert data to be able to work in specified language&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;overview      Produce &quot;Overview.pdf&quot; for data files in directory&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;list          List all files and file types in a directory recursively&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;show          Shows content of an object or file in an informative way&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;update        Updates the object in question (mainly used for settings)&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;calculate     Perform calculations on the command line&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;track         Find position of features in images or videos&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;simulate      Run simulation of type &quot;object&quot;&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;plot          Plot examples and objects&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;help          Show detailed help for a command or these help pages&#39;</span><span class="p">)</span>
+
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">{}:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">green</span><span class="p">(</span><span class="s">&#39;Arguments&#39;</span><span class="p">)))</span>
+        <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;FILE          Input file&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;PATH          Out directory&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;DIR           Input directory&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;LANGUAGE      Preferred language or data container&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;OBJECT        Either general tweezer object (like settings) or concrete file&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;IMAGE         Image file (.png, or .jpg)&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;VIDEO         Video file (.avi, or .fits)&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;ARGS          Keyword arguments (like n=4 p=&quot;test&quot;); no spaces around &quot;=&quot;&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;COMMAND       Command name out of the list of commands&#39;</span><span class="p">)</span>
+
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">{}:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">green</span><span class="p">(</span><span class="s">&#39;Options&#39;</span><span class="p">)))</span>
+        <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;-h --help         Show this screen&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;-v --version      Show version number&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;-t --tweebot      Tweebot tweezer mode&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;-m --manual       Manual tweezer mode&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;-l --logging      Write log file&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;-p --part=&lt;TYPE&gt;  Part or Subclass of an object&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;-d --default      Refer to the saved default object&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;-f --file         Switch to file mode when input can be file or dir&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;-i --image        Switch to image mode when input can be image or video&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;-a --args=&lt;ARGS&gt;  Additional keyword arguments to be passed to the command&#39;</span><span class="p">)</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;-c --clean        Suppress terminal output of extra information&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="print_plot_help"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.help.print_plot_help">[docs]</a><span class="k">def</span> <span class="nf">print_plot_help</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Help for {} command:</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;tweezer plot&#39;</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="print_overview_help"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.help.print_overview_help">[docs]</a><span class="k">def</span> <span class="nf">print_overview_help</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Help for {} command:</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;tweezer overview&#39;</span><span class="p">)))</span>
+</div>
+<div class="viewcode-block" id="print_simulate_help"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.help.print_simulate_help">[docs]</a><span class="k">def</span> <span class="nf">print_simulate_help</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Help for {} command:</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;tweezer simulate&#39;</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="print_show_help"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.help.print_show_help">[docs]</a><span class="k">def</span> <span class="nf">print_show_help</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Help for {} command:</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;tweezer show&#39;</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="print_analyse_help"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.help.print_analyse_help">[docs]</a><span class="k">def</span> <span class="nf">print_analyse_help</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Help for {} command:</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;tweezer analyse&#39;</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="print_watch_help"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.help.print_watch_help">[docs]</a><span class="k">def</span> <span class="nf">print_watch_help</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Help for {} command:</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;tweezer watch&#39;</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="print_track_help"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.help.print_track_help">[docs]</a><span class="k">def</span> <span class="nf">print_track_help</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Help for {} command:</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;tweezer track&#39;</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="print_update_help"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.help.print_update_help">[docs]</a><span class="k">def</span> <span class="nf">print_update_help</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Help for {} command:</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;tweezer update&#39;</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="print_list_help"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.help.print_list_help">[docs]</a><span class="k">def</span> <span class="nf">print_list_help</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Help for {} command:</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;tweezer list&#39;</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.help.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">show_tweezer_help_pages</span><span class="p">()</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2012, Marcus Jahnel.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

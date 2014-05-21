@@ -146,7 +146,15 @@ todo_include_todos = True
 # html_theme_options = { "roottarget": "index" }
 
 # Read The Docs Theme
-import sphinx_rtd_theme
+from sys import platform, version_info
+
+if platform == 'darwin':
+    import sphinx_rtd_theme
+elif platform == 'linux2':
+    if version_info == (3, 3):
+        import imp
+        sphinx_rtd_theme = imp.load_source('sphinx_rtd_theme', '~/miniconda3/lib/pyhton3.3/site-packages/sphinx_rtd_theme')
+
 
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]

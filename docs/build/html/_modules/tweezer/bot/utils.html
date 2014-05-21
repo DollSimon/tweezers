@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tweezer.bot.utils &mdash; Tweezer 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Tweezer 0.1 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> Tweezer</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">tweezer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tweezer.html">tweezer package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../References.html">References</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Tweezer</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>tweezer.bot.utils</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for tweezer.bot.utils</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#-*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+
+<div class="viewcode-block" id="simplify_tweebot_data_names"><a class="viewcode-back" href="../../../tweezer.bot.html#tweezer.bot.utils.simplify_tweebot_data_names">[docs]</a><span class="k">def</span> <span class="nf">simplify_tweebot_data_names</span><span class="p">(</span><span class="n">variable_names</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts tweebot variable names from a list of variables and substitutes them for common tweezer nomenclature</span>
+
+<span class="sd">    :param variable_names: (list) with variable names as read by tweebot datalog reader</span>
+
+<span class="sd">    :return names: (list) new list with simpler variable names</span>
+
+<span class="sd">    :return units: (dict) with the corresponding units of the variable names</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">variable_names</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s">&#39;Time sent (s)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Time sent (s)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;timeSent&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;timeSent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;s&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Time received (s)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Time received (s)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;timeReceived&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;timeReceived&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;s&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Experiment Phase (int)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Experiment Phase (int)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;experimentPhase&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;experimentPhase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;int&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Message index (int)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Message index (int)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;mIndex&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;mIndex&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="s">&#39;Extension from Trap and PSD positions (nm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Extension from Trap and PSD positions (nm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;extensionByTrap&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;extensionByTrap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Extension from image measurements (nm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Extension from image measurements (nm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;extenstionByImage&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;extenstionByImage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Force felt by AOD (pN)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Force felt by AOD (pN)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;forceAod&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;forceAod&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Force felt by PM  (pN)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Force felt by PM  (pN)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;forcePm&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;forcePm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AOD to PM vector x (nm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AOD to PM vector x (nm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;trapSeparationX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;trapSeparationX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AOD to PM vector y (nm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AOD to PM vector y (nm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;trapSeparationY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;trapSeparationY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AODx (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AODx (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;dispAodX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;dispAodX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AODy (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AODy (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;dispAodY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;dispAodX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMx (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMx (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;dispPmX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;dispPmX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMy (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMy (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;dispPmY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;dispPmY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMsensorx (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMsensorx (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;mirrorX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;mirrorX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMsensory (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMsensory (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;mirrorY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;mirrorY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMxdiff (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMxdiff (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;pmX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMydiff (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMydiff (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;pmY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMxsum (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMxsum (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;pmSum&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmSum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AODxdiff (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AODxdiff (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;aodX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AODydiff (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AODydiff (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;aodY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AODxsum (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AODxsum (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;aodSum&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodSum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;StageX (mm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;StageX (mm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;stageX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;stageX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;StageY (mm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;StageY (mm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;stageY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;stageY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;StageZ (mm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;StageZ (mm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;stageZ&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;stageZ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Pressure (a.u.)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Pressure (a.u.)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;pressure&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;pressure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;a.u.&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;FBx (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;FBx (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;fbX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;fbX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;FBy (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;FBy (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;fbY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;fbY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;FBsum(V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;FBsum (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;fbZ&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;fbZ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">return</span> <span class="n">names</span><span class="p">,</span> <span class="n">units</span>
+
+</div>
+<span class="k">def</span> <span class="nf">combine_tweebot_data</span><span class="p">(</span><span class="n">datalog_content</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([]),</span> <span class="n">tdms_content</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aligns the data from different sources, most notably from Tweebot Datalog files and from TDMS files.</span>
+
+<span class="sd">    :param datalog_content: (pandas.DataFrame) of</span>
+<span class="sd">    :param tdms_content: (pandas.DataFrame) of high frequency tdms data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dc</span> <span class="o">=</span> <span class="n">datalog_content</span>
+    <span class="n">tc</span> <span class="o">=</span> <span class="n">tdms_content</span>
+
+    <span class="k">pass</span>
+    <span class="c"># get attributes</span>
+
+    <span class="c"># find common values in column....</span>
+    <span class="c"># where is dc.pressure == tc.pressure</span>
+
+    <span class="c"># combine attributes</span>
+    <span class="c">#</span>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2012, Marcus Jahnel.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

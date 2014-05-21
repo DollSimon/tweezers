@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tweezer.single.calibration &mdash; Tweezer 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Tweezer 0.1 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> Tweezer</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">tweezer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tweezer.html">tweezer package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../References.html">References</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Tweezer</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>tweezer.single.calibration</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for tweezer.single.calibration</h1><div class="highlight"><pre>
+<span class="n">__doc__</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s">Thermal calibration of single optical trap.</span>
+<span class="s">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">tweezer.physics</span> <span class="kn">import</span> <span class="n">thermal_energy</span>
+
+
+<div class="viewcode-block" id="corner_frequency"><a class="viewcode-back" href="../../../tweezer.single.html#tweezer.single.calibration.corner_frequency">[docs]</a><span class="k">def</span> <span class="nf">corner_frequency</span><span class="p">(</span><span class="n">dragCoefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">,</span> <span class="n">trapStiffness</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Corner frequency of the spectrum of a single trap.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dragCoefficient : float</span>
+<span class="sd">        Stokes drag coefficient in [pN/nm s]</span>
+<span class="sd">        Default: 2e-5 pN/nm s</span>
+
+<span class="sd">    trapStiffness : float</span>
+<span class="sd">        Trap stiffness in [pN/nm]</span>
+<span class="sd">        Default: 0.1 pN/nm</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cornerFrequency : float</span>
+<span class="sd">        Characteristic frequency of the power spectrum in [Hz]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cornerFrequency</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">trapStiffness</span> <span class="o">/</span> <span class="n">dragCoefficient</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;In:&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Drag coefficient: gamma = {} pN/nm s&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">dragCoefficient</span><span class="p">,</span> <span class="mi">12</span><span class="p">)))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Trap stiffness: k = {} pN/nm^2 s</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trapStiffness</span><span class="p">))</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Out:&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Corner frequency: fc = {} Hz&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cornerFrequency</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">cornerFrequency</span>
+
+</div>
+<div class="viewcode-block" id="detector_sensitivity"><a class="viewcode-back" href="../../../tweezer.single.html#tweezer.single.calibration.detector_sensitivity">[docs]</a><span class="k">def</span> <span class="nf">detector_sensitivity</span><span class="p">(</span><span class="n">diffusionConstant</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dragCoefficient</span><span class="o">=</span><span class="mf">2e-5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Detector sensitivity used for the position calibration of an optical trap</span>
+
+<span class="sd">    Parameters</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">detectorSensitivity</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">thermal_energy</span><span class="p">()</span> <span class="o">/</span> <span class="n">dragCoefficient</span> <span class="o">*</span> <span class="n">diffusionConstant</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">detectorSensitivity</span>
+
+</div>
+<div class="viewcode-block" id="power_spectrum_mpl"><a class="viewcode-back" href="../../../tweezer.single.html#tweezer.single.calibration.power_spectrum_mpl">[docs]</a><span class="k">def</span> <span class="nf">power_spectrum_mpl</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">asDataFrame</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the power spectral density</span>
+
+<span class="sd">    Parameter</span>
+<span class="sd">    ---------</span>
+<span class="sd">    data : array</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">psd</span><span class="p">,</span> <span class="n">freq</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">psd</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">NFFT</span><span class="o">=</span><span class="n">block</span><span class="p">,</span> <span class="n">Fs</span><span class="o">=</span><span class="n">sampling_rate</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="n">overlap</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">asDataFrame</span><span class="p">:</span>
+        <span class="n">psdData</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s">&#39;freq&#39;</span><span class="p">:</span> <span class="n">freq</span><span class="p">,</span> <span class="s">&#39;psd&#39;</span><span class="p">:</span> <span class="n">psd</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">psdData</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">psd</span><span class="p">,</span> <span class="n">freq</span>
+
+</div>
+<div class="viewcode-block" id="positional_fluctuations"><a class="viewcode-back" href="../../../tweezer.single.html#tweezer.single.calibration.positional_fluctuations">[docs]</a><span class="k">def</span> <span class="nf">positional_fluctuations</span><span class="p">(</span><span class="n">kBT</span><span class="o">=</span><span class="n">thermal_energy</span><span class="p">(),</span> <span class="n">trapStiffness</span><span class="o">=</span><span class="mf">0.02</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Average measure for the position fluctuations of a bead in an optical trap.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">kBT</span> <span class="o">/</span> <span class="n">trapStiffness</span><span class="p">)</span>
+</pre></div></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2012, Marcus Jahnel.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

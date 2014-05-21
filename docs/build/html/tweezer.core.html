@@ -1,0 +1,820 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tweezer.core package &mdash; Tweezer 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Tweezer 0.1 documentation" href="index.html"/>
+        <link rel="up" title="tweezer package" href="tweezer.html"/>
+        <link rel="next" title="tweezer.dia package" href="tweezer.dia.html"/>
+        <link rel="prev" title="tweezer.cli package" href="tweezer.cli.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> Tweezer</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Using the tweezer package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">tweezer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tweezer.html">tweezer package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="References.html">References</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Tweezer</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="modules.html">tweezer</a> &raquo;</li>
+      
+          <li><a href="tweezer.html">tweezer package</a> &raquo;</li>
+      
+    <li>tweezer.core package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/tweezer.core.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="tweezer-core-package">
+<h1>tweezer.core package<a class="headerlink" href="#tweezer-core-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tweezer.core.analysis">
+<span id="tweezer-core-analysis-module"></span><h2>tweezer.core.analysis module<a class="headerlink" href="#module-tweezer.core.analysis" title="Permalink to this headline">¶</a></h2>
+<p>Analysis of Tweezer Experiments</p>
+<dl class="class">
+<dt id="tweezer.core.analysis.TweezerExperiment">
+<em class="property">class </em><tt class="descclassname">tweezer.core.analysis.</tt><tt class="descname">TweezerExperiment</tt><big>(</big><em>**parameters</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/analysis.html#TweezerExperiment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.analysis.TweezerExperiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Analysis of a tweezer experiment. Holds the data, metadata of a tweezer experiment.</p>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="tweezer.core.analysis.TweezerExperiment.print_units">
+<tt class="descname">print_units</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/analysis.html#TweezerExperiment.print_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.analysis.TweezerExperiment.print_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints the units of the tweezer experiments in a formatted table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tweezer.core.analysis.TweezerExperimentMetaData">
+<em class="property">class </em><tt class="descclassname">tweezer.core.analysis.</tt><tt class="descname">TweezerExperimentMetaData</tt><a class="reference internal" href="_modules/tweezer/core/analysis.html#TweezerExperimentMetaData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.analysis.TweezerExperimentMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.dict</span></tt></p>
+<p>The metadata of the tweezer experiment.</p>
+<p class="rubric">Methods</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.analysis.read_data_and_save">
+<tt class="descclassname">tweezer.core.analysis.</tt><tt class="descname">read_data_and_save</tt><big>(</big><em>files_sorted_by_trial</em>, <em>dir_root</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/analysis.html#read_data_and_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.analysis.read_data_and_save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.analysis.set_up_directories">
+<tt class="descclassname">tweezer.core.analysis.</tt><tt class="descname">set_up_directories</tt><big>(</big><em>files_sorted_by_trial</em>, <em>dir_root</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/analysis.html#set_up_directories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.analysis.set_up_directories" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates directories for the analysis</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>files_sorted_by_trial</strong> &#8211; nested dictionary of trials and their related files</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tweezer.core.datatypes">
+<span id="tweezer-core-datatypes-module"></span><h2>tweezer.core.datatypes module<a class="headerlink" href="#module-tweezer.core.datatypes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tweezer.core.datatypes.Foo">
+<em class="property">class </em><tt class="descclassname">tweezer.core.datatypes.</tt><tt class="descname">Foo</tt><a class="reference internal" href="_modules/tweezer/core/datatypes.html#Foo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.datatypes.Foo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tweezer.core.datatypes.TweezerDataFrame">
+<em class="property">class </em><tt class="descclassname">tweezer.core.datatypes.</tt><tt class="descname">TweezerDataFrame</tt><a class="reference internal" href="_modules/tweezer/core/datatypes.html#TweezerDataFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.datatypes.TweezerDataFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pandas.core.frame.DataFrame</span></tt></p>
+<p>Tweezer DataFrame class</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="59%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>is_copy</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="tweezer.core.datatypes.TweezerDataFrame.rocket">
+<tt class="descname">rocket</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/datatypes.html#TweezerDataFrame.rocket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.datatypes.TweezerDataFrame.rocket" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tweezer.core.datatypes.TweezerDictionary">
+<em class="property">class </em><tt class="descclassname">tweezer.core.datatypes.</tt><tt class="descname">TweezerDictionary</tt><a class="reference internal" href="_modules/tweezer/core/datatypes.html#TweezerDictionary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.datatypes.TweezerDictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.dict</span></tt></p>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="tweezer.core.datatypes.TweezerDictionary.dump_to_json">
+<tt class="descname">dump_to_json</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/datatypes.html#TweezerDictionary.dump_to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.datatypes.TweezerDictionary.dump_to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dumps the dictionary to json</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>new</strong> (<em>integer</em>) &#8211; THis is a test</li>
+<li><strong>rocket</strong> (<em>np.array</em>) &#8211; The new test type</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tweezer.core.datatypes.TweezerFunction">
+<em class="property">class </em><tt class="descclassname">tweezer.core.datatypes.</tt><tt class="descname">TweezerFunction</tt><a class="reference internal" href="_modules/tweezer/core/datatypes.html#TweezerFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.datatypes.TweezerFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Abstract class to represent mathematical functions and endow them with
+user-friendly functionality.</p>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="tweezer.core.datatypes.TweezerFunction.plot">
+<tt class="descname">plot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/datatypes.html#TweezerFunction.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.datatypes.TweezerFunction.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tweezer.core.datatypes.TweezerList">
+<em class="property">class </em><tt class="descclassname">tweezer.core.datatypes.</tt><tt class="descname">TweezerList</tt><a class="reference internal" href="_modules/tweezer/core/datatypes.html#TweezerList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.datatypes.TweezerList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.list</span></tt></p>
+<p>Tweezer List class</p>
+<p class="rubric">Methods</p>
+</dd></dl>
+
+</div>
+<div class="section" id="tweezer-core-dio-module">
+<h2>tweezer.core.dio module<a class="headerlink" href="#tweezer-core-dio-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tweezer.core.geometry">
+<span id="tweezer-core-geometry-module"></span><h2>tweezer.core.geometry module<a class="headerlink" href="#module-tweezer.core.geometry" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tweezer.core.geometry.Box">
+<em class="property">class </em><tt class="descclassname">tweezer.core.geometry.</tt><tt class="descname">Box</tt><big>(</big><em>xmin=0</em>, <em>xmax=10</em>, <em>ymin=0</em>, <em>ymax=10</em>, <em>zmin=0</em>, <em>zmax=10</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/geometry.html#Box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.Box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Box in 3D space, constructed from 6 points.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>xmin</strong> &#8211; minimum x component</li>
+<li><strong>xmax</strong> &#8211; maximum x component</li>
+<li><strong>ymin</strong> &#8211; minimum y component</li>
+<li><strong>ymax</strong> &#8211; maximum y component</li>
+<li><strong>zmin</strong> &#8211; minimum z component</li>
+<li><strong>zmax</strong> &#8211; maximum z component</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="tweezer.core.geometry.Box.draw">
+<tt class="descname">draw</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/geometry.html#Box.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.Box.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws given Box in 3D using Matplotlib.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tweezer.core.geometry.IntersectionLine">
+<em class="property">class </em><tt class="descclassname">tweezer.core.geometry.</tt><tt class="descname">IntersectionLine</tt><a class="reference internal" href="_modules/tweezer/core/geometry.html#IntersectionLine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.IntersectionLine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tweezer.core.geometry.Line" title="tweezer.core.geometry.Line"><tt class="xref py py-class docutils literal"><span class="pre">tweezer.core.geometry.Line</span></tt></a></p>
+<p class="rubric">Attributes</p>
+<p class="rubric">Methods</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tweezer.core.geometry.Line">
+<em class="property">class </em><tt class="descclassname">tweezer.core.geometry.</tt><tt class="descname">Line</tt><big>(</big><em>first_anchor_point</em>, <em>second_anchor_point</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/geometry.html#Line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.Line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Line constructed from 2 points in 3D</p>
+<p class="rubric">Attributes</p>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="tweezer.core.geometry.Line.draw">
+<tt class="descname">draw</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/geometry.html#Line.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.Line.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot Line in 3D</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tweezer.core.geometry.Line.normal_form">
+<tt class="descname">normal_form</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/geometry.html#Line.normal_form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.Line.normal_form" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tweezer.core.geometry.Line.normalised_direction">
+<tt class="descname">normalised_direction</tt><a class="reference internal" href="_modules/tweezer/core/geometry.html#Line.normalised_direction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.Line.normalised_direction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tweezer.core.geometry.Plane">
+<em class="property">class </em><tt class="descclassname">tweezer.core.geometry.</tt><tt class="descname">Plane</tt><big>(</big><em>first_anchor_point</em>, <em>second_anchor_point</em>, <em>third_anchor_point</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/geometry.html#Plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.Plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Plane constructed from 3 anchor points</p>
+<p class="rubric">Methods</p>
+<dl class="staticmethod">
+<dt id="tweezer.core.geometry.Plane.draw_example">
+<em class="property">static </em><tt class="descname">draw_example</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/geometry.html#Plane.draw_example"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.Plane.draw_example" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tweezer.core.geometry.Point">
+<em class="property">class </em><tt class="descclassname">tweezer.core.geometry.</tt><tt class="descname">Point</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/geometry.html#Point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.Point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="tweezer.core.geometry.Point.draw">
+<tt class="descname">draw</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/geometry.html#Point.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.Point.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot Point in 3D</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="tweezer.core.geometry.Point.draw_example">
+<em class="property">static </em><tt class="descname">draw_example</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/geometry.html#Point.draw_example"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.geometry.Point.draw_example" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="tweezer-core-overview-module">
+<h2>tweezer.core.overview module<a class="headerlink" href="#tweezer-core-overview-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tweezer.core.parallel">
+<span id="tweezer-core-parallel-module"></span><h2>tweezer.core.parallel module<a class="headerlink" href="#module-tweezer.core.parallel" title="Permalink to this headline">¶</a></h2>
+<p>A program that reads integer values from a CSV file and writes out their
+sums to another CSV file, using multiple processes if desired.</p>
+<dl class="class">
+<dt id="tweezer.core.parallel.CSVWorker">
+<em class="property">class </em><tt class="descclassname">tweezer.core.parallel.</tt><tt class="descname">CSVWorker</tt><big>(</big><em>numprocs</em>, <em>infile</em>, <em>outfile</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/parallel.html#CSVWorker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parallel.CSVWorker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="tweezer.core.parallel.CSVWorker.parse_input_csv">
+<tt class="descname">parse_input_csv</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/parallel.html#CSVWorker.parse_input_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parallel.CSVWorker.parse_input_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses the input CSV and yields tuples with the index of the row
+as the first element, and the integers of the row as the second
+element.</p>
+<p>The index is zero-index based.</p>
+<p>The data is then sent over inqueue for the workers to do their
+thing.  At the end the input thread sends a &#8216;STOP&#8217; message for each
+worker.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tweezer.core.parallel.CSVWorker.sum_row">
+<tt class="descname">sum_row</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/parallel.html#CSVWorker.sum_row"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parallel.CSVWorker.sum_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Workers. Consume inq and produce answers on outq</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tweezer.core.parallel.CSVWorker.write_output_csv">
+<tt class="descname">write_output_csv</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/parallel.html#CSVWorker.write_output_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parallel.CSVWorker.write_output_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open outgoing csv file then start reading outq for answers
+Since I chose to make sure output was synchronized to the input there
+is some extra goodies to do that.</p>
+<p>Obviously your input has the original row number so this is not
+required.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.parallel.main">
+<tt class="descclassname">tweezer.core.parallel.</tt><tt class="descname">main</tt><big>(</big><em>argv</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/parallel.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parallel.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.parallel.make_cli_parser">
+<tt class="descclassname">tweezer.core.parallel.</tt><tt class="descname">make_cli_parser</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/parallel.html#make_cli_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parallel.make_cli_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the command line interface parser.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tweezer.core.parsers">
+<span id="tweezer-core-parsers-module"></span><h2>tweezer.core.parsers module<a class="headerlink" href="#module-tweezer.core.parsers" title="Permalink to this headline">¶</a></h2>
+<p>Different parser utils for detecting file patterns and extracting information from them.</p>
+<dl class="function">
+<dt id="tweezer.core.parsers.classify">
+<tt class="descclassname">tweezer.core.parsers.</tt><tt class="descname">classify</tt><big>(</big><em>file_path</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/parsers.html#classify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parsers.classify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Infers the file type of a tweezer data file from its name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_path</strong> (<em>String</em>) &#8211; File path, including name of course, to be tested</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return file_type:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">(String) classifier of the file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.parsers.classify_all">
+<tt class="descclassname">tweezer.core.parsers.</tt><tt class="descname">classify_all</tt><big>(</big><em>files</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/parsers.html#classify_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parsers.classify_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Infers the file type of a tweezer data file from its name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_path</strong> (<em>String</em>) &#8211; File path, including name of course, to be tested</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return file_type:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">(String) classifier of the file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.parsers.main">
+<tt class="descclassname">tweezer.core.parsers.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/parsers.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parsers.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.parsers.parse_tweebot_datalog_file_name">
+<tt class="descclassname">tweezer.core.parsers.</tt><tt class="descname">parse_tweebot_datalog_file_name</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/parsers.html#parse_tweebot_datalog_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parsers.parse_tweebot_datalog_file_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts useful information from a given file name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_name</strong> (<em>String</em>) &#8211; File name or path to be tested</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return match:</th><td class="field-body">(Boolean) True if the file_name pattern was found</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return infos:</th><td class="field-body">(dict) Additional information stored in the file name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.parsers.parse_tweebot_log_file_name">
+<tt class="descclassname">tweezer.core.parsers.</tt><tt class="descname">parse_tweebot_log_file_name</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/parsers.html#parse_tweebot_log_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parsers.parse_tweebot_log_file_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metadata from file name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_name</strong> &#8211; (path) name of a tweebot log file of type &#8220;18.TweeBotLog.2013.02.19.22.43.07.txt&#8221;</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return FileInfo:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">(namedtuple) that carries the trial, subtrial and date of the corresponding log file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.parsers.parse_tweebot_tdms_file_name">
+<tt class="descclassname">tweezer.core.parsers.</tt><tt class="descname">parse_tweebot_tdms_file_name</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/parsers.html#parse_tweebot_tdms_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parsers.parse_tweebot_tdms_file_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract metadata from file name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_name</strong> &#8211; (path) name of a tweebot tdms file</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return FileInfo:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">(namedtuple) that carries the trial, subtrial and date of the corresponding tdms file</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.parsers.parse_tweezer_file_name">
+<tt class="descclassname">tweezer.core.parsers.</tt><tt class="descname">parse_tweezer_file_name</tt><big>(</big><em>file_name</em>, <em>parser='bot_data'</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/parsers.html#parse_tweezer_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.parsers.parse_tweezer_file_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts metadata from a tweezer file name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>file_name</strong> &#8211; (path) of the corresponding tweezer file</li>
+<li><strong>parser</strong> &#8211; (str) that specifies the file type to be parsed</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return FileInfo:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body"><p class="first last">(namedtuple) that carries the trial, subtrial and date of the corresponding tdms file</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tweezer.core.polymer">
+<span id="tweezer-core-polymer-module"></span><h2>tweezer.core.polymer module<a class="headerlink" href="#module-tweezer.core.polymer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain">
+<em class="property">class </em><tt class="descclassname">tweezer.core.polymer.</tt><tt class="descname">ExtensibleWormLikeChain</tt><big>(</big><em>contour_length</em>, <em>persistence_length=50</em>, <em>stretch_modulus=1200</em>, <em>temperature=295</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Extensible WLC Model according to Odijk, T. Stiff chains     and filaments under tension. Macromolecules (1995).</p>
+<p>X(F; L, Lp, S) = L(1 - 1/2*sqrt(kT/F*Lp) + F/S)</p>
+<p class="rubric">Attributes</p>
+<p class="rubric">Methods</p>
+<dl class="attribute">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.L">
+<tt class="descname">L</tt><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.L"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.L" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contour length of the polymer in the worm like chain model</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.P">
+<tt class="descname">P</tt><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.P"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.P" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stretch modulus of the worm-like chain model in pN</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.S">
+<tt class="descname">S</tt><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.S"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.S" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stretch modulus of the worm-like chain model in pN</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.T">
+<tt class="descname">T</tt><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.T"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.T" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temperature in K</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.contour_length">
+<tt class="descname">contour_length</tt><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.contour_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.contour_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contour length of the polymer in the worm like chain model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.diff">
+<tt class="descname">diff</tt><big>(</big><em>force</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.diff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.diff" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.diff_extension">
+<tt class="descname">diff_extension</tt><big>(</big><em>force</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.diff_extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.diff_extension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the derivative of eWLC with respect to force</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.extension">
+<tt class="descname">extension</tt><big>(</big><em>force</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.extension" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.formula">
+<tt class="descname">formula</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.formula" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.parameter">
+<tt class="descname">parameter</tt><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameters for the worm like chain and their current values</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.persistence_length">
+<tt class="descname">persistence_length</tt><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.persistence_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.persistence_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stretch modulus of the worm-like chain model in pN</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.plot_example">
+<tt class="descname">plot_example</tt><big>(</big><em>force_range=[0.5, 50], **kwargs</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.plot_example"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.plot_example" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.stiffness">
+<tt class="descname">stiffness</tt><big>(</big><em>force</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.stiffness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.stiffness" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.stretch_modulus">
+<tt class="descname">stretch_modulus</tt><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.stretch_modulus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.stretch_modulus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stretch modulus of the worm-like chain model in pN</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tweezer.core.polymer.ExtensibleWormLikeChain.thermal_energy">
+<tt class="descname">thermal_energy</tt><a class="reference internal" href="_modules/tweezer/core/polymer.html#ExtensibleWormLikeChain.thermal_energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.ExtensibleWormLikeChain.thermal_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Thermal energy in units of pN nm</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tweezer.core.polymer.LengthDependentPersistenceLength">
+<em class="property">class </em><tt class="descclassname">tweezer.core.polymer.</tt><tt class="descname">LengthDependentPersistenceLength</tt><big>(</big><em>persistence_length_infinity=50</em>, <em>a=4</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/polymer.html#LengthDependentPersistenceLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.LengthDependentPersistenceLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Implements the empirical length-dependent persistence length formula of:</p>
+<p>Ribezzi-Crivellari, M. &amp; Ritort, F.     Force Spectroscopy with Dual-Trap Optical Tweezers:
+Molecular Stiffness Measurements and Coupled Fluctuations     Analysis. Biophys J (2012).</p>
+<p><a class="reference external" href="http://www.cell.com/biophysj/abstract/S0006-3495(12)01059-4">Paper Link</a></p>
+<dl class="docutils">
+<dt>Parameter:</dt>
+<dd>L - contour_length of semiflexible polymer (unit: nm)
+P_inf - projected persistence length for infinitely long polymer
+a - configuration-dependent unit-less parameter</dd>
+</dl>
+<p class="rubric">Methods</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tweezer.core.polymer.TwistedWormLikeChain">
+<em class="property">class </em><tt class="descclassname">tweezer.core.polymer.</tt><tt class="descname">TwistedWormLikeChain</tt><a class="reference internal" href="_modules/tweezer/core/polymer.html#TwistedWormLikeChain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.polymer.TwistedWormLikeChain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tweezer.core.simulations">
+<span id="tweezer-core-simulations-module"></span><h2>tweezer.core.simulations module<a class="headerlink" href="#module-tweezer.core.simulations" title="Permalink to this headline">¶</a></h2>
+<p>Simulations related to the analysis of single molecule transcription data.</p>
+<dl class="class">
+<dt id="tweezer.core.simulations.MonteCarloTranscription">
+<em class="property">class </em><tt class="descclassname">tweezer.core.simulations.</tt><tt class="descname">MonteCarloTranscription</tt><big>(</big><em>arg</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/simulations.html#MonteCarloTranscription"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.simulations.MonteCarloTranscription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>docstring for MonteCarloTranscription</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tweezer.core.trap">
+<span id="tweezer-core-trap-module"></span><h2>tweezer.core.trap module<a class="headerlink" href="#module-tweezer.core.trap" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="trap">
+<h3>Trap<a class="headerlink" href="#trap" title="Permalink to this headline">¶</a></h3>
+<p>Routines, classes and functions related to optical traps.</p>
+</div>
+</div>
+<div class="section" id="module-tweezer.core.trap_calibration">
+<span id="tweezer-core-trap-calibration-module"></span><h2>tweezer.core.trap_calibration module<a class="headerlink" href="#module-tweezer.core.trap_calibration" title="Permalink to this headline">¶</a></h2>
+<p>Contains classes and functions related to the calibration of forces in an optical trap</p>
+<dl class="class">
+<dt id="tweezer.core.trap_calibration.SingleTrapPowerSpectrum">
+<em class="property">class </em><tt class="descclassname">tweezer.core.trap_calibration.</tt><tt class="descname">SingleTrapPowerSpectrum</tt><big>(</big><em>diffusion_coefficient</em>, <em>corner_frequency=500</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/trap_calibration.html#SingleTrapPowerSpectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.trap_calibration.SingleTrapPowerSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+<p>Analytic form for fitting the power spectrum of a microsphere trapped in a single optical trap</p>
+<dl class="docutils">
+<dt>Parameter:</dt>
+<dd>D - diffusion_coefficient (µm^2 / s)
+fc - corner_frequency (500 Hz)</dd>
+<dt>Methods:</dt>
+<dd>constructor(L, P, S, T): set parameter (with default values)
+power_spectrum(frequency): compute the extension at a certain force
+formula(): print out formula used</dd>
+</dl>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="tweezer.core.trap_calibration.SingleTrapPowerSpectrum.formula">
+<tt class="descname">formula</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/trap_calibration.html#SingleTrapPowerSpectrum.formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.trap_calibration.SingleTrapPowerSpectrum.formula" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tweezer.core.visualisation">
+<span id="tweezer-core-visualisation-module"></span><h2>tweezer.core.visualisation module<a class="headerlink" href="#module-tweezer.core.visualisation" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tweezer.core.visualisation.Rocket">
+<em class="property">class </em><tt class="descclassname">tweezer.core.visualisation.</tt><tt class="descname">Rocket</tt><a class="reference internal" href="_modules/tweezer/core/visualisation.html#Rocket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.visualisation.Rocket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">builtins.object</span></tt></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tweezer.core.watcher">
+<span id="tweezer-core-watcher-module"></span><h2>tweezer.core.watcher module<a class="headerlink" href="#module-tweezer.core.watcher" title="Permalink to this headline">¶</a></h2>
+<p>Monitors a tweezer directory for file changing events</p>
+<dl class="class">
+<dt id="tweezer.core.watcher.ChangeHandler">
+<em class="property">class </em><tt class="descclassname">tweezer.core.watcher.</tt><tt class="descname">ChangeHandler</tt><a class="reference internal" href="_modules/tweezer/core/watcher.html#ChangeHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.watcher.ChangeHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">watchdog.events.FileSystemEventHandler</span></tt></p>
+<p>Reacts to changes on the file system and dispatches the appropriate     methods for the registered file system event.</p>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="tweezer.core.watcher.ChangeHandler.on_created">
+<tt class="descname">on_created</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/watcher.html#ChangeHandler.on_created"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.watcher.ChangeHandler.on_created" title="Permalink to this definition">¶</a></dt>
+<dd><p>If any file or directory is on_created</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.watcher.build_docs">
+<tt class="descclassname">tweezer.core.watcher.</tt><tt class="descname">build_docs</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/watcher.html#build_docs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.watcher.build_docs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the Sphinx build (<cite>make html</cite>) to make sure we have the
+latest version of the docs</p>
+<p>Use <cite>call</cite> here so that we don&#8217;t detect file changes while this
+is running...</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.watcher.find_files">
+<tt class="descclassname">tweezer.core.watcher.</tt><tt class="descname">find_files</tt><big>(</big><em>files</em>, <em>regex_pattern</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/watcher.html#find_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.watcher.find_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds all files in a list that matches a certain pattern.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.watcher.get_now">
+<tt class="descclassname">tweezer.core.watcher.</tt><tt class="descname">get_now</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/watcher.html#get_now"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.watcher.get_now" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current date and time as a string</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.watcher.get_type">
+<tt class="descclassname">tweezer.core.watcher.</tt><tt class="descname">get_type</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/watcher.html#get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.watcher.get_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the file type and other attributes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.watcher.run_behave">
+<tt class="descclassname">tweezer.core.watcher.</tt><tt class="descname">run_behave</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/watcher.html#run_behave"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.watcher.run_behave" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run BDD tests with behave.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.watcher.run_unittests">
+<tt class="descclassname">tweezer.core.watcher.</tt><tt class="descname">run_unittests</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/core/watcher.html#run_unittests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.watcher.run_unittests" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run unit tests with unittest.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.core.watcher.run_watcher">
+<tt class="descclassname">tweezer.core.watcher.</tt><tt class="descname">run_watcher</tt><big>(</big><em>directory</em><big>)</big><a class="reference internal" href="_modules/tweezer/core/watcher.html#run_watcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.core.watcher.run_watcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when run as main() from the command line.
+Looks for changes to the file system.
+Can be stopped with CTRL+C.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tweezer.core"></span><p>Contains core modules and classes for analysing tweezer experiments.</p>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tweezer.dia.html" class="btn btn-neutral float-right" title="tweezer.dia package"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tweezer.cli.html" class="btn btn-neutral" title="tweezer.cli package"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2012, Marcus Jahnel.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

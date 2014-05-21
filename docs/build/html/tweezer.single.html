@@ -1,0 +1,255 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tweezer.single package &mdash; Tweezer 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Tweezer 0.1 documentation" href="index.html"/>
+        <link rel="up" title="tweezer package" href="tweezer.html"/>
+        <link rel="next" title="tweezer.statistics package" href="tweezer.statistics.html"/>
+        <link rel="prev" title="tweezer.simulate package" href="tweezer.simulate.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> Tweezer</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Using the tweezer package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">tweezer</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tweezer.html">tweezer package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="References.html">References</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Tweezer</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="modules.html">tweezer</a> &raquo;</li>
+      
+          <li><a href="tweezer.html">tweezer package</a> &raquo;</li>
+      
+    <li>tweezer.single package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/tweezer.single.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="tweezer-single-package">
+<h1>tweezer.single package<a class="headerlink" href="#tweezer-single-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tweezer.single.calibration">
+<span id="tweezer-single-calibration-module"></span><h2>tweezer.single.calibration module<a class="headerlink" href="#module-tweezer.single.calibration" title="Permalink to this headline">¶</a></h2>
+<p>Thermal calibration of single optical trap.</p>
+<dl class="function">
+<dt id="tweezer.single.calibration.corner_frequency">
+<tt class="descclassname">tweezer.single.calibration.</tt><tt class="descname">corner_frequency</tt><big>(</big><em>dragCoefficient=2e-05</em>, <em>trapStiffness=0.1</em>, <em>verbose=False</em><big>)</big><a class="reference internal" href="_modules/tweezer/single/calibration.html#corner_frequency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.single.calibration.corner_frequency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Corner frequency of the spectrum of a single trap.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dragCoefficient</strong> : float</p>
+<blockquote>
+<div><p>Stokes drag coefficient in [pN/nm s]
+Default: 2e-5 pN/nm s</p>
+</div></blockquote>
+<p><strong>trapStiffness</strong> : float</p>
+<blockquote>
+<div><p>Trap stiffness in [pN/nm]
+Default: 0.1 pN/nm</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>cornerFrequency</strong> : float</p>
+<blockquote class="last">
+<div><p>Characteristic frequency of the power spectrum in [Hz]</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.single.calibration.detector_sensitivity">
+<tt class="descclassname">tweezer.single.calibration.</tt><tt class="descname">detector_sensitivity</tt><big>(</big><em>diffusionConstant=2</em>, <em>dragCoefficient=2e-05</em><big>)</big><a class="reference internal" href="_modules/tweezer/single/calibration.html#detector_sensitivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.single.calibration.detector_sensitivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detector sensitivity used for the position calibration of an optical trap</p>
+<p>Parameters</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.single.calibration.positional_fluctuations">
+<tt class="descclassname">tweezer.single.calibration.</tt><tt class="descname">positional_fluctuations</tt><big>(</big><em>kBT=4.114333424000001</em>, <em>trapStiffness=0.02</em><big>)</big><a class="reference internal" href="_modules/tweezer/single/calibration.html#positional_fluctuations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.single.calibration.positional_fluctuations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Average measure for the position fluctuations of a bead in an optical trap.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tweezer.single.calibration.power_spectrum_mpl">
+<tt class="descclassname">tweezer.single.calibration.</tt><tt class="descname">power_spectrum_mpl</tt><big>(</big><em>data</em>, <em>asDataFrame=True</em><big>)</big><a class="reference internal" href="_modules/tweezer/single/calibration.html#power_spectrum_mpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.single.calibration.power_spectrum_mpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the power spectral density</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tweezer.single.theory">
+<span id="tweezer-single-theory-module"></span><h2>tweezer.single.theory module<a class="headerlink" href="#module-tweezer.single.theory" title="Permalink to this headline">¶</a></h2>
+<p>Theoretical results for a single optical trap.</p>
+<dl class="function">
+<dt id="tweezer.single.theory.signal_to_noise">
+<tt class="descclassname">tweezer.single.theory.</tt><tt class="descname">signal_to_noise</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/tweezer/single/theory.html#signal_to_noise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tweezer.single.theory.signal_to_noise" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils citation" frame="void" id="r3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[R3]</td><td><ol class="first last upperalpha simple" start="10">
+<li>Moffitt et al., &#8220;Differential detection of dual traps improves     the spatial resolution of optical tweezers&#8221;, PNAS, 103 (24), 2006</li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tweezer.single"></span><p>Module related to calibration and analysis of a single optical trap.</p>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tweezer.statistics.html" class="btn btn-neutral float-right" title="tweezer.statistics package"/>Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tweezer.simulate.html" class="btn btn-neutral" title="tweezer.simulate package"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2012, Marcus Jahnel.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

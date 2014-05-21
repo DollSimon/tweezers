@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tweezer.core.dio &mdash; Tweezer 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootstrap-3.0.0/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootstrap-3.0.0/css/bootstrap-theme.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="Tweezer 0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">Tweezer</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a href="../../../index.html"
+     class="dropdown-toggle"
+     data-toggle="dropdown">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+    ><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">tweezer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../References.html">References</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <h1>Source code for tweezer.core.dio</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#-*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Classes and Functions used for handling various data input and output tasks.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">sure</span>
+
+
+<div class="viewcode-block" id="DataReader"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.dio.DataReader">[docs]</a><span class="k">class</span> <span class="nc">DataReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;docstring for DataReader&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DataReader</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+
+<div class="viewcode-block" id="DataReader.read_data"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.dio.DataReader.read_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads raw tweezer according to the argument specified</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+</div></div>
+<div class="viewcode-block" id="TweezerCalibrationValues"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.dio.TweezerCalibrationValues">[docs]</a><span class="k">class</span> <span class="nc">TweezerCalibrationValues</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores tweezer calibration values and metadata about the experiments</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="TweezerCalibrationValues.units"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.dio.TweezerCalibrationValues.units">[docs]</a>    <span class="k">def</span> <span class="nf">units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;We need a string here to query the dictionary&#39;</span><span class="p">)</span>
+
+        <span class="n">reference_units</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reference_units</span><span class="p">()</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s">&#39;Units of {} : [{}]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="s">&#39;test&#39;</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="TweezerCalibrationValues.print_units"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.dio.TweezerCalibrationValues.print_units">[docs]</a>    <span class="k">def</span> <span class="nf">print_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the units of the tweezer experiments in a formatted table.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">units</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">units</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;{} : {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">))</span>
+</div>
+    <span class="k">def</span> <span class="nf">_reference_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Contains a dictionary of all the units used in tweezer experiments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">reference_units</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">reference_units</span> <span class="o">=</span> <span class="p">{</span>   <span class="s">&#39;date&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;day&#39;</span><span class="p">,</span> <span class="s">&#39;month&#39;</span><span class="p">,</span> <span class="s">&#39;year&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;time_of_experiment&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;hour&#39;</span><span class="p">,</span> <span class="s">&#39;minute&#39;</span><span class="p">,</span> <span class="s">&#39;second&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;laser_diode_temperature&#39;</span><span class="p">:</span> <span class="s">&#39;C&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;laser_diode_operating_hours&#39;</span><span class="p">:</span> <span class="s">&#39;h&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;laser_diode_current&#39;</span><span class="p">:</span> <span class="s">&#39;A&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_andor_center_x&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_andor_center_y&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_andor_range_x&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_andor_range_y&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_ccd_center_x&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_ccd_center_y&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_ccd_range_x&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_ccd_range_y&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_andor_center_x&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_andor_center_y&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_andor_range_x&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_andor_range_y&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_ccd_center_x&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_ccd_center_y&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_ccd_range_x&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_ccd_range_y&#39;</span><span class="p">:</span> <span class="s">&#39;px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;andor_pixel_size_x&#39;</span><span class="p">:</span> <span class="s">&#39;nm&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;andor_pixel_size_y&#39;</span><span class="p">:</span> <span class="s">&#39;nm&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;ccd_pixel_size_x&#39;</span><span class="p">:</span> <span class="s">&#39;nm&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;ccd_pixel_size_y&#39;</span><span class="p">:</span> <span class="s">&#39;nm&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_detector_x_offset&#39;</span><span class="p">:</span> <span class="s">&#39;V&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_detector_y_offset&#39;</span><span class="p">:</span> <span class="s">&#39;V&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_trap_stiffness_x&#39;</span><span class="p">:</span> <span class="s">&#39;pN/nm&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_trap_stiffness_y&#39;</span><span class="p">:</span> <span class="s">&#39;pN/nm&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_trap_distance_conversion_x&#39;</span><span class="p">:</span> <span class="s">&#39;MHz/px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_trap_distance_conversion_y&#39;</span><span class="p">:</span> <span class="s">&#39;MHz/px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_detector_x_offset&#39;</span><span class="p">:</span> <span class="s">&#39;V&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_detector_y_offset&#39;</span><span class="p">:</span> <span class="s">&#39;V&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_trap_stiffness_x&#39;</span><span class="p">:</span> <span class="s">&#39;pN/nm&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_trap_stiffness_y&#39;</span><span class="p">:</span> <span class="s">&#39;pN/nm&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_trap_distance_conversion_x&#39;</span><span class="p">:</span> <span class="s">&#39;V/px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_trap_distance_conversion_y&#39;</span><span class="p">:</span> <span class="s">&#39;V/px&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;aod_bead_radius&#39;</span><span class="p">:</span> <span class="s">&#39;um&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;pm_bead_radius&#39;</span><span class="p">:</span> <span class="s">&#39;um&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;sampling_rate&#39;</span><span class="p">:</span> <span class="s">&#39;Hz&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;number_of_samples&#39;</span><span class="p">:</span> <span class="s">&#39;unitless&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;time_step&#39;</span><span class="p">:</span> <span class="s">&#39;s&#39;</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">reference_units</span>
+
+    <span class="k">def</span> <span class="nf">_print_reference_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the reference units of the tweezer experiments in a formatted table.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">reference_units</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reference_units</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">keys</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">reference_units</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;{} : {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="find_files"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.dio.find_files">[docs]</a><span class="k">def</span> <span class="nf">find_files</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">regex_pattern</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Finds all files in a list that matches a certain pattern.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    &quot;&quot;&quot;</span><span class="s">&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;</span>
+
+<span class="s">        files           : list of files</span>
+<span class="s">        regex_pattern   : regular expression pattern</span>
+<span class="s">        verbose         : whether or not to print extra information</span>
+
+<span class="s">    Returns:</span>
+<span class="s">    &quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;</span>
+<span class="s">    </span>
+<span class="s">        files_found     : list of files that matches the pattern</span>
+
+<span class="s">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Expects a list of strings representing file paths.&#39;</span><span class="p">)</span>
+
+
+    <span class="n">files_found</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">iFile</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">regex_pattern</span><span class="p">,</span> <span class="n">iFile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">files_found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iFile</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Found file: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">iFile</span><span class="p">))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Pattern not found!&quot;</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">files_found</span>
+</pre></div></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2012, Marcus Jahnel.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

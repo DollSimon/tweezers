@@ -1,0 +1,762 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tweezer.core.parsers &mdash; Tweezer 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Tweezer 0.1 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> Tweezer</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">tweezer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tweezer.html">tweezer package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../References.html">References</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Tweezer</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>tweezer.core.parsers</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for tweezer.core.parsers</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Different parser utils for detecting file patterns and extracting information from them.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">from</span> <span class="nn">parsley</span> <span class="kn">import</span> <span class="n">makeGrammar</span><span class="p">,</span> <span class="n">ParseError</span>
+<span class="kn">from</span> <span class="nn">tweezer.ixo.os_</span> <span class="kn">import</span> <span class="n">get_parent_directory</span>
+
+<div class="viewcode-block" id="parse_tweezer_file_name"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parsers.parse_tweezer_file_name">[docs]</a><span class="k">def</span> <span class="nf">parse_tweezer_file_name</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="s">&#39;bot_data&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts metadata from a tweezer file name</span>
+
+<span class="sd">    :param file_name: (path) of the corresponding tweezer file</span>
+
+<span class="sd">    :param parser: (str) that specifies the file type to be parsed</span>
+
+<span class="sd">    :return FileInfo: (namedtuple) that carries the trial, subtrial and date of the corresponding tdms file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">file_info</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;FileInfo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;trial&#39;</span><span class="p">,</span> <span class="s">&#39;subtrial&#39;</span><span class="p">,</span> <span class="s">&#39;date&#39;</span><span class="p">])</span>
+
+    <span class="n">base_grammar</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">        # date related patterns</span>
+<span class="s">        y = &lt;digit{4}&gt;:year -&gt; int(year)</span>
+<span class="s">        mo = &lt;digit{2}&gt;:month -&gt; int(month)</span>
+<span class="s">        d = &lt;digit{2}&gt;:day -&gt; int(day)</span>
+<span class="s">        h = &lt;digit{2}&gt;:hour -&gt; int(hour)</span>
+<span class="s">        mi = &lt;digit{2}&gt;:minute -&gt; int(minute)</span>
+<span class="s">        sc = &lt;digit{2}&gt;:second -&gt; int(second)</span>
+
+<span class="s">        # trial and subtrial information</span>
+<span class="s">        t = &lt;digit+&gt;:trial -&gt; str(trial)</span>
+<span class="s">        sub = &lt;letter{1}&gt;:subtrial -&gt; str(subtrial)</span>
+
+<span class="s">        # separator</span>
+<span class="s">        s = &#39;.&#39; | &#39;_&#39; | &#39; &#39;</span>
+<span class="s">    &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="s">&#39;bot_data&#39;</span><span class="p">:</span>
+        <span class="n">name_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            n = &lt;(&#39;D&#39; | &#39;d&#39;) &#39;a&#39; &#39;t&#39; &#39;a&#39; &#39;l&#39; &#39;o&#39; &#39;g&#39;&gt;:name -&gt; str(name)</span>
+<span class="s">            ext = &#39;.&#39; &lt;&#39;t&#39; &#39;x&#39; &#39;t&#39;&gt;:ext -&gt; str(ext)</span>
+<span class="s">            pattern = (&lt;t &#39;_&#39; sub&gt; | t):name s n s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s n ext -&gt; (name, y, mo, d, h, mi, sc)</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">extends</span> <span class="o">=</span> <span class="n">base_grammar</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">parser</span> <span class="ow">is</span> <span class="s">&#39;bot_log&#39;</span><span class="p">:</span>
+        <span class="n">name_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            twb = &lt;(&#39;T&#39; | &#39;t&#39;) &#39;w&#39; &#39;e&#39; &#39;e&#39; (&#39;b&#39; | &#39;B&#39;) &#39;o&#39; &#39;t&#39;&gt;:tweebot -&gt; str(tweebot)</span>
+<span class="s">            log = &lt;twb (&#39;L&#39; | &#39;l&#39;) &#39;o&#39; &#39;g&#39;&gt;:log -&gt; str(log)</span>
+<span class="s">            ext = &#39;.&#39; &lt;&#39;t&#39; &#39;x&#39; &#39;t&#39;&gt;:ext -&gt; str(ext)</span>
+<span class="s">            pattern = (&lt;t &#39;_&#39; sub&gt; | t):name s log s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc ext -&gt; (name, y, mo, d, h, mi, sc)</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">extends</span> <span class="o">=</span> <span class="n">base_grammar</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">parser</span> <span class="ow">is</span> <span class="s">&#39;bot_tdms&#39;</span><span class="p">:</span>
+        <span class="n">name_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            ext = &#39;.&#39; &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39;&gt;:ext -&gt; str(ext)</span>
+<span class="s">            pattern = (&lt;t &#39;_&#39; sub&gt; | t):name s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc ext -&gt; (name, y, mo, d, h, mi, sc)</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">extends</span> <span class="o">=</span> <span class="n">base_grammar</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">parser</span> <span class="ow">is</span> <span class="s">&#39;bot_andor&#39;</span><span class="p">:</span>
+        <span class="n">name_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            ms = &lt;digit{2, 3}&gt;:microsecond -&gt; int(microsecond)</span>
+<span class="s">            and = &lt;&#39;a&#39; &#39;n&#39; &#39;d&#39; &#39;o&#39; &#39;r&#39;&gt;:andor -&gt; str(andor)</span>
+<span class="s">            ssh = &lt;(&#39;S&#39; | &#39;s&#39;) &#39;n&#39; &#39;a&#39; &#39;p&#39; &#39;s&#39; &#39;h&#39; &#39;o&#39; &#39;t&#39;&gt;</span>
+<span class="s">            ext = &#39;.&#39; &lt;&#39;p&#39; &#39;n&#39; &#39;g&#39;&gt;:ext -&gt; str(ext)</span>
+<span class="s">            pattern = (&lt;t &#39;_&#39; sub&gt; | t):name s ssh s{2} y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s ms:ms s and ext -&gt; (name, y, mo, d, h, mi, sc, ms)</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">extends</span> <span class="o">=</span> <span class="n">base_grammar</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">parser</span> <span class="ow">is</span> <span class="s">&#39;bot_ccd&#39;</span><span class="p">:</span>
+        <span class="n">name_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            ms = &lt;digit{2, 3}&gt;:microsecond -&gt; int(microsecond)</span>
+<span class="s">            ccd = &lt;&#39;c&#39; &#39;c&#39; &#39;d&#39;&gt;:ccd -&gt; str(ccd)</span>
+<span class="s">            ssh = &lt;(&#39;S&#39; | &#39;s&#39;) &#39;n&#39; &#39;a&#39; &#39;p&#39; &#39;s&#39; &#39;h&#39; &#39;o&#39; &#39;t&#39;&gt;</span>
+<span class="s">            ext = &#39;.&#39; &lt;&#39;p&#39; &#39;n&#39; &#39;g&#39;&gt;:ext -&gt; str(ext)</span>
+<span class="s">            pattern = (&lt;t &#39;_&#39; sub&gt; | t):name s ssh s{2} y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s ms:ms s ccd ext -&gt; (name, y, mo, d, h, mi, sc, ms)</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">extends</span> <span class="o">=</span> <span class="n">base_grammar</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">parser</span> <span class="ow">is</span> <span class="s">&#39;man_data&#39;</span><span class="p">:</span>
+        <span class="n">name_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            # ending</span>
+<span class="s">            txt = &lt;&#39;t&#39; &#39;x&#39; &#39;t&#39;&gt;:txt -&gt; str(txt)</span>
+<span class="s">            gro = &lt;&#39;g&#39; &#39;r&#39; &#39;o&#39; &#39;o&#39; &#39;v&#39; &#39;y&#39;&gt;:groovy -&gt; str(groovy)</span>
+<span class="s">            wgr = &lt;&#39;w&#39; &#39;h&#39; &#39;o&#39; &#39;l&#39; &#39;e&#39; &#39;.&#39; gro&gt;</span>
+<span class="s">            png = &lt;&#39;p&#39; &#39;n&#39; &#39;g&#39;&gt;:png -&gt; str(png)</span>
+<span class="s">            jpg = &lt;(&#39;j&#39; &#39;e&#39; &#39;p&#39; &#39;g&#39; | &#39;j&#39; &#39;p&#39; &#39;g&#39;)&gt;:jpg -&gt; str(jpg)</span>
+<span class="s">            avi = &lt;&#39;a&#39; &#39;v&#39; &#39;i&#39;&gt;:avi -&gt; str(avi)</span>
+<span class="s">            csv = &lt;&#39;c&#39; &#39;s&#39; &#39;v&#39;&gt;:csv -&gt; str(csv)</span>
+<span class="s">            fts = &lt;&#39;f&#39; &#39;i&#39; &#39;t&#39; &#39;s&#39;&gt;:fts -&gt; str(fts)</span>
+<span class="s">            tif = &lt;&#39;t&#39; &#39;i&#39; (&#39;f&#39; &#39;f&#39; | &#39;f&#39;)&gt;:tif -&gt; str(tif)</span>
+<span class="s">            tdms = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39;&gt;:tdms -&gt; str(tdms)</span>
+<span class="s">            tdms_index = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39; &#39;_&#39; &#39;i&#39; &#39;n&#39; &#39;d&#39; &#39;e&#39; &#39;x&#39;&gt;:tdms_index -&gt; str(tdms_index)</span>
+<span class="s">            end = &#39;.&#39; (txt | gro | png | jpg | wgr | tdms | avi | tif | csv | tdms_index)</span>
+
+<span class="s">            pattern = (&lt;t &#39;_&#39; sub&gt; | t):name end:ext -&gt; (name, ext)</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">extends</span> <span class="o">=</span> <span class="n">base_grammar</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">parser</span> <span class="ow">is</span> <span class="s">&#39;man_pics&#39;</span><span class="p">:</span>
+        <span class="n">name_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            # ending</span>
+<span class="s">            txt = &lt;&#39;t&#39; &#39;x&#39; &#39;t&#39;&gt;:txt -&gt; str(txt)</span>
+<span class="s">            gro = &lt;&#39;g&#39; &#39;r&#39; &#39;o&#39; &#39;o&#39; &#39;v&#39; &#39;y&#39;&gt;:groovy -&gt; str(groovy)</span>
+<span class="s">            wgr = &lt;&#39;w&#39; &#39;h&#39; &#39;o&#39; &#39;l&#39; &#39;e&#39; &#39;.&#39; gro&gt;</span>
+<span class="s">            png = &lt;&#39;p&#39; &#39;n&#39; &#39;g&#39;&gt;:png -&gt; str(png)</span>
+<span class="s">            jpg = &lt;(&#39;j&#39; &#39;e&#39; &#39;p&#39; &#39;g&#39; | &#39;j&#39; &#39;p&#39; &#39;g&#39;)&gt;:jpg -&gt; str(jpg)</span>
+<span class="s">            avi = &lt;&#39;a&#39; &#39;v&#39; &#39;i&#39;&gt;:avi -&gt; str(avi)</span>
+<span class="s">            csv = &lt;&#39;c&#39; &#39;s&#39; &#39;v&#39;&gt;:csv -&gt; str(csv)</span>
+<span class="s">            fts = &lt;&#39;f&#39; &#39;i&#39; &#39;t&#39; &#39;s&#39;&gt;:fts -&gt; str(fts)</span>
+<span class="s">            tif = &lt;&#39;t&#39; &#39;i&#39; (&#39;f&#39; &#39;f&#39; | &#39;f&#39;)&gt;:tif -&gt; str(tif)</span>
+<span class="s">            tdms = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39;&gt;:tdms -&gt; str(tdms)</span>
+<span class="s">            tdms_index = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39; &#39;_&#39; &#39;i&#39; &#39;n&#39; &#39;d&#39; &#39;e&#39; &#39;x&#39;&gt;:tdms_index -&gt; str(tdms_index)</span>
+<span class="s">            end = &#39;.&#39; (txt | gro | png | jpg | wgr | tdms | avi | tif | csv | tdms_index)</span>
+
+<span class="s">            pattern = (&lt;t &#39;_&#39; sub&gt; | t):name end:ext -&gt; (name, ext)</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">extends</span> <span class="o">=</span> <span class="n">base_grammar</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">parser</span> <span class="ow">is</span> <span class="s">&#39;tc_psd&#39;</span><span class="p">:</span>
+        <span class="n">name_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            # ending</span>
+<span class="s">            txt = &lt;&#39;t&#39; &#39;x&#39; &#39;t&#39;&gt;:txt -&gt; str(txt)</span>
+<span class="s">            gro = &lt;&#39;g&#39; &#39;r&#39; &#39;o&#39; &#39;o&#39; &#39;v&#39; &#39;y&#39;&gt;:groovy -&gt; str(groovy)</span>
+<span class="s">            wgr = &lt;&#39;w&#39; &#39;h&#39; &#39;o&#39; &#39;l&#39; &#39;e&#39; &#39;.&#39; gro&gt;</span>
+<span class="s">            png = &lt;&#39;p&#39; &#39;n&#39; &#39;g&#39;&gt;:png -&gt; str(png)</span>
+<span class="s">            jpg = &lt;(&#39;j&#39; &#39;e&#39; &#39;p&#39; &#39;g&#39; | &#39;j&#39; &#39;p&#39; &#39;g&#39;)&gt;:jpg -&gt; str(jpg)</span>
+<span class="s">            avi = &lt;&#39;a&#39; &#39;v&#39; &#39;i&#39;&gt;:avi -&gt; str(avi)</span>
+<span class="s">            csv = &lt;&#39;c&#39; &#39;s&#39; &#39;v&#39;&gt;:csv -&gt; str(csv)</span>
+<span class="s">            fts = &lt;&#39;f&#39; &#39;i&#39; &#39;t&#39; &#39;s&#39;&gt;:fts -&gt; str(fts)</span>
+<span class="s">            tif = &lt;&#39;t&#39; &#39;i&#39; (&#39;f&#39; &#39;f&#39; | &#39;f&#39;)&gt;:tif -&gt; str(tif)</span>
+<span class="s">            tdms = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39;&gt;:tdms -&gt; str(tdms)</span>
+<span class="s">            tdms_index = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39; &#39;_&#39; &#39;i&#39; &#39;n&#39; &#39;d&#39; &#39;e&#39; &#39;x&#39;&gt;:tdms_index -&gt; str(tdms_index)</span>
+<span class="s">            end = &#39;.&#39; (txt | gro | png | jpg | wgr | tdms | avi | tif | csv | tdms_index)</span>
+
+<span class="s">            pattern = &#39;P&#39; &#39;S&#39; &#39;D&#39; s &lt;t &#39;_&#39; sub&gt; | t):name end:ext -&gt; (name, ext)</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">extends</span> <span class="o">=</span> <span class="n">base_grammar</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">parser</span> <span class="ow">is</span> <span class="s">&#39;man_track&#39;</span><span class="p">:</span>
+        <span class="n">name_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            # ending</span>
+<span class="s">            txt = &lt;&#39;t&#39; &#39;x&#39; &#39;t&#39;&gt;:txt -&gt; str(txt)</span>
+<span class="s">            gro = &lt;&#39;g&#39; &#39;r&#39; &#39;o&#39; &#39;o&#39; &#39;v&#39; &#39;y&#39;&gt;:groovy -&gt; str(groovy)</span>
+<span class="s">            wgr = &lt;&#39;w&#39; &#39;h&#39; &#39;o&#39; &#39;l&#39; &#39;e&#39; &#39;.&#39; gro&gt;</span>
+<span class="s">            png = &lt;&#39;p&#39; &#39;n&#39; &#39;g&#39;&gt;:png -&gt; str(png)</span>
+<span class="s">            jpg = &lt;(&#39;j&#39; &#39;e&#39; &#39;p&#39; &#39;g&#39; | &#39;j&#39; &#39;p&#39; &#39;g&#39;)&gt;:jpg -&gt; str(jpg)</span>
+<span class="s">            avi = &lt;&#39;a&#39; &#39;v&#39; &#39;i&#39;&gt;:avi -&gt; str(avi)</span>
+<span class="s">            csv = &lt;&#39;c&#39; &#39;s&#39; &#39;v&#39;&gt;:csv -&gt; str(csv)</span>
+<span class="s">            fts = &lt;&#39;f&#39; &#39;i&#39; &#39;t&#39; &#39;s&#39;&gt;:fts -&gt; str(fts)</span>
+<span class="s">            tif = &lt;&#39;t&#39; &#39;i&#39; (&#39;f&#39; &#39;f&#39; | &#39;f&#39;)&gt;:tif -&gt; str(tif)</span>
+<span class="s">            tdms = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39;&gt;:tdms -&gt; str(tdms)</span>
+<span class="s">            tdms_index = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39; &#39;_&#39; &#39;i&#39; &#39;n&#39; &#39;d&#39; &#39;e&#39; &#39;x&#39;&gt;:tdms_index -&gt; str(tdms_index)</span>
+<span class="s">            end = &#39;.&#39; (txt | gro | png | jpg | wgr | tdms | avi | tif | csv | tdms_index)</span>
+
+<span class="s">            pattern = &lt;t &#39;_&#39; sub&gt; | t):name end:ext -&gt; (name, ext)</span>
+<span class="s">            &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="n">extends</span> <span class="o">=</span> <span class="n">base_grammar</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">infos</span> <span class="o">=</span> <span class="n">name_parser</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">pattern</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s">&#39;_&#39;</span> <span class="ow">in</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">None</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="o">*</span><span class="n">infos</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">8</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">ParseError</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+</div>
+<div class="viewcode-block" id="parse_tweebot_tdms_file_name"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parsers.parse_tweebot_tdms_file_name">[docs]</a><span class="k">def</span> <span class="nf">parse_tweebot_tdms_file_name</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract metadata from file name</span>
+
+<span class="sd">    :param file_name: (path) name of a tweebot tdms file</span>
+
+<span class="sd">    :return FileInfo: (namedtuple) that carries the trial, subtrial and date of the corresponding tdms file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">        y = &lt;digit{4}&gt;:year -&gt; int(year)</span>
+<span class="s">        mo = &lt;digit{2}&gt;:month -&gt; int(month)</span>
+<span class="s">        d = &lt;digit{2}&gt;:day -&gt; int(day)</span>
+<span class="s">        h = &lt;digit{2}&gt;:hour -&gt; int(hour)</span>
+<span class="s">        mi = &lt;digit{2}&gt;:minute -&gt; int(minute)</span>
+<span class="s">        sc = &lt;digit{2}&gt;:second -&gt; int(second)</span>
+<span class="s">        t = &lt;digit+&gt;:trial -&gt; str(trial)</span>
+<span class="s">        sub = &lt;letter{1}&gt;:subtrial -&gt; str(subtrial)</span>
+<span class="s">        ext = &#39;.&#39; &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39;&gt;:ext -&gt; str(ext)</span>
+<span class="s">        s = &#39;.&#39; | &#39;_&#39; | &#39; &#39;</span>
+<span class="s">        pattern = (&lt;t &#39;_&#39; sub&gt; | t):name s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc ext -&gt; (name, y, mo, d, h, mi, sc)</span>
+<span class="s">    &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="n">file_info</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;FileInfo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;trial&#39;</span><span class="p">,</span> <span class="s">&#39;subtrial&#39;</span><span class="p">,</span> <span class="s">&#39;date&#39;</span><span class="p">])</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">infos</span> <span class="o">=</span> <span class="n">data_parser</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">pattern</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s">&#39;_&#39;</span> <span class="ow">in</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">None</span>
+
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="o">*</span><span class="n">infos</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">7</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">ParseError</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+</div>
+<div class="viewcode-block" id="parse_tweebot_datalog_file_name"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parsers.parse_tweebot_datalog_file_name">[docs]</a><span class="k">def</span> <span class="nf">parse_tweebot_datalog_file_name</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts useful information from a given file name.</span>
+
+<span class="sd">    :param String file_name: File name or path to be tested</span>
+
+<span class="sd">    :return match: (Boolean) True if the file_name pattern was found</span>
+
+<span class="sd">    :return infos: (dict) Additional information stored in the file name</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">        y = &lt;digit{4}&gt;:year -&gt; int(year)</span>
+<span class="s">        mo = &lt;digit{2}&gt;:month -&gt; int(month)</span>
+<span class="s">        d = &lt;digit{2}&gt;:day -&gt; int(day)</span>
+<span class="s">        h = &lt;digit{2}&gt;:hour -&gt; int(hour)</span>
+<span class="s">        mi = &lt;digit{2}&gt;:minute -&gt; int(minute)</span>
+<span class="s">        sc = &lt;digit{2}&gt;:second -&gt; int(second)</span>
+<span class="s">        t = &lt;digit+&gt;:trial -&gt; str(trial)</span>
+<span class="s">        sub = &lt;letter{1}&gt;:subtrial -&gt; str(subtrial)</span>
+<span class="s">        ext = &#39;.&#39; &lt;&#39;t&#39; &#39;x&#39; &#39;t&#39;&gt;:ext -&gt; str(ext)</span>
+<span class="s">        n = &lt;(&#39;D&#39; | &#39;d&#39;) &#39;a&#39; &#39;t&#39; &#39;a&#39; &#39;l&#39; &#39;o&#39; &#39;g&#39;&gt;:n -&gt; str(n)</span>
+<span class="s">        s = &#39;.&#39; | &#39;_&#39; | &#39; &#39;</span>
+<span class="s">        pattern = (&lt;t &#39;_&#39; sub&gt; | t):name s n s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc s n ext -&gt; (name, y, mo, d, h, mi, sc)</span>
+<span class="s">    &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="n">file_info</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;FileInfo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;trial&#39;</span><span class="p">,</span> <span class="s">&#39;subtrial&#39;</span><span class="p">,</span> <span class="s">&#39;date&#39;</span><span class="p">])</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">infos</span> <span class="o">=</span> <span class="n">data_parser</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">pattern</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s">&#39;_&#39;</span> <span class="ow">in</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">None</span>
+
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="o">*</span><span class="n">infos</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">7</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">ParseError</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+</div>
+<div class="viewcode-block" id="parse_tweebot_log_file_name"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parsers.parse_tweebot_log_file_name">[docs]</a><span class="k">def</span> <span class="nf">parse_tweebot_log_file_name</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract metadata from file name</span>
+
+<span class="sd">    :param file_name: (path) name of a tweebot log file of type &quot;18.TweeBotLog.2013.02.19.22.43.07.txt&quot;</span>
+
+<span class="sd">    :return FileInfo: (namedtuple) that carries the trial, subtrial and date of the corresponding log file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_parser</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">        y = &lt;digit{4}&gt;:year -&gt; int(year)</span>
+<span class="s">        mo = &lt;digit{2}&gt;:month -&gt; int(month)</span>
+<span class="s">        d = &lt;digit{2}&gt;:day -&gt; int(day)</span>
+<span class="s">        h = &lt;digit{2}&gt;:hour -&gt; int(hour)</span>
+<span class="s">        mi = &lt;digit{2}&gt;:minute -&gt; int(minute)</span>
+<span class="s">        sc = &lt;digit{2}&gt;:second -&gt; int(second)</span>
+<span class="s">        t = &lt;digit+&gt;:trial -&gt; str(trial)</span>
+<span class="s">        sub = &lt;letter{1}&gt;:subtrial -&gt; str(subtrial)</span>
+<span class="s">        twb = &lt;(&#39;T&#39; | &#39;t&#39;) &#39;w&#39; &#39;e&#39; &#39;e&#39; (&#39;b&#39; | &#39;B&#39;) &#39;o&#39; &#39;t&#39;&gt;:tweebot -&gt; str(tweebot)</span>
+<span class="s">        log = &lt;twb (&#39;L&#39; | &#39;l&#39;) &#39;o&#39; &#39;g&#39;&gt;:log -&gt; str(log)</span>
+<span class="s">        ext = &#39;.&#39; &lt;&#39;t&#39; &#39;x&#39; &#39;t&#39;&gt;:ext -&gt; str(ext)</span>
+<span class="s">        s = &#39;.&#39; | &#39;_&#39; | &#39; &#39;</span>
+<span class="s">        pattern = (&lt;t &#39;_&#39; sub&gt; | t):name s log s y:y s mo:mo s d:d s h:h s mi:mi s sc:sc ext -&gt; (name, y, mo, d, h, mi, sc)</span>
+<span class="s">    &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="n">file_info</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;FileInfo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;trial&#39;</span><span class="p">,</span> <span class="s">&#39;subtrial&#39;</span><span class="p">,</span> <span class="s">&#39;date&#39;</span><span class="p">])</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">infos</span> <span class="o">=</span> <span class="n">data_parser</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">pattern</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s">&#39;_&#39;</span> <span class="ow">in</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span> <span class="o">=</span> <span class="n">infos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">None</span>
+
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="o">*</span><span class="n">infos</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">7</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">subtrial</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">ParseError</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+</div>
+<div class="viewcode-block" id="classify"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parsers.classify">[docs]</a><span class="k">def</span> <span class="nf">classify</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Infers the file type of a tweezer data file from its name.</span>
+
+<span class="sd">    :param String file_path: File path, including name of course, to be tested</span>
+
+<span class="sd">    :return file_type: (String) classifier of the file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">parent_dir</span> <span class="o">=</span> <span class="n">get_parent_directory</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="n">parent_dir</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+
+    <span class="n">file_name</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">parent_dir</span><span class="p">,</span> <span class="n">base_name</span><span class="p">])</span>
+
+    <span class="n">type_grammar</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">        # separator</span>
+<span class="s">        s = &#39;.&#39; | &#39;_&#39; | &#39; &#39;</span>
+<span class="s">        ps = &#39;/&#39;</span>
+<span class="s">        path = &lt;(letterOrDigit | &#39;_&#39; | &#39; &#39; | &#39;.&#39;)*&gt;:path -&gt; str(path)</span>
+<span class="s">        andor_path = &lt;(letterOrDigit | &#39;_&#39; | &#39; &#39; )*&gt;:andor_path -&gt; str(andor_path)</span>
+
+<span class="s">        # beginning</span>
+<span class="s">        t = &lt;digit+&gt;:trial -&gt; int(trial)</span>
+
+<span class="s">        # ending</span>
+<span class="s">        txt = &lt;&#39;t&#39; &#39;x&#39; &#39;t&#39;&gt;:txt -&gt; str(txt)</span>
+<span class="s">        gro = &lt;&#39;g&#39; &#39;r&#39; &#39;o&#39; &#39;o&#39; &#39;v&#39; &#39;y&#39;&gt;:groovy -&gt; str(groovy)</span>
+<span class="s">        wgr = &lt;&#39;w&#39; &#39;h&#39; &#39;o&#39; &#39;l&#39; &#39;e&#39; &#39;.&#39; gro&gt;</span>
+<span class="s">        png = &lt;&#39;p&#39; &#39;n&#39; &#39;g&#39;&gt;:png -&gt; str(png)</span>
+<span class="s">        jpg = &lt;(&#39;j&#39; &#39;e&#39; &#39;p&#39; &#39;g&#39; | &#39;j&#39; &#39;p&#39; &#39;g&#39;)&gt;:jpg -&gt; str(jpg)</span>
+<span class="s">        avi = &lt;&#39;a&#39; &#39;v&#39; &#39;i&#39;&gt;:avi -&gt; str(avi)</span>
+<span class="s">        csv = &lt;&#39;c&#39; &#39;s&#39; &#39;v&#39;&gt;:csv -&gt; str(csv)</span>
+<span class="s">        fts = &lt;&#39;f&#39; &#39;i&#39; &#39;t&#39; &#39;s&#39;&gt;:fts -&gt; str(fts)</span>
+<span class="s">        tif = &lt;&#39;t&#39; &#39;i&#39; (&#39;f&#39; &#39;f&#39; | &#39;f&#39;)&gt;:tif -&gt; str(tif)</span>
+<span class="s">        tdms = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39;&gt;:tdms -&gt; str(tdms)</span>
+<span class="s">        tdms_index = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39; &#39;_&#39; &#39;i&#39; &#39;n&#39; &#39;d&#39; &#39;e&#39; &#39;x&#39;&gt;:tdms_index -&gt; str(tdms_index)</span>
+<span class="s">        end = &#39;.&#39; (txt | gro | png | jpg | wgr | tdms | avi | tif | csv | tdms_index)</span>
+
+<span class="s">        # date and time</span>
+<span class="s">        y = &lt;digit{4}&gt;:year -&gt; int(year)</span>
+<span class="s">        mo = &lt;digit{2}&gt;:month -&gt; int(month)</span>
+<span class="s">        d = &lt;digit{2}&gt;:day -&gt; int(day)</span>
+<span class="s">        h = &lt;digit{2}&gt;:hour -&gt; int(hour)</span>
+<span class="s">        mi = &lt;digit{2}&gt;:minute -&gt; int(minute)</span>
+<span class="s">        sc = &lt;digit{2}&gt;:second -&gt; int(second)</span>
+<span class="s">        ms = &lt;digit{2, 3}&gt;:microsecond -&gt; int(microsecond)</span>
+<span class="s">        date = y:y s mo:mo s d:d s h:h s mi:mi s sc:sc -&gt; (y, mo, d, h, mi, sc)</span>
+
+<span class="s">        # names</span>
+<span class="s">        twb = &lt;(&#39;T&#39; | &#39;t&#39;) &#39;w&#39; &#39;e&#39; &#39;e&#39; (&#39;b&#39; | &#39;B&#39;) &#39;o&#39; &#39;t&#39;&gt;:tweebot -&gt; str(tweebot)</span>
+<span class="s">        dat = &lt;(&#39;D&#39; | &#39;d&#39;) &#39;a&#39; &#39;t&#39; &#39;a&#39; &#39;l&#39; &#39;o&#39; &#39;g&#39;&gt;:data -&gt; str(data)</span>
+<span class="s">        log = &lt;twb (&#39;L&#39; | &#39;l&#39;) &#39;o&#39; &#39;g&#39;&gt;:log -&gt; str(log)</span>
+<span class="s">        sts = &lt;twb (&#39;S&#39; | &#39;s&#39;) &#39;t&#39; &#39;a&#39; &#39;t&#39; &#39;s&#39;&gt;:stats -&gt; str(stats)</span>
+<span class="s">        foc = &lt;(&#39;F&#39; | &#39;f&#39;) &#39;o&#39; &#39;c&#39; &#39;u&#39; &#39;s&#39;&gt;:focus -&gt; str(focus)</span>
+<span class="s">        sta = &lt;(&#39;S&#39; | &#39;s&#39;) &#39;t&#39; &#39;a&#39; &#39;g&#39; &#39;e&#39;&gt;:stage -&gt; str(stage)</span>
+<span class="s">        fst = &lt;foc &#39;s&#39; &#39;i&#39; &#39;n&#39; &#39;g&#39; sta&gt;</span>
+<span class="s">        fuf = &lt;&#39;f&#39; &#39;u&#39; &#39;l&#39; &#39;l&#39; foc&gt;</span>
+<span class="s">        ref = &lt;&#39;r&#39; &#39;e&#39; foc&gt;</span>
+<span class="s">        ftb = &lt;foc &#39;t&#39; &#39;a&#39; &#39;b&#39; &#39;l&#39; &#39;e&#39;&gt;</span>
+<span class="s">        sct = &lt;(&#39;S&#39; | &#39;s&#39;) &#39;a&#39; &#39;v&#39; &#39;e&#39; &#39;d&#39; twb (&#39;S&#39; | &#39;s&#39;) &#39;c&#39; &#39;r&#39; &#39;i&#39; &#39;p&#39; &#39;t&#39;&gt;</span>
+<span class="s">        ccd = &lt;&#39;c&#39; &#39;c&#39; &#39;d&#39;&gt;:ccd -&gt; str(ccd)</span>
+<span class="s">        and = &lt;&#39;a&#39; &#39;n&#39; &#39;d&#39; &#39;o&#39; &#39;r&#39;&gt;:andor -&gt; str(andor)</span>
+<span class="s">        ssh = &lt;(&#39;S&#39; | &#39;s&#39;) &#39;n&#39; &#39;a&#39; &#39;p&#39; &#39;s&#39; &#39;h&#39; &#39;o&#39; &#39;t&#39;&gt;</span>
+<span class="s">        cal = &lt;&#39;c&#39; &#39;a&#39; &#39;l&#39; &#39;i&#39; &#39;b&#39; &#39;r&#39; &#39;a&#39; &#39;t&#39; &#39;i&#39; &#39;o&#39; &#39;n&#39;&gt;</span>
+<span class="s">        vid = &lt;&#39;v&#39; &#39;i&#39; &#39;d&#39; &#39;e&#39; (&#39;o&#39; &#39;s&#39; | &#39;o&#39;)&gt;</span>
+<span class="s">        tpx = &lt;(&#39;a&#39; &#39;o&#39; &#39;d&#39; | &#39;p&#39; &#39;m&#39;) &#39;2&#39; &#39;p&#39; &#39;i&#39; &#39;x&#39;&gt;</span>
+<span class="s">        clb = &lt;&#39;c&#39; &#39;a&#39; &#39;l&#39; &#39;i&#39; &#39;b&#39;&gt;</span>
+<span class="s">        tmp = &lt;&#39;t&#39; &#39;e&#39; &#39;m&#39; &#39;p&#39; &#39;l&#39; &#39;a&#39; &#39;t&#39; (&#39;e&#39; &#39;s&#39; | &#39;e&#39;)&gt;</span>
+<span class="s">        flw = &lt;&#39;f&#39; &#39;l&#39; &#39;o&#39; &#39;w&#39; &#39;c&#39; &#39;e&#39; &#39;l&#39; &#39;l&#39;&gt;</span>
+<span class="s">        pcs = &lt;&#39;p&#39; &#39;i&#39; &#39;c&#39; &#39;t&#39; &#39;u&#39; &#39;r&#39; (&#39;e&#39; &#39;s&#39; | &#39;s&#39;)&gt;</span>
+<span class="s">        trc = &lt;&#39;t&#39; &#39;r&#39; &#39;a&#39; &#39;c&#39; &#39;k&#39; &#39;i&#39; &#39;n&#39; &#39;g&#39;&gt;</span>
+
+<span class="s">        # bot file patterns</span>
+<span class="s">        bot_data = &lt;path ps t s dat s date s dat end&gt; -&gt; &#39;BOT_DATA&#39;</span>
+<span class="s">        bot_log = &lt;path ps t s log s date end&gt; -&gt; &#39;BOT_LOG&#39;</span>
+<span class="s">        bot_stats = &lt;path ps t s sts end&gt; -&gt; &#39;BOT_STATS&#39;</span>
+<span class="s">        bot_focus = &lt;path ps fst s (fuf | ref) t s ftb end&gt; -&gt; &#39;BOT_FOCUS&#39;</span>
+<span class="s">        bot_script = &lt;path ps t s sct s date end&gt; -&gt; &#39;BOT_SCRIPT&#39;</span>
+<span class="s">        bot_ccd = &lt;path ps t s ssh s{2} date s ms s ccd end&gt; -&gt; &#39;BOT_CCD&#39;</span>
+<span class="s">        bot_andor = &lt;path ps t s ssh s{2} date s ms s and end&gt; -&gt; &#39;BOT_ANDOR&#39;</span>
+<span class="s">        bot_tdms = &lt;path ps t s date &#39;.&#39; tdms&gt; -&gt; &#39;BOT_TDMS&#39;</span>
+<span class="s">        bot_tdms_index = &lt;path ps t s date &#39;.&#39; tdms_index&gt; -&gt; &#39;BOT_TDMS_INDEX&#39;</span>
+
+<span class="s">        # manual file patterns</span>
+<span class="s">        man_data = &lt;&#39;d&#39; &#39;a&#39; &#39;t&#39; &#39;a&#39; ps (t &#39;_&#39; &lt;letter+&gt; | t) end&gt; -&gt; &#39;MAN_DATA&#39;</span>
+
+<span class="s">        man_pm_dc_v = &lt;path ps (&#39;P&#39; &#39;M&#39; | &#39;p&#39; &#39;m&#39;) s cal s vid end&gt; -&gt; &#39;MAN_PM_DIST_CAL_VID&#39;</span>
+<span class="s">        man_pm_dc_r = &lt;path ps (&#39;P&#39; &#39;M&#39; | &#39;p&#39; &#39;m&#39;) s cal s clb s tpx end&gt; -&gt; &#39;MAN_PM_DIST_CAL_RES&#39;</span>
+<span class="s">        man_pm_dc_m = &lt;path ps (&#39;P&#39; &#39;M&#39; | &#39;p&#39; &#39;m&#39;) s cal s &lt;&#39;p&#39; &#39;m&#39; &#39;2&#39; &#39;p&#39;&gt; end&gt; -&gt; &#39;MAN_PM_DIST_CAL_MAT&#39;</span>
+
+<span class="s">        man_aod_dc_v = &lt;path ps (&#39;A&#39; &#39;O&#39; &#39;D&#39; | &#39;a&#39; &#39;o&#39; &#39;d&#39;) s cal s vid end&gt; -&gt; &#39;MAN_AOD_DIST_CAL_VID&#39;</span>
+<span class="s">        man_aod_dc_r = &lt;path ps (&#39;A&#39; &#39;O&#39; &#39;D&#39; | &#39;a&#39; &#39;o&#39; &#39;d&#39;) s cal s clb s tpx end&gt; -&gt; &#39;MAN_AOD_DIST_CAL_RES&#39;</span>
+<span class="s">        man_aod_dc_m = &lt;path ps (&#39;A&#39; &#39;O&#39; &#39;D&#39; | &#39;a&#39; &#39;o&#39; &#39;d&#39;) s cal s &lt;&#39;a&#39; &#39;o&#39; &#39;d&#39; &#39;2&#39; &#39;p&#39;&gt; end&gt; -&gt; &#39;MAN_AOD_DIST_CAL_MAT&#39;</span>
+
+<span class="s">        man_dc_tmp = &lt;path ps cal s tmp s &lt;&#39;d&#39; &#39;b&#39;&gt; s &lt;&#39;t&#39; &#39;b&#39;&gt; end&gt; -&gt; &#39;MAN_DIST_CAL_TMP&#39;</span>
+<span class="s">        man_vid = &lt;vid ps (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; avi&gt; -&gt; &#39;MAN_VID&#39;</span>
+<span class="s">        man_flow = &lt;flw ps (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; csv &gt; -&gt; &#39;MAN_FLOW&#39;</span>
+<span class="s">        man_pics = &lt;pcs ps (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; jpg &gt; -&gt; &#39;MAN_PICS&#39;</span>
+<span class="s">        man_track = &lt;trc ps (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; csv &gt; -&gt; &#39;MAN_TRACK&#39;</span>
+<span class="s">        man_tmp = &lt;tmp ps (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; tif &gt; -&gt; &#39;MAN_TMP&#39;</span>
+
+<span class="s">        # general file patterns</span>
+<span class="s">        tc_ts = &lt;path ps &#39;T&#39; &#39;S&#39; s (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; &#39;txt&#39;&gt; -&gt; &#39;TC_TS&#39;</span>
+<span class="s">        tc_psd = &lt;path ps &#39;P&#39; &#39;S&#39; &#39;D&#39; s (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; &#39;txt&#39;&gt; -&gt; &#39;TC_PSD&#39;</span>
+<span class="s">        andor_vid = &lt;andor_path ps andor_path &lt;&#39;.&#39; fts&gt;&gt; -&gt; &#39;ANDOR_VID&#39;</span>
+
+<span class="s">        type = (man_data |</span>
+<span class="s">            man_pm_dc_v |</span>
+<span class="s">            man_pm_dc_r |</span>
+<span class="s">            man_pm_dc_m |</span>
+<span class="s">            man_aod_dc_v |</span>
+<span class="s">            man_aod_dc_r |</span>
+<span class="s">            man_aod_dc_m |</span>
+<span class="s">            man_dc_tmp |</span>
+<span class="s">            man_vid |</span>
+<span class="s">            man_flow |</span>
+<span class="s">            man_pics |</span>
+<span class="s">            man_track |</span>
+<span class="s">            man_tmp |</span>
+<span class="s">            tc_ts |</span>
+<span class="s">            tc_psd |</span>
+<span class="s">            andor_vid |</span>
+<span class="s">            bot_data |</span>
+<span class="s">            bot_log |</span>
+<span class="s">            bot_stats |</span>
+<span class="s">            bot_focus |</span>
+<span class="s">            bot_script |</span>
+<span class="s">            bot_ccd |</span>
+<span class="s">            bot_tdms |</span>
+<span class="s">            bot_tdms_index |</span>
+<span class="s">            bot_andor ):type -&gt; str(type)</span>
+
+<span class="s">        pattern = type:type -&gt; str(type)</span>
+<span class="s">    &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">file_type</span> <span class="o">=</span> <span class="n">type_grammar</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">pattern</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">ParseError</span><span class="p">:</span>
+        <span class="n">file_type</span> <span class="o">=</span> <span class="s">&#39;UNKNOWN&#39;</span>
+
+    <span class="k">return</span> <span class="n">file_type</span>
+
+</div>
+<div class="viewcode-block" id="classify_all"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parsers.classify_all">[docs]</a><span class="k">def</span> <span class="nf">classify_all</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Infers the file type of a tweezer data file from its name.</span>
+
+<span class="sd">    :param String file_path: File path, including name of course, to be tested</span>
+
+<span class="sd">    :return file_type: (String) classifier of the file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">type_grammar</span> <span class="o">=</span> <span class="n">makeGrammar</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">        # separator</span>
+<span class="s">        s = &#39;.&#39; | &#39;_&#39; | &#39; &#39;</span>
+<span class="s">        ps = &#39;/&#39;</span>
+<span class="s">        path = &lt;(letterOrDigit | &#39;_&#39; | &#39; &#39; | &#39;.&#39;)*&gt;:path -&gt; str(path)</span>
+<span class="s">        andor_path = &lt;(letterOrDigit | &#39;_&#39; | &#39; &#39; )*&gt;:andor_path -&gt; str(andor_path)</span>
+
+<span class="s">        # beginning</span>
+<span class="s">        t = &lt;digit+&gt;:trial -&gt; int(trial)</span>
+
+<span class="s">        # ending</span>
+<span class="s">        txt = &lt;&#39;t&#39; &#39;x&#39; &#39;t&#39;&gt;:txt -&gt; str(txt)</span>
+<span class="s">        gro = &lt;&#39;g&#39; &#39;r&#39; &#39;o&#39; &#39;o&#39; &#39;v&#39; &#39;y&#39;&gt;:groovy -&gt; str(groovy)</span>
+<span class="s">        wgr = &lt;&#39;w&#39; &#39;h&#39; &#39;o&#39; &#39;l&#39; &#39;e&#39; &#39;.&#39; gro&gt;</span>
+<span class="s">        png = &lt;&#39;p&#39; &#39;n&#39; &#39;g&#39;&gt;:png -&gt; str(png)</span>
+<span class="s">        jpg = &lt;(&#39;j&#39; &#39;e&#39; &#39;p&#39; &#39;g&#39; | &#39;j&#39; &#39;p&#39; &#39;g&#39;)&gt;:jpg -&gt; str(jpg)</span>
+<span class="s">        avi = &lt;&#39;a&#39; &#39;v&#39; &#39;i&#39;&gt;:avi -&gt; str(avi)</span>
+<span class="s">        csv = &lt;&#39;c&#39; &#39;s&#39; &#39;v&#39;&gt;:csv -&gt; str(csv)</span>
+<span class="s">        fts = &lt;&#39;f&#39; &#39;i&#39; &#39;t&#39; &#39;s&#39;&gt;:fts -&gt; str(fts)</span>
+<span class="s">        tif = &lt;&#39;t&#39; &#39;i&#39; (&#39;f&#39; &#39;f&#39; | &#39;f&#39;)&gt;:tif -&gt; str(tif)</span>
+<span class="s">        tdms = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39;&gt;:tdms -&gt; str(tdms)</span>
+<span class="s">        tdms_index = &lt;&#39;t&#39; &#39;d&#39; &#39;m&#39; &#39;s&#39; &#39;_&#39; &#39;i&#39; &#39;n&#39; &#39;d&#39; &#39;e&#39; &#39;x&#39;&gt;:tdms_index -&gt; str(tdms_index)</span>
+<span class="s">        end = &#39;.&#39; (txt | gro | png | jpg | wgr | tdms | avi | tif | csv | tdms_index)</span>
+
+<span class="s">        # date and time</span>
+<span class="s">        y = &lt;digit{4}&gt;:year -&gt; int(year)</span>
+<span class="s">        mo = &lt;digit{2}&gt;:month -&gt; int(month)</span>
+<span class="s">        d = &lt;digit{2}&gt;:day -&gt; int(day)</span>
+<span class="s">        h = &lt;digit{2}&gt;:hour -&gt; int(hour)</span>
+<span class="s">        mi = &lt;digit{2}&gt;:minute -&gt; int(minute)</span>
+<span class="s">        sc = &lt;digit{2}&gt;:second -&gt; int(second)</span>
+<span class="s">        ms = &lt;digit{2, 3}&gt;:microsecond -&gt; int(microsecond)</span>
+<span class="s">        date = y:y s mo:mo s d:d s h:h s mi:mi s sc:sc -&gt; (y, mo, d, h, mi, sc)</span>
+
+<span class="s">        # names</span>
+<span class="s">        twb = &lt;(&#39;T&#39; | &#39;t&#39;) &#39;w&#39; &#39;e&#39; &#39;e&#39; (&#39;b&#39; | &#39;B&#39;) &#39;o&#39; &#39;t&#39;&gt;:tweebot -&gt; str(tweebot)</span>
+<span class="s">        dat = &lt;(&#39;D&#39; | &#39;d&#39;) &#39;a&#39; &#39;t&#39; &#39;a&#39; &#39;l&#39; &#39;o&#39; &#39;g&#39;&gt;:data -&gt; str(data)</span>
+<span class="s">        log = &lt;twb (&#39;L&#39; | &#39;l&#39;) &#39;o&#39; &#39;g&#39;&gt;:log -&gt; str(log)</span>
+<span class="s">        sts = &lt;twb (&#39;S&#39; | &#39;s&#39;) &#39;t&#39; &#39;a&#39; &#39;t&#39; &#39;s&#39;&gt;:stats -&gt; str(stats)</span>
+<span class="s">        foc = &lt;(&#39;F&#39; | &#39;f&#39;) &#39;o&#39; &#39;c&#39; &#39;u&#39; &#39;s&#39;&gt;:focus -&gt; str(focus)</span>
+<span class="s">        sta = &lt;(&#39;S&#39; | &#39;s&#39;) &#39;t&#39; &#39;a&#39; &#39;g&#39; &#39;e&#39;&gt;:stage -&gt; str(stage)</span>
+<span class="s">        fst = &lt;foc &#39;s&#39; &#39;i&#39; &#39;n&#39; &#39;g&#39; sta&gt;</span>
+<span class="s">        fuf = &lt;&#39;f&#39; &#39;u&#39; &#39;l&#39; &#39;l&#39; foc&gt;</span>
+<span class="s">        ref = &lt;&#39;r&#39; &#39;e&#39; foc&gt;</span>
+<span class="s">        ftb = &lt;foc &#39;t&#39; &#39;a&#39; &#39;b&#39; &#39;l&#39; &#39;e&#39;&gt;</span>
+<span class="s">        sct = &lt;(&#39;S&#39; | &#39;s&#39;) &#39;a&#39; &#39;v&#39; &#39;e&#39; &#39;d&#39; twb (&#39;S&#39; | &#39;s&#39;) &#39;c&#39; &#39;r&#39; &#39;i&#39; &#39;p&#39; &#39;t&#39;&gt;</span>
+<span class="s">        ccd = &lt;&#39;c&#39; &#39;c&#39; &#39;d&#39;&gt;:ccd -&gt; str(ccd)</span>
+<span class="s">        and = &lt;&#39;a&#39; &#39;n&#39; &#39;d&#39; &#39;o&#39; &#39;r&#39;&gt;:andor -&gt; str(andor)</span>
+<span class="s">        ssh = &lt;(&#39;S&#39; | &#39;s&#39;) &#39;n&#39; &#39;a&#39; &#39;p&#39; &#39;s&#39; &#39;h&#39; &#39;o&#39; &#39;t&#39;&gt;</span>
+<span class="s">        cal = &lt;&#39;c&#39; &#39;a&#39; &#39;l&#39; &#39;i&#39; &#39;b&#39; &#39;r&#39; &#39;a&#39; &#39;t&#39; &#39;i&#39; &#39;o&#39; &#39;n&#39;&gt;</span>
+<span class="s">        vid = &lt;&#39;v&#39; &#39;i&#39; &#39;d&#39; &#39;e&#39; (&#39;o&#39; &#39;s&#39; | &#39;o&#39;)&gt;</span>
+<span class="s">        tpx = &lt;(&#39;a&#39; &#39;o&#39; &#39;d&#39; | &#39;p&#39; &#39;m&#39;) &#39;2&#39; &#39;p&#39; &#39;i&#39; &#39;x&#39;&gt;</span>
+<span class="s">        clb = &lt;&#39;c&#39; &#39;a&#39; &#39;l&#39; &#39;i&#39; &#39;b&#39;&gt;</span>
+<span class="s">        tmp = &lt;&#39;t&#39; &#39;e&#39; &#39;m&#39; &#39;p&#39; &#39;l&#39; &#39;a&#39; &#39;t&#39; (&#39;e&#39; &#39;s&#39; | &#39;e&#39;)&gt;</span>
+<span class="s">        flw = &lt;&#39;f&#39; &#39;l&#39; &#39;o&#39; &#39;w&#39; &#39;c&#39; &#39;e&#39; &#39;l&#39; &#39;l&#39;&gt;</span>
+<span class="s">        pcs = &lt;&#39;p&#39; &#39;i&#39; &#39;c&#39; &#39;t&#39; &#39;u&#39; &#39;r&#39; (&#39;e&#39; &#39;s&#39; | &#39;s&#39;)&gt;</span>
+<span class="s">        trc = &lt;&#39;t&#39; &#39;r&#39; &#39;a&#39; &#39;c&#39; &#39;k&#39; &#39;i&#39; &#39;n&#39; &#39;g&#39;&gt;</span>
+
+<span class="s">        # bot file patterns</span>
+<span class="s">        bot_data = &lt;path ps t s dat s date s dat end&gt; -&gt; &#39;BOT_DATA&#39;</span>
+<span class="s">        bot_log = &lt;path ps t s log s date end&gt; -&gt; &#39;BOT_LOG&#39;</span>
+<span class="s">        bot_stats = &lt;path ps t s sts end&gt; -&gt; &#39;BOT_STATS&#39;</span>
+<span class="s">        bot_focus = &lt;path ps fst s (fuf | ref) t s ftb end&gt; -&gt; &#39;BOT_FOCUS&#39;</span>
+<span class="s">        bot_script = &lt;path ps t s sct s date end&gt; -&gt; &#39;BOT_SCRIPT&#39;</span>
+<span class="s">        bot_ccd = &lt;path ps t s ssh s{2} date s ms s ccd end&gt; -&gt; &#39;BOT_CCD&#39;</span>
+<span class="s">        bot_andor = &lt;path ps t s ssh s{2} date s ms s and end&gt; -&gt; &#39;BOT_ANDOR&#39;</span>
+<span class="s">        bot_tdms = &lt;path ps t s date &#39;.&#39; tdms&gt; -&gt; &#39;BOT_TDMS&#39;</span>
+<span class="s">        bot_tdms_index = &lt;path ps t s date &#39;.&#39; tdms_index&gt; -&gt; &#39;BOT_TDMS_INDEX&#39;</span>
+
+<span class="s">        # manual file patterns</span>
+<span class="s">        man_data = &lt;&#39;d&#39; &#39;a&#39; &#39;t&#39; &#39;a&#39; ps (t &#39;_&#39; &lt;letter+&gt; | t) end&gt; -&gt; &#39;MAN_DATA&#39;</span>
+
+<span class="s">        man_pm_dc_v = &lt;path ps (&#39;P&#39; &#39;M&#39; | &#39;p&#39; &#39;m&#39;) s cal s vid end&gt; -&gt; &#39;MAN_PM_DIST_CAL_VID&#39;</span>
+<span class="s">        man_pm_dc_r = &lt;path ps (&#39;P&#39; &#39;M&#39; | &#39;p&#39; &#39;m&#39;) s cal s clb s tpx end&gt; -&gt; &#39;MAN_PM_DIST_CAL_RES&#39;</span>
+<span class="s">        man_pm_dc_m = &lt;path ps (&#39;P&#39; &#39;M&#39; | &#39;p&#39; &#39;m&#39;) s cal s &lt;&#39;p&#39; &#39;m&#39; &#39;2&#39; &#39;p&#39;&gt; end&gt; -&gt; &#39;MAN_PM_DIST_CAL_MAT&#39;</span>
+
+<span class="s">        man_aod_dc_v = &lt;path ps (&#39;A&#39; &#39;O&#39; &#39;D&#39; | &#39;a&#39; &#39;o&#39; &#39;d&#39;) s cal s vid end&gt; -&gt; &#39;MAN_AOD_DIST_CAL_VID&#39;</span>
+<span class="s">        man_aod_dc_r = &lt;path ps (&#39;A&#39; &#39;O&#39; &#39;D&#39; | &#39;a&#39; &#39;o&#39; &#39;d&#39;) s cal s clb s tpx end&gt; -&gt; &#39;MAN_AOD_DIST_CAL_RES&#39;</span>
+<span class="s">        man_aod_dc_m = &lt;path ps (&#39;A&#39; &#39;O&#39; &#39;D&#39; | &#39;a&#39; &#39;o&#39; &#39;d&#39;) s cal s &lt;&#39;a&#39; &#39;o&#39; &#39;d&#39; &#39;2&#39; &#39;p&#39;&gt; end&gt; -&gt; &#39;MAN_AOD_DIST_CAL_MAT&#39;</span>
+
+<span class="s">        man_dc_tmp = &lt;path ps cal s tmp s &lt;&#39;d&#39; &#39;b&#39;&gt; s &lt;&#39;t&#39; &#39;b&#39;&gt; end&gt; -&gt; &#39;MAN_DIST_CAL_TMP&#39;</span>
+<span class="s">        man_vid = &lt;vid ps (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; avi&gt; -&gt; &#39;MAN_VID&#39;</span>
+<span class="s">        man_flow = &lt;flw ps (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; csv &gt; -&gt; &#39;MAN_FLOW&#39;</span>
+<span class="s">        man_pics = &lt;pcs ps (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; jpg &gt; -&gt; &#39;MAN_PICS&#39;</span>
+<span class="s">        man_track = &lt;trc ps (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; csv &gt; -&gt; &#39;MAN_TRACK&#39;</span>
+<span class="s">        man_tmp = &lt;tmp ps (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; tif &gt; -&gt; &#39;MAN_TMP&#39;</span>
+
+<span class="s">        # general file patterns</span>
+<span class="s">        tc_ts = &lt;path ps &#39;T&#39; &#39;S&#39; s (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; &#39;txt&#39;&gt; -&gt; &#39;TC_TS&#39;</span>
+<span class="s">        tc_psd = &lt;path ps &#39;P&#39; &#39;S&#39; &#39;D&#39; s (t &#39;_&#39; &lt;letter+&gt; | t) &#39;.&#39; &#39;txt&#39;&gt; -&gt; &#39;TC_PSD&#39;</span>
+<span class="s">        andor_vid = &lt;andor_path ps andor_path &lt;&#39;.&#39; fts&gt;&gt; -&gt; &#39;ANDOR_VID&#39;</span>
+
+<span class="s">        type = (man_data |</span>
+<span class="s">            man_pm_dc_v |</span>
+<span class="s">            man_pm_dc_r |</span>
+<span class="s">            man_pm_dc_m |</span>
+<span class="s">            man_aod_dc_v |</span>
+<span class="s">            man_aod_dc_r |</span>
+<span class="s">            man_aod_dc_m |</span>
+<span class="s">            man_dc_tmp |</span>
+<span class="s">            man_vid |</span>
+<span class="s">            man_flow |</span>
+<span class="s">            man_pics |</span>
+<span class="s">            man_track |</span>
+<span class="s">            man_tmp |</span>
+<span class="s">            tc_ts |</span>
+<span class="s">            tc_psd |</span>
+<span class="s">            andor_vid |</span>
+<span class="s">            bot_data |</span>
+<span class="s">            bot_log |</span>
+<span class="s">            bot_stats |</span>
+<span class="s">            bot_focus |</span>
+<span class="s">            bot_script |</span>
+<span class="s">            bot_ccd |</span>
+<span class="s">            bot_tdms |</span>
+<span class="s">            bot_tdms_index |</span>
+<span class="s">            bot_andor ):type -&gt; str(type)</span>
+
+<span class="s">        pattern = type:type -&gt; str(type)</span>
+<span class="s">    &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+    <span class="n">file_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">base_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">parent_dir</span> <span class="o">=</span> <span class="n">get_parent_directory</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="n">parent_dir</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+
+        <span class="n">file_name</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">parent_dir</span><span class="p">,</span> <span class="n">base_name</span><span class="p">])</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">file_type</span> <span class="o">=</span> <span class="n">type_grammar</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">pattern</span><span class="p">()</span>
+            <span class="n">file_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_type</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ParseError</span><span class="p">:</span>
+            <span class="n">file_type</span> <span class="o">=</span> <span class="s">&#39;UNKNOWN&#39;</span>
+            <span class="n">file_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_type</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">file_types</span>
+
+</div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parsers.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;path/39.Datalog.2013.02.20.04.14.20.datalog.txt&#39;</span><span class="p">,</span>
+        <span class="s">&#39;39.Datalog.2013.02.20.04.14.20.datalog.txt&#39;</span><span class="p">,</span>
+        <span class="s">&#39;path/56.TweeBotLog.2013.02.20.08.55.15.txt&#39;</span><span class="p">,</span>
+        <span class="s">&#39;path/1.SavedTweeBotScript.2013.02.19.17.04.25.whole.groovy&#39;</span><span class="p">,</span>
+        <span class="s">&#39;path/18.SavedTweeBotScript.2013.02.19.17.04.25.whole.groovy&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/Users/jahnel/code/example_data/tweebot/snapshots.andor/20.Snapshot..2013.02.19.23.32.30.254.andor.png&#39;</span><span class="p">,</span>
+        <span class="s">&#39;path/TS_4_d.txt&#39;</span><span class="p">,</span> <span class="s">&#39;path/TS_5.txt&#39;</span><span class="p">,</span> <span class="s">&#39;path/TS_10.txt&#39;</span><span class="p">,</span> <span class="s">&#39;data/18_2013_05_19_17_18_07.tdms&#39;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">classify</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2012, Marcus Jahnel.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

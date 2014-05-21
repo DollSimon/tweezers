@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tweezer.ixo &mdash; Tweezer 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootstrap-2.3.1/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootstrap-2.3.1/css/bootstrap-responsive.min.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-2.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="Tweezer 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <a class="brand" href="../../index.html">Tweezer</a>
+        <span class="navbar-text pull-left"><b>0.1</b></span>
+
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="divider-vertical"></li>
+            
+              <li class="dropdown globaltoc-container">
+  <a href="../../index.html"
+     class="dropdown-toggle"
+     data-toggle="dropdown">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+    ><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installing the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Using the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">tweezer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../References.html">References</a></li>
+</ul>
+</ul>
+</li>
+              <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"></ul>
+</li>
+            
+            
+              
+            
+            
+              <li></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-search pull-right" style="margin-bottom:-3px;" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container">
+  
+  <h1>Source code for tweezer.ixo</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#-*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">General utility functions used for tweezer package.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">cProfile</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">envoy</span>
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">nose.plugins.attrib</span> <span class="kn">import</span> <span class="n">attr</span>
+<span class="kn">from</span> <span class="nn">nose.plugins.skip</span> <span class="kn">import</span> <span class="n">SkipTest</span>
+ 
+
+<div class="viewcode-block" id="profile_this"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.profile_this">[docs]</a><span class="k">def</span> <span class="nf">profile_this</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to profile the execution time of a function</span>
+
+<span class="sd">    :param fn: function to be profiled</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">profiled_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c"># name of profile dump</span>
+        <span class="n">fpath</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot;.profile&quot;</span>
+        <span class="n">prof</span> <span class="o">=</span> <span class="n">cProfile</span><span class="o">.</span><span class="n">Profile</span><span class="p">()</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">prof</span><span class="o">.</span><span class="n">runcall</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">prof</span><span class="o">.</span><span class="n">dump_stats</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span>
+    <span class="k">return</span> <span class="n">profiled_fn</span>
+
+</div>
+<div class="viewcode-block" id="get_subdirs"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.get_subdirs">[docs]</a><span class="k">def</span> <span class="nf">get_subdirs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">is_file</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splits a path into its subdirectories and returns a list of those</span>
+
+<span class="sd">    :param path: file path</span>
+<span class="sd">    :param is_file: (Boolean) defaults to True for a complete file_name</span>
+
+<span class="sd">    :return subdirs: List of subdirectories that make up a path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_file</span><span class="p">:</span>
+        <span class="n">_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_path</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="n">subdirs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">_path</span><span class="p">,</span> <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">folder</span><span class="o">!=</span><span class="s">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">subdirs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_path</span><span class="o">!=</span><span class="s">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">subdirs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_path</span><span class="p">)</span>
+            <span class="k">break</span>
+
+    <span class="n">subdirs</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">subdirs</span>
+
+</div>
+<div class="viewcode-block" id="get_parent_directory"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.get_parent_directory">[docs]</a><span class="k">def</span> <span class="nf">get_parent_directory</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts the parent directory of a file from an absolute path</span>
+
+<span class="sd">    :param file_name: (Path)</span>
+
+<span class="sd">    :return parent_dir: (String) name of parent directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_subdirs</span><span class="p">(</span><span class="n">file_name</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+</div>
+<div class="viewcode-block" id="run_rscript"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.run_rscript">[docs]</a><span class="k">def</span> <span class="nf">run_rscript</span><span class="p">(</span><span class="n">script</span><span class="p">,</span> <span class="n">script_path</span><span class="o">=</span><span class="s">&#39;/Library/Frameworks/R.framework/Resources/library/tweezR/&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calls an R script</span>
+
+<span class="sd">    :param script: (Str) name of the script</span>
+
+<span class="sd">    :param script_path: (Path)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">script_path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;/&#39;</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_path</span><span class="p">,</span> <span class="n">script</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">script_path</span><span class="p">,</span> <span class="n">script</span><span class="p">)</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">envoy</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s">&quot;Rscript {} &quot;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="compile_pytex_file"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.compile_pytex_file">[docs]</a><span class="k">def</span> <span class="nf">compile_pytex_file</span><span class="p">(</span><span class="n">pytex_file</span><span class="o">=</span><span class="s">&#39;pytex_template.tex&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compile a [PythonTex](https://github.com/gpoore/pythontex) file into</span>
+
+<span class="sd">    :param pytex_file: (.tex file) A pytexDescription</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pdflatex_call</span> <span class="o">=</span> <span class="n">envoy</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s">&quot;pdflatex -interaction=batchmode {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pytex_file</span><span class="p">))</span>
+    <span class="n">pytex_call</span> <span class="o">=</span> <span class="n">envoy</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s">&quot;pythontex.py {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pytex_file</span><span class="p">))</span>
+    <span class="n">pdflatex_call</span> <span class="o">=</span> <span class="n">envoy</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s">&quot;pdflatex -interaction=batchmode {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pytex_file</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="TweebotDictionary"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.TweebotDictionary">[docs]</a><span class="k">class</span> <span class="nc">TweebotDictionary</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;TweebotDictionary&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;date&#39;</span><span class="p">,</span> 
+        <span class="s">&#39;timeOfExperiment&#39;</span><span class="p">,</span> 
+        <span class="s">&#39;laserDiodeTemp&#39;</span><span class="p">,</span> 
+        <span class="s">&#39;laserDiodeHours&#39;</span><span class="p">,</span>
+        <span class="s">&#39;laserDiodeCurrent&#39;</span><span class="p">,</span>
+        <span class="s">&#39;andorAodCenterX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;andorAodCenterY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;andorAodRangeX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;andorAodRangeY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ccdAodCenterX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ccdAodCenterY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ccdAodRangeX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ccdAodRangeY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;andorPmCenterX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;andorPmCenterY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;andorPmRangeX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;andorPmRangeY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ccdPmCenterX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ccdPmCenterY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ccdPmRangeX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ccdPmRangeY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;andorPixelSizeX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;andorPixelSizeY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ccdPixelSizeX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;ccdPixelSizeY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;aodDetectorOffsetX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;aodDetectorOffsetY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;aodStiffnessX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;aodStiffnessY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;aodDistanceConversionX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;aodDistanceConversionY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;pmDetectorOffsetX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;pmDetectorOffsetY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;pmStiffnessX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;pmStiffnessY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;pmDistanceConversionX&#39;</span><span class="p">,</span>
+        <span class="s">&#39;pmDistanceConversionY&#39;</span><span class="p">,</span>
+        <span class="s">&#39;aodBeadRadius&#39;</span><span class="p">,</span>
+        <span class="s">&#39;pmBeadRadius&#39;</span><span class="p">,</span>
+        <span class="s">&#39;samplingRate&#39;</span><span class="p">,</span>
+        <span class="s">&#39;nSamples&#39;</span><span class="p">,</span>
+        <span class="s">&#39;deltaTime&#39;</span><span class="p">,</span>
+        <span class="s">&#39;timeStep&#39;</span><span class="p">])):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TweebotDictionary is build on a namedtuple for easy access of variables with the dot notation.</span>
+<span class="sd">    In addition to the namedtuple it allows for default values to be set and extra values to be added when needed.</span>
+<span class="sd">    However, it preserves the immutability of the namedtuple on first glance. To set a value after initiation use</span>
+<span class="sd">    d = d._replace(key=value)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+        <span class="n">timeOfExperiment</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+        <span class="n">laserDiodeTemp</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+        <span class="n">laserDiodeHours</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">laserDiodeCurrent</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">andorAodCenterX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">andorAodCenterY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">andorAodRangeX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">andorAodRangeY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">ccdAodCenterX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">ccdAodCenterY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">ccdAodRangeX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">ccdAodRangeY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">andorPmCenterX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">andorPmCenterY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">andorPmRangeX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">andorPmRangeY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">ccdPmCenterX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">ccdPmCenterY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">ccdPmRangeX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">ccdPmRangeY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">andorPixelSizeX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">andorPixelSizeY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">ccdPixelSizeX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">ccdPixelSizeY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">aodDetectorOffsetX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">aodDetectorOffsetY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">aodStiffnessX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">aodStiffnessY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">aodDistanceConversionX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">aodDistanceConversionY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">pmDetectorOffsetX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">pmDetectorOffsetY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">pmStiffnessX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">pmStiffnessY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">pmDistanceConversionX</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">pmDistanceConversionY</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">aodBeadRadius</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">pmBeadRadius</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">samplingRate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">nSamples</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">deltaTime</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+        <span class="n">timeStep</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c"># add default values</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TweebotDictionary</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> 
+        <span class="n">timeOfExperiment</span><span class="p">,</span> 
+        <span class="n">laserDiodeTemp</span><span class="p">,</span> 
+        <span class="n">laserDiodeHours</span><span class="p">,</span>
+        <span class="n">laserDiodeCurrent</span><span class="p">,</span>
+        <span class="n">andorAodCenterX</span><span class="p">,</span>
+        <span class="n">andorAodCenterY</span><span class="p">,</span>
+        <span class="n">andorAodRangeX</span><span class="p">,</span>
+        <span class="n">andorAodRangeY</span><span class="p">,</span>
+        <span class="n">ccdAodCenterX</span><span class="p">,</span>
+        <span class="n">ccdAodCenterY</span><span class="p">,</span>
+        <span class="n">ccdAodRangeX</span><span class="p">,</span>
+        <span class="n">ccdAodRangeY</span><span class="p">,</span>
+        <span class="n">andorPmCenterX</span><span class="p">,</span>
+        <span class="n">andorPmCenterY</span><span class="p">,</span>
+        <span class="n">andorPmRangeX</span><span class="p">,</span>
+        <span class="n">andorPmRangeY</span><span class="p">,</span>
+        <span class="n">ccdPmCenterX</span><span class="p">,</span>
+        <span class="n">ccdPmCenterY</span><span class="p">,</span>
+        <span class="n">ccdPmRangeX</span><span class="p">,</span>
+        <span class="n">ccdPmRangeY</span><span class="p">,</span>
+        <span class="n">andorPixelSizeX</span><span class="p">,</span>
+        <span class="n">andorPixelSizeY</span><span class="p">,</span>
+        <span class="n">ccdPixelSizeX</span><span class="p">,</span>
+        <span class="n">ccdPixelSizeY</span><span class="p">,</span>
+        <span class="n">aodDetectorOffsetX</span><span class="p">,</span>
+        <span class="n">aodDetectorOffsetY</span><span class="p">,</span>
+        <span class="n">aodStiffnessX</span><span class="p">,</span>
+        <span class="n">aodStiffnessY</span><span class="p">,</span>
+        <span class="n">aodDistanceConversionX</span><span class="p">,</span>
+        <span class="n">aodDistanceConversionY</span><span class="p">,</span>
+        <span class="n">pmDetectorOffsetX</span><span class="p">,</span>
+        <span class="n">pmDetectorOffsetY</span><span class="p">,</span>
+        <span class="n">pmStiffnessX</span><span class="p">,</span>
+        <span class="n">pmStiffnessY</span><span class="p">,</span>
+        <span class="n">pmDistanceConversionX</span><span class="p">,</span>
+        <span class="n">pmDistanceConversionY</span><span class="p">,</span>
+        <span class="n">aodBeadRadius</span><span class="p">,</span>
+        <span class="n">pmBeadRadius</span><span class="p">,</span>
+        <span class="n">samplingRate</span><span class="p">,</span>
+        <span class="n">nSamples</span><span class="p">,</span>
+        <span class="n">deltaTime</span><span class="p">,</span>
+        <span class="n">timeStep</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="TweezerUnits"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.TweezerUnits">[docs]</a><span class="k">class</span> <span class="nc">TweezerUnits</span><span class="p">(</span><span class="n">TweebotDictionary</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+            <span class="n">timeOfExperiment</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+            <span class="n">laserDiodeTemp</span><span class="o">=</span><span class="s">&#39;C&#39;</span><span class="p">,</span> 
+            <span class="n">laserDiodeHours</span><span class="o">=</span><span class="s">&#39;h&#39;</span><span class="p">,</span>
+            <span class="n">laserDiodeCurrent</span><span class="o">=</span><span class="s">&#39;A&#39;</span><span class="p">,</span>
+            <span class="n">andorAodCenterX</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">andorAodCenterY</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">andorAodRangeX</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">andorAodRangeY</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">ccdAodCenterX</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">ccdAodCenterY</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">ccdAodRangeX</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">ccdAodRangeY</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">andorPmCenterX</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">andorPmCenterY</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">andorPmRangeX</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">andorPmRangeY</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">ccdPmCenterX</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">ccdPmCenterY</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">ccdPmRangeX</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">ccdPmRangeY</span><span class="o">=</span><span class="s">&#39;px&#39;</span><span class="p">,</span>
+            <span class="n">andorPixelSizeX</span><span class="o">=</span><span class="s">&#39;nm&#39;</span><span class="p">,</span>
+            <span class="n">andorPixelSizeY</span><span class="o">=</span><span class="s">&#39;nm&#39;</span><span class="p">,</span>
+            <span class="n">ccdPixelSizeX</span><span class="o">=</span><span class="s">&#39;nm&#39;</span><span class="p">,</span>
+            <span class="n">ccdPixelSizeY</span><span class="o">=</span><span class="s">&#39;nm&#39;</span><span class="p">,</span>
+            <span class="n">aodDetectorOffsetX</span><span class="o">=</span><span class="s">&#39;V&#39;</span><span class="p">,</span>
+            <span class="n">aodDetectorOffsetY</span><span class="o">=</span><span class="s">&#39;V&#39;</span><span class="p">,</span>
+            <span class="n">aodStiffnessX</span><span class="o">=</span><span class="s">&#39;pN/nm&#39;</span><span class="p">,</span>
+            <span class="n">aodStiffnessY</span><span class="o">=</span><span class="s">&#39;pN/nm&#39;</span><span class="p">,</span>
+            <span class="n">aodDistanceConversionX</span><span class="o">=</span><span class="s">&#39;V/nm&#39;</span><span class="p">,</span>
+            <span class="n">aodDistanceConversionY</span><span class="o">=</span><span class="s">&#39;V/nm&#39;</span><span class="p">,</span>
+            <span class="n">pmDetectorOffsetX</span><span class="o">=</span><span class="s">&#39;V&#39;</span><span class="p">,</span>
+            <span class="n">pmDetectorOffsetY</span><span class="o">=</span><span class="s">&#39;V&#39;</span><span class="p">,</span>
+            <span class="n">pmStiffnessX</span><span class="o">=</span><span class="s">&#39;pN/nm&#39;</span><span class="p">,</span>
+            <span class="n">pmStiffnessY</span><span class="o">=</span><span class="s">&#39;pN/nm&#39;</span><span class="p">,</span>
+            <span class="n">pmDistanceConversionX</span><span class="o">=</span><span class="s">&#39;V/nm&#39;</span><span class="p">,</span>
+            <span class="n">pmDistanceConversionY</span><span class="o">=</span><span class="s">&#39;V/nm&#39;</span><span class="p">,</span>
+            <span class="n">aodBeadRadius</span><span class="o">=</span><span class="s">&#39;nm&#39;</span><span class="p">,</span>
+            <span class="n">pmBeadRadius</span><span class="o">=</span><span class="s">&#39;nm&#39;</span><span class="p">,</span>
+            <span class="n">samplingRate</span><span class="o">=</span><span class="s">&#39;Hz&#39;</span><span class="p">,</span>
+            <span class="n">nSamples</span><span class="o">=</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="n">deltaTime</span><span class="o">=</span><span class="s">&#39;s&#39;</span><span class="p">,</span>
+            <span class="n">timeStep</span><span class="o">=</span><span class="s">&#39;s&#39;</span><span class="p">):</span>
+            <span class="c"># add default values</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">TweezerUnits</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> 
+            <span class="n">timeOfExperiment</span><span class="p">,</span> 
+            <span class="n">laserDiodeTemp</span><span class="p">,</span> 
+            <span class="n">laserDiodeHours</span><span class="p">,</span>
+            <span class="n">laserDiodeCurrent</span><span class="p">,</span>
+            <span class="n">andorAodCenterX</span><span class="p">,</span>
+            <span class="n">andorAodCenterY</span><span class="p">,</span>
+            <span class="n">andorAodRangeX</span><span class="p">,</span>
+            <span class="n">andorAodRangeY</span><span class="p">,</span>
+            <span class="n">ccdAodCenterX</span><span class="p">,</span>
+            <span class="n">ccdAodCenterY</span><span class="p">,</span>
+            <span class="n">ccdAodRangeX</span><span class="p">,</span>
+            <span class="n">ccdAodRangeY</span><span class="p">,</span>
+            <span class="n">andorPmCenterX</span><span class="p">,</span>
+            <span class="n">andorPmCenterY</span><span class="p">,</span>
+            <span class="n">andorPmRangeX</span><span class="p">,</span>
+            <span class="n">andorPmRangeY</span><span class="p">,</span>
+            <span class="n">ccdPmCenterX</span><span class="p">,</span>
+            <span class="n">ccdPmCenterY</span><span class="p">,</span>
+            <span class="n">ccdPmRangeX</span><span class="p">,</span>
+            <span class="n">ccdPmRangeY</span><span class="p">,</span>
+            <span class="n">andorPixelSizeX</span><span class="p">,</span>
+            <span class="n">andorPixelSizeY</span><span class="p">,</span>
+            <span class="n">ccdPixelSizeX</span><span class="p">,</span>
+            <span class="n">ccdPixelSizeY</span><span class="p">,</span>
+            <span class="n">aodDetectorOffsetX</span><span class="p">,</span>
+            <span class="n">aodDetectorOffsetY</span><span class="p">,</span>
+            <span class="n">aodStiffnessX</span><span class="p">,</span>
+            <span class="n">aodStiffnessY</span><span class="p">,</span>
+            <span class="n">aodDistanceConversionX</span><span class="p">,</span>
+            <span class="n">aodDistanceConversionY</span><span class="p">,</span>
+            <span class="n">pmDetectorOffsetX</span><span class="p">,</span>
+            <span class="n">pmDetectorOffsetY</span><span class="p">,</span>
+            <span class="n">pmStiffnessX</span><span class="p">,</span>
+            <span class="n">pmStiffnessY</span><span class="p">,</span>
+            <span class="n">pmDistanceConversionX</span><span class="p">,</span>
+            <span class="n">pmDistanceConversionY</span><span class="p">,</span>
+            <span class="n">aodBeadRadius</span><span class="p">,</span>
+            <span class="n">pmBeadRadius</span><span class="p">,</span>
+            <span class="n">samplingRate</span><span class="p">,</span>
+            <span class="n">nSamples</span><span class="p">,</span>
+            <span class="n">deltaTime</span><span class="p">,</span>
+            <span class="n">timeStep</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="extract_meta_and_units"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.extract_meta_and_units">[docs]</a><span class="k">def</span> <span class="nf">extract_meta_and_units</span><span class="p">(</span><span class="n">comment_list</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s">&#39;man_data&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts metadata and units from the comments in raw tweezer data files</span>
+
+<span class="sd">    :param comment_list: (list) List of strings that hold the raw comment lines</span>
+
+<span class="sd">    :param file_type: (str) identifies the file type for which meta and units are extracted</span>
+
+<span class="sd">    :return CommentInfo: (namedtuple) that holds dictionaries for metadata and units</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c"># set defaults</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;laserDiodeCurrent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;A&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;laserDiodeHours&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;h&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;laserDiodeTemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;C&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;viscosity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN s / nm^2&#39;</span>
+
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;samplingRate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Hz&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;recordingRate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Hz&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;timeStep&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;s&#39;</span>
+
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDistanceConversionX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDistanceConversionY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDistanceConversionX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDistanceConversionY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDisplacementSensitivityX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDisplacementSensitivityY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDisplacementSensitivityX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDisplacementSensitivityY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmStiffnessX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmStiffnessY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodStiffnessX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodStiffnessY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN/nm&#39;</span>
+
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmBeadDiameter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodBeadDiameter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmBeadRadius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodBeadRadius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;laserDiodeTemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;C&#39;</span> 
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;laserDiodeHours&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;h&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;laserDiodeCurrent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;A&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;andorAodCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;andorAodCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;andorAodRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;andorAodRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;ccdAodCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;ccdAodCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;ccdAodRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;ccdAodRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;andorPmCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;andorPmCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;andorPmRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;andorPmRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;ccdPmCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;ccdPmCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;ccdPmRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;ccdPmRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;px&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;andorPixelSizeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;andorPixelSizeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;ccdPixelSizeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;ccdPixelSizeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodStiffnessX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodStiffnessY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDistanceConversionX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDistanceConversionY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmStiffnessX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmStiffnessY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDistanceConversionX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDistanceConversionY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V/nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodBeadRadius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmBeadRadius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;samplingRate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Hz&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;nSamples&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;int&#39;</span>
+    <span class="n">units</span><span class="p">[</span><span class="s">&#39;deltaTime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;s&#39;</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;laserDiodeCurrent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;laserDiodeHours&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;laserDiodeTemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;viscosity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDistanceConversionX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDistanceConversionY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDistanceConversionX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDistanceConversionY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDisplacementSensitivityX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDisplacementSensitivityY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDisplacementSensitivityX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDisplacementSensitivityY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmStiffnessX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmStiffnessY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodStiffnessX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodStiffnessY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmBeadDiameter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodBeadDiameter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmBeadRadius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmBeadRadius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;timeStep&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;samplingRate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;recordingRate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorAodCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorAodCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorAodRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorAodRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdAodCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdAodCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdAodRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdAodRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPmCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPmCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPmRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPmRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPmCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPmCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPmRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPmRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPixelSizeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPixelSizeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPixelSizeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPixelSizeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;samplingRate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;nSamples&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;deltaTime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">comment_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s">&#39;Date&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">date_string</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s">&#39;starttime&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">time_string</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="s">&#39;Time of Experiment&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">time_string</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">elif</span> <span class="s">&#39;Laser Diode Status&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="s">&#39;thermal calibration&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="s">&#39;data averaged to while-loop&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&#39;FALSE&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">isDataAveraged</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">isDataAveraged</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;isDataAveraged&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">isDataAveraged</span>
+
+        <span class="k">elif</span> <span class="s">&#39;errors&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">error_string</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">error_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">errors</span><span class="p">):</span>
+                <span class="n">hasErrors</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">hasErrors</span> <span class="o">=</span> <span class="bp">False</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;errors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">errors</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;hasErrors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hasErrors</span>
+
+        <span class="k">elif</span> <span class="s">&#39;number of samples&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">nSamples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">nSamples</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;nSamples&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nSamples</span>
+
+        <span class="k">elif</span> <span class="s">&#39;sample rate&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">samplingRate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">samplingRate</span> <span class="o">=</span> <span class="mi">10000</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;samplingRate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">samplingRate</span>
+
+        <span class="k">elif</span> <span class="s">&#39;rate of while-loop&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">recordingRate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">recordingRate</span> <span class="o">=</span> <span class="mi">10000</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;recordingRate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">recordingRate</span>
+
+        <span class="k">elif</span> <span class="s">&#39;duration of measurement&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">duration</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">duration</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">units</span><span class="p">[</span><span class="s">&#39;duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;s&#39;</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;duration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">duration</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD detector horizontal offset&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">aodDetectorOffsetX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">aodDetectorOffsetX</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodDetectorOffsetX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD detector vertical offset&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">aodDetectorOffsetY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">aodDetectorOffsetY</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodDetectorOffsetY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM detector horizontal offset&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pmDetectorOffsetX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">pmDetectorOffsetX</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmDetectorOffsetX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM detector vertical offset&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pmDetectorOffsetY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">pmDetectorOffsetY</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmDetectorOffsetY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM horizontal trap stiffness&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pmStiffnessX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">pmStiffnessX</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmStiffnessX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmStiffnessX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM vertical trap stiffness&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pmStiffnessY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">pmStiffnessY</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmStiffnessY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmStiffnessY</span>
+            
+        <span class="k">elif</span> <span class="s">&#39;AOD horizontal trap stiffness&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">aodStiffnessX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">aodStiffnessX</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodStiffnessX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodStiffnessX</span>
+            
+        <span class="k">elif</span> <span class="s">&#39;AOD vertical trap stiffness&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">aodStiffnessY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">aodStiffnessY</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodStiffnessY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodStiffnessY</span>
+            
+        <span class="k">elif</span> <span class="s">&#39;PM horizontal OLS&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pmDisplacementSensitivityX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">pmDisplacementSensitivityX</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDisplacementSensitivityX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmDisplacementSensitivityX</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDistanceConversionX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmDisplacementSensitivityX</span>
+            
+        <span class="k">elif</span> <span class="s">&#39;PM vertical OLS&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pmDisplacementSensitivityY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">pmDisplacementSensitivityY</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDisplacementSensitivityY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmDisplacementSensitivityY</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDistanceConversionY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmDisplacementSensitivityY</span>
+            
+        <span class="k">elif</span> <span class="s">&#39;AOD horizontal OLS&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">aodDisplacementSensitivityX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">aodDisplacementSensitivityX</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDisplacementSensitivityX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodDisplacementSensitivityX</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDistanceConversionX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodDisplacementSensitivityX</span>
+            
+        <span class="k">elif</span> <span class="s">&#39;AOD vertical OLS&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">aodDisplacementSensitivityY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">aodDisplacementSensitivityY</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDisplacementSensitivityY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodDisplacementSensitivityY</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDistanceConversionY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodDisplacementSensitivityY</span>
+            
+        <span class="k">elif</span> <span class="s">&#39;Viscosity&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">viscosity</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">viscosity</span> <span class="o">=</span> <span class="mf">0.8902e-9</span> <span class="c"># viscosity of water @ 25C</span>
+
+            <span class="n">units</span><span class="p">[</span><span class="s">&#39;viscosity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN s / nm^2&#39;</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;viscosity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">viscosity</span>
+
+        <span class="k">elif</span> <span class="s">&#39;dt &#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.0010</span>
+
+            <span class="n">units</span><span class="p">[</span><span class="s">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="p">[</span><span class="s">&#39;timeStep&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;s&#39;</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;timeStep&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span> 
+
+        <span class="k">elif</span> <span class="s">&#39;PM bead diameter&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pmBeadDiameter</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">pmBeadDiameter</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+                    <span class="n">pmBeadDiameter</span> <span class="o">=</span> <span class="n">pmBeadDiameter</span> <span class="o">*</span> <span class="mi">1000</span>
+                <span class="k">elif</span> <span class="s">&#39;(um)&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">pmBeadDiameter</span> <span class="o">=</span> <span class="n">pmBeadDiameter</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">pmBeadDiameter</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">pmBeadRadius</span> <span class="o">=</span> <span class="n">pmBeadDiameter</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmBeadDiameter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmBeadDiameter</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmBeadRadius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmBeadRadius</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD bead diameter&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">aodBeadDiameter</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">aodBeadDiameter</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+                    <span class="n">aodBeadDiameter</span> <span class="o">=</span> <span class="n">aodBeadDiameter</span> <span class="o">*</span> <span class="mi">1000</span>
+                <span class="k">elif</span> <span class="s">&#39;(um)&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">aodBeadDiameter</span> <span class="o">=</span> <span class="n">aodBeadDiameter</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">aodBeadDiameter</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">aodBeadRadius</span> <span class="o">=</span> <span class="n">aodBeadDiameter</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodBeadDiameter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodBeadDiameter</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodBeadRadius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodBeadRadius</span>
+
+        <span class="k">elif</span> <span class="s">&#39;Laser Diode Temp&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">laserDiodeTemp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;laserDiodeTemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">laserDiodeTemp</span>
+
+        <span class="k">elif</span> <span class="s">&#39;Laser Diode Operating Hours&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">laserDiodeHours</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;laserDiodeHours&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">laserDiodeHours</span>
+
+        <span class="k">elif</span> <span class="s">&#39;Laser Diode Current&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">laserDiodeCurrent</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;laserDiodeCurrent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">laserDiodeCurrent</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD ANDOR center x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">andorAodCenterX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorAodCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">andorAodCenterX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD ANDOR center y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">andorAodCenterY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorAodCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">andorAodCenterY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD ANDOR range x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">andorAodRangeX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorAodRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">andorAodRangeX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD ANDOR range y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">andorAodRangeY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorAodRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">andorAodRangeY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD CCD center x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">ccdAodCenterX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdAodCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccdAodCenterX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD CCD center y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">ccdAodCenterY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdAodCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccdAodCenterY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD CCD range x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">ccdAodRangeX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdAodRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccdAodRangeX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD CCD range y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">ccdAodRangeY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdAodRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccdAodRangeY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM ANDOR center x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">andorPmCenterX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPmCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">andorPmCenterX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM ANDOR center y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">andorPmCenterY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPmCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">andorPmCenterY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM ANDOR range x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">andorPmRangeX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPmRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">andorPmRangeX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM ANDOR range y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">andorPmRangeY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPmRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">andorPmRangeY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM CCD center x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">ccdPmCenterX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPmCenterX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccdPmCenterX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM CCD center y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">ccdPmCenterY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPmCenterY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccdPmCenterY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM CCD range x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">ccdPmRangeX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPmRangeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccdPmRangeX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM CCD range y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">ccdPmRangeY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPmRangeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccdPmRangeY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;ANDOR pixel size x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">andorPixelSizeX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPixelSizeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">andorPixelSizeX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;ANDOR pixel size y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">andorPixelSizeY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;andorPixelSizeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">andorPixelSizeY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;CCD pixel size x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">ccdPixelSizeX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPixelSizeX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccdPixelSizeX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;CCD pixel size y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">ccdPixelSizeY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ccdPixelSizeY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccdPixelSizeY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD detector x offset&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">aodDetectorOffsetX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodDetectorOffsetX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD detector y offset&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">aodDetectorOffsetY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodDetectorOffsetY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD trap stiffness x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">aodStiffnessX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodStiffnessX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodStiffnessX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD trap stiffness y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">aodStiffnessY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodStiffnessY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodStiffnessY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD trap distance conversion x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">aodDistanceConversionX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDistanceConversionX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodDistanceConversionX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD trap distance conversion y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">aodDistanceConversionY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodDistanceConversionY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">aodDistanceConversionY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM detector x offset&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">pmDetectorOffsetX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmDetectorOffsetX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM detector y offset&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">pmDetectorOffsetY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDetectorOffsetY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmDetectorOffsetY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM trap stiffness x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">pmStiffnessX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmStiffnessX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmStiffnessX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM trap stiffness y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">pmStiffnessY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmStiffnessY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmStiffnessY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM trap distance conversion x&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">pmDistanceConversionX</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDistanceConversionX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmDistanceConversionX</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM trap distance conversion y&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">pmDistanceConversionY</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmDistanceConversionY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmDistanceConversionY</span>
+
+        <span class="k">elif</span> <span class="s">&#39;AOD bead radius&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">aodBeadRadius</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">aodBeadRadius</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+                    <span class="n">aodBeadRadius</span> <span class="o">=</span> <span class="n">aodBeadRadius</span> <span class="o">*</span> <span class="mi">1000</span>
+                <span class="k">elif</span> <span class="s">&#39;(um)&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">aodBeadRadius</span> <span class="o">=</span> <span class="n">aodBeadRadius</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">aodBeadRadius</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">aodBeadDiameter</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">aodBeadRadius</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodBeadDiameter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">aodBeadDiameter</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;aodBeadRadius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">aodBeadRadius</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="s">&#39;PM bead radius &#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pmBeadRadius</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">pmBeadRadius</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+                    <span class="n">pmBeadRadius</span> <span class="o">=</span> <span class="n">pmBeadRadius</span> <span class="o">*</span> <span class="mi">1000</span>
+                <span class="k">elif</span> <span class="s">&#39;(um)&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">pmBeadRadius</span> <span class="o">=</span> <span class="n">pmBeadRadius</span> <span class="o">*</span> <span class="mi">1000</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">pmBeadRadius</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">pmBeadDiameter</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">pmBeadRadius</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmBeadDiameter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">pmBeadDiameter</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pmBeadRadius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">pmBeadRadius</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="s">&#39;Sample rate&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">samplingRate</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;samplingRate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">samplingRate</span>
+
+        <span class="k">elif</span> <span class="s">&#39;Number of samples&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">nSamples</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;nSamples&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nSamples</span>
+
+        <span class="k">elif</span> <span class="s">&#39;Delta time&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">deltaTime</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;deltaTime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">deltaTime</span>
+
+        <span class="k">elif</span> <span class="s">&#39;Laser Diode Operating Hours&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">laserDiodeHours</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">laserDiodeHours</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;laserDiodeHours&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">laserDiodeHours</span>
+            <span class="n">units</span><span class="p">[</span><span class="s">&#39;laserDiodeHours&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;h&#39;</span>
+
+        <span class="k">elif</span> <span class="s">&#39;Laser Diode Current&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">laserDiodeCurrent</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">laserDiodeCurrent</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;laserDiodeCurrent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">laserDiodeCurrent</span>
+            <span class="n">units</span><span class="p">[</span><span class="s">&#39;laserDiodeCurrent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;A&#39;</span>
+
+        <span class="k">elif</span> <span class="s">&#39;Laser Diode Temp&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">laserDiodeTemp</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">laserDiodeTemp</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;laserDiodeTemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">laserDiodeTemp</span>
+            <span class="n">units</span><span class="p">[</span><span class="s">&#39;laserDiodeTemp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;C&#39;</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s">&quot;:&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;\w\s(\d|-\d)&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">var</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">var</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">None</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="n">units</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">unit</span>
+            <span class="n">meta</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="c"># parsing the date</span>
+    <span class="k">if</span> <span class="n">date_string</span> <span class="ow">and</span> <span class="n">time_string</span><span class="p">:</span>
+        <span class="n">combined_date</span> <span class="o">=</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">date_string</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">time_string</span><span class="o">.</span><span class="n">strip</span><span class="p">()])</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">combined_date</span><span class="p">,</span> <span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%Y %I:%M %p&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+    <span class="n">meta</span><span class="p">[</span><span class="s">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">date</span>
+
+    <span class="n">CommentInfo</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;CommentInfo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;metadata&#39;</span><span class="p">,</span> <span class="s">&#39;units&#39;</span><span class="p">])</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">CommentInfo</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">C</span>
+
+</div>
+<div class="viewcode-block" id="simplify_tweebot_data_names"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.simplify_tweebot_data_names">[docs]</a><span class="k">def</span> <span class="nf">simplify_tweebot_data_names</span><span class="p">(</span><span class="n">variable_names</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts tweebot variable names from a list of variables and substitutes them for common tweezer nomenclature</span>
+<span class="sd">    </span>
+<span class="sd">    :param variable_names: (list) with variable names as read by tweebot datalog reader</span>
+
+<span class="sd">    :return names: (list) new list with simpler variable names</span>
+
+<span class="sd">    :return units: (dict) with the corresponding units of the variable names</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">variable_names</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s">&#39;Time sent (s)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Time sent (s)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;timeSent&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;timeSent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;s&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Time received (s)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Time received (s)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;timeReceived&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;timeReceived&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;s&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Experiment Phase (int)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Experiment Phase (int)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;experimentPhase&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;experimentPhase&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;int&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Message index (int)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Message index (int)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;mIndex&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;mIndex&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="s">&#39;Extension from Trap and PSD positions (nm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Extension from Trap and PSD positions (nm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;extensionByTrap&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;extensionByTrap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Extension from image measurements (nm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Extension from image measurements (nm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;extenstionByImage&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;extenstionByImage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Force felt by AOD (pN)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Force felt by AOD (pN)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;forceAod&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;forceAod&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Force felt by PM  (pN)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Force felt by PM  (pN)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;forcePm&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;forcePm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;pN&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AOD to PM vector x (nm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AOD to PM vector x (nm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;trapSeparationX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;trapSeparationX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AOD to PM vector y (nm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AOD to PM vector y (nm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;trapSeparationY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;trapSeparationY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AODx (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AODx (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;dispAodX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;dispAodX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AODy (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AODy (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;dispAodY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;dispAodX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMx (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMx (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;dispPmX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;dispPmX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMy (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMy (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;dispPmY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;dispPmY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMsensorx (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMsensorx (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;mirrorX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;mirrorX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMsensory (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMsensory (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;mirrorY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;mirrorY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMxdiff (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMxdiff (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;pmX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMydiff (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMydiff (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;pmY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;PMxsum (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;PMxsum (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;pmSum&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;pmSum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AODxdiff (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AODxdiff (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;aodX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AODydiff (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AODydiff (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;aodY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;AODxsum (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;AODxsum (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;aodSum&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;aodSum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;StageX (mm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;StageX (mm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;stageX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;stageX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;StageY (mm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;StageY (mm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;stageY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;stageY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;StageZ (mm)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;StageZ (mm)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;stageZ&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;stageZ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;nm&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;Pressure (a.u.)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;Pressure (a.u.)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;pressure&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;pressure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;a.u.&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;FBx (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;FBx (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;fbX&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;fbX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;FBy (V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;FBy (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;fbY&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;fbY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">if</span> <span class="s">&#39;FBsum(V)&#39;</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">names</span><span class="p">[</span><span class="n">names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s">&#39;FBsum (V)&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&#39;fbZ&#39;</span>
+        <span class="n">units</span><span class="p">[</span><span class="s">&#39;fbZ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;V&#39;</span>
+
+    <span class="k">return</span> <span class="n">names</span><span class="p">,</span> <span class="n">units</span>
+
+</div>
+<div class="viewcode-block" id="fail"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.fail">[docs]</a><span class="k">def</span> <span class="nf">fail</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+ </div>
+<div class="viewcode-block" id="wip"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.wip">[docs]</a><span class="k">def</span> <span class="nf">wip</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SkipTest</span><span class="p">(</span><span class="s">&quot;WIP test failed: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="n">fail</span><span class="p">(</span><span class="s">&quot;test passed but marked as work in progress&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">attr</span><span class="p">(</span><span class="s">&#39;wip&#39;</span><span class="p">)(</span><span class="n">run_test</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="h5_save"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.h5_save">[docs]</a><span class="k">def</span> <span class="nf">h5_save</span><span class="p">(</span><span class="n">h5_file</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Saves pandas DataFrame with additional attributes to h5 file format. Since custom attributes can&#39;t be stored like this yet, these are recognised and saved as json file format with the same name.</span>
+<span class="sd">    </span>
+<span class="sd">    :param h5_file: (path) where to save the data</span>
+<span class="sd">    :param DataFrame: (pandas.DataFrame) that might carry additional custom attributes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># get attributes if any</span>
+    <span class="n">REF</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span>
+     
+    <span class="n">attributes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="n">REF</span><span class="p">))</span> <span class="o">^</span> <span class="nb">set</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">attributes</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="h5_load"><a class="viewcode-back" href="../../tweezer.html#tweezer.ixo.h5_load">[docs]</a><span class="k">def</span> <span class="nf">h5_load</span><span class="p">(</span><span class="n">h5_file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load pandas DataFrame from an h5 file. If there exists a .json file of the same name in the same directory the content of that file is parsed as custom attributes attached to the DataFrame</span>
+<span class="sd">    </span>
+<span class="sd">    :param h5_file: (path) of h5 file from which to load the data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">jFile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">h5_file</span><span class="p">),</span> <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">h5_file</span><span class="p">))[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;json&#39;</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">jFile</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div></div>
+
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2012, Marcus Jahnel.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2b1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tweezer.core.parallel &mdash; Tweezer 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Tweezer 0.1 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> Tweezer</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">tweezer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tweezer.html">tweezer package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../References.html">References</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Tweezer</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>tweezer.core.parallel</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for tweezer.core.parallel</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: UTF-8 -*-</span>
+<span class="c"># multiproc_sums.py</span>
+<span class="sd">&quot;&quot;&quot;A program that reads integer values from a CSV file and writes out their</span>
+<span class="sd">sums to another CSV file, using multiple processes if desired.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">optparse</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">NUM_PROCS</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
+
+<div class="viewcode-block" id="make_cli_parser"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parallel.make_cli_parser">[docs]</a><span class="k">def</span> <span class="nf">make_cli_parser</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Make the command line interface parser.&quot;&quot;&quot;</span>
+    <span class="n">usage</span> <span class="o">=</span> <span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;python %prog INPUT_CSV OUTPUT_CSV&quot;</span><span class="p">,</span>
+            <span class="n">__doc__</span><span class="p">,</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ARGUMENTS:</span>
+<span class="sd">    INPUT_CSV: an input CSV file with rows of numbers</span>
+<span class="sd">    OUTPUT_CSV: an output file that will contain the sums\</span>
+<span class="sd">&quot;&quot;&quot;</span><span class="p">])</span>
+    <span class="n">cli_parser</span> <span class="o">=</span> <span class="n">optparse</span><span class="o">.</span><span class="n">OptionParser</span><span class="p">(</span><span class="n">usage</span><span class="p">)</span>
+    <span class="n">cli_parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;-n&#39;</span><span class="p">,</span> <span class="s">&#39;--numprocs&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;int&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="n">NUM_PROCS</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s">&quot;Number of processes to launch [DEFAULT: </span><span class="si">%d</span><span class="s">efault]&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cli_parser</span>
+</div>
+<div class="viewcode-block" id="CSVWorker"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parallel.CSVWorker">[docs]</a><span class="k">class</span> <span class="nc">CSVWorker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numprocs</span><span class="p">,</span> <span class="n">infile</span><span class="p">,</span> <span class="n">outfile</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numprocs</span> <span class="o">=</span> <span class="n">numprocs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outfile</span> <span class="o">=</span> <span class="n">outfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_csvfile</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">infile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inq</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outq</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pin</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parse_input_csv</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pout</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">write_output_csv</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sum_row</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">())</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numprocs</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pin</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pout</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ps</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pin</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ps</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Done: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pout</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CSVWorker.parse_input_csv"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parallel.CSVWorker.parse_input_csv">[docs]</a>    <span class="k">def</span> <span class="nf">parse_input_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Parses the input CSV and yields tuples with the index of the row</span>
+<span class="sd">            as the first element, and the integers of the row as the second</span>
+<span class="sd">            element.</span>
+
+<span class="sd">            The index is zero-index based.</span>
+
+<span class="sd">            The data is then sent over inqueue for the workers to do their</span>
+<span class="sd">            thing.  At the end the input thread sends a &#39;STOP&#39; message for each</span>
+<span class="sd">            worker.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_csvfile</span><span class="p">):</span>
+                <span class="n">row</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">int</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">row</span> <span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inq</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numprocs</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inq</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&quot;STOP&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CSVWorker.sum_row"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parallel.CSVWorker.sum_row">[docs]</a>    <span class="k">def</span> <span class="nf">sum_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Workers. Consume inq and produce answers on outq</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tot</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inq</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="s">&quot;STOP&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outq</span><span class="o">.</span><span class="n">put</span><span class="p">(</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">row</span><span class="p">))</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outq</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&quot;STOP&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CSVWorker.write_output_csv"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parallel.CSVWorker.write_output_csv">[docs]</a>    <span class="k">def</span> <span class="nf">write_output_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Open outgoing csv file then start reading outq for answers</span>
+<span class="sd">        Since I chose to make sure output was synchronized to the input there</span>
+<span class="sd">        is some extra goodies to do that.</span>
+
+<span class="sd">        Obviously your input has the original row number so this is not</span>
+<span class="sd">        required.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="nb">buffer</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c"># For some reason csv.writer works badly across threads so open/close</span>
+        <span class="c"># and use it all in the same thread or else you&#39;ll have the last</span>
+        <span class="c"># several rows missing</span>
+        <span class="n">outfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outfile</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_csvfile</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
+
+        <span class="c">#Keep running until we see numprocs STOP messages</span>
+        <span class="k">for</span> <span class="n">works</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numprocs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outq</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="s">&quot;STOP&quot;</span><span class="p">):</span>
+                <span class="c"># verify rows are in order, if not save in buffer</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">cur</span><span class="p">:</span>
+                    <span class="nb">buffer</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c">#if yes are write it out and make sure no waiting rows exist</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_csvfile</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span> <span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">val</span><span class="p">]</span> <span class="p">)</span>
+                    <span class="n">cur</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">while</span> <span class="n">cur</span> <span class="ow">in</span> <span class="nb">buffer</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">out_csvfile</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span> <span class="n">cur</span><span class="p">,</span> <span class="nb">buffer</span><span class="p">[</span><span class="n">cur</span><span class="p">]</span> <span class="p">])</span>
+                        <span class="k">del</span> <span class="nb">buffer</span><span class="p">[</span><span class="n">cur</span><span class="p">]</span>
+                        <span class="n">cur</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">outfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</div></div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../tweezer.core.html#tweezer.core.parallel.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
+    <span class="n">cli_parser</span> <span class="o">=</span> <span class="n">make_cli_parser</span><span class="p">()</span>
+    <span class="n">opts</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">cli_parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">cli_parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Please provide an input file and output file.&quot;</span><span class="p">)</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">CSVWorker</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">numprocs</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2012, Marcus Jahnel.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

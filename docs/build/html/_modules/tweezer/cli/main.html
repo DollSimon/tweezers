@@ -1,0 +1,656 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tweezer.cli.main &mdash; Tweezer 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="Tweezer 0.1 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../../index.html" class="fa fa-home"> Tweezer</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Using the tweezer package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">tweezer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tweezer.html">tweezer package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../References.html">References</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Tweezer</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>tweezer.cli.main</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for tweezer.cli.main</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#-*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Tweezer Data Analysis on Steroids</span>
+
+<span class="sd">Usage:</span>
+<span class="sd">  tweezer watch [-t | -m] [&lt;DIR&gt;...] [-l]</span>
+<span class="sd">  tweezer (analyse | analyze) [-t | -m] [&lt;FILE&gt;...]</span>
+<span class="sd">  tweezer convert [&lt;FILE&gt;...] &lt;LANGUAGE&gt;</span>
+<span class="sd">  tweezer overview [-t | -m] ([&lt;DIR&gt;...] | -f [&lt;FILE&gt;...])</span>
+<span class="sd">  tweezer list [&lt;DIR&gt;...] [--kind=&lt;TYPE&gt;]</span>
+<span class="sd">  tweezer show &lt;OBJECT&gt; [--kind=&lt;TYPE&gt;] [-d]</span>
+<span class="sd">  tweezer update &lt;OBJECT&gt; [--kind=&lt;TYPE&gt;]</span>
+<span class="sd">  tweezer track [-o &lt;OBJECT&gt;] ([&lt;VIDEO&gt;...] | -i [&lt;IMAGE&gt;...])</span>
+<span class="sd">  tweezer simulate &lt;OBJECT&gt; [--args=&lt;ARGS&gt;...]</span>
+<span class="sd">  tweezer plot &lt;OBJECT&gt; [--args=&lt;ARGS&gt;...]</span>
+<span class="sd">  tweezer calculate &lt;OBJECT&gt; [--args=&lt;ARGS&gt;...]...</span>
+<span class="sd">  tweezer help [&lt;COMMAND&gt;]</span>
+<span class="sd">  tweezer (-h | --help)</span>
+<span class="sd">  tweezer (-v | --version)</span>
+
+<span class="sd">Commands:</span>
+<span class="sd">  watch         Monitor directory for changes</span>
+<span class="sd">  analyse       Perform specified data analysis</span>
+<span class="sd">  analyze       Perform specified data analysis</span>
+<span class="sd">  convert       Convert data to be able to work in specified language</span>
+<span class="sd">  overview      Produce &quot;Overview.pdf&quot; for data files in directory</span>
+<span class="sd">  list          List all files and file types in a directory recursively</span>
+<span class="sd">  show          Shows content of an object or file in an informative way</span>
+<span class="sd">  update        Update the object in question (mainly used for settings)</span>
+<span class="sd">  track         Find position of features in images or videos</span>
+<span class="sd">  simulate      Run simulation of type &quot;object&quot;</span>
+<span class="sd">  plot          Plot examples and objects</span>
+<span class="sd">  calculate     Perform calculations on the command line</span>
+<span class="sd">  help          Show detailed help for a command or these help pages</span>
+<span class="sd">Arguments:</span>
+<span class="sd">  FILE          Input file</span>
+<span class="sd">  PATH          Out directory</span>
+<span class="sd">  DIR           Input directory</span>
+<span class="sd">  LANGUAGE      Preferred language or data container</span>
+<span class="sd">  OBJECT        Either general tweezer object (like settings) or concrete file</span>
+<span class="sd">  TYPE          Generic classifier for general purposes</span>
+<span class="sd">  IMAGE         Image file (.png, or .jpg)</span>
+<span class="sd">  VIDEO         Video file (.avi, or .fits)</span>
+<span class="sd">  ARGS          Keyword arguments (like n=4 p=&#39;test&#39;); no spaces around &quot;=&quot;</span>
+<span class="sd">  COMMAND       Command name out of the list of commands</span>
+
+<span class="sd">Options:</span>
+<span class="sd">  -h --help         Show this screen</span>
+<span class="sd">  -v --version      Show version number</span>
+<span class="sd">  -t --tweebot      Tweebot tweezer mode</span>
+<span class="sd">  -m --manual       Manual tweezer mode</span>
+<span class="sd">  -l --logging      Write log file</span>
+<span class="sd">  -k --kind=&lt;TYPE&gt;  Kind, type, part or subclass of an object</span>
+<span class="sd">  -d --default      Refer to the saved default object</span>
+<span class="sd">  -f --file         Switch to file mode when input can be file or dir</span>
+<span class="sd">  -i --image        Switch to image mode when input can be image or video</span>
+<span class="sd">  -a --args=&lt;ARGS&gt;  Additional keyword arguments to be passed to the command</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="kn">from</span> <span class="nn">docopt</span> <span class="kn">import</span> <span class="n">docopt</span>
+<span class="kn">from</span> <span class="nn">clint.textui</span> <span class="kn">import</span> <span class="n">colored</span><span class="p">,</span> <span class="n">puts</span><span class="p">,</span> <span class="n">indent</span>
+
+<span class="kn">from</span> <span class="nn">tweezer</span> <span class="kn">import</span> <span class="n">__version__</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">tweezer.cli.help</span> <span class="kn">import</span> <span class="n">show_tweezer_help_pages</span>
+
+    <span class="kn">from</span> <span class="nn">tweezer.cli.help</span> <span class="kn">import</span> <span class="p">(</span><span class="n">print_plot_help</span><span class="p">,</span> <span class="n">print_simulate_help</span><span class="p">,</span>
+                                  <span class="n">print_update_help</span><span class="p">,</span>
+                                  <span class="n">print_track_help</span><span class="p">,</span> <span class="n">print_show_help</span><span class="p">,</span>
+                                  <span class="n">print_list_help</span><span class="p">,</span> <span class="n">print_analyse_help</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">tweezer.core.watcher</span> <span class="kn">import</span> <span class="n">run_watcher</span>
+    <span class="kn">from</span> <span class="nn">tweezer.cli.utils</span> <span class="kn">import</span> <span class="n">list_tweezer_files</span>
+    <span class="kn">from</span> <span class="nn">tweezer.cli</span> <span class="kn">import</span> <span class="n">InterpretUserInput</span>
+    <span class="kn">from</span> <span class="nn">tweezer.cli.utils</span> <span class="kn">import</span> <span class="n">pprint_settings</span><span class="p">,</span> <span class="n">update_settings</span>
+    <span class="kn">from</span> <span class="nn">tweezer</span> <span class="kn">import</span> <span class="n">_DEFAULT_SETTINGS</span>
+    <span class="kn">from</span> <span class="nn">tweezer</span> <span class="kn">import</span> <span class="n">_TWEEBOT_CONFIG</span>
+    <span class="kn">from</span> <span class="nn">tweezer.ixo.json_</span> <span class="kn">import</span> <span class="n">parse_json</span>
+
+    <span class="kn">from</span> <span class="nn">tweezer.simulate.brownian_motion</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">simulate_naive_1D_brownian_motion</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">tweezer.ixo.functions</span> <span class="kn">import</span> <span class="n">get_function_arguments</span>
+
+    <span class="kn">from</span> <span class="nn">tweezer.cli.plots</span> <span class="kn">import</span> <span class="p">(</span><span class="n">matplotlib_example</span><span class="p">,</span>
+                                   <span class="n">plot_extensible_worm_like_chain</span><span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">tweezer.cli.calculations</span> <span class="kn">import</span> <span class="n">calc_example</span><span class="p">,</span> <span class="n">calc_viscosity</span>
+
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">puts</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">red</span><span class="p">(</span><span class="s">&#39;The tweezer package has not been correctly installed or updated.&#39;</span><span class="p">))</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;The following import error occurred: {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">red</span><span class="p">(</span><span class="n">err</span><span class="p">)))</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Please check installation instructions @ {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">yellow</span><span class="p">(</span><span class="s">&#39;http://bitbucket.org/majahn/tweezer&#39;</span><span class="p">)))</span>
+    <span class="nb">exit</span><span class="p">()</span>
+
+
+<span class="n">VERSION</span> <span class="o">=</span> <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">__version__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="start"><a class="viewcode-back" href="../../../tweezer.cli.html#tweezer.cli.main.start">[docs]</a><span class="k">def</span> <span class="nf">start</span><span class="p">():</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">docopt</span><span class="p">(</span><span class="n">__doc__</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">VERSION</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">red</span><span class="p">(</span><span class="s">&#39;Development: Show arguments&#39;</span><span class="p">)))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="c"># Getting help</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--help&#39;</span><span class="p">]:</span>
+        <span class="n">show_tweezer_help_pages</span><span class="p">()</span>
+
+    <span class="c"># Checking and setting default values</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--tweebot&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--manual&#39;</span><span class="p">]:</span>
+        <span class="n">args</span><span class="p">[</span><span class="s">&#39;--tweebot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="c"># check directory</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;DIR&gt;&#39;</span><span class="p">]:</span>
+        <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;DIR&gt;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+    <span class="n">DIR</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;DIR&gt;&#39;</span><span class="p">]</span>
+
+    <span class="c"># tweezer analyse | analyze</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;analyse&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;analyze&#39;</span><span class="p">]:</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;FILE&gt;&#39;</span><span class="p">]))</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;i{}V&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">red</span><span class="p">(</span><span class="s">&#39;Rackooon&#39;</span><span class="p">)))</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;This is {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">__file__</span><span class="p">))))</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">green</span><span class="p">(</span><span class="s">&#39;Rackooon&#39;</span><span class="p">)))</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Test&#39;</span><span class="p">)</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;First argument is {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Second argument is {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Third argument is {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+    <span class="c"># tweezer watch</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;watch&#39;</span><span class="p">]:</span>
+
+        <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Calling tweezer watch from {}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">green</span><span class="p">(</span><span class="n">DIR</span><span class="p">)))</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;To stop this script hit {}.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">red</span><span class="p">(</span><span class="s">&quot;CTRL + C&quot;</span><span class="p">)))</span>
+
+        <span class="n">run_watcher</span><span class="p">(</span><span class="n">DIR</span><span class="p">)</span>
+
+    <span class="c"># tweezer list</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;list&#39;</span><span class="p">]:</span>
+
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Calling tweezer list from {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">green</span><span class="p">(</span><span class="n">DIR</span><span class="p">)))</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">list_tweezer_files</span><span class="p">(</span><span class="n">DIR</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">((</span><span class="s">&#39;There are {} file types&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">))))</span>
+        <span class="k">print</span><span class="p">((</span><span class="s">&#39;There are the following types: {} &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">))))</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Here is the result: &#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;directory_state&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;These are the files of type {}:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">yellow</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span>
+                    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="n">DIR</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">DIR</span><span class="p">,</span> <span class="s">&#39;...&#39;</span><span class="p">)))</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;The {} is described by:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">yellow</span><span class="p">(</span><span class="s">&#39;directory_state&#39;</span><span class="p">)))</span>
+                    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="s">&#39;directory_state&#39;</span><span class="p">]))</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="c"># tweezer show</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;show&#39;</span><span class="p">]:</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--kind&#39;</span><span class="p">]:</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--kind&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="s">&#39;all&#39;</span>
+
+        <span class="c"># Check objects with special meaning</span>
+        <span class="k">if</span> <span class="s">&#39;setting&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]:</span>
+
+            <span class="n">has_settings</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s">&#39;settings.json&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">has_settings</span><span class="p">:</span>
+
+                <span class="n">settings</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="s">&#39;settings.json&#39;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--default&#39;</span><span class="p">]:</span>
+                    <span class="n">pprint_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s">&#39;local&#39;</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">default_settings</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="n">_DEFAULT_SETTINGS</span><span class="p">)</span>
+                    <span class="n">pprint_settings</span><span class="p">(</span><span class="n">default_settings</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+                        <span class="n">status</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="n">other_settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span> <span class="n">other_status</span><span class="o">=</span><span class="s">&#39;locally&#39;</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--default&#39;</span><span class="p">]:</span>
+                <span class="n">default_settings</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="n">_DEFAULT_SETTINGS</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">has_settings</span><span class="p">:</span>
+                    <span class="n">settings</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="s">&#39;settings.json&#39;</span><span class="p">)</span>
+                    <span class="n">pprint_settings</span><span class="p">(</span><span class="n">default_settings</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>
+                        <span class="n">status</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="n">other_settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span> <span class="n">other_status</span><span class="o">=</span><span class="s">&#39;locally&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">pprint_settings</span><span class="p">(</span><span class="n">default_settings</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;No settings file found...</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">putSettigns</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">&#39;Shall I add the default settings file to this directory: &#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">InterpretUserInput</span><span class="p">[</span><span class="n">putSettigns</span><span class="p">]:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;I am copying it over...&#39;</span><span class="p">)</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">_DEFAULT_SETTINGS</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DIR</span><span class="p">,</span> <span class="s">&#39;settings.json&#39;</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Ok, than I have nothing to show...&#39;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="s">&#39;result&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;These are the results:&#39;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="s">&#39;tweebot&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="s">&#39;configuration&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]:</span>
+
+            <span class="n">has_tweebot_configs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s">&#39;tweebot_configuration.json&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">has_tweebot_configs</span><span class="p">:</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--default&#39;</span><span class="p">]:</span>
+                    <span class="n">settings</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="s">&#39;tweebot_configuration.json&#39;</span><span class="p">)</span>
+                    <span class="n">pprint_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s">&#39;local&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;These are the tweebot default configurations:</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                    <span class="n">settings</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="n">_TWEEBOT_CONFIG</span><span class="p">)</span>
+                    <span class="n">pprint_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--default&#39;</span><span class="p">]:</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;These are the tweebot default configurations:</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">settings</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="n">_TWEEBOT_CONFIG</span><span class="p">)</span>
+                <span class="n">pprint_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;No tweebot configuration file found...</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">putSettigns</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">&#39;Shall I add the default tweebot configuration file to this directory: &#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">InterpretUserInput</span><span class="p">[</span><span class="n">putSettigns</span><span class="p">]:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;I am copying it over...&#39;</span><span class="p">)</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">_TWEEBOT_CONFIG</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DIR</span><span class="p">,</span> <span class="s">&#39;tweebot_configuration.json&#39;</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Ok, than I have nothing to show...&#39;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="s">&#39;files&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]:</span>
+
+            <span class="n">CACHED_FILES</span> <span class="o">=</span> <span class="s">&#39;cached_file_listing.json&#39;</span>
+
+            <span class="n">has_cached_file_listing</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">CACHED_FILES</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">has_cached_file_listing</span><span class="p">:</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="n">CACHED_FILES</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="s">&#39;all&#39;</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;directory_state&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;These are the files of type {}:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">yellow</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span>
+                                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+                                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                                    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                                        <span class="k">if</span> <span class="n">DIR</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                                            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">DIR</span><span class="p">,</span> <span class="s">&#39;...&#39;</span><span class="p">)))</span>
+                                        <span class="k">else</span><span class="p">:</span>
+                                            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;The {} is described by:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">yellow</span><span class="p">(</span><span class="s">&#39;directory_state&#39;</span><span class="p">)))</span>
+                                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+                                <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                                    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="s">&#39;directory_state&#39;</span><span class="p">]))</span>
+                        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;directory_state&#39;</span><span class="p">,</span> <span class="s">&#39;state&#39;</span><span class="p">]:</span>
+                            <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;These are the files of type {}:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">yellow</span><span class="p">(</span><span class="n">kind</span><span class="p">)))</span>
+                                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+                                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">files</span><span class="p">[</span><span class="n">kind</span><span class="p">]:</span>
+                                    <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                                        <span class="k">if</span> <span class="n">DIR</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                                            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">DIR</span><span class="p">,</span> <span class="s">&#39;...&#39;</span><span class="p">)))</span>
+                                        <span class="k">else</span><span class="p">:</span>
+                                            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;The {} is described by:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">yellow</span><span class="p">(</span><span class="s">&#39;directory_state&#39;</span><span class="p">)))</span>
+                                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+                                <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                                    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="s">&#39;directory_state&#39;</span><span class="p">]))</span>
+                        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s">&#39;No such file type found&#39;</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;No files listing found...</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">putSettigns</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">&#39;Shall I search the current directory for known file types: &#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">InterpretUserInput</span><span class="p">[</span><span class="n">putSettigns</span><span class="p">]:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&quot;I&#39;m classifying the files here. Might take a minute...&quot;</span><span class="p">)</span>
+                    <span class="n">files</span> <span class="o">=</span> <span class="n">list_tweezer_files</span><span class="p">(</span><span class="n">DIR</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Ok, than I have nothing to show...&#39;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">((</span><span class="s">&#39;This is the content of file {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">])))</span>
+
+    <span class="c"># tweezer update &lt;OBJECT&gt; [--kind=&lt;TYPE&gt;]</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;update&#39;</span><span class="p">]:</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--kind&#39;</span><span class="p">]:</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--kind&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="s">&#39;all&#39;</span>
+
+        <span class="c"># check special objects</span>
+        <span class="k">if</span> <span class="s">&#39;setting&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]:</span>
+
+            <span class="n">has_settings</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s">&#39;settings.json&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">has_settings</span><span class="p">:</span>
+
+                <span class="n">old_settings</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="s">&#39;settings.json&#39;</span><span class="p">)</span>
+
+                <span class="n">update_settings</span><span class="p">(</span><span class="s">&#39;settings.json&#39;</span><span class="p">,</span> <span class="n">old_settings</span><span class="o">=</span><span class="n">old_settings</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">kind</span><span class="p">)</span>
+
+                <span class="c"># new_settings = parse_json(&#39;settings.json&#39;)</span>
+
+                <span class="n">default_settings</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="n">_DEFAULT_SETTINGS</span><span class="p">)</span>
+
+                <span class="n">pprint_settings</span><span class="p">(</span><span class="n">old_settings</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">other_settings</span><span class="o">=</span><span class="n">default_settings</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Update only works with local settings file, but none was found...</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">putSettigns</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">&#39;Shall I add the default settings file to this directory: &#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">InterpretUserInput</span><span class="p">[</span><span class="n">putSettigns</span><span class="p">]:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;I am copying it over...&#39;</span><span class="p">)</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">_DEFAULT_SETTINGS</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DIR</span><span class="p">,</span> <span class="s">&#39;settings.json&#39;</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Sorry, could not interpret your answer. Try (y | n)...&#39;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="s">&#39;result&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;These are the results:&#39;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="s">&#39;tweebot&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="s">&#39;configuration&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]:</span>
+
+            <span class="n">has_tweebot_configs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s">&#39;tweebot_configuration.json&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">has_tweebot_configs</span><span class="p">:</span>
+
+                <span class="n">settings</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="s">&#39;tweebot_configuration.json&#39;</span><span class="p">)</span>
+
+                <span class="n">pprint_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">kind</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--default&#39;</span><span class="p">]:</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;These are the tweebot default configurations:</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+                <span class="n">settings</span> <span class="o">=</span> <span class="n">parse_json</span><span class="p">(</span><span class="n">_TWEEBOT_CONFIG</span><span class="p">)</span>
+
+                <span class="n">pprint_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">part</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s">&#39;default&#39;</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;No tweebot configuration file found...</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="n">putSettigns</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">&#39;Shall I add the default tweebot configuration file to this directory: &#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">InterpretUserInput</span><span class="p">[</span><span class="n">putSettigns</span><span class="p">]:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;I am copying it over...&#39;</span><span class="p">)</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">_TWEEBOT_CONFIG</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DIR</span><span class="p">,</span> <span class="s">&#39;tweebot_configuration.json&#39;</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Ok, than I have nothing to show...&#39;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">((</span><span class="s">&#39;This is the content of file {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">])))</span>
+
+    <span class="c"># tweezer simulate</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;simulate&#39;</span><span class="p">]:</span>
+
+        <span class="n">simulation_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;naive_brownian_motion&#39;</span><span class="p">:</span> <span class="n">simulate_naive_1D_brownian_motion</span><span class="p">}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">simulation_mapper</span><span class="p">[</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]](</span><span class="mi">4</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyboardInterrupt</span><span class="p">,</span> <span class="ne">SystemExit</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">err</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Could not find simulation {}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">red</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">])))</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Available simulations are: </span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">simulation_mapper</span><span class="p">:</span>
+                    <span class="n">args_list</span> <span class="o">=</span> <span class="n">get_function_arguments</span><span class="p">(</span><span class="n">simulation_mapper</span><span class="p">[</span><span class="n">each</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">args_list</span><span class="p">:</span>
+                        <span class="n">arg_string</span> <span class="o">=</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args_list</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">arg_string</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}({})</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">blue</span><span class="p">(</span><span class="n">each</span><span class="p">),</span> <span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="n">arg_string</span><span class="p">)))</span>
+
+    <span class="c"># tweezer plot</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;plot&#39;</span><span class="p">]:</span>
+
+        <span class="n">plot_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;matplotlib_example&#39;</span><span class="p">:</span> <span class="n">matplotlib_example</span><span class="p">,</span>
+            <span class="s">&#39;wlc&#39;</span><span class="p">:</span> <span class="n">plot_extensible_worm_like_chain</span><span class="p">,</span>
+            <span class="s">&#39;eWLC&#39;</span><span class="p">:</span> <span class="n">plot_extensible_worm_like_chain</span><span class="p">,</span>
+            <span class="s">&#39;WLC&#39;</span><span class="p">:</span> <span class="n">plot_extensible_worm_like_chain</span><span class="p">,</span>
+            <span class="s">&#39;worm-like-chain&#39;</span><span class="p">:</span> <span class="n">plot_extensible_worm_like_chain</span><span class="p">}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">plot_mapper</span><span class="p">[</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]]())</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyboardInterrupt</span><span class="p">,</span> <span class="ne">SystemExit</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">err</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Could not find plot routine for {}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">red</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">])))</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Available plotting examples are: </span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">plot_mapper</span><span class="p">:</span>
+                    <span class="n">args_list</span> <span class="o">=</span> <span class="n">get_function_arguments</span><span class="p">(</span><span class="n">plot_mapper</span><span class="p">[</span><span class="n">each</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">args_list</span><span class="p">:</span>
+                        <span class="n">arg_string</span> <span class="o">=</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args_list</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">arg_string</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}({})</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">blue</span><span class="p">(</span><span class="n">each</span><span class="p">),</span> <span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="n">arg_string</span><span class="p">)))</span>
+
+
+    <span class="c"># tweezer calculate</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;calculate&#39;</span><span class="p">]:</span>
+
+        <span class="n">calc_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;example&#39;</span><span class="p">:</span> <span class="n">calc_example</span><span class="p">,</span>
+                       <span class="s">&#39;viscosity&#39;</span><span class="p">:</span> <span class="n">calc_viscosity</span><span class="p">}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--args&#39;</span><span class="p">]:</span>
+                <span class="k">print</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;--args&#39;</span><span class="p">]))</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">calc_mapper</span><span class="p">[</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]]())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">calc_mapper</span><span class="p">[</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">]]())</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyboardInterrupt</span><span class="p">,</span> <span class="ne">SystemExit</span><span class="p">)</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">err</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Could not find calculation for {}</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">red</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;OBJECT&gt;&#39;</span><span class="p">])))</span>
+                <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Available calculations are: </span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">calc_mapper</span><span class="p">:</span>
+                    <span class="n">args_list</span> <span class="o">=</span> <span class="n">get_function_arguments</span><span class="p">(</span><span class="n">calc_mapper</span><span class="p">[</span><span class="n">each</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">args_list</span><span class="p">:</span>
+                        <span class="n">arg_string</span> <span class="o">=</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args_list</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">arg_string</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                    <span class="n">puts</span><span class="p">(</span><span class="s">&#39;{}({})</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">blue</span><span class="p">(</span><span class="n">each</span><span class="p">),</span> <span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="n">arg_string</span><span class="p">)))</span>
+
+    <span class="c"># tweezer overview</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;overview&#39;</span><span class="p">]:</span>
+
+        <span class="c"># check directory</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;DIR&gt;&#39;</span><span class="p">]:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;DIR&gt;&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+        <span class="n">DIR</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;DIR&gt;&#39;</span><span class="p">]</span>
+
+        <span class="c"># check file input</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;--file&#39;</span><span class="p">]:</span>
+            <span class="n">FILES</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;FILE&gt;&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">FILES</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="n">FILES</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">FILES</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DIR</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="c"># tweebot_overview(path)</span>
+
+        <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Calling {} from {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">white</span><span class="p">(</span><span class="s">&#39;tweezer overview&#39;</span><span class="p">),</span> <span class="n">colored</span><span class="o">.</span><span class="n">green</span><span class="p">(</span><span class="n">DIR</span><span class="p">)))</span>
+        <span class="c"># full_tweebot_overview(DIR)</span>
+
+    <span class="c"># tweezer help</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;help&#39;</span><span class="p">]:</span>
+
+        <span class="n">command</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&#39;&lt;COMMAND&gt;&#39;</span><span class="p">]</span>
+
+        <span class="n">command_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;plot&#39;</span><span class="p">:</span> <span class="n">print_plot_help</span><span class="p">,</span>
+            <span class="s">&#39;simulate&#39;</span><span class="p">:</span> <span class="n">print_simulate_help</span><span class="p">,</span> <span class="s">&#39;update&#39;</span><span class="p">:</span> <span class="n">print_update_help</span><span class="p">,</span>
+            <span class="s">&#39;track&#39;</span><span class="p">:</span> <span class="n">print_track_help</span><span class="p">,</span> <span class="s">&#39;show&#39;</span><span class="p">:</span> <span class="n">print_show_help</span><span class="p">,</span>
+            <span class="s">&#39;list&#39;</span><span class="p">:</span> <span class="n">print_list_help</span><span class="p">,</span> <span class="s">&#39;analyse&#39;</span><span class="p">:</span> <span class="n">print_analyse_help</span><span class="p">}</span>
+
+        <span class="k">with</span> <span class="n">indent</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">puts</span><span class="p">(</span><span class="s">&#39;Help pages for {} {} command:</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">colored</span><span class="o">.</span><span class="n">green</span><span class="p">(</span><span class="s">&#39;tweezer&#39;</span><span class="p">),</span> <span class="n">colored</span><span class="o">.</span><span class="n">green</span><span class="p">(</span><span class="n">command</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">command</span><span class="p">:</span>
+            <span class="n">show_tweezer_help_pages</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">command_mapper</span><span class="p">[</span><span class="n">command</span><span class="p">]()</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;Still under construction&#39;</span><span class="p">)</span>
+</pre></div></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2012, Marcus Jahnel.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
