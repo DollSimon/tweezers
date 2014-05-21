@@ -3,7 +3,7 @@
 
 from clint.textui import colored, puts
 
-from tweezer.ixo.viscosity import calc_dynamic_viscosity_of_mixture
+from tweezer.physics.viscosity import dynamic_viscosity_of_mixture
 
 
 def calc_example(clean=False, *args, **kwargs):
@@ -32,7 +32,7 @@ def calc_viscosity(clean=False, *args, **kwargs):
     mixtures.
     """
     try:
-        result = calc_dynamic_viscosity_of_mixture(1, 2)
+        result = dynamic_viscosity_of_mixture(1, 2)
         funcArgs = None
         if clean:
             print(result)
