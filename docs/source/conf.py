@@ -42,7 +42,7 @@ sys.path.append(os.path.expanduser('sphinxext'))
 
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
-              'numpydoc',
+              #'numpydoc',
               'sphinx.ext.doctest',
               'sphinx.ext.intersphinx',
               'sphinx.ext.todo',
@@ -369,4 +369,5 @@ epub_copyright = u'2012, Marcus Jahnel'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {'python': ('http://docs.python.org/3.3', None),
+                       'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None)}
