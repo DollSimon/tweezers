@@ -370,4 +370,7 @@ epub_copyright = u'2012, Marcus Jahnel'
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'python': ('http://docs.python.org/3.3', None),
+                       'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
+                       'numpy': ('http://docs.scipy.org/doc/numpy/', None),
+                       'matplotlib': ('http://matplotlib.sourceforge.net/', None),
                        'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None)}
