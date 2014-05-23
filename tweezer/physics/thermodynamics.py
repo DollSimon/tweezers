@@ -7,7 +7,7 @@ def thermal_energy(temperature=298, units='pN nm'):
     Thermal energy in units of [pN nm]
 
     Args:
-        temperature (float): temperature in units of [K] (optional, default 298)
+        temperature (float): temperature in units of [K]. (optional, default 298)
         units (str): unit of the returned energy value, allowed values: 'pN nm', 'J', \
         or None. (optional, default 'pN nm')
 

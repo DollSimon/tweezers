@@ -1,8 +1,4 @@
-from __future__ import print_function, division
-
-__modules__ = ['polymer', 'geometry', 'trap', 'simulations', 'trap_calibration',
-    'datatypes', 'analysis', 'watcher', 'visualisation', 'parsers', 'overview']
-
+# coding=utf-8
 __doc__ = """\
 Contains core modules and classes for analysing tweezer experiments.
 """

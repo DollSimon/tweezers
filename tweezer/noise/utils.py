@@ -8,24 +8,28 @@ from tweezer.ixo.math_ import map_array_to_range
 
 
 def generate_power_noise(alpha=1, nSamples=1e5, normalize=False,
-                         deterministic_spectrum=True):
+                         deterministicSpectrum=True):
     """
     Generate samples of power law noise. The power spectrum
     of the signal scales as f^(-alpha).
 
-    :param alpha: (number) scaling exponent for the power law
-    :param nSamples: (int) number of samples to produce
+    Args:
 
-    :param noramlize: (boolean) whether to map the resulting series to the
-    range [-1, 1]
-    :param deterministic_spectrum: (boolean) to switch between deterministic
-    and stochastic distribution of power spectrum (see details)
+        alpha (number): Scaling exponent for the power law. **Default: 1**
 
-    :return X: (numpy.array) of the signal whose frequency response follows
-    the power law
+        nSamples (int): Number of samples to produce. **Default: 1e5**
 
-    Details:
-    --------
+        normalize (bool): Whether to map the resulting series to the \
+        range [-1, 1]. **Default: False**
+
+        deterministicSpectrum (bool): To switch between deterministic \
+        and stochastic distribution of power spectrum (see details). \
+        **Default: True**
+
+    Returns:
+
+        X (numpy.array): of the signal whose frequency response follows the power law
+
 
     |P(f)|^2 = 1/f^alpha. Special cases include 1/f noise (alpha = 1) and
     white noise (alpha = 0). The algorithm generates the appropriate Fourier
@@ -39,14 +43,14 @@ def generate_power_noise(alpha=1, nSamples=1e5, normalize=False,
     With no option strings specified, the power spectrum is
     deterministic, and the phases are uniformly distributed in the range
     -pi to +pi. The power law extends all the way down to 0Hz (DC)
-    component. By specifying the 'randpower' option (edit: by flipping the
-        *deterministic_spectrum* flag) string however, the
+    component. By specifying the 'randpower' option (edit: by flipping the \
+    *deterministicSpectrum* flag) string however, the
     power spectrum will be stochastic with Chi-square distribution. The
     'normalize' option string forces scaling of the output to the range
     [-1, 1], consequently the power law will not necessarily extend
     right down to 0Hz.
 
-    ..note::
+    .. note::
 
         This is a Python port of the following code:
 
@@ -67,7 +71,7 @@ def generate_power_noise(alpha=1, nSamples=1e5, normalize=False,
     ideal_spectrum = 1.0 / (frequency ** (alpha / 2.0))
     ideal_spectrum = ideal_spectrum.reshape((ideal_spectrum.size, 1))
 
-    if deterministic_spectrum:
+    if deterministicSpectrum:
         fluctuations = (np.random.random(size=(NYQ, 1)) - 0.5) * 2 * np.pi
         real_spectrum = ideal_spectrum * np.exp(1j * fluctuations)
     else:
@@ -91,7 +95,7 @@ def generate_lorentzian_power_noise(cornerFrequency=100,
                                     diffusionCoef=1,
                                     nSamples=5e5,
                                     normalize=False,
-                                    deterministic_spectrum=True):
+                                    deterministicSpectrum=True):
 
     fc = cornerFrequency
     D = diffusionCoef
@@ -103,7 +107,7 @@ def generate_lorentzian_power_noise(cornerFrequency=100,
     ideal_spectrum = (D / (2 * np.pi)) / (fc ** 2 + frequency ** 2)
     ideal_spectrum = ideal_spectrum.reshape((ideal_spectrum.size, 1))
 
-    if deterministic_spectrum:
+    if deterministicSpectrum:
         fluctuations = (np.random.random(size=(NYQ, 1)) - 0.5) * 2 * np.pi
         real_spectrum = ideal_spectrum * np.exp(1j * fluctuations)
     else:

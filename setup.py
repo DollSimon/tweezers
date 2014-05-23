@@ -16,7 +16,7 @@ LONG_DESCRIPTION = """
  of dual-trap optical tweezer experiments.
 """
 
-DEPENDENCIES = ['nose', 'pytest', 'docopt', 'pandas', 'tables', 'numpy',
+DEPENDENCIES = ['pytest', 'docopt', 'pandas', 'tables', 'numpy',
                 'scipy', 'termcolor', 'parsley', 'clint']
 
 PACKAGES = ['tweezer',

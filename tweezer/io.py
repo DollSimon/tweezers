@@ -1515,3 +1515,7 @@ def standardized_unit_of(variable):
     }
 
     return variable_mapper.get(variable, None)
+
+
+def read_header(fileName):
+    raise NotImplementedError()

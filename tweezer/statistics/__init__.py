@@ -1,7 +1,8 @@
+# coding=utf-8
 __doc__ = """\
-Module concerned with statistics and fitting of data.
+OLS, MLE, Bayes and all that for fitting and learning from data
 
-Also concerns the parameter estimation with maximum likelihood methods.
+Parameter estimation with maximum likelihood methods.
 """
 
 import os

@@ -2,8 +2,11 @@
 #-*- coding: utf-8 -*-
 
 
-import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from astropy.io import fits
 
 
 def show_images(images, titles=None):
@@ -38,5 +41,22 @@ class CameraConversionFactor(object):
         self.camera = camera
 
 
-def create_timestamp_from_fits(fileName):
-    pass
+def get_times_from_andor_fits(fileName):
+    """
+    Reads the time information from an Andor .fits file.
+
+    :param: fileName
+    :return: times
+    """
+
+    header = fits.getheader(fileName)
+
+    # parse header
+    startTime = header['FRAME']
+    timePerFrame = header['KCT']
+    nImages = header['NUMKIN']
+
+    # create list of pandas time stamps
+    times = [pd.to_datetime(startTime) + i * pd.to_timedelta(str(timePerFrame), unit='s') for i in range(nImages)]
+
+    return times

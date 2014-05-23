@@ -9,6 +9,8 @@ from tweezer.physics.viscosity import dynamic_viscosity_of_mixture
 def calc_example(clean=False, *args, **kwargs):
     """
     This is an example calculation
+
+    Add more comments. We are now modifying.
     """
     def example(n=4, m=6, l=65):
         return n * m - l

@@ -6,7 +6,7 @@ the aim is to fit these models to data obtained by optical tweezer experiments.
 
 References:
 
-:cite:`Ishibashi:2014cd1987:nelson`
+:cite:`Ishibashi:2014cd`
 
 .. bibliography:: tweezer.bib
 

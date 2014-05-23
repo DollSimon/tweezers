@@ -1,5 +1,5 @@
 __doc__ = """\
-Module with general physical and chemical functions
+General physical and chemical functions and constants
 """
 
 import os
