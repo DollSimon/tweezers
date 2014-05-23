@@ -4,14 +4,6 @@ tweezer.core package
 Submodules
 ----------
 
-tweezer.core.analysis module
-----------------------------
-
-.. automodule:: tweezer.core.analysis
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 tweezer.core.datatypes module
 -----------------------------
 

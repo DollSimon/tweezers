@@ -42,7 +42,7 @@ sys.path.append(os.path.expanduser('sphinxext'))
 
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
-              #'numpydoc',
+              'sphinxcontrib.napoleon',
               'sphinx.ext.doctest',
               'sphinx.ext.intersphinx',
               'sphinx.ext.todo',

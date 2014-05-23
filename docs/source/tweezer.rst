@@ -6,9 +6,11 @@ Subpackages
 
 .. toctree::
 
+    tweezer.analysis
     tweezer.bot
     tweezer.cli
     tweezer.core
+    tweezer.db
     tweezer.dia
     tweezer.dual
     tweezer.ixo
@@ -16,6 +18,7 @@ Subpackages
     tweezer.math
     tweezer.noise
     tweezer.physics
+    tweezer.polymer
     tweezer.rnap
     tweezer.simulate
     tweezer.single

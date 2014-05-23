@@ -12,5 +12,3 @@ A python package containing all the relevant files for tweezer data analysis.
     3. applying corrections for two beads in close proximity
     4. using Allan variance as a second way to calibrate the time series
     5. using active calibration methods (oscillation)
-
-*

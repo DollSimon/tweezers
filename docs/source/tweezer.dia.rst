@@ -4,6 +4,14 @@ tweezer.dia package
 Submodules
 ----------
 
+tweezer.dia.andor_calibration module
+------------------------------------
+
+.. automodule:: tweezer.dia.andor_calibration
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tweezer.dia.calibration module
 ------------------------------
 

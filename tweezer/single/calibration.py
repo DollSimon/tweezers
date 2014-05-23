@@ -76,3 +76,5 @@ def positional_fluctuations(kBT=thermal_energy(), trapStiffness=0.02):
     Average measure for the position fluctuations of a bead in an optical trap.
     """
     return np.sqrt(kBT / trapStiffness)
+
+
