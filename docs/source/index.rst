@@ -8,8 +8,6 @@ The Tweezer Code Docs!
 
 Tools to analyse data of dual-trap optical tweezer experiments. 
 
-This is to test :cite:`Revyakin:2003dm` all the features of cites.
-
 Aim
 ====
 
@@ -29,31 +27,27 @@ A user of this code base should be able to:
 * easily extend the functionality of this code by following the examples and reading the docs
 * do all this from a convenient command line interface or from within ipyhton
 
+Overview
+========
 
-.. todo:: 
-   
-   Figure out why tikz extension does not work :bbissue:`1`
+.. autosummary::
 
-
-Tikz test:
-===========
-
-.. tikz:: [>=latex',dotted,thick] \draw[->] (0,0) -- (1,1) -- (1,0)
-   -- (2,0);
-   :libs: arrows
-
-
-.. tikz:: An Example Directive with Caption
-   \draw[thick,rounded corners=8pt]
-   (0,0)--(0,2)--(1,3.25)--(2,2)--(2,0)--(0,2)--(2,2)--(0,0)--(2,0);
-   
-
-This is a test whether this all works. This
-
-   :bbissue:`1`
-
-is almost cool.
-
+    tweezer
+    tweezer.analysis
+    tweezer.bot
+    tweezer.cli
+    tweezer.core
+    tweezer.db
+    tweezer.dual
+    tweezer.ixo
+    tweezer.math
+    tweezer.noise
+    tweezer.physics
+    tweezer.polymer
+    tweezer.rnap
+    tweezer.simulate
+    tweezer.single
+    tweezer.statistics
 
 Contents:
 

@@ -41,6 +41,7 @@ sys.path.append(os.path.expanduser('sphinxext'))
 #             'sphinx.ext.viewcode']
 
 extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.autosummary',
               'sphinx.ext.mathjax',
               'sphinxcontrib.napoleon',
               'sphinx.ext.doctest',

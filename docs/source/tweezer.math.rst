@@ -1,6 +1,10 @@
 tweezer.math package
 ====================
 
+.. autosummary::
+
+    tweezer.math
+
 Submodules
 ----------
 
