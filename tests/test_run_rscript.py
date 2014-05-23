@@ -16,6 +16,7 @@ def get_script():
     r_script = os.path.join(r_path, r_file)
     return r_script
 
+
 def test_simple_rscript():
     r_script = get_script()
 
@@ -31,4 +32,3 @@ def test_simple_rscript():
     # calling tweebot script with one arguments
     t = envoy.run('Rscript {} 4 x:n=5'.format(r_script))
     t.status_code.should.equal(0) 
- 
