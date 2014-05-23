@@ -31,6 +31,7 @@ PACKAGES = ['tweezer',
             'tweezer.math',
             'tweezer.rnap',
             'tweezer.physics',
+            'tweezer.polymer',
             'tweezer.statistics',
             'tweezer.single',
             'tweezer.dual']
@@ -91,6 +92,9 @@ MODULES = ['tweezer.io',
            'tweezer.physics.hydrodynamics',
            'tweezer.physics.electrostatics',
            'tweezer.physics.constants',
+           # polymer (mainly dna) module
+           'tweezer.polymer.dna',
+           'tweezer.polymer.utils',
            # simulate (simulation related) modules
            'tweezer.simulate.brownian_motion',
            # single (trap) modules
