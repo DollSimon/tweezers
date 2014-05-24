@@ -36,3 +36,7 @@ recursive-include tweezer *.py
 # added by check_manifest.py
 recursive-include tweezer *.feature
 recursive-include tweezer *.md
+
+# added by check_manifest.py
+recursive-include docs *.mp4
+recursive-include tweezer *.cl
