@@ -4,29 +4,21 @@ import numpy as np
 from skimage import filter
 from skimage import io
 
-#set the paths of a single image or a collection of images
 
-SCALE = 10000       #distance between edges in nm
+_SCALE = 10000       #distance between edges in nm
 
 def get_edges(line, threshold=10):
     """
     Gets the edges coordinates from the whole line of the image and discriminate false edges
 
-    Parameters
-    ----------
-    line : np.array
-        a line in the image to count the number of edges
+    Args:
+        line (numpy.array): A line in the image to count the number of edges
 
-    threshold : int, optional
-        Minimum distance in pixels between two actual edges
-        Default : 10
-        TODO: This is useful to remove false edges, but can be further optimized for more precision
+        threshold (int): Minimum distance in pixels between two actual edges (optional, default : 10)
+        #TODO: This is useful to remove false edges, but can be further optimized for more precision
 
-    Returns
-    -------
-    edgesCoord : list of int
-        Coordinates of the edges in the specified line.
-        Removes the first element, set to 0 for loop purposes
+    Returns:
+        edgesCoord (list of int): Coordinates of the edges in the specified line. (Removes the first element, set to 0 for loop purposes)
     """
 
     edgesCoord = [0]
@@ -43,18 +35,14 @@ def get_edges(line, threshold=10):
 
 def mean_edge_separation(edgesCoord):
     """
-    average separation (between equivalent edges) of the three lines of each image
+    Average separation (between equivalent edges) of the three lines of each image
     It considers the distance between two equivalent edges (two indexes away in the list)
     
-    Parameters
-    ----------
-    edgesCoord : list of int
-        Coordinate (in pixel) of the edges in one line
+    Args:
+        edgesCoord (list of int): Coordinate (in pixel) of the edges in one line
 
-    Returns
-    -------
-    meanOneLine : float
-        average distance between edges in one line
+    Returns:
+        meanOneLine (float): average distance between edges in one line
     
     """
 
@@ -74,15 +62,11 @@ def check_orientation(edgesImage):
     """
     Function to determine the orientation of each image
 
-    Parameters
-    ----------
-    edgesImage : np.array
-        Image to be analyzed
+    Args:
+        edgesImage (numpy.array): Image to be analyzed
 
-    Returns
-    -------
-    orientation : int
-        0 for horizontal, 1 for vertical and 2 for not determined
+    Returns:
+        orientation (int): 0 for horizontal, 1 for vertical and 2 for not determined
 
     """
 
@@ -106,15 +90,11 @@ def get_factor(edgesImage, orientation):
     """
     Function to get the nm/pixel factor by edge detection
     
-    Parameters
-    ----------
-    edgesImage : np.array
-        image containing the edge information
+    Args:
+        edgesImage (numpy.array): image containing the edge information
 
-    Returns
-    -------
-    factor : float
-        Distance calibration factor in units of nm/pixel
+    Returns:
+        factor (float): Distance calibration factor in units of nm/pixel
     """
 
     #plt.imshow(edges)
@@ -129,7 +109,7 @@ def get_factor(edgesImage, orientation):
                         mean_edge_separation(c2) +
                         mean_edge_separation(c3))/3
         if meanDistance != 0:
-            factor = SCALE/meanDistance
+            factor = _SCALE/meanDistance
         else:
             factor = 0
 
@@ -145,7 +125,7 @@ def get_factor(edgesImage, orientation):
                         mean_edge_separation(c2) +
                         mean_edge_separation(c3))/3
         if meanDistance != 0:
-            factor = SCALE/meanDistance
+            factor = _SCALE/meanDistance
         else:
             factor = 0
 
@@ -160,19 +140,13 @@ def eliminate_bad_factors(factorX, factorY, criterion=1):
     """
     Removes the factors that deviate to much from the mean
 
-    Parameters
-    ----------
-    factorX, factorY : list of float
-        Contain all the calculated distance calibration factors
+    Args:
+        factorX, factorY (list of float): Contain all the calculated distance calibration factors
 
-    criterion : float
-        How many standard deviations away from the mean the values can be
-        Default : 1
+        criterion (float): How many standard deviations away from the mean the values can be (default: 1)
 
-    Returns
-    -------
-    factorX, factorY : lost of float
-        Filtered list without values too deviated from the mean
+    Returns:
+        factorX, factorY (list of float): Filtered list without values too deviated from the mean
     """
 
     #means and standard deviations of the factors
@@ -203,15 +177,11 @@ def factor_collection(collectionPath=os.path.dirname(os.path.realpath(__file__))
     """
     Function to get the calibration factors from the CCD camera
 
-    Parameters
-    ----------
-    path : str
-        Sets the folder containing the images
+    Args:
+        path(str): Sets the folder containing the images
 
-    Returns
-    -------
-    np.mean(factorX), np.mean(factorY) : float
-        Mean values of the X and Y distance calibration factors
+    Returns:
+        np.mean(factorX), np.mean(factorY) (float): Mean values of the X and Y distance calibration factors
 
     """
 
