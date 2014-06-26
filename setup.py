@@ -4,7 +4,7 @@
 from tweezer import __version__
 
 try:
-    from setuptools import setup, find_packages
+    from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
@@ -113,6 +113,19 @@ MODULES = ['tweezer.io',
            # rnap (theory and models of transcription) modules
            'tweezer.rnap.pausing']
 
+CLASSIFIERS = [
+    'Development Status :: 4 - Beta',
+    'Natural Language :: English',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: OS Independent',
+    'Intended Audience :: Science/Research',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.3',
+    'Programming Language :: Python :: 3.4',
+    'Topic :: Scientific/Engineering',
+]
+
 setup(
     name='tweezer',
     version=".".join(str(x) for x in __version__),
@@ -132,14 +145,5 @@ setup(
         ],
     },
     py_modules=MODULES,
-    classifiers=(
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'Natural Language :: English',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-    ),
+    classifiers=CLASSIFIERS,
 )
