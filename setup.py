@@ -4,8 +4,8 @@
 from tweezer import __version__
 
 try:
-    from setuptools import setup
-except:
+    from setuptools import setup, find_packages
+except ImportError:
     from distutils.core import setup
 
 DESCRIPTION = ("Tools to read, analyse and interpret dual-trap\
@@ -28,6 +28,7 @@ PACKAGES = ['tweezer',
             'tweezer.dia',
             'tweezer.simulate',
             'tweezer.noise',
+            'tweezer.lux',
             'tweezer.math',
             'tweezer.rnap',
             'tweezer.physics',
@@ -80,6 +81,12 @@ MODULES = ['tweezer.io',
            'tweezer.ixo.functions',
            'tweezer.ixo.math_',
            'tweezer.ixo.ipython_',
+           # lux (optical tweezer toolbox) modules
+           'tweezer.lux.utils',
+           'tweezer.lux.bessel',
+           'tweezer.lux.vector_spherical_harmonics',
+           'tweezer.lux.t_matrix',
+           'tweezer.lux.examples',
            # math modules
            'tweezer.math.geometry',
            # noise (fluctuations and signal processing) related modules
