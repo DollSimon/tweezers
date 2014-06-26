@@ -79,3 +79,6 @@ tweezer/templates/pytex/*
 # files from nose testing
 setup.json
 tests.json
+
+# ignore Mac specific files
+.DS_Store
