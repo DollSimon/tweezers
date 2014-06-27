@@ -95,6 +95,17 @@ class Point(object):
         else:
             raise ValueError('Cannot add non-Point, {}, to a Point'.format(other))
 
+    def __radd__(self, other):
+        """
+        Adding a number to a point acts like a translation.
+        """
+        if isinstance(other, Point):
+            coordinates = [x + y for x, y in zip(self.coordinates, other.coordinates)]
+            return Point(coordinates)
+        else:
+            coordinates = [other + x for x in self.coordinates]
+            return Point(coordinates)
+
     def __sub__(self, other):
         """
         Subtract a Point from another Point by subtracting their coordinates.
@@ -109,11 +120,20 @@ class Point(object):
         """Multiply a Point's coordinates by a factor."""
         return Point([x * factor for x in self.coordinates])
 
+    def __rmul__(self, factor):
+        """Multiply a Point's coordinates by a factor."""
+        return Point([x * factor for x in self.coordinates])
+
+    def __truediv__(self, factor):
+        """Divide a Point's coordinates by a factor."""
+        return Point([x / factor for x in self.coordinates])
+
     def __len__(self):
         return 3
 
     def __iter__(self):
         return iter(self.coordinates)
+
 
 class Vector(object):
     """
@@ -122,20 +142,32 @@ class Vector(object):
     def __init__(self, start=Point(0, 0, 0), end=Point(1, 1, 1)):
         self.start = start
         self.end = end
-        self._dx = end.x - start.x
-        self._dy = end.y - start.y
-        self._dz = end.z - start.z
+        self.x = end.x - start.x
+        self.y = end.y - start.y
+        self.z = end.z - start.z
 
     @property
     def length(self):
         """
         Length of the vector defined as L^2 norm.
         """
-        return np.linalg.norm([self._dx, self._dy, self._dz])
+        return np.linalg.norm([self.x, self.y, self.z])
 
     @property
     def direction(self):
         pass
+
+    @property
+    def coordinates(self):
+        """
+        Coordinates of vector as list. The vector coordinates are independent from the anchor points of the vector.
+
+        The coordinates coincide with the end point only if the start point is the origin (0, 0, 0).
+
+        Returns:
+            (list): 3D coordinates
+        """
+        return [self.x, self.y, self.z]
 
     def norm(self, order=None):
         """
@@ -144,7 +176,63 @@ class Vector(object):
         Args:
             order (optional, non-zero int): order of the norm
         """
-        return np.linalg.norm([self._dx, self._dy, self._dz], ord=order)
+        return np.linalg.norm([self.x, self.y, self.z], ord=order)
+
+    def inner(self, other):
+        """
+        Inner product between two vectors
+
+        :param other: Vector
+        :return: inner Inner Product
+        """
+        if isinstance(other, Vector):
+            inner = sum(x * y for x, y in zip(self.coordinates, other.coordinates))
+            return inner
+        else:
+            raise ValueError('Cannot calculate the inner product between non-Vector, {}, and a Vector'.format(other))
+
+    def angleTo(self, other, inDegrees=False):
+        """
+        Calculates the angle between two vectors.
+        """
+        if isinstance(other, Vector):
+            angle = np.arccos(self.inner(other) / (self.norm() * other.norm()))
+
+            if inDegrees:
+                angle = 180 * angle / np.pi
+            return angle
+        else:
+            raise ValueError('Cannot calculate the angle between non-Vector, {}, and a Vector'.format(other))
+
+
+    def __neg__(self):
+        """
+        Negation of a vector changes its direction.
+        """
+        return Vector(start=self.end, end=self.start)
+
+    def __add__(self, other):
+        """
+        Adding one vector to another.
+        """
+        if isinstance(other, Vector):
+            coords = [x + y for x, y in zip(self.coordinates, other.coordinates)]
+            return Vector(end=Point(coords[0], coords[1], coords[2]))
+        else:
+            raise ValueError('Cannot add non-Vector, {}, to a Vector'.format(other))
+
+    def __sub__(self, other):
+        """
+        Subtracting one vector from the other.
+        """
+        if isinstance(other, Vector):
+            coords = [x - y for x, y in zip(self.coordinates, other.coordinates)]
+            return Vector(end=Point(coords[0], coords[1], coords[2]))
+        else:
+            raise ValueError('Cannot subtract non-Vector, {}, from a Vector'.format(other))
+
+    def __iter__(self):
+        return iter(self.coordinates)
 
 
 class UnitVector(Vector):

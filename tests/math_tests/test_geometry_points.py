@@ -64,6 +64,15 @@ def test_common_operations_between_points():
     assert p3 / 10 == Point(0.3, 0.2)
 
 
+def test_common_right_hand_side_operations():
+    p1 = Point(1.2, -2.2, 3)
+    p2 = Point(4, 3, 2)
+    p3 = Point(3, 2)
+
+    assert 3 * p3 == Point(9, 6, 0)
+    assert 4 + p2 == Point(8, 7, 6)
+
+
 def test_iteration_on_coordinates():
     p1 = Point(1, 2, 3)
     p2 = Point(2.3, -4.3)
