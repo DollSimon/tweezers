@@ -5,7 +5,8 @@ from tweezer import __version__
 
 try:
     from setuptools import setup
-except ImportError:
+except ImportError as err:
+    print(err)
     from distutils.core import setup
 
 DESCRIPTION = ("Tools to read, analyse and interpret dual-trap\
@@ -84,6 +85,7 @@ MODULES = ['tweezer.io',
            # lux (optical tweezer toolbox) modules
            'tweezer.lux.utils',
            'tweezer.lux.bessel',
+           'tweezer.lux.laser',
            'tweezer.lux.vector_spherical_harmonics',
            'tweezer.lux.t_matrix',
            'tweezer.lux.examples',

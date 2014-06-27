@@ -48,3 +48,7 @@ def K(k_2, k2, k3):
     Dimensionless constant
     """
     return (k_2 + k3) / k2
+
+
+def calculate_dwell_times():
+    raise NotImplementedError()
