@@ -40,8 +40,8 @@ def angular_grid(nTheta:int=10, nPhi:int=10, output:int=0, inDegrees:bool=False)
     phi = np.linspace(0, 2 * np.pi, nPhi)
 
     if inDegrees:
-        theta = [n * 360 / np.pi for n in theta]
-        phi = [n * 360 / np.pi for n in phi]
+        theta = [n * 180 / np.pi for n in theta]
+        phi = [n * 180 / np.pi for n in phi]
 
     if output == 0:
         grid = np.array(theta + phi)
