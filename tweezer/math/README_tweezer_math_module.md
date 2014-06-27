@@ -1,4 +1,4 @@
-# tweezer.geom
+# tweezer.math.geometry
 
 Module containing basic geometry classes and functions.
 
