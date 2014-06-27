@@ -1,5 +1,8 @@
 # coding=utf-8
 
+import numpy as np
+import pandas as pd
+
 
 def angular_grid(nTheta:int=10, nPhi:int=10, output:int=0, inDegrees:bool=False):
     """
@@ -32,9 +35,9 @@ def angular_grid(nTheta:int=10, nPhi:int=10, output:int=0, inDegrees:bool=False)
     grid : numpy.array
         Grid with equally distributed theta and phi angles.
     """
-    theta = [np.pi * (n - 0.5) / nTheta for n in range(1, nTheta + 1)]
+    theta = np.linspace(0, np.pi, nTheta)
 
-    phi = [2 * np.pi * (n - 0.5) / nPhi for n in range(1, nPhi + 1)]
+    phi = np.linspace(0, 2 * np.pi, nPhi)
 
     if inDegrees:
         theta = [n * 360 / np.pi for n in theta]
@@ -42,6 +45,8 @@ def angular_grid(nTheta:int=10, nPhi:int=10, output:int=0, inDegrees:bool=False)
 
     if output == 0:
         grid = np.array(theta + phi)
+    elif output == 1:
+        grid =
 
     return grid
 

@@ -2,6 +2,8 @@
 
 __doc__ = """\
 Re-implementation of the Optical Tweezer Toolbox in Python.
+
+Tools for the computational modelling of optical tweezers.
 """
 
 import os
