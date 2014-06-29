@@ -296,7 +296,7 @@ def calibrate_file(data, limit=0.05, plot=False):
     return DV, fcV, errorV, checkV
 
 
-def iterative_fitting(file, plt=False):
+def iterative_fitting(file, plot=False):
     """Performs the fitting with different limits and chooses the 
     one with least deviation (minimum mean residuals squared)
     
@@ -332,15 +332,15 @@ def iterative_fitting(file, plt=False):
             else:
                 step = -step*0.8
             limits = limits + step
-        D, fc, sigma, check = factors_from_data(column, limit=limits, plot=plt)
-        Ds.append(D)
-        fcs.append(fc)
-        sigmas.append(sigma)
+        D, fc, sigma, check = factors_from_data(column, limit=limits, plot=plt)    
+	Ds.append(D)
+	fcs.append(fc)
+	sigmas.append(sigma)
                     
     return Ds, fcs, sigmas
     
 
-D, fc, errors = iterative_fitting(pathFile, plt=True)
+D, fc, errors = iterative_fitting(pathFile, plot=True)
 
 #Calculation of the used parameters:
 
@@ -348,9 +348,9 @@ beta = [distance_calibration(diff) for diff in D]
 kappa = [trap_stiffness(freq) for freq in fc]
 alpha = [force_calibration(be, ka) for be, ka in zip(beta,kappa)]
 
-print("Betas: ",beta)
-print("Trap stiffness: ",kappa)
-print("Alphas: ",alpha)
+print(beta)
+print(kappa)
+print(alpha)
 
 
 
