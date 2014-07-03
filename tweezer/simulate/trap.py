@@ -145,15 +145,15 @@ def step(eigenvalues=eigenvalues(), aValues=aValues(), alpha=alpha()):
     partA = (A.plus * v1 + A.minus * v2) * np.sqrt(1 + alpha) * np.random.randn()
     partB = (A.plus * v1 - A.minus * v2) * np.sqrt(1 - alpha) * np.random.randn()
 
-    deltaX = partA[0] + partB[0]
-    deltaV = partA[1] + partB[1]
-
-    step = np.array([deltaX, deltaV])
+    # keep in mind that:
+    # deltaX = partA[0] + partB[0]
+    # deltaV = partA[1] + partB[1]
+    step = partA + partB
 
     return step
 
 
-def simulate_trap(dataPoints=1e4,
+def simulate_trap(dataPoints=1e3,
                   timeStep=0.001,
                   radius=1000,
                   viscosity=2e5,
@@ -185,22 +185,20 @@ def simulate_trap(dataPoints=1e4,
 
     c = cValues(eigenvalues=l, timeStep=timeStep)
 
-    expM = exp_Matrix(eigenvalues=l, cValues=c)
+    expM = exp_Matrix(eigenvalues=l, cValues=c).T
 
     A = aValues(dragCoefficient=drag, eigenvalues=l, cValues=c)
 
     alphaValue = alpha(eigenvalues=l, cValues=c)
 
-    state = pd.DataFrame({'x': np.zeros(dataPoints),
-                          'v': np.zeros(dataPoints),
-                          't': timeStep * np.arange(dataPoints)})
+    state = np.zeros((dataPoints, 3))
+    state[:, 0] = np.arange(0, timeStep * dataPoints, timeStep)
 
-    for i in range(dataPoints - 1):
+    for i in range(int(dataPoints) - 1):
 
         singleStep = step(eigenvalues=l, aValues=A, alpha=alphaValue)
 
-        newState = np.array(expM * state[['x', 'v']].ix[i].as_matrix().reshape(2, 1) + singleStep.reshape(2, 1))
+        state[i + 1, 1:3] = state[i, 1:3] * expM + singleStep
 
-        state.loc[i+1, ['x', 'v']] = newState.flatten()
-
+    state = pd.DataFrame(state, columns=['t', 'x', 'v'])
     return state
