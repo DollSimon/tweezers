@@ -3,8 +3,10 @@
 
 import numpy as np
 
+from tweezer.physics import thermal_energy
 
-def drag_on_sphere(radius=1000, dynamicViscosity=0.9e-9, verbose=False):
+
+def drag_sphere(radius=1000, dynamicViscosity=0.9e-9, verbose=False):
     """
     Calculates the simple Stokes' drag coefficient of a sphere in a Newtonian fluid
     at low Reynolds number.
@@ -55,6 +57,19 @@ def drag_on_sphere(radius=1000, dynamicViscosity=0.9e-9, verbose=False):
         print("Drag coefficient: gamma = {} pN/nm s".format(round(dragCoefficient, 12)))
 
     return dragCoefficient
+
+
+def diffusion_coefficient(radius=1000, temperature=25, dynamicViscosity=1e-9, verbose=False):
+    """
+    Calculates the diffusion coefficient for a sphere based on Stokes drag and the Stokes-Einstein relation.
+    """
+    kT = thermal_energy(temperature)
+    drag = drag_sphere(radius=radius, dynamicViscosity=dynamicViscosity)
+
+
+
+    return diffusionConstant
+
 
 
 class StokesDragSphere(object):

@@ -101,15 +101,18 @@ MODULES = ['tweezer.io',
            'tweezer.physics.hydrodynamics',
            'tweezer.physics.electrostatics',
            'tweezer.physics.constants',
+           'tweezer.physics.utils',
            # polymer (mainly dna) module
            'tweezer.polymer.dna',
            'tweezer.polymer.utils',
            # simulate (simulation related) modules
            'tweezer.simulate.brownian_motion',
+           'tweezer.simulate.trap',
            # single (trap) modules
            'tweezer.single.calibration',
            'tweezer.single.theory',
            'tweezer.single.utils',
+           'tweezer.single.thermal_calibration_MLE',
            # statistics module
            'tweezer.statistics.wlc_models',
            # rnap (theory and models of transcription) modules

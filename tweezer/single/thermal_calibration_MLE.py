@@ -10,7 +10,9 @@ from scipy.signal import welch
 
 import matplotlib.pyplot as plt
 
+from tweezer.physics import thermal_energy
 
+kT = thermal_energy(as_Kelvin(46))
 
 #Parameters:
 _radius = 1000             #nm
@@ -112,7 +114,8 @@ def force_calibration(beta, kappa):
 
     return alpha
 
-def mle_factors(x,y):
+
+def mle_factors(x, y):
     """
     Calculation of the S coefficients related to the MLE, according to the paper of Norrelike
     
