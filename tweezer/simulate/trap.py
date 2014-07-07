@@ -23,7 +23,7 @@ def eigenvalues(dragCoefficient=drag_sphere(1000),
         Drag
 
     massSphere : float
-        Mass in [g / ]
+        Mass in [g]
 
     trapStiffness : float
         Stiffness in [pN / nm]
@@ -178,7 +178,7 @@ def simulate_trap(dataPoints=1e3,
     assert dataPoints > 0
 
     # boundary conditions
-    drag = drag_sphere(radius=radius)
+    drag = drag_sphere(radius=radius, dynamicViscosity=viscosity)
     mass = mass_sphere(radius=radius)
 
     l = eigenvalues(dragCoefficient=drag, massSphere=mass, trapStiffness=trapStiffness)
