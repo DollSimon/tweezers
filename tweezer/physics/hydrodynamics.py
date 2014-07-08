@@ -3,7 +3,8 @@
 
 import numpy as np
 
-from tweezer.physics import thermal_energy, as_Kelvin
+from tweezer.physics.thermodynamics import thermal_energy
+from tweezer.physics.utils import as_Kelvin
 
 
 def drag_sphere(radius=1000, dynamicViscosity=0.9e-9, verbose=False):

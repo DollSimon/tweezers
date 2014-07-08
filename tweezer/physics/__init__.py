@@ -1,3 +1,4 @@
+# coding=utf-8
 __doc__ = """\
 General physical and chemical functions and constants
 """
@@ -21,4 +22,4 @@ from .viscosity import (dynamic_viscosity_of_mixture,
 
 from .constants import (kB, h, NA, c, vacuumPermittivity)
 
-from .utils import mass_sphere, volume_sphere, as_Celsius, as_Kelvin
+from .utils import (mass_sphere, volume_sphere, as_Celsius, as_Kelvin)
