@@ -1,7 +1,4 @@
 include docs/*.txt
-include tweezer/data/bot_snapshots/*/*/*.png
-include tweezer/data/bot_snapshots/*/*.png
-include tweezer/data/*/*/*
 include tweezer/data/*/*
 
 include tweezer/data/settings/default_settings.json

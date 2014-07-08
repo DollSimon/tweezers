@@ -46,7 +46,7 @@ def angular_grid(nTheta:int=10, nPhi:int=10, output:int=0, inDegrees:bool=False)
     if output == 0:
         grid = np.array(theta + phi)
     elif output == 1:
-        grid =
+        grid = np.matrix(np.array(theta + phi))
 
     return grid
 
