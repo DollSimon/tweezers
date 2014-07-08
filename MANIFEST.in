@@ -1,4 +1,7 @@
 include docs/*.txt
+include tweezer/data/bot_snapshots/*/*/*.png
+include tweezer/data/bot_snapshots/*/*.png
+include tweezer/data/*/*/*
 include tweezer/data/*/*
 
 include tweezer/data/settings/default_settings.json
@@ -40,3 +43,6 @@ recursive-include tweezer *.md
 # added by check_manifest.py
 recursive-include docs *.mp4
 recursive-include tweezer *.cl
+
+# added by check_manifest.py
+recursive-include tweezer *.png

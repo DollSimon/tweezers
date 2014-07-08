@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Tweezer documentation build configuration file, created by
-# sphinx-quickstart on Sat Dec 22 03:29:38 2012.
+# sphinx-quickstart on Sat Dec 22 03:29:trial_38 2012.
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #

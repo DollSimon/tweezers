@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from tweezer.physics import drag_sphere, mass_sphere
+from tweezer.physics.hydrodynamics import diffusion_coefficient
 
 __doc__ = """\
 Simulation of optical trap time series according to Norrelykke et al.
@@ -20,7 +21,7 @@ def eigenvalues(dragCoefficient=drag_sphere(1000),
     Parameters
     ----------
     dragCoefficient : float
-        Drag
+        Stokes drag coefficient in [pN/nm s]
 
     massSphere : float
         Mass in [g]
@@ -71,14 +72,35 @@ def cValues(eigenvalues=eigenvalues(), timeStep = 0.001):
     return c
 
 
-def aValues(dragCoefficient=drag_sphere(1000), eigenvalues=eigenvalues(), cValues=cValues()):
+def aValues(diffusionCoefficient=diffusion_coefficient(radius=1000, temperature=25, dynamicViscosity=1e-9),
+            eigenvalues=eigenvalues(), cValues=cValues()):
     """
     Calculates A values in the simulation of OTs according to Norrelykke et al.
+
+    Parameters
+    ----------
+    diffusionCoefficient : float
+        Diffusion coefficient in [nm^2 / s]
+
+    eigenvalues : namedtuple
+        Eigenvalues of Langevin equation
+        Fields: plus & minus
+
+    cValue : namedtuple
+        C values from eigenvalues in the simulation of an optical trap;
+        Fields: plus & minus
+
+    Return
+    ------
+    aValues : namedtuple
+        A values in the calculations of an optical trap
+        Fields: plus & minus
+
     """
 
     l = eigenvalues
     c = cValues
-    D = dragCoefficient
+    D = diffusionCoefficient
 
     factorA = (l.plus + l.minus) / (l.plus - l.minus)
     factorB = np.sqrt((1 - c.plus**2) * D / (2 * l.plus))
@@ -129,9 +151,7 @@ def exp_Matrix(eigenvalues=eigenvalues(), cValues=cValues()):
 
     return prefactor * M
 
-#' Calculates step
-#'
-#' @export ot.sim.step
+
 def step(eigenvalues=eigenvalues(), aValues=aValues(), alpha=alpha()):
     """
     Calculates step
@@ -156,9 +176,8 @@ def step(eigenvalues=eigenvalues(), aValues=aValues(), alpha=alpha()):
 def simulate_trap(dataPoints=1e3,
                   timeStep=0.001,
                   radius=1000,
-                  viscosity=2e5,
+                  viscosity=1e-9,
                   trapStiffness=0.1,
-                  material="polystyrene",
                   temperature=25):
     """
     Simulates the position time series of a sphere in an optical trap
@@ -180,6 +199,7 @@ def simulate_trap(dataPoints=1e3,
     # boundary conditions
     drag = drag_sphere(radius=radius, dynamicViscosity=viscosity)
     mass = mass_sphere(radius=radius)
+    D = diffusion_coefficient(radius=radius, temperature=temperature, dynamicViscosity=viscosity)
 
     l = eigenvalues(dragCoefficient=drag, massSphere=mass, trapStiffness=trapStiffness)
 
@@ -187,7 +207,7 @@ def simulate_trap(dataPoints=1e3,
 
     expM = exp_Matrix(eigenvalues=l, cValues=c).T
 
-    A = aValues(dragCoefficient=drag, eigenvalues=l, cValues=c)
+    A = aValues(diffusionCoefficient=D, eigenvalues=l, cValues=c)
 
     alphaValue = alpha(eigenvalues=l, cValues=c)
 

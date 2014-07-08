@@ -133,16 +133,18 @@ def detector_sensitivity(diffusionConstant=0.12, dragCoefficient=2e-9, thermalEn
     return detectorSensitivity
 
 
-def power_spectrum_mpl(data, asDataFrame=True):
+def power_spectrum_mpl(data, asDataFrame=True, Fs=80000, NFFT=4096, **kwargs):
     """
     Calculates the power spectral density
+
+    Wrapper for matplotlib routine.
 
     Parameter
     ---------
     data : array
-
     """
-    psd, freq = plt.psd(data, NFFT=block, Fs=sampling_rate, noverlap=overlap)
+    psd, freq = plt.psd(data, NFFT=NFFT, Fs=Fs,
+                        noverlap=kwargs('noverlap', False))
 
     if asDataFrame:
         psdData = pd.DataFrame({'freq': freq, 'psd': psd})

@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from tweezer.physics import thermal_energy
+from tweezer.physics import thermal_energy, as_Kelvin
 
 
 def drag_sphere(radius=1000, dynamicViscosity=0.9e-9, verbose=False):
@@ -20,7 +20,7 @@ def drag_sphere(radius=1000, dynamicViscosity=0.9e-9, verbose=False):
 
     dynamicViscosity : float
         Dynamic viscosity in [pN/nm^2 s]
-        Default: 0.9e-9 pN/nm^s s
+        Default: 0.9e-9 pN/nm^2 s
 
     verbose : bool
         Print parameters and results with units
@@ -62,11 +62,49 @@ def drag_sphere(radius=1000, dynamicViscosity=0.9e-9, verbose=False):
 def diffusion_coefficient(radius=1000, temperature=25, dynamicViscosity=1e-9, verbose=False):
     """
     Calculates the diffusion coefficient for a sphere based on Stokes drag and the Stokes-Einstein relation.
+
+    D = kT / gamma
+
+    Parameters
+    ----------
+    radius : float
+        Radius of sphere in [nm]
+        Default: 1000 nm
+
+    temperature : float
+        Solvent temperature in °C
+        Default: 25
+
+    dynamicViscosity : float
+        Dynamic viscosity in [pN/nm^2 s]
+        Default: 0.9e-9 pN/nm^2 s
+
+    verbose : bool
+        Print parameters and results with units
+        Default: False
+
+    Return
+    ------
+    diffusionConstant : float
+        Diffusion constant in [nm^2 / s]
     """
-    kT = thermal_energy(temperature)
+    assert radius > 0
+    assert temperature >= -273.15
+    assert dynamicViscosity > 0
+
+    kT = thermal_energy(as_Kelvin(temperature))
     drag = drag_sphere(radius=radius, dynamicViscosity=dynamicViscosity)
 
+    diffusionConstant = kT / drag
 
+    if verbose:
+        print("In:")
+        print("Radius: r = {} nm".format(radius))
+        print("Temperature: T = {} °C".format(temperature))
+        print("Dynamic viscosity: eta = {} pN/nm^2 s\n".format(dynamicViscosity))
+
+        print("Out:")
+        print("Diffusion constant: D = {} nm^2 / s".format(round(diffusionConstant, 12)))
 
     return diffusionConstant
 
