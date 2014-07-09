@@ -1,5 +1,4 @@
 # coding=utf-8
-
 __doc__ = """\
 Thermal calibration of single optical trap.
 """
@@ -8,10 +7,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from tweezer.physics import thermal_energy
+from tweezer.physics.thermodynamics import thermal_energy
+from tweezer.physics.hydrodynamics import (diffusion_coefficient, drag_sphere)
 
 
-def corner_frequency(dragCoefficient=2e-5, trapStiffness=0.1, verbose=False):
+def corner_frequency(dragCoefficient=drag_sphere(), trapStiffness=0.1, verbose=False):
     """
     Corner frequency of the spectrum of a single trap.
 
@@ -51,7 +51,7 @@ def corner_frequency(dragCoefficient=2e-5, trapStiffness=0.1, verbose=False):
     return cornerFrequency
 
 
-def trap_stiffness(cornerFrequency=500, dragCoefficient=2e-5, verbose=False):
+def trap_stiffness(cornerFrequency=500, dragCoefficient=drag_sphere(), verbose=False):
     """
     Trap stiffness of a single trap from the corner frequency of the power spectrum.
 
@@ -91,7 +91,10 @@ def trap_stiffness(cornerFrequency=500, dragCoefficient=2e-5, verbose=False):
     return trapStiffness
 
 
-def detector_sensitivity(diffusionConstant=0.12, dragCoefficient=2e-9, thermalEnergy=thermal_energy(), verbose=False):
+def detector_sensitivity(diffusionConstant=diffusion_coefficient(),
+                         dragCoefficient=drag_sphere(),
+                         thermalEnergy=thermal_energy(),
+                         verbose=False):
     """
     Detector sensitivity used for the position calibration of an optical trap.
 
@@ -181,7 +184,7 @@ def mle_factors(frequency, powerSpectrum, asMatrix=True):
     S : numpy.matrix
         Matrix with the S coefficients
 
-    .. [1] Power spectrum analysis with least-squares fitting: Amplitude biasand its elimination, with \
+    .. [1] Power spectrum analysis with least-squares fitting: Amplitude bias and its elimination, with \
     application to optical tweezers and atomic force microscope cantilevers. 1–16 (2010). doi:10.1063/1.3455217
     """
     assert len(frequency) == len(powerSpectrum)
