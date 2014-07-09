@@ -18,16 +18,13 @@ def eigenvalues(dragCoefficient=drag_sphere(1000),
     """
     Calculates eigenvalues in the simulation of OTs according to Norrelykke et al.
 
-    Parameters
-    ----------
-    dragCoefficient : float
-        Stokes drag coefficient in [pN/nm s]
+    Args:
+        dragCoefficient (float): Stokes drag coefficient in [pN/nm s]
+        massSphere (float): Mass in [g]
+        trapStiffness (float): Stiffness in [pN/nm] (Default: 0.1 pN/nm)
 
-    massSphere : float
-        Mass in [g]
-
-    trapStiffness : float
-        Stiffness in [pN / nm]
+    Returns:
+        eigenvalues (namedtuple): Eigenvalues of Langevin equation; fields are 'plus' and 'minus'
     """
     g = dragCoefficient
     m = massSphere
@@ -53,14 +50,12 @@ def cValues(eigenvalues=eigenvalues(), timeStep = 0.001):
 
     Computes: c = exp(-λ * ∆t)
 
-    Parameters
-    ----------
-    eigenvalues : namedtuple
-        Eigenvalues of Langevin equation; namedtuple with "plus" and "minus" fields
+    Args:
+        eigenvalues (namedtuple): Eigenvalues of Langevin equation; (Fields: 'plus', 'minus')
+        timeStep (float): Difference between two time points in [s]; delta time (Default: 0.001 s)
 
-    timeStep : float
-        Difference between two time points; delta time
-        Default: 0.001
+    Returns:
+        cValues (namedtuple): C values in the simulation of an optical trap; (Fields: 'plus', 'minus')
     """
     cValues = namedtuple("cValues", ['plus', 'minus'])
 
@@ -77,25 +72,13 @@ def aValues(diffusionCoefficient=diffusion_coefficient(radius=1000, temperature=
     """
     Calculates A values in the simulation of OTs according to Norrelykke et al.
 
-    Parameters
-    ----------
-    diffusionCoefficient : float
-        Diffusion coefficient in [nm^2 / s]
+    Args:
+        diffusionCoefficient (float): Diffusion coefficient in [nm^2 / s]
+        eigenvalues (namedtuple): Eigenvalues of Langevin equation; (Fields: 'plus', 'minus')
+        cValues (namedtuple): C values in the simulation of an optical trap; (Fields: 'plus', 'minus')
 
-    eigenvalues : namedtuple
-        Eigenvalues of Langevin equation
-        Fields: plus & minus
-
-    cValue : namedtuple
-        C values from eigenvalues in the simulation of an optical trap;
-        Fields: plus & minus
-
-    Return
-    ------
-    aValues : namedtuple
-        A values in the calculations of an optical trap
-        Fields: plus & minus
-
+    Returns:
+        aValues (namedtuple): A values in the simulation of an optical trap; (Fields: 'plus', 'minus')
     """
 
     l = eigenvalues
@@ -119,6 +102,13 @@ def aValues(diffusionCoefficient=diffusion_coefficient(radius=1000, temperature=
 def alpha(eigenvalues=eigenvalues(), cValues=cValues()):
     """
     Calculates alpha in the simulation of OTs according to Norrelykke et al.
+
+    Args:
+        eigenvalues (namedtuple): Eigenvalues of Langevin equation; (Fields: 'plus', 'minus')
+        cValues (namedtuple): C values in the simulation of an optical trap; (Fields: 'plus', 'minus')
+
+    Returns:
+        alpha (float): alpha in the simulation of an optical trap;
     """
     l = eigenvalues
     c = cValues
@@ -136,6 +126,13 @@ def exp_Matrix(eigenvalues=eigenvalues(), cValues=cValues()):
     Calculates alpha in the simulation of OTs according to Norrelykke et al.
 
     Computes: exp(-M * ∆t)
+
+    Args:
+        eigenvalues (namedtuple): Eigenvalues of Langevin equation; (Fields: 'plus', 'minus')
+        cValues (namedtuple): C values in the simulation of an optical trap; (Fields: 'plus', 'minus')
+
+    Returns:
+        M (np.matrix(2, 2)): exp(-M * ∆t) in the simulation of an optical trap;
     """
     l = eigenvalues
     c = cValues
@@ -154,7 +151,15 @@ def exp_Matrix(eigenvalues=eigenvalues(), cValues=cValues()):
 
 def step(eigenvalues=eigenvalues(), aValues=aValues(), alpha=alpha()):
     """
-    Calculates step
+    Calculates single step in the simulation of OTs according to Norrelykke et al.
+
+    Args:
+        eigenvalues (namedtuple): Eigenvalues of Langevin equation; (Fields: 'plus', 'minus')
+        aValues (namedtuple): A values in the simulation of an optical trap; (Fields: 'plus', 'minus')
+        alpha (float): alpha in the simulation of an optical trap;
+
+    Returns:
+        step (np.array): Simulation step; step[0] - deltaX in [nm], step[1] - deltaV in [nm/s]
     """
     l = eigenvalues
     A = aValues
@@ -182,16 +187,19 @@ def simulate_trap(dataPoints=1e3,
     """
     Simulates the position time series of a sphere in an optical trap
 
-    Parameters
-    ----------
-    dataPoints : int
-        Number of data points in final time series
-        Default: 10000
+    Args:
+        dataPoints (int): Number of data points in final time series. (Default: 1e3)
+        timeStep (float): Difference between two time points in [s]; delta time (Default: 0.001 s)
+        radius (float): Radius of trapped sphere in [nm]. (Default: 1000)
+        viscosity (float): Dynamic viscosity in [pN/nm^2 s] (Default: 1e-9 pN/nm^2 s)
+        trapStiffness (float): Stiffness of simulated trap, k, in [pN/nm]. (Default: 0.1 pN/nm)
+        temperature (float): Temperature in [°C]. (Default: 25 °C)
 
-    timeStep : float
-        Difference between two time points; delta time
-        Default: 0.001
+    Returns:
+        state (pandas.DataFrame): Simulated state of an optical trap. (Columns: 't', 'x', 'v')
+
     """
+    #TODO: add time index to pd.DataFrame; makes for easier plotting as time is inherent
     assert timeStep > 0
     assert radius > 0
     assert dataPoints > 0

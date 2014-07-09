@@ -20,6 +20,13 @@ tweezer.simulate.schroedinger module
     :undoc-members:
     :show-inheritance:
 
+tweezer.simulate.trap module
+------------------------------------
+
+.. automodule:: tweezer.simulate.trap
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Module contents
 ---------------
