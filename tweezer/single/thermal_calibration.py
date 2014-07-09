@@ -1,342 +1,405 @@
-import os
-import glob
-import math
+# -*- coding: utf-8 -*-
+
 import numpy as np
-from scipy.optimize import curve_fit
-
 import matplotlib.pyplot as plt
+import math
+from tweezer.physics import thermal_energy, drag_sphere as dg_sph, dynamic_viscosity_of_mixture, as_Kelvin
+from tweezer.simulate.trap import *
+import pandas as pd
+from scipy.signal import welch
+from collections import namedtuple
 
 
-
-#Parameters:
-radius = 1000             #nm
-viscosity = 3.3e-9        #pN/nm^2s
-kb = 1.3806488e-23        #IS
-T = 300                   #K
-drag_coef = 6*math.pi*radius*viscosity
-
-
-block = 8192              #number of data points per block
-samplingRate = 80000     #sampling rate of data acquisition
-overlap = 0             #overlap between the blocks for the calculation of the PSD function
-
-
-
-filesPath=os.path.dirname(os.path.realpath(__file__))
-
-
-def lorentz_fit(f,D,fc):
+def read_time_series(file, headerLines=7, columns=[1, 3], type="pandas"):
     """
-    Lorentzian function to fit the PSD function
+    Reads a .txt file to obtain the data using pandas. It gets the columns specified in usecols and ignors the lines
+    specified by header.
 
-    Parameters
-    ----------
-    f : np.array
-        frequency in units of [Hz]
+    Args:
+        file (str): name of the file containing the data
+        headerLines (int): number of lines of the header (Default: 7)
+        columns (list of int): index of the columns to be read
+        type (str): returns the data in pandas or numpy (Default: "pandas")
 
-    D : float
-        diffusion constant in units of [V]
-
-    fc : float
-        corner frequency in units of [Hz]
-
-    Returns
-    -------
-    PSD values : np.array
-        returns the function in order to perform the fit
+    Returns:
+        data: returns the columns specified in usecols
     """
 
-    return D/((math.pi)**2*(f**2+fc**2))
+    if type == "pandas":
+        data = pd.read_csv(file, usecols=columns, header=headerLines, sep=r"\t+")
+        data.dropna(how="all", inplace=True)
+        data.columns = ['PM', 'AOD']
 
+    elif type == "numpy":
+        columnsNumpy = (columns[0], columns[1])
+        data = np.loadtxt(file, delimiter="\t", usecols=columnsNumpy, skiprows=headerLines, unpack=True)
 
-def get_files(filesPath=os.path.dirname(os.path.realpath(__file__)), pattern='TS*.txt'):
-    """
-    List with the files to be calibrated
-
-    Parameters
-    ----------
-    filesPath : str
-        Path to the folder with files
-        Default : path of the script
-
-    Returns
-    -------
-    files : list
-        contains all the files matching the requirements
-    """
-
-    files=[]
-    os.chdir(filesPath)
-    for file in glob.glob(pattern):
-            files.append(file)
-    files.sort()
-    return files
-
-
-def read_files(file,header=7):
-    """
-    Reads a .txt file to obtain the data
-
-    Parameters
-    ----------
-    file : str
-        name of the file containing the data
-
-    header : int
-        number of lines comprising the header (including variable name of columns)
-        Default : 7 (according to thermal calibration data files from 2014)
-
-    Returns
-    -------
-    data : np.array
-    """
-    data=np.loadtxt(file,delimiter="\t",usecols=(0, 1, 2, 3),skiprows=header,unpack=True)
     return data
 
 
-def distance_calibration(D):
-    """Distance calibration factor (beta) in units of [V/nm]
+def lorentzian(f, D, fc):
+    """
+    Lorentzian function
 
-    Parameters
-    ----------
-    D : float
-        diffusion constant in units of [V]
+    Args:
+        f (numpy.array): frequency in units of [Hz]
+        D (float): diffusion constant in units of [V]
+        fc (float): corner frequency in units of [Hz]
 
-    Returns
-    -------
-    beta : float
-        distance calibration factor in units of [V/nm]
+    Returns:
+        Lorentzian values(np.array): Lorentzian function with the corresponding parameters
     """
 
-    beta=1/math.sqrt(kb*T*1e21/(drag_coef*D))
+    return D/(math.pi**2*(f**2 + fc**2))
+
+
+def distance_calibration(D=0.46, radius=1000, viscosity=8.93e-10, T=25):
+    """Distance calibration factor (beta) in units of [V/nm]
+
+    Args:
+        D (float): diffusion constant in units of [V]
+        radius (float): radius of the bead in units of [nm]
+        viscosity (float): viscosity of the solution in units of [pN/nm^2s]
+        T (float): temperature in units of [ºC]
+
+    Returns:
+        beta (float): distance calibration factor in units of [V/nm]
+    """
+
+    beta = 1/np.sqrt(thermal_energy(as_Kelvin(T))/(dg_sph(radius, viscosity)*D))
 
     return beta
 
 
-def trap_stiffness(fc):
+def trap_stiffness(fc=500, radius=1000, viscosity=8.93e-10):
     """Trap stiffness in units of [pN/nm]
 
-    Parameters
-    ----------
-    fc : float
-        corner frequency in units of [Hz]
+    Args:
+        fc (float): corner frequency in units of [Hz]
+        radius (float): radius of the bead in units of [nm]
+        viscosity (float): viscosity of the solution in units of [pN/nm^2s]
 
-    Returns
-    -------
-    kappa : float
-        trap stiffness in units of [pN/nm]
+    Returns:
+        kappa (float): trap stiffness in units of [pN/nm]
     """
 
-    kappa=2*math.pi*fc*drag_coef
+    kappa = 2*math.pi*fc*dg_sph(radius, viscosity)
 
     return kappa
 
 
-def force_calibration(beta,kappa):
+def force_calibration(beta, kappa):
     """force calibration factor in units of [pN/V]
 
-    Parameters
-    ----------
-    beta : float
-        distance calibration factor in units of [V/nm]
+    Args:
+        beta (float): distance calibration factor in units of [V/nm]
+        kappa (float): trap stiffness in units of [pN/nm]
 
-    kappa : float
-        trap stiffness in units of [pN/nm]
-
-    Returns
-    -------
-    alpha : float
-        force calibration factor in units of [pN/V]
+    Returns:
+        alpha (float): force calibration factor in units of [pN/V]
     """
 
-    alpha=kappa/beta
+    alpha = kappa/beta
 
     return alpha
 
 
-def fitting(psd,f,limit=None):
-    """Fits the power spectrum distribution function to the lorentz_fit curve. Limit refers to
-    the maximum frequency considered for the fit
+def mle_factors(f, P):
+    """
+    Calculation of the S coefficients related to the MLE, according to the paper of Norrelike
 
-    Parameters
-    ----------
-    psd : list
-        Power spectrum distribution values from the function matplotlib.psd in units of [Hz^-1]
+    Args:
+        f (np.array): Frequency in [Hz]
+        P (np.array): Experimental PSD function in [V^2]
 
-    f : list
-        Frequency in units of (Hz)
+    Returns:
+        s (list of float): matrix with the S coefficients
+    """
+    s01 = 1/(len(f)) * np.sum(P)
+    s02 = 1/(len(f)) * np.sum(np.power(P, 2))
+    s11 = 1/(len(f)) * np.sum(np.multiply(np.power(f, 2), P))
+    s12 = 1/(len(f)) * np.sum(np.multiply(np.power(f, 2), np.power(P, 2)))
+    s22 = 1/(len(f)) * np.sum(np.multiply(np.power(f, 4), np.power(P, 2)))
+    s = [[0, s01, s02], [0, s11, s12], [0, s12, s22]]
 
-    limit : float
-        maximum frequency to perform the fitting
-        Default: None
+    return s
 
-    Returns
-    -------
 
-        results : list
-            Parameters of the fitting --> result[0]=D [V], result[1]=fc [Hz]
+def mle_ab(s, n):
+    """
+    Calculation of the pre-parameters a and b, according to the paper of Norrelike
 
-        error: list
-            Contains the variances (errors of the parameters in the diagonal)
+    Args:
+        s (list of float): matrix with the S coefficients
+        n (float): number of averaged power spectra (total data points divided by the block length)
+
+    Returns:
+        a, b (float): pre-parameters for the calculation of D and fc
     """
 
-    result, error = curve_fit(lorentz_fit, f[2:len(psd)*limit], psd[2:len(psd)*limit])
+    a = ((1+1/n)/(s[0][2]*s[2][2]-s[1][2]*s[1][2])) * (s[0][1]*s[2][2]-s[1][1]*s[1][2])
+    b = ((1+1/n)/(s[0][2]*s[2][2]-s[1][2]*s[1][2])) * (s[1][1]*s[0][2]-s[0][1]*s[1][2])
+    return a, b
 
-    return result, error
 
+def mle_parameters(a, b, n):
+    """Calculate parameters from the factors of the MLE
 
-def show_fit(psd, f, result):
-    """
-    Plots the PSD and the fit
+    Args:
+        a, b (float): pre-parameters for the calculation of D and fc
+        n (float): number of averaged power spectra (total data points divided by the block length)
 
-    Parameters
-    ----------
-    psd : list of float
-        PSD values
+    Returns:
+        D (float): diffusion constant in units of [V]
+        fc (float): corner frequency in units of [Hz]
 
-    f : list of float
-        Frequency values
-
-    result : list of float
-        Parameters obtained from the Lorentzian fit
     """
 
-    y = lorentz_fit(f, result[0], result[1])
+    if a*b > 0:
+        fc = math.sqrt(a/b)
+    else:
+        fc = 0
+    D = (n * (math.pi)**2/(n+1)) / b
 
-    plt.plot(f[2:], psd[2:])
-    plt.plot(f[2:len(psd)*0.5], y[2:len(psd)*0.5])
-    plt.yscale('log')
-    plt.xscale('log')
-    plt.show()
+    return D, fc
 
 
-def factors_from_data(data, limit=0.5, plot=False):
-    """Calculates the Power Spectrum Density function of data, fits it to a Lorentzian and
-    returns the distance calibration factor [V/pN], the trap stiffness [pN/nm] and
-    the force calibration factor [pN/V]
+def mle_errors(f, D, fc, a, b, n):
+    """Function to get the standard deviation of the parameters according to the paper of Norrelyke
 
-    Parameters
-    ----------
-    data : np.array
-        Data from the time series file
+    Args:
+        f (np.array): array of the frequencies in units of [Hz]
+        D (float): diffusion constant in units of [V]
+        fc (float): corner frequency in units of [Hz]
+        a, b (float): pre-parameters for the calculation of D and fc
+        n (float): number of averaged power spectra (total data points divided by the block length)
 
-    limit : float
-        Sets the maximum frequency to be considered in the fit
-        Default: 0.5 (to remove the tail)
+    Returns:
+        errosMle (np.array): with sigma(D) and sigma(fc)
+    """
+    y = lorentzian(f, D, fc)
+    s = mle_factors(f, y)
+    sB = [[(n+1)/n*s[0][2], (n+1)/n*s[1][2]], [(n+1)/n*s[1][2], (n+1)/n*s[2][2]]]
+    sError = 1/(len(f)*n)*(n+3)/n*np.linalg.inv(sB)
 
-    plot : bool
-        When True, it plots the PSD and the fit
-        Default: False
+    sigmaFc = fc**2/4 * (sError[0][0]/a**2+sError[1][1]/b**2-2*sError[0][1]/(a*b))
+    sigmaD = D**2*(sError[1][1]/b**2)
+    errorsMle = [np.sqrt(sigmaD), np.sqrt(sigmaFc)]
 
-    Returns
-    -------
-    beta, kappa, alpha : float
-        Distance calibration factor [V/nm], trap stiffness [pN/nm] and force calibration factor [pN/V]
+    return errorsMle
+
+
+def mle_calibration(f, psd, n):
+    """Calculates the diffusion constant in units of [V] and the corner frequency in units of [Hz] from the PSD,
+    following the linear approximation of Norrelyke paper
+
+    Args:
+        f (pandas.DataFrame): frequency in units of [Hz]
+        psd (pandas.DataFrame): PSD in units of [V^2]
+        n (float): number of averaged power spectra (total data points divided by the block length)
+
+    Returns:
+        D (float): diffusion constant in units of [V]
+        fc (float): corner frequency in units of [Hz]
+        errors (list of float): standard deviation of D and fc
+        chiSqr (float): average of the squared residues (test of chi^2)
     """
 
-    psd, f = plt.psd(data, NFFT=block, Fs=samplingRate, noverlap=overlap, scale_by_freq=True)
-    result, error = fitting(psd, f, limit)
+    s = mle_factors(f, psd)
+    a, b = mle_ab(s, n)
+    D, fc = mle_parameters(a, b, n)
 
+    errors = mle_errors(f, D, fc, a, b, n)
+    chiSqr = residuals(f, psd, D, fc)
+
+    return D, fc, errors, chiSqr
+
+
+def residuals(f, psdExp, D, fc):
+    """Performs a chi^2 test with the average of the residuals squared to test the best fitting limits
+
+    Args:
+        f (np.array): array of the frequencies in units of [Hz]
+        psdExp (np.array): array of the experimental values of the PSD in units of [V^2]
+        D (float): diffusion constant in units of [V]
+        fc (float): corner frequency in units of [Hz]
+    Returns:
+        np.mean(res) (float): the mean of the residuals squared
+    """
+
+    psdTheo = lorentzian(f, D, fc)
+    res = [(exp-theo)**2 for exp, theo in zip(psdExp, psdTheo)]
+
+    return np.mean(res)
+
+
+def single_calibration(psd, limit, n, plot=False):
+    """Calculates the Power Spectrum Density function of data, fits it with Maximum Likelihood Method (according to
+    the reference given), and calculates the Diffusion constant [V] and the corner frequency [Hz]
+
+    Args:
+        psd (pandas.DataFrame): frequency in [Hz] and power spectrum density in [V^2]
+        limit (int): sets the maximum frequency to be considered in the fit
+        n (float): number of averaged power spectra (total data points divided by the block length)
+        plot (bool): when True, it plots the PSD and the fit (Default: False)
+
+    Returns:
+        D (float): diffusion constant in units of V
+        fc (float): corner frequency in units of Hz
+        errors (list of float): standard deviation of the parameters
+        chiSqr (float): average of the squared residues (test of chi^2)
+
+    """
+
+    #eliminate the points out of the limit range
+    fLim = psd["f"][:int(limit)]
+    pLim = psd["PSD"][:int(limit)]
+
+    #calculate parameters from data
+    D, fc, errors, chiSqr = mle_calibration(fLim, pLim, n)
+
+    #plot data and fit
     if plot == True:
-        show_fit(psd, f, result)
 
-    beta = distance_calibration(result[0])
-    kappa = trap_stiffness(result[1])
-    alpha = force_calibration(beta, kappa)
+        y = [lorentzian(x, D, fc) for x in fLim]
+        plt.plot(psd["f"], psd["PSD"])
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('PSD (V^2)')
 
-    return beta, kappa, alpha
+        plt.plot(fLim, y, color='orange', label='Maximum likelihood by S factors')
 
+        plt.yscale('log')
+        plt.xscale('log')
+        plt.show()
 
-def calibrate_file(file, limit=0.5, plot=False):
-    """
-    Obtain the distance calibration factor [V/nm], the trap stiffness [pN/nm] and the force calibration factor [pN/V]
-    values for a file after fitting the PSD function
-
-    Parameters
-    ----------
-    file : str
-        Path to the file containing the time series data
-
-    limit : float
-        Sets the maximum frequency to be considered in the fit
-        Default: 0.5 (to remove the tail)
-
-    plot : bool
-        When True, it plots the PSD and the fit
-        Default: False
-
-    Returns
-    -------
-    betaV, kappaV, alphaV : lists of lists of float
-        beta, kappa and alpha values (respectively) of each trap and component (T1X, T1Y, T2X, T2Y)
-    """
-
-    #Lists with the beta, kappa and alpha values from each file
-    betaV = []
-    kappaV = []
-    alphaV = []
-
-    data = read_files(file)
-
-    for column in data:
-
-        beta, kappa, alpha = factors_from_data(column, limit, plot)
-        betaV.append(beta)
-        kappaV.append(kappa)
-        alphaV.append(alpha)
-
-    print(betaV, kappaV, alphaV)
-    return betaV, kappaV, alphaV
+    return D, fc, errors, chiSqr
 
 
-def calibrate_directory(directory=os.path.dirname(os.path.realpath(__file__)), pattern='TS*.txt', limit=0.5, plot=False):
-    """
-    Obtain the beta, kappa and alpha values for TS files in a directory after fitting the psd
+def calibration_psd(psd, blockLength=2**14, TSLength=2**19, overlap=0, plot=False):
+    """Performs the fitting of a PSD with different limits and chooses the
+    one with least deviation (minimum mean residuals squared)
 
-    Parameters
-    ----------
-    directory : str
-        Path to the directory with the files (excluding the file)
-        Default: directory where the script is running
-    pattern : str
-        Defines the filter to open the files of the directory
-        Default: all time series .txt files of the directory
+    Args:
+        psd (pandas.DataFrame): PSD data
+        blockLength (float): length of each block of the time series taken for calculating the psd
+        TSLength (float): total number of data points in the time series
+        overlap (float): number of points for overlapping blocks
+        plot (bool): if True, the fittings are plotted. Default: False
 
-    limit : float
-        Sets the maximum frequency to be considered in the fit
-        Default: 0.5 (to remove the tail)
+    Returns:
+        D (list of float): diffusion coefficients in units of [v]
+        fc (list of float): corner frequencies in units fo [Hz]
+        sigma (list of lists of float): standard deviations of the parameters
 
-    plot : bool
-        When True, it plots the PSD and the fit
-        Default: False
-
-    Returns
-    -------
-    betaV, kappaV, alphaV : lists of float
-        beta, kappa and alpha values (respectively) of each trap and component, and of each file
-        Format: [[file1_T1X, file1_T1Y, file1_T2X, file1_T2Y],
-        ..., [fileN_T1X, fileN_T1Y, fileN_T2X, fileN_T2Y]]
     """
 
-    #Lists with the beta, kappa and alpha values from each file
-    betaV = []
-    kappaV = []
-    alphaV = []
+    #maxThreshold controls the maximum value for the limit as (minimum_value_of_PSD)*maxThreshold.
+    # 1 takes the whole spectrum
+    maxThreshold = 30
+    #set the first step as the fraction (points_in_limits_range)/stepInitial
+    stepInitial = 5
+    #set the precision criteria (in %) required to stop the iteration
+    precision = 5
 
-    files = get_files(directory, pattern)
-    print(files)
-
-    for file in files:
-
-        beta, kappa, alpha = calibrate_file(directory+'/'+file, limit, plot)
-
-        betaV.append(beta)
-        kappaV.append(kappa)
-        alphaV.append(alpha)
-
-    print(betaV, kappaV, alphaV)
-    return betaV, kappaV, alphaV
+    #calculate the number of averaged spectra (nBlocks)
+    if overlap == 0:
+        nBlocks = TSLength/blockLength
+    else:
+        nBlocks = TSLength/blockLength*overlap
 
 
-#TODO: check the optimal limit value
+    #Maximum value considered in the fit
+    limMax = next(a[0] for a in enumerate(psd["PSD"]) if a[1] < min(psd["PSD"])*maxThreshold)
 
+    #starting limit is the maximum limit
+    limits = limMax
+    #the first step is taken in the negative direction
+    step = -limMax//stepInitial
+
+    D, fc, sigma, chiSqr = single_calibration(psd, limit=limits, n=nBlocks)
+    D, fc, sigma, chiSqrNext = single_calibration(psd, limit=limits+step, n=nBlocks)
+
+    while abs((chiSqr-chiSqrNext)/chiSqr)*100 > precision:
+
+        chiSqrNext = chiSqr
+        D, fc, sigma, chiSqr = single_calibration(psd, limit=limits+step, n=nBlocks)
+
+        #iteration algorithm: after a step is made, if the fit is better (chiSqr is smaller) a new, smaller step in the
+        #same direction is made ONLY if it will not go out of the maximum limit.
+        #If some of the conditions fail, the step is made in the opposite direction
+        if chiSqr < chiSqrNext and limits <= limMax and limits+step <= limMax:
+            step = step//1.2
+        else:
+            step = -step//1.25
+
+        limits = limits + step
+
+    #evaluate the final result in case the user wants to plot
+    D, fc, sigma, chiSqr = single_calibration(psd, limits, nBlocks, plot)
+
+    return D, fc, sigma
+
+
+def calibration_time_series(data, blockLength=2**14, sFreq=80000, overlap=0, plot=False):
+    """Performs the fitting with different limits from the time series data
+    
+    Args:
+        data (np.array): data read from the file
+        blockLength (float): length of each block of the time series taken for calculating the psd
+        sFreq (float): sample frequency in units of [Hz]
+        overlap (float): number of points for overlapping blocks
+        plot (bool): if True, the fittings are plotted. Default: False
+        
+    Returns:
+        D (list of float): diffusion coefficients in units of [v]
+        fc (list of float): corner frequencies in units fo [Hz]
+        sigma (list of lists of float): standard deviations of the parameters
+    
+    """
+
+    #calculation of the power spectrum density function with the Welch algorithm
+    fRaw, psdRaw = welch(data, nperseg=blockLength, fs=sFreq, noverlap=overlap)
+    #set format to pandas
+    psd = pd.DataFrame({"PSD": psdRaw, "f": fRaw})
+
+    D, fc, sigma = calibration_psd(psd, blockLength, len(data), overlap, plot)
+
+    return D, fc, sigma
+
+
+def calibration(file, headerLines=7, columns=[1, 3], type="pandas", viscosity=8.93e-10, radii=[1000, 1000], blockLength=2**14, sFreq=80000, overlap=0, plot=False):
+    """Perform the thermal calibration from a time series file
+
+    Args:
+        file (str): name of the file containing the data
+        headerLines (int): number of lines of the header (Default: 7)
+        columns (list of int): index of the columns to be read (Default: [1,3] for Y direction PM and AOD)
+        type (str): returns the data in pandas or numpy (Default: "pandas")
+        viscosity (float): viscosity of the solution in units of [pN/nm^2s] (Default: 8.93e-10, pure water at 25 ºC)
+        radii (list of float): radius of the bead in units of [nm] (Default: [1000, 1000] nm)
+        blockLength (float): length of each block of the time series taken for calculating the psd (Default: 2^14)
+        sFreq (float): sample frequency in units of [Hz] (Default: 80000 Hz)
+        overlap (float): number of points for overlapping blocks (Default: 0)
+        plot (bool): if True, the fittings are plotted. (Default: False)
+    Returns:
+
+    fit (tuple): contains the interest parameters from the fit: D, fc, distance calibration factors and stifnesses
+    """
+    Ds = []
+    fcs = []
+    sigmas = []
+
+    data = read_time_series(file,headerLines,columns,type)
+
+    for i, column in data.iteritems():
+        D, fc, sigma = calibration_time_series(column, blockLength, sFreq, overlap, plot)
+        Ds.append(D)
+        fcs.append(fc)
+        sigmas.append(sigma)
+
+    beta = [distance_calibration(d, r, viscosity) for d, r in zip(Ds, radii)]
+    kappa = [trap_stiffness(fcc, r, viscosity) for fcc, r in zip(fcs, radii)]
+
+    Fit = namedtuple("Fit", ["D", "fc", "beta", "kappa"])
+    fit = Fit(Ds, fcs, beta, kappa)
+    return fit

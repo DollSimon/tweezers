@@ -112,7 +112,7 @@ MODULES = ['tweezer.io',
            'tweezer.single.calibration',
            'tweezer.single.theory',
            'tweezer.single.utils',
-           'tweezer.single.thermal_calibration',
+           'tweezer.single.thermal_calibration_MLE',
            # statistics module
            'tweezer.statistics.wlc_models',
            # rnap (theory and models of transcription) modules
