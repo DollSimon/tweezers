@@ -22,17 +22,20 @@ units = Units('g/cm^3')
 
 # Glasses ----
 # BK7 - borosilicate crown glass
-_SellmeierBK7 = SellmeierCoefficients(1.03961212,  0.231792344,  1.01046945,  0,
-                                      6.00069867E-3,  2.00179144E-2,  1.03560653E2,  0)
+_SellmeierBK7 = SellmeierCoefficients(1.03961212, 0.231792344, 1.01046945, 0,
+                                      6.00069867E-3, 2.00179144E-2, 1.03560653E2, 0)
 
 _IndexOfRefractionBK7At1064 = dispersion(1.064, _SellmeierBK7)
 
 BK7 = MaterialDescription(_IndexOfRefractionBK7At1064, 1.05E-21, _SellmeierBK7)
 
 # Silica, Silicon dioxide, quartz
-_N_AT_1064 = 1.5341
+_SellmeierSilica = SellmeierCoefficients(0.28604141, 1.07044083, 1.10202242, 0,
+                                         0, 1.00585997e-2, 100, 0)
 
-Silica = MaterialDescription(_N_AT_1064, 3, SellmeierCoefficients(1, 2, 3, 0, 4, 5, 6, 0))
+_IndexOfRefractionSilicaAt1064 = dispersion(1.064, _SellmeierSilica)
+
+Silica = MaterialDescription(_IndexOfRefractionSilicaAt1064, 3, _SellmeierSilica)
 
 # Polymer materials ----
 # Polystyrene

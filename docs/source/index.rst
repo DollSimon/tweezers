@@ -4,12 +4,12 @@
    contain the root `toctree` directive.
 
 The Tweezer Code Docs!
-===================================
+======================
 
 Tools to analyse data of dual-trap optical tweezer experiments. 
 
 Aim
-====
+===
 
 A user of this code base should be able to:
 
@@ -40,6 +40,7 @@ Overview
     tweezer.db
     tweezer.dual
     tweezer.ixo
+    tweezer.lux
     tweezer.math
     tweezer.noise
     tweezer.physics
