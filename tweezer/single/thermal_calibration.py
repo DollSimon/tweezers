@@ -233,6 +233,27 @@ def residuals(f, psdExp, D, fc):
     return np.mean(res)
 
 
+def calculate_psd(data, blockLength=2**14, sFreq=80000, overlap=0):
+    """Calculates the power spectral density of the data and sets the proper pandas format
+
+    Args:
+        data (pandas.DataFrame): data read from the file
+        blockLength (float): length of each block of the time series taken for calculating the psd
+        sFreq (float): sample frequency in units of [Hz]
+        overlap (float): number of points for overlapping blocks
+
+    Returns:
+        psd (pandas.DataFrame): power spectrum density of the data
+    """
+
+    fRaw, psdRaw = welch(data, nperseg=blockLength, fs=sFreq, noverlap=overlap)
+
+    #set format to pandas
+    psd = pd.DataFrame({"PSD": psdRaw, "f": fRaw})
+
+    return psd
+
+
 def single_calibration(psd, limit, n, plot=False):
     """Calculates the Power Spectrum Density function of data, fits it with Maximum Likelihood Method (according to
     the reference given), and calculates the Diffusion constant [V] and the corner frequency [Hz]
@@ -275,27 +296,31 @@ def single_calibration(psd, limit, n, plot=False):
     return D, fc, errors, chiSqr
 
 
-def calibration_psd(psd, blockLength=2**14, TSLength=2**19, overlap=0, plot=False):
+def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**14, TSLength=2**19, overlap=0, maxLim=30, plot=False):
     """Performs the fitting of a PSD with different limits and chooses the
     one with least deviation (minimum mean residuals squared)
 
     Args:
         psd (pandas.DataFrame): PSD data
+        viscosity (float): viscosity of the solution in units of [pN/nm^2s] (Default: 8.93e-10, pure water at 25 ºC)
+        T (float): temperature in ºC
+        radii (list of float): radius of the bead in units of [nm] (Default: [1000, 1000] nm)
         blockLength (float): length of each block of the time series taken for calculating the psd
         TSLength (float): total number of data points in the time series
         overlap (float): number of points for overlapping blocks
+        maxLim (float): the minimum value of the psd multiplied by maxLim gives the maximum value considered for the fit
         plot (bool): if True, the fittings are plotted. Default: False
 
     Returns:
-        D (list of float): diffusion coefficients in units of [v]
-        fc (list of float): corner frequencies in units fo [Hz]
-        sigma (list of lists of float): standard deviations of the parameters
+        fitPsd (named tuple): values of the fit: diffusion constant (D), corner frequency (fc), \
+        errors of D and fc (sigma), distance calibration factor (beta), trap stiffness (kappa), \
+        error of beta (eBeta), error of kappa (eKappa) and limits of the fit (limits)
 
     """
 
     #maxThreshold controls the maximum value for the limit as (minimum_value_of_PSD)*maxThreshold.
     # 1 takes the whole spectrum
-    maxThreshold = 30
+    maxThreshold = maxLim
     #set the first step as the fraction (points_in_limits_range)/stepInitial
     stepInitial = 5
     #set the precision criteria (in %) required to stop the iteration
@@ -337,37 +362,48 @@ def calibration_psd(psd, blockLength=2**14, TSLength=2**19, overlap=0, plot=Fals
     #evaluate the final result in case the user wants to plot
     D, fc, sigma, chiSqr = single_calibration(psd, limits, nBlocks, plot)
 
-    return D, fc, sigma
+    beta = distance_calibration(D, radius, viscosity, T)
+    kappa = trap_stiffness(fc, radius, viscosity)
+    eBeta = (sigma[0]/D)*beta
+    eKappa=(sigma[1]/fc)*kappa
+
+    Fit = namedtuple("Fit", ["D", "fc", "sigma", "beta", "kappa", "eBeta", "eKappa", "limits"])
+    fitPsd = Fit(D, fc, sigma, beta, kappa, eBeta, eKappa, limits)
+    return fitPsd
 
 
-def calibration_time_series(data, blockLength=2**14, sFreq=80000, overlap=0, plot=False):
+def calibration_time_series(data, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**14, sFreq=80000, overlap=0, maxLim=30, plot=False):
     """Performs the fitting with different limits from the time series data
-    
+
     Args:
-        data (np.array): data read from the file
+        data (pandas.DataFrame): data read from the file
+        viscosity (float): viscosity of the solution in units of [pN/nm^2s] (Default: 8.93e-10, pure water at 25 ºC)
+        T (float): temperature in ºC
+        radii (list of float): radius of the bead in units of [nm] (Default: [1000, 1000] nm)
         blockLength (float): length of each block of the time series taken for calculating the psd
         sFreq (float): sample frequency in units of [Hz]
         overlap (float): number of points for overlapping blocks
+        maxLim (float): the minimum value of the psd multiplied by maxLim gives the maximum value considered for the fit
         plot (bool): if True, the fittings are plotted. Default: False
-        
+
     Returns:
-        D (list of float): diffusion coefficients in units of [v]
-        fc (list of float): corner frequencies in units fo [Hz]
-        sigma (list of lists of float): standard deviations of the parameters
-    
+        fitPsd (named tuple): values of the fit: diffusion constant (D), corner frequency (fc), \
+        errors of D and fc (sigma), distance calibration factor (beta), trap stiffness (kappa), \
+        error of beta (eBeta), error of kappa (eKappa) and limits of the fit (limits)
+
     """
 
     #calculation of the power spectrum density function with the Welch algorithm
-    fRaw, psdRaw = welch(data, nperseg=blockLength, fs=sFreq, noverlap=overlap)
-    #set format to pandas
-    psd = pd.DataFrame({"PSD": psdRaw, "f": fRaw})
-
-    D, fc, sigma = calibration_psd(psd, blockLength, len(data), overlap, plot)
-
-    return D, fc, sigma
+    psd = calculate_psd(data, blockLength, sFreq,overlap)
 
 
-def calibration(file, headerLines=7, columns=[1, 3], type="pandas", viscosity=8.93e-10, radii=[1000, 1000], blockLength=2**14, sFreq=80000, overlap=0, plot=False):
+    fit = calibration_psd(psd, viscosity, T, radius, blockLength, len(data), overlap, maxLim, plot)
+
+    return fit
+
+
+
+def calibration_file(file, headerLines=7, columns=[1, 3], type="pandas", viscosity=8.93e-10, T=25, radii=[1000, 1000], blockLength=2**14, sFreq=80000, overlap=0, maxLim=30, plot=False):
     """Perform the thermal calibration from a time series file
 
     Args:
@@ -376,30 +412,50 @@ def calibration(file, headerLines=7, columns=[1, 3], type="pandas", viscosity=8.
         columns (list of int): index of the columns to be read (Default: [1,3] for Y direction PM and AOD)
         type (str): returns the data in pandas or numpy (Default: "pandas")
         viscosity (float): viscosity of the solution in units of [pN/nm^2s] (Default: 8.93e-10, pure water at 25 ºC)
+        T (float): temperature in ºC
         radii (list of float): radius of the bead in units of [nm] (Default: [1000, 1000] nm)
         blockLength (float): length of each block of the time series taken for calculating the psd (Default: 2^14)
         sFreq (float): sample frequency in units of [Hz] (Default: 80000 Hz)
         overlap (float): number of points for overlapping blocks (Default: 0)
+        maxLim (float): the minimum value of the psd multiplied by maxLim gives the maximum value considered for the fit
         plot (bool): if True, the fittings are plotted. (Default: False)
+
     Returns:
-
-    fit (tuple): contains the interest parameters from the fit: D, fc, distance calibration factors and stifnesses
+        fitPsd (named tuple): values of the fit: diffusion constant (D), corner frequency (fc), \
+        errors of D and fc (sigma), distance calibration factor (beta), trap stiffness (kappa), \
+        error of beta (eBeta), error of kappa (eKappa) and limits of the fit (limits)
     """
-    Ds = []
-    fcs = []
-    sigmas = []
 
-    data = read_time_series(file,headerLines,columns,type)
+    #define arrays to store the fittting values
+    D = []
+    fc = []
+    sigma = []
+    beta =[]
+    kappa = []
+    eBeta = []
+    eKappa = []
+    limit = []
 
+    #read data from file
+    data = read_time_series(file)
+
+    #Set the radius to be used
     for i, column in data.iteritems():
-        D, fc, sigma = calibration_time_series(column, blockLength, sFreq, overlap, plot)
-        Ds.append(D)
-        fcs.append(fc)
-        sigmas.append(sigma)
+        if i == "PM":
+            rIndex = 0
+        else:
+            rIndex = 1
 
-    beta = [distance_calibration(d, r, viscosity) for d, r in zip(Ds, radii)]
-    kappa = [trap_stiffness(fcc, r, viscosity) for fcc, r in zip(fcs, radii)]
+        fit = calibration_time_series(column, viscosity, T, radii[rIndex], blockLength, sFreq, overlap, maxLim, plot)
+        D.append(fit.D)
+        fc.append(fit.fc)
+        sigma.append(fit.sigma)
+        beta.append(fit.beta)
+        kappa.append(fit.kappa)
+        eBeta.append(fit.eBeta)
+        eKappa.append(fit.eKappa)
+        limit.append(fit.limits)
 
-    Fit = namedtuple("Fit", ["D", "fc", "beta", "kappa"])
-    fit = Fit(Ds, fcs, beta, kappa)
+    Fit = namedtuple("Fit", ["D", "fc", "sigma", "beta", "kappa",  "errorBeta", "errorKappa", "limits"])
+    fit = Fit(D, fc, sigma, beta, kappa, eBeta, eKappa, limit)
     return fit
