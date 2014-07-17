@@ -28,7 +28,10 @@ def read_time_series(file, headerLines=7, columns=[1, 3], type="pandas"):
     if type == "pandas":
         data = pd.read_csv(file, usecols=columns, header=headerLines, sep=r"\t+")
         data.dropna(how="all", inplace=True)
-        data.columns = ['PM', 'AOD']
+        if columns == [1, 3]:
+            data.columns = ['pm', 'aod']
+        if columns == [0, 1, 2, 3]:
+            data.columns = ['pmx', 'pmy', 'aodx', 'aody']
 
     elif type == "numpy":
         columnsNumpy = (columns[0], columns[1])
@@ -249,7 +252,7 @@ def calculate_psd(data, blockLength=2**14, sFreq=80000, overlap=0):
     fRaw, psdRaw = welch(data, nperseg=blockLength, fs=sFreq, noverlap=overlap)
 
     #set format to pandas
-    psd = pd.DataFrame({"PSD": psdRaw, "f": fRaw})
+    psd = pd.DataFrame({"psd": psdRaw, "f": fRaw})
 
     return psd
 
@@ -274,7 +277,7 @@ def single_calibration(psd, limit, n, plot=False):
 
     #eliminate the points out of the limit range
     fLim = psd["f"][:int(limit)]
-    pLim = psd["PSD"][:int(limit)]
+    pLim = psd["psd"][:int(limit)]
 
     #calculate parameters from data
     D, fc, errors, chiSqr = mle_calibration(fLim, pLim, n)
@@ -283,7 +286,7 @@ def single_calibration(psd, limit, n, plot=False):
     if plot == True:
 
         y = [lorentzian(x, D, fc) for x in fLim]
-        plt.plot(psd["f"], psd["PSD"])
+        plt.plot(psd["f"], psd["psd"])
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('PSD (V^2)')
 
@@ -334,7 +337,7 @@ def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**1
 
 
     #Maximum value considered in the fit
-    limMax = next(a[0] for a in enumerate(psd["PSD"]) if a[1] < min(psd["PSD"])*maxThreshold)
+    limMax = next(a[0] for a in enumerate(psd["psd"]) if a[1] < min(psd["psd"])*maxThreshold)
 
     #starting limit is the maximum limit
     limits = limMax
@@ -366,6 +369,7 @@ def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**1
     kappa = trap_stiffness(fc, radius, viscosity)
     eBeta = (sigma[0]/D)*beta
     eKappa=(sigma[1]/fc)*kappa
+
 
     Fit = namedtuple("Fit", ["D", "fc", "sigma", "beta", "kappa", "eBeta", "eKappa", "limits"])
     fitPsd = Fit(D, fc, sigma, beta, kappa, eBeta, eKappa, limits)
@@ -437,25 +441,50 @@ def calibration_file(file, headerLines=7, columns=[1, 3], type="pandas", viscosi
     limit = []
 
     #read data from file
-    data = read_time_series(file)
+    data = read_time_series(file, headerLines, columns, type)
 
     #Set the radius to be used
     for i, column in data.iteritems():
-        if i == "PM":
+        if "pm" in i:
             rIndex = 0
         else:
             rIndex = 1
 
-        fit = calibration_time_series(column, viscosity, T, radii[rIndex], blockLength, sFreq, overlap, maxLim, plot)
-        D.append(fit.D)
-        fc.append(fit.fc)
-        sigma.append(fit.sigma)
-        beta.append(fit.beta)
-        kappa.append(fit.kappa)
-        eBeta.append(fit.eBeta)
-        eKappa.append(fit.eKappa)
-        limit.append(fit.limits)
+        fitTimeSeries = calibration_time_series(column, viscosity, T, radii[rIndex], blockLength, sFreq, overlap, maxLim, plot)
+        D.append(fitTimeSeries.D)
+        fc.append(fitTimeSeries.fc)
+        sigma.append(fitTimeSeries.sigma)
+        beta.append(fitTimeSeries.beta)
+        kappa.append(fitTimeSeries.kappa)
+        eBeta.append(fitTimeSeries.eBeta)
+        eKappa.append(fitTimeSeries.eKappa)
+        limit.append(fitTimeSeries.limits)
 
-    Fit = namedtuple("Fit", ["D", "fc", "sigma", "beta", "kappa",  "errorBeta", "errorKappa", "limits"])
-    fit = Fit(D, fc, sigma, beta, kappa, eBeta, eKappa, limit)
+    if len(columns) is 4:
+        Fit = namedtuple("Fit", ["pm", "aod"])
+        Fitpm = namedtuple("Fitpm", ["x", "y"])
+        Fitaod = namedtuple("Fitaod", ["x", "y"])
+        Fitpmx = namedtuple("Fitpmx", ["D", "fc", "sigma", "beta", "kappa",  "errorBeta", "errorKappa", "limits"])
+        Fitpmy = namedtuple("Fitpmy", ["D", "fc", "sigma", "beta", "kappa",  "errorBeta", "errorKappa", "limits"])
+        Fitaodx = namedtuple("Fitaodx", ["D", "fc", "sigma", "beta", "kappa",  "errorBeta", "errorKappa", "limits"])
+        Fitaody = namedtuple("Fitaodx", ["D", "fc", "sigma", "beta", "kappa",  "errorBeta", "errorKappa", "limits"])
+        fitpmx = Fitpmx(D[0], fc[0], sigma[0], beta[0],
+                       kappa[0], eBeta[0], eKappa[0],
+                       limit[0])
+        fitpmy = Fitpmy(D[1], fc[1], sigma[1],beta[1],
+                kappa[1], eBeta[1], eKappa[1],
+                limit[1])
+        fitaodx = Fitaodx(D[2], fc[2], sigma[2], beta[2],
+                        kappa[2], eBeta[2], eKappa[2],
+                        limit[2])
+        fitaody = Fitaody(D[3], fc[3], sigma[3], beta[3],
+                kappa[3], eBeta[3], eKappa[3],
+                limit[3])
+
+        fitpm = Fitpm(fitpmx, fitpmy)
+        fitaod = Fitpm(fitaodx, fitaody)
+
+
+    fit = Fit(fitpm, fitaod)
+
     return fit
