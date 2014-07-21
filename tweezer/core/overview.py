@@ -6,7 +6,6 @@ Routines related to producing experimental overview files
 """
 import os
 
-from clint import args
 from clint.textui import colored, puts, indent
 
 

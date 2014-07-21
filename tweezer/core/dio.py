@@ -5,7 +5,6 @@ Classes and Functions used for handling various data input and output tasks.
 """
 
 import re
-import sure
 
 
 class DataReader(object):
