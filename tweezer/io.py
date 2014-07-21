@@ -1,5 +1,5 @@
 """
-Input/Output routines for the tweezer package.
+Input/output routines for the tweezer package.
 
 Performs file reads and data conversion.
 """
@@ -11,7 +11,6 @@ import numpy as np
 import pandas as pd
 from pandas.core.datetools import Micro
 
-import envoy
 from nptdms import TdmsFile
 
 from tweezer.bot.utils import simplify_tweebot_data_names
@@ -28,45 +27,48 @@ def read_tweezer_txt(fileName):
     """
     Reads dual-trap data and metadata contained in text files.
 
-    :param str fileName: the full path to the data file to read
-    :returns: (:class:`pandas.DataFrame`) experiment data
+    Args:
+        fileName (str): the full path to the data file to read
+
+    Returns:
+        (:class:`pandas.DataFrame`) experiment data
     """
 
-    # check file sanity and correct it if necessary
-    shell_call = envoy.run('tail -n 12 {}'.format(fileName), timeout=5)
-    if shell_call.status_code is 0:
-        tail = shell_call.std_out.split("\n")
-    else:
-        raise IOError("The file {} does not exist".format(fileName))
+    try:
+        # extract headers and get file information
+        with open('54_short.txt', 'r') as f:
+            commentLines = []
+            nonDataLines = []
+            nLine = 0
+            # use a generator to avoid strip each line upon reading
+            lines = (line.strip() for line in f)
+            for line in lines:
+                # check for empty and non data lines
+                if not line or not line.startswith(tuple('-0123456789')):
+                    nonDataLines.append(nLine)
+                    # check for config line
+                    if line.startswith('#'):
+                        commentLines.append(line.strip('# '))
+                    # check for column titles
+                    elif line and line[0].isalpha():
+                        columnPrecursor = [col.strip() for col in line.split('\t')]
+                nLine += 1
+    # catch file not found error
+    except OSError:
+        print("Could not read input file: {}".format(fileName))
+        raise
 
-    if any([l.strip().startswith("#") for l in tail]):
-        isFileSane = False
-    else:
-        isFileSane = True
+    # parse comment lines
+    commentInfo = extract_meta_and_units(commentLines)
 
-    with open(fileName, 'r', encoding='utf-8') as f:
-        fl = []
-        for i in range(60):
-            fl.append(f.readline())
-
-    # parsing header information
-    headerComments = [line.strip().strip("# ") for line in fl[0:40] if line.strip().startswith('#')]
-    tailComments = [line.strip().strip("# ") for line in tail[-10:] if line.strip().startswith('#')]
-    comments = headerComments + tailComments
-
-    CommentInfo = extract_meta_and_units(comments)
-
-    units = CommentInfo.units
-    meta = CommentInfo.metadata
+    units = commentInfo.units
+    meta = commentInfo.metadata
 
     meta['originalFile'] = fileName
-    meta['isFileSane'] = isFileSane
+    # this check might not be reliable enough
+    meta['isFileSane'] = not nLine-1 == nonDataLines[-1]
 
     # getting header and data
-    headerIndices = [ind for ind, line in enumerate(fl[0:45]) if re.match(r'^[a-zA-Z]', line.strip())][-1]
-    header = fl[headerIndices]
-    columnPrecursor = [col.strip() for col in header.strip().split('\t')]
-
     columns = []
     for c in columnPrecursor:
         if re.search(r'\(([a-zA-Z]+)\)', c):
@@ -76,14 +78,9 @@ def read_tweezer_txt(fileName):
         else:
             columns.append(c)
 
-    firstDataLine = [ind for ind, line in enumerate(fl[0:45]) if re.match(r'^[-0-9]', line.strip())][0]
-
-    if isFileSane:
-        data = pd.read_table(fileName, sep='\t', header=None, skiprows=firstDataLine,
+    # read data into pandas.DataFrame
+    data = pd.read_table(fileName, sep='\t', header=None, skiprows=nonDataLines,
             names=columns, dtype=np.float64)
-    else:
-        data = pd.read_table(fileName, sep='\t', header=None, skiprows=firstDataLine,
-            skipfooter=10, names=columns, dtype=np.float64)
 
     # drop rows with "NaN" values
     data = data.dropna()
@@ -106,14 +103,15 @@ def read_tweebot_data(fileName):
     """
     Reads dual-trap data and metadata from TweeBot datalog files.
 
-    :param str fileName: path to the TweeBot datalog file
+    Args:
+        fileName (str): path to the TweeBot datalog file
 
-    :returns data: (:class:`pandas.DataFrame`) contains recorded data and also meta \
-    data and units as attributes.
+    Returns:
+        data (:class:`pandas.DataFrame`): contains recorded data and also meta data and
+        units as attributes
 
-    .. note::
-
-        Test things like 'data.units' or data.meta to see what's available. Be
+    Note:
+        Test things like 'data.units' or 'data.meta' to see what's available. Be
         aware that :class:`pandas.DataFrame` can mutate when certain actions and
         computations are performed (for example shape changes). It's not clear
         whether the units and meta attributes persist.
@@ -121,17 +119,16 @@ def read_tweebot_data(fileName):
     :returns: * **calibration** (:class:`dict`) -- metadata of the experiment
               * **cal_units** (:class:`dict`) -- lookup Table for units of the calibration data
 
+
     Usage:
 
     >>> data = read_tweebot_txt('27.Datalog.2013.02.17.19.42.09.datalog.txt')
 
-    .. note::
-
+    Note:
         This function so far only works for TweeBot data files in the form of \
         2013
 
-    .. warning::
-
+    Warning:
         Currently this function removes duplicates in the *timeSent* column \
         of the TweeBot datalog files.
 
@@ -205,12 +202,12 @@ def read_thermal_calibration(fileName, frequency=80000):
     """
     Reads time series and calculated power spectra of a thermal calibration.
 
-    :param str fileName: path to the tweezer time series file containing the raw values of the PSD signals
+    Args:
+        fileName (str): path to the tweezer time series file containing the raw values of the PSD signals
+        frequency (int): sampling frequency of time series
 
-    :param int frequency: sampling frequency of time series
-
-    :returns: (:class:`pandas.DataFrame`) raw thermal calibration data with time as index
-
+    Returns:
+        (:class:`pandas.DataFrame`) raw thermal calibration data with time as index
     """
     # get header information
     with open(fileName, 'r', encoding='utf-8') as f:
@@ -263,9 +260,11 @@ def read_tweezer_power_spectrum(fileName):
     Reads data from tweezer power spectrum file. These files are produced by LabView and contain the raw PSDs and the \
     fits used to extract trap calibration results.
 
-    :param str fileName: file path to the tweezer power spectrum file
+    Args:
+        fileName (str): file path to the tweezer power spectrum file
 
-    :returns: (:class:`pandas.DataFrame`) all the raw and fitted data as well as the fit results
+    Returns:
+        (:class:`pandas.DataFrame`) all the raw and fitted data as well as the fit results
     """
     # get header information
     with open(fileName, 'r', encoding='utf-8') as f:
@@ -305,7 +304,8 @@ def read_distance_calibration_data(comments):
     """
     Extract fit and l
 
-    :param input: Description
+    Args:
+        comments (str): Description
     """
     pass
 
@@ -314,12 +314,12 @@ def read_tdms(fileName, frequency=1000):
     """
     Reads data from Labview TDMS file.
 
-    :param str fileName: path to tdms file
+    Args:
+        fileName (str): path to tdms file
+        frequency (int): sampling frequency in Hz (default 1000, i.e. data taken at 1 ms time resolution)
 
-    :param int frequency: sampling frequency in Hz (default 1000, i.e. data taken at 1 ms time resolution)
-
-    :returns: (:class:`pandas.DataFrame`) channels as columns and index based on fileName infos
-
+    Returns:
+        (:class:`pandas.DataFrame`) channels as columns and index based on fileName infos
     """
     info = parse_tweezer_file_name(fileName, parser='bot_tdms')
 
@@ -373,6 +373,9 @@ def read_tdms(fileName, frequency=1000):
 def read_tweebot_stats(fileName):
     """
     Reads data from TweeBot statistic files.
+
+    Args:
+        filenName (str): path to the TweeBot statistic file
     """
     pass
 
@@ -381,9 +384,11 @@ def read_tweebot_logs(fileName):
     """
     Reads data from TweeBot log files.
 
-    :param str fileName: path to Tweebot log file to be parsed
+    Args:
+        fileName (str): path to TweeBot log file to be parsed
 
-    :returns: (:class:`pandas.DataFrame`) logging data
+    Returns:
+        (:class:`pandas.DataFrame`) logging data
     """
     log = pd.read_table(fileName)
     log.columns = ['time', 'kind', 'routine', 'message']
@@ -398,8 +403,10 @@ def read_tracking_data(fileName):
     """
     Reads data from Tweezer Tracking files.
 
-    :param str fileName: path to the tweezer tracking file
-    :returns: (:class:`pandas.DataFrame`) data
+    Args:
+        fileName (str): path to the tweezer tracking file
+    Returns:
+        (:class:`pandas.DataFrame`) data
     """
     data = pd.read_csv(fileName, sep = '\t', dtype=np.float64)
     return data
@@ -409,10 +416,12 @@ def read_tweebot_data_header(datalog_file):
     """
     Extracts the header of a Tweebot data log file as a list
 
-    :param str datalog_file: path to Tweebot datalog file from which the header is extracted
+    Args:
+        datalog_file (str): path to Tweebot datalog file from which the header is extracted
 
-    :returns: (:func:`collections.namedtuple`) info container with fields 'column_names', 'metadata', 'units',
-    and 'headerIndices', 'firstDataLine'
+    Returns:
+        (:func:`collections.namedtuple`) info container with fields 'column_names', 'metadata', 'units',
+        and 'headerIndices', 'firstDataLine'
 
     Usage:
 
@@ -434,10 +443,6 @@ def read_tweebot_data_header(datalog_file):
 
     meta['originalFile'] = datalog_file
 
-    CommentInfo = extract_meta_and_units(comments)
-    meta = CommentInfo.metadata
-    units = CommentInfo.units
-
     # getting header and data
     headerIndices = [ind for ind, line in enumerate(fl[0:45]) if re.match(r'^[a-zA-Z]', line.strip())][-1]
     header = fl[headerIndices]
@@ -457,10 +462,12 @@ def read_tweezer_image_info(fileName, fileType='man_pics'):
     """
     Extracts basic information about an image.
 
-    :param str fileName: path to the image
-    :param str fileType: ? (optional, default 'man_pics')
+    Args:
+        fileName (str): path to the image
+        fileType (str): ? (optional, default 'man_pics')
 
-    :return: description
+    Returns:
+        description (:class:`dict`)
     """
     try:
         im = Image.open(fileName)
@@ -490,11 +497,12 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
     """
     Extracts metadata and units from the comments in raw tweezer data files.
 
-    :param list comment_list: list of strings that hold the raw comment lines
+    Args:
+        comment_list (list): list of strings that hold the raw comment lines
+        file_type (str): identifies the file type for which meta and units are extracted
 
-    :param str file_type: identifies the file type for which meta and units are extracted
-
-    :returns: (:func:`collections.namedtuple`) that holds dictionaries for metadata and units
+    Returns:
+        (:func:`collections.namedtuple`) that holds dictionaries for metadata and units
     """
     units = {}
     meta = {}
@@ -1134,11 +1142,10 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
                     var, unit, value = parts[0].split(".")[0], parts[0].split(".")[1], float(parts[1])
                 else:
                     var, unit, value = parts[0], None, float(parts[1])
+                units[var] = unit
+                meta[var] = value
             except:
-                print()
-
-            units[var] = unit
-            meta[var] = value
+                print('Could not find units for line: ' + line)
 
     # parsing the date
     if dateString and time_string:
@@ -1168,8 +1175,8 @@ def standardized_name_of(variable):
     """
     Maps various variable names onto a common pattern.
 
-    :param str variable: str input variable
-
+    Args:
+        variable (str): str input variable
     """
     variable_mapper = {
         # general stuff
@@ -1355,8 +1362,8 @@ def standardized_unit_of(variable):
     """
     Maps various variable names onto their unit.
 
-    :param str variable: str input variable
-
+    Args:
+        variable (str): str input variable
     """
     variable_mapper = {
         # general stuff
@@ -1518,4 +1525,7 @@ def standardized_unit_of(variable):
 
 
 def read_header(fileName):
+    """
+    Not implemented.
+    """
     raise NotImplementedError()
