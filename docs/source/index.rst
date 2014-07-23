@@ -40,6 +40,7 @@ Overview
     tweezer.db
     tweezer.dual
     tweezer.ixo
+    tweezer.learn
     tweezer.lux
     tweezer.math
     tweezer.noise

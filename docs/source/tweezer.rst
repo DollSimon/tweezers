@@ -14,7 +14,8 @@ Subpackages
     tweezer.dia
     tweezer.dual
     tweezer.ixo
-    tweezer.labview
+    tweezer.learn
+    tweezer.lux
     tweezer.math
     tweezer.noise
     tweezer.physics
