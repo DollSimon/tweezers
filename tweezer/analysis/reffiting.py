@@ -335,7 +335,7 @@ def refit_files(directory):
             newHeader=new_values(directory+"/data/"+file, directory+"/thermal_calibration/TS_"+file)
         else:
             newdHeader=change_format_only(directory+"/data/"+file)
-            print("The file",directory+"/"+file,"does not have a thermal calibration file. Old calibration values remain.")
+            print("The file", directory+"/"+file, "does not have a thermal calibration file. Old calibration values remain.")
         fOld = open(directory+"/data/"+file, "r")
         line = fOld.readline()
         while line[0] == "#" or line.strip() == "":
@@ -343,7 +343,7 @@ def refit_files(directory):
         data = fOld.read()
         fOld.close()
 
-        fNew = open(directory+"/data/"+"test.txt", "w")
+        fNew = open(directory+"/data/"+file, "w")
         fNew.write(json.dumps(newHeader, indent=4))
         fNew.write("\n\n#### DATA ####\n\n")
         fNew.write(line)
