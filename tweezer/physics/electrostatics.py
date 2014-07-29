@@ -7,7 +7,7 @@ def bjerrum_length(temperature=298, units='pN nm'):
         temperature (float): Temperature in units of [K]. (default: 298 K)
 
     Returns:
-        length (floaat): Bjerrum length
+        length (float): Bjerrum length
 
     """
     raise NotImplementedError()

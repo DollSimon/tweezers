@@ -1,5 +1,4 @@
 import os
-import glob
 from tweezer.io import read_tweebot_data_header
 from tweezer.single.thermal_calibration import *
 import numpy as np
@@ -230,7 +229,7 @@ def change_format_only(pathData):
         new['fractionGlycerol'] = 0.1
         new['fractionWater'] = 0.9
 
-    # set vscosity and temperature
+    # set viscosity and temperature
     if header.metadata['viscosity'] is None:
         new['temperature'] = 27
         new['viscosity'] = 1e-6 * dynamic_viscosity_of_mixture(new["fractionWater"],
@@ -330,12 +329,23 @@ def refit_files(directory):
 
     fileNames = get_data_files(directory)
     for file in fileNames:
-        if ("TS_"+file) in get_thermal_calibration_files(directory):
-            #print("cool!!")
-            newHeader=new_values(directory+"/data/"+file, directory+"/thermal_calibration/TS_"+file)
+        # check for corresponding thermal calibration file
+        tsFiles = get_thermal_calibration_files(directory)
+        tsFile = 'TS_' + file
+        otherTsFile = 'TS_' + file.split('_', maxsplit=1)[0] + '.txt'
+        foundTsFile = False
+        if tsFile in tsFiles:
+            foundTsFile = True
+        elif otherTsFile in tsFiles:
+            foundTsFile = True
+            tsFile = otherTsFile
+
+        if foundTsFile:
+            newHeader = new_values(directory+"/data/"+file, directory+"/thermal_calibration/" + tsFile)
         else:
-            newdHeader=change_format_only(directory+"/data/"+file)
+            newdHeader = change_format_only(directory+"/data/"+file)
             print("The file", directory+"/"+file, "does not have a thermal calibration file. Old calibration values remain.")
+
         fOld = open(directory+"/data/"+file, "r")
         line = fOld.readline()
         while line[0] == "#" or line.strip() == "":
@@ -357,6 +367,11 @@ def refit_directories(directory):
     Args:
         directory (str): path of the directory containing data and thermal_calibration folders
     """
+
+    # check last character in path
+    if directory[-1] != '/':
+        directory += '/'
+
     subDirectories = get_immediate_subdirectories(directory)
     for subdir in subDirectories:
         if "data" and "thermal_calibration" in get_immediate_subdirectories(directory + subdir):
