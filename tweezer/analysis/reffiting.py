@@ -329,6 +329,8 @@ def refit_files(directory):
 
     fileNames = get_data_files(directory)
     for file in fileNames:
+        # display current state
+        print('Processing: ' + file + ' in ' + directory)
         # check for corresponding thermal calibration file
         tsFiles = get_thermal_calibration_files(directory)
         tsFile = 'TS_' + file
@@ -340,10 +342,18 @@ def refit_files(directory):
             foundTsFile = True
             tsFile = otherTsFile
 
+        # check if the new file is already a json file
+        fOld = open(directory+"/data/"+file, "r")
+        line = fOld.readline().strip()
+        fOld.close()
+        if line[0] == '{':
+            print('    Skipping file as it already has a json header.')
+            continue
+
         if foundTsFile:
             newHeader = new_values(directory+"/data/"+file, directory+"/thermal_calibration/" + tsFile)
         else:
-            newdHeader = change_format_only(directory+"/data/"+file)
+            newHeader = change_format_only(directory+"/data/"+file)
             print("The file", directory+"/"+file, "does not have a thermal calibration file. Old calibration values remain.")
 
         fOld = open(directory+"/data/"+file, "r")
