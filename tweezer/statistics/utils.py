@@ -9,6 +9,7 @@ def corrcoef(x, y, maxlag=None):
     """
     Compute the correlation coefficients of two one dimensional arrays with a given maximum lag.\
     The input vectors are converted to numpy arrays.
+    http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient
 
     Args:
         x (array_like): one dimensional input array

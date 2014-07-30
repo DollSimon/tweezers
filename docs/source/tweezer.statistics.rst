@@ -13,6 +13,15 @@ tweezer.statistics.wlc_models module
     :show-inheritance:
 
 
+tweezer.statistics.utils module
+-------------------------------
+
+.. automodule:: tweezer.statistics.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 Module contents
 ---------------
 
