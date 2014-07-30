@@ -299,7 +299,7 @@ def single_calibration(psd, limit, n, plot=False):
     return D, fc, errors, chiSqr
 
 
-def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**14, TSLength=2**19, overlap=0, maxLim=30, plot=False):
+def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**14, TSLength=2**19, overlap=0, maxLim=0.6, plot=False):
     """Performs the fitting of a PSD with different limits and chooses the
     one with least deviation (minimum mean residuals squared)
 
@@ -323,7 +323,7 @@ def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**1
 
     #maxThreshold controls the maximum value for the limit as (minimum_value_of_PSD)*maxThreshold.
     # 1 takes the whole spectrum
-    maxThreshold = maxLim
+    maxThreshold = min(psd["psd"])+10**(np.log10(min(psd["psd"]))-(-np.log10(psd["psd"][0])+np.log10(min(psd["psd"])))*maxLim)
     #set the first step as the fraction (points_in_limits_range)/stepInitial
     stepInitial = 5
     #set the precision criteria (in %) required to stop the iteration
@@ -337,7 +337,7 @@ def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**1
 
 
     #Maximum value considered in the fit
-    limMax = next(a[0] for a in enumerate(psd["psd"]) if a[1] < min(psd["psd"])*maxThreshold)
+    limMax = next(a[0] for a in enumerate(psd["psd"]) if a[1] < maxThreshold)
 
     #starting limit is the maximum limit
     limits = limMax
@@ -376,7 +376,7 @@ def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**1
     return fitPsd
 
 
-def calibration_time_series(data, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**14, sFreq=80000, overlap=0, maxLim=30, plot=False):
+def calibration_time_series(data, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**14, sFreq=80000, overlap=0, maxLim=0.6, plot=False):
     """Performs the fitting with different limits from the time series data
 
     Args:
@@ -407,7 +407,7 @@ def calibration_time_series(data, viscosity=8.93e-10, T=25, radius=1000, blockLe
 
 
 
-def calibration_file(file, headerLines=7, columns=[1, 3], type="pandas", viscosity=8.93e-10, T=25, radii=[1000, 1000], blockLength=2**14, sFreq=80000, overlap=0, maxLim=30, plot=False):
+def calibration_file(file, headerLines=7, columns=[1, 3], type="pandas", viscosity=8.93e-10, T=25, radii=[1000, 1000], blockLength=2**14, sFreq=80000, overlap=0, maxLim=0.6, plot=False):
     """Perform the thermal calibration from a time series file
 
     Args:
