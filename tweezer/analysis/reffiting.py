@@ -383,10 +383,8 @@ def refit_directories(directory):
         directory += '/'
 
     subDirectories = get_immediate_subdirectories(directory)
-    for subdir in subDirectories:
-        if "data" and "thermal_calibration" in get_immediate_subdirectories(directory + subdir):
-            refit_files(directory+subdir)
-            
-        else:
-            #print("The folder",rootDir+subdir,"does not have the structure 'data' and 'thermal_calibration'")
+    if 'data' and 'thermal_calibration' in subDirectories:
+        refit_files(directory)
+    else:
+        for subdir in subDirectories:
             refit_directories(directory + subdir+"/")
