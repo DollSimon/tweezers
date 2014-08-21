@@ -10,6 +10,7 @@ def corrcoef(x, y, maxlag=None):
     Compute the correlation coefficients of two one dimensional arrays with a given maximum lag.\
     The input vectors are converted to numpy arrays.
     http://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient
+    Or see: Chatfield, 2004, The analysis of time series
 
     Args:
         x (array_like): one dimensional input array
@@ -33,11 +34,15 @@ def corrcoef(x, y, maxlag=None):
     if len(y) < maxlag + 1:
         raise ValueError('y array is too short.')
 
+    # pre-computing mean and denominator
+    mx = np.mean(x)
+    my = np.mean(y)
+    denom = np.sqrt(np.sum((x - mx)**2) * np.sum((y - my)**2))
+
     # compute correlation coefficient for each lag
     for i in range(maxlag + 1):
-        dx = x[:len(x)-i] - np.mean(x[:len(x)-i])
-        dy = y[i:] - np.mean(y[i:])
+        dx = x[:len(x)-i] - mx
+        dy = y[i:] - my
         nom = np.sum(dx * dy)
-        denom = np.sqrt(np.sum(dx**2) * np.sum(dy**2))
         res[i] = nom / denom
     return res
