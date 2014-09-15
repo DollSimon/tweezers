@@ -242,7 +242,7 @@ def change_format_only(pathData):
         T = np.linspace(20, 35,1000)
         visc = [1e-6 * dynamic_viscosity_of_mixture(new['fractionWater'], new['fractionGlycerol'], t) for t in T]
         for indexV, v in enumerate(visc):
-            if (v-new['viscosity'])<1e-3:
+            if (v-new['viscosity'])/v<1e-3:
                 new['temperature']=T[indexV]
                 break
         newUnits['viscosity'] = header.metadata['viscosity']
