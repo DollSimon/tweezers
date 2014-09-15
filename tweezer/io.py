@@ -826,7 +826,9 @@ def extract_meta_and_units(comment_list, file_type='man_data'):
             try:
                 viscosity = float(line.strip().split(": ")[-1])
             except:
-                viscosity = 0.8902e-9 # viscosity of water @ 25C
+                # viscosity = 0.8902e-9 # viscosity of water @ 25C
+                # don't set default value to allow checking if viscosity was set by the refitting routine
+                viscosity = None
 
             units['viscosity'] = 'pN s / nm^2'
             meta[standardized_name_of('viscosity')] = viscosity
