@@ -8,7 +8,7 @@ from tweezer.simulate.trap import *
 import pandas as pd
 from scipy.signal import welch
 from collections import namedtuple
-
+from scipy.optimize import curve_fit
 
 def read_time_series(file, headerLines=7, columns=[1, 3], type="pandas"):
     """
@@ -105,6 +105,18 @@ def force_calibration(beta, kappa):
     alpha = kappa/beta
 
     return alpha
+
+
+def lstsq_calibration(f,psd):
+    result, errors = curve_fit(lorentzian, f, psd, p0=[0.0001, 500])
+    
+    if result[1] < 0:
+        result[1] = -result[1]
+    
+    D=result[0]
+    fc=result[1]
+    chiSqr = residuals(f, psd, D, fc)
+    return D, fc, errors, chiSqr
 
 
 def mle_factors(f, P):
@@ -257,7 +269,7 @@ def calculate_psd(data, blockLength=2**14, sFreq=80000, overlap=0):
     return psd
 
 
-def single_calibration(psd, limit, n, plot=False):
+def single_calibration(psd, limit, n, plot=False, mode="mle"):
     """Calculates the Power Spectrum Density function of data, fits it with Maximum Likelihood Method (according to
     the reference given), and calculates the Diffusion constant [V] and the corner frequency [Hz]
 
@@ -274,13 +286,16 @@ def single_calibration(psd, limit, n, plot=False):
         chiSqr (float): average of the squared residues (test of chi^2)
 
     """
-
+    
     #eliminate the points out of the limit range
     fLim = psd["f"][:int(limit)]
     pLim = psd["psd"][:int(limit)]
 
     #calculate parameters from data
-    D, fc, errors, chiSqr = mle_calibration(fLim, pLim, n)
+    if(mode=="mle"):
+        D, fc, errors, chiSqr = mle_calibration(fLim, pLim, n)
+    elif(mode=="lstsq"):
+        D, fc, errors, chiSqr = lstsq_calibration(fLim, pLim)
 
     #plot data and fit
     if plot == True:
@@ -299,7 +314,7 @@ def single_calibration(psd, limit, n, plot=False):
     return D, fc, errors, chiSqr
 
 
-def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**14, TSLength=2**19, overlap=0, maxLim=0.6, plot=False):
+def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**14, TSLength=2**19, overlap=0, maxLim=0.6, plot=False, mode="mle"):
     """Performs the fitting of a PSD with different limits and chooses the
     one with least deviation (minimum mean residuals squared)
 
@@ -344,13 +359,13 @@ def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**1
     #the first step is taken in the negative direction
     step = -limMax//stepInitial
 
-    D, fc, sigma, chiSqr = single_calibration(psd, limit=limits, n=nBlocks)
-    D, fc, sigma, chiSqrNext = single_calibration(psd, limit=limits+step, n=nBlocks)
+    D, fc, sigma, chiSqr = single_calibration(psd, limit=limits, n=nBlocks, mode=mode)
+    D, fc, sigma, chiSqrNext = single_calibration(psd, limit=limits+step, n=nBlocks, mode=mode)
 
     while abs((chiSqr-chiSqrNext)/chiSqr)*100 > precision:
 
         chiSqrNext = chiSqr
-        D, fc, sigma, chiSqr = single_calibration(psd, limit=limits+step, n=nBlocks)
+        D, fc, sigma, chiSqr = single_calibration(psd, limit=limits+step, n=nBlocks, mode=mode)
 
         #iteration algorithm: after a step is made, if the fit is better (chiSqr is smaller) a new, smaller step in the
         #same direction is made ONLY if it will not go out of the maximum limit.
@@ -363,7 +378,7 @@ def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**1
         limits = limits + step
 
     #evaluate the final result in case the user wants to plot
-    D, fc, sigma, chiSqr = single_calibration(psd, limits, nBlocks, plot)
+    D, fc, sigma, chiSqr = single_calibration(psd, limits, nBlocks, plot, mode)
 
     beta = distance_calibration(D, radius, viscosity, T)
     kappa = trap_stiffness(fc, radius, viscosity)
@@ -376,7 +391,7 @@ def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**1
     return fitPsd
 
 
-def calibration_time_series(data, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**14, sFreq=80000, overlap=0, maxLim=0.6, plot=False):
+def calibration_time_series(data, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**14, sFreq=80000, overlap=0, maxLim=0.6, plot=False, mode="mle"):
     """Performs the fitting with different limits from the time series data
 
     Args:
@@ -401,13 +416,13 @@ def calibration_time_series(data, viscosity=8.93e-10, T=25, radius=1000, blockLe
     psd = calculate_psd(data, blockLength, sFreq,overlap)
 
 
-    fit = calibration_psd(psd, viscosity, T, radius, blockLength, len(data), overlap, maxLim, plot)
+    fit = calibration_psd(psd, viscosity, T, radius, blockLength, len(data), overlap, maxLim, plot, mode)
 
     return fit
 
 
 
-def calibration_file(file, headerLines=7, columns=[1, 3], type="pandas", viscosity=8.93e-10, T=25, radii=[1000, 1000], blockLength=2**14, sFreq=80000, overlap=0, maxLim=0.6, plot=False):
+def calibration_file(file, headerLines=7, columns=[0,1,2,3], type="pandas", viscosity=8.93e-10, T=25, radii=[1000, 1000], blockLength=2**14, sFreq=80000, overlap=0, maxLim=0.6, plot=False, mode="mle"):
     """Perform the thermal calibration from a time series file
 
     Args:
@@ -450,7 +465,7 @@ def calibration_file(file, headerLines=7, columns=[1, 3], type="pandas", viscosi
         else:
             rIndex = 1
 
-        fitTimeSeries = calibration_time_series(column, viscosity, T, radii[rIndex], blockLength, sFreq, overlap, maxLim, plot)
+        fitTimeSeries = calibration_time_series(column, viscosity, T, radii[rIndex], blockLength, sFreq, overlap, maxLim, plot, mode)
         D.append(fitTimeSeries.D)
         fc.append(fitTimeSeries.fc)
         sigma.append(fitTimeSeries.sigma)
