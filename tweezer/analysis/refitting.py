@@ -289,30 +289,36 @@ def change_format_only(pathData):
       [('beadDiameter', header.metadata['aodBeadDiameter']),
         ('x', od(
             [('displacementSensitivity', header.metadata['aodDisplacementSensitivityX']),
-             ('stiffness', header.metadata['aodStiffnessX'])
+             ('stiffness', header.metadata['aodStiffnessX']),
+             ('detectorOffset', header.metadata['aodDetectorOffsetX']),
             ])),
         ('y', od(
             [('displacementSensitivity', header.metadata['aodDisplacementSensitivityY']),
-             ('stiffness', header.metadata['aodStiffnessY'])
+             ('stiffness', header.metadata['aodStiffnessY']),
+             ('detectorOffset', header.metadata['aodDetectorOffsetY']),
             ])),
         ('units', od(
             [('displacementSensitivity', header.units['aodDisplacementSensitivityX']),
-             ('stiffness', header.units['aodStiffnessX'])
+             ('stiffness', header.units['aodStiffnessX']),
+             ('detectorOffset', header.metadata['aodDetectorOffsetX']),
             ]))
     ])),
     ('pm', od(
       [('beadDiameter', header.metadata['pmBeadDiameter']),
        ('x', od(
                 [('displacementSensitivity', header.metadata['pmDisplacementSensitivityX']),
-                 ('stiffness', header.metadata['pmStiffnessX'])
+                 ('stiffness', header.metadata['pmStiffnessX']),
+                 ('detectorOffset', header.metadata['pmDetectorOffsetX']),
                 ])),
              ('y', od(
                 [('displacementSensitivity', header.metadata['pmDisplacementSensitivityY']),
-                 ('stiffness', header.metadata['pmStiffnessY'])
+                 ('stiffness', header.metadata['pmStiffnessY']),
+                 ('detectorOffset', header.metadata['pmDetectorOffsetY']),
                 ])),
             ('units', od(
                 [('displacementSensitivity', header.units['pmDisplacementSensitivityX']),
-                 ('stiffness', header.units['pmStiffnessX'])
+                 ('stiffness', header.units['pmStiffnessX']),
+                 ('detectorOffset', header.metadata['pmDetectorOffsetX']),
                 ]))
     ])),
 
