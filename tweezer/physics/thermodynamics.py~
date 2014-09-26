@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from tweezer.physics.constants import Constant
 from tweezer.physics.constants import kB
 
