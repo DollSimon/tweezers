@@ -62,24 +62,32 @@ def new_values(pathData, pathThermalCalibration):
         new['fractionGlycerol'] = 0.1
         new['fractionWater'] = 0.9
 
+    # set temperature to 25˚C and use the corresponding viscosity
+    new['temperature'] = 25
+    new['viscosity'] = 1e-6 * dynamic_viscosity_of_mixture(new["fractionWater"],
+                                                           new["fractionGlycerol"],
+                                                           new["temperature"])
+    newUnits['viscosity'] = header.metadata['viscosity']
+    newUnits['temperature'] = '˚C'
 
-    if header.metadata['viscosity'] is None:
-        new['temperature'] = 27
-        new['viscosity'] = 1e-6 * dynamic_viscosity_of_mixture(new["fractionWater"],
-                                                               new["fractionGlycerol"],
-                                                               new["temperature"])
-        newUnits['viscosity'] = header.metadata['viscosity']
-        newUnits['temperature'] = '˚C'
-    else:
-        new['viscosity'] = header.metadata['viscosity']
-        T = np.linspace(20, 35,1000)
-        visc = [1e-6 * dynamic_viscosity_of_mixture(new['fractionWater'], new['fractionGlycerol'], t) for t in T]
-        for indexV, v in enumerate(visc):
-            if (v-new['viscosity'])/v<1e-3:
-                new['temperature']=T[indexV]
-                break
-        newUnits['viscosity'] = header.metadata['viscosity']
-        newUnits['temperature'] = 'C'
+    # # get correct temperature and viscosity if possible, else use 27 ˚C
+    # if header.metadata['viscosity'] is None:
+    #     new['temperature'] = 27
+    #     new['viscosity'] = 1e-6 * dynamic_viscosity_of_mixture(new["fractionWater"],
+    #                                                            new["fractionGlycerol"],
+    #                                                            new["temperature"])
+    #     newUnits['viscosity'] = header.metadata['viscosity']
+    #     newUnits['temperature'] = '˚C'
+    # else:
+    #     new['viscosity'] = header.metadata['viscosity']
+    #     T = np.linspace(20, 35,1000)
+    #     visc = [1e-6 * dynamic_viscosity_of_mixture(new['fractionWater'], new['fractionGlycerol'], t) for t in T]
+    #     for indexV, v in enumerate(visc):
+    #         if (v-new['viscosity'])/v<1e-3:
+    #             new['temperature']=T[indexV]
+    #             break
+    #     newUnits['viscosity'] = header.metadata['viscosity']
+    #     newUnits['temperature'] = '˚C'
 
     # do the fitting
     newFit = calibration_file(pathThermalCalibration, columns=[0,1,2,3], viscosity=new["viscosity"],
@@ -229,24 +237,32 @@ def change_format_only(pathData):
         new['fractionGlycerol'] = 0.1
         new['fractionWater'] = 0.9
 
-    # set viscosity and temperature
-    if header.metadata['viscosity'] is None:
-        new['temperature'] = 27
-        new['viscosity'] = 1e-6 * dynamic_viscosity_of_mixture(new["fractionWater"],
-                                                               new["fractionGlycerol"],
-                                                               new["temperature"])
-        newUnits['viscosity'] = header.metadata['viscosity']
-        newUnits['temperature'] = '˚C'
-    else:
-        new['viscosity'] = header.metadata['viscosity']
-        T = np.linspace(20, 35,1000)
-        visc = [1e-6 * dynamic_viscosity_of_mixture(new['fractionWater'], new['fractionGlycerol'], t) for t in T]
-        for indexV, v in enumerate(visc):
-            if (v-new['viscosity'])/v<1e-3:
-                new['temperature']=T[indexV]
-                break
-        newUnits['viscosity'] = header.metadata['viscosity']
-        newUnits['temperature'] = 'C'
+    # set temperature to 25˚C and use the corresponding viscosity
+    new['temperature'] = 25
+    new['viscosity'] = 1e-6 * dynamic_viscosity_of_mixture(new["fractionWater"],
+                                                           new["fractionGlycerol"],
+                                                           new["temperature"])
+    newUnits['viscosity'] = header.metadata['viscosity']
+    newUnits['temperature'] = '˚C'
+
+    # # set viscosity and temperature
+    # if header.metadata['viscosity'] is None:
+    #     new['temperature'] = 27
+    #     new['viscosity'] = 1e-6 * dynamic_viscosity_of_mixture(new["fractionWater"],
+    #                                                            new["fractionGlycerol"],
+    #                                                            new["temperature"])
+    #     newUnits['viscosity'] = header.metadata['viscosity']
+    #     newUnits['temperature'] = '˚C'
+    # else:
+    #     new['viscosity'] = header.metadata['viscosity']
+    #     T = np.linspace(20, 35,1000)
+    #     visc = [1e-6 * dynamic_viscosity_of_mixture(new['fractionWater'], new['fractionGlycerol'], t) for t in T]
+    #     for indexV, v in enumerate(visc):
+    #         if (v-new['viscosity'])/v<1e-3:
+    #             new['temperature']=T[indexV]
+    #             break
+    #     newUnits['viscosity'] = header.metadata['viscosity']
+    #     newUnits['temperature'] = '˚C'
 
     hdict = od([
     ('general', od(
