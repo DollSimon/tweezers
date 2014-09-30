@@ -114,6 +114,9 @@ def lstsq_calibration(f,psd):
     
     if result[1] < 0:
         result[1] = -result[1]
+
+    # standard deviation errors
+    errors = np.sqrt(np.diag(errors))
     
     D=result[0]
     fc=result[1]
