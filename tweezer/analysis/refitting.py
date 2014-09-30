@@ -91,7 +91,8 @@ def new_values(pathData, pathThermalCalibration):
 
     # do the fitting
     newFit = calibration_file(pathThermalCalibration, columns=[0,1,2,3], viscosity=new["viscosity"],
-                              radii=[header.metadata["pmBeadRadius"],header.metadata["aodBeadRadius"]], T=new["temperature"], plot=False)
+                              radii=[header.metadata["pmBeadRadius"],header.metadata["aodBeadRadius"]],
+                              T=new["temperature"], plot=False)
 
     # create ordered dictionary
     hdict = od([
@@ -151,7 +152,7 @@ def new_values(pathData, pathThermalCalibration):
              ('stiffnessError', newFit.aod.y.errorKappa)])),
         ('units', od(
             [('cornerFrequency', 'Hz'),
-             ('detectorOffset', header.units['pmDetectorOffsetX']),
+             ('detectorOffset', header.units['aodDetectorOffsetX']),
              ('displacementSensitivity', 'V / nm'),
              ('stiffness', 'pN / nm')
             ]))
@@ -316,7 +317,7 @@ def change_format_only(pathData):
         ('units', od(
             [('displacementSensitivity', header.units['aodDisplacementSensitivityX']),
              ('stiffness', header.units['aodStiffnessX']),
-             ('detectorOffset', header.metadata['aodDetectorOffsetX']),
+             ('detectorOffset', header.units['aodDetectorOffsetX']),
             ]))
     ])),
     ('pm', od(
@@ -334,7 +335,7 @@ def change_format_only(pathData):
             ('units', od(
                 [('displacementSensitivity', header.units['pmDisplacementSensitivityX']),
                  ('stiffness', header.units['pmStiffnessX']),
-                 ('detectorOffset', header.metadata['pmDetectorOffsetX']),
+                 ('detectorOffset', header.units['pmDetectorOffsetX']),
                 ]))
     ])),
 

@@ -10,7 +10,7 @@ from scipy.signal import welch
 from collections import namedtuple
 from scipy.optimize import curve_fit
 
-def read_time_series(file, headerLines=7, columns=[1, 3], type="pandas"):
+def read_time_series(file, headerLines=6, columns=[1, 3], type="pandas"):
     """
     Reads a .txt file to obtain the data using pandas. It gets the columns specified in usecols and ignors the lines
     specified by header.
@@ -30,8 +30,10 @@ def read_time_series(file, headerLines=7, columns=[1, 3], type="pandas"):
         data.dropna(how="all", inplace=True)
         if columns == [1, 3]:
             data.columns = ['pm', 'aod']
-        if columns == [0, 1, 2, 3]:
+        elif columns == [0, 1, 2, 3]:
             data.columns = ['pmx', 'pmy', 'aodx', 'aody']
+        else:
+            raise ValueError
 
     elif type == "numpy":
         columnsNumpy = (columns[0], columns[1])
@@ -413,7 +415,7 @@ def calibration_time_series(data, viscosity=8.93e-10, T=25, radius=1000, blockLe
     """
 
     #calculation of the power spectrum density function with the Welch algorithm
-    psd = calculate_psd(data, blockLength, sFreq,overlap)
+    psd = calculate_psd(data, blockLength, sFreq, overlap)
 
 
     fit = calibration_psd(psd, viscosity, T, radius, blockLength, len(data), overlap, maxLim, plot, mode)
@@ -422,7 +424,9 @@ def calibration_time_series(data, viscosity=8.93e-10, T=25, radius=1000, blockLe
 
 
 
-def calibration_file(file, headerLines=7, columns=[0,1,2,3], type="pandas", viscosity=8.93e-10, T=25, radii=[1000, 1000], blockLength=2**14, sFreq=80000, overlap=0, maxLim=0.6, plot=False, mode="mle"):
+def calibration_file(file, headerLines=7, columns=[0,1,2,3], type="pandas", viscosity=8.93e-10, T=25, radii=[1000,
+                                                                                                             1000],
+                     blockLength=2**14, sFreq=80000, overlap=0, maxLim=0.6, plot=False, mode="lstsq"):
     """Perform the thermal calibration from a time series file
 
     Args:
@@ -482,7 +486,7 @@ def calibration_file(file, headerLines=7, columns=[0,1,2,3], type="pandas", visc
         Fitpmx = namedtuple("Fitpmx", ["D", "fc", "sigma", "beta", "kappa",  "errorBeta", "errorKappa", "limits"])
         Fitpmy = namedtuple("Fitpmy", ["D", "fc", "sigma", "beta", "kappa",  "errorBeta", "errorKappa", "limits"])
         Fitaodx = namedtuple("Fitaodx", ["D", "fc", "sigma", "beta", "kappa",  "errorBeta", "errorKappa", "limits"])
-        Fitaody = namedtuple("Fitaodx", ["D", "fc", "sigma", "beta", "kappa",  "errorBeta", "errorKappa", "limits"])
+        Fitaody = namedtuple("Fitaody", ["D", "fc", "sigma", "beta", "kappa",  "errorBeta", "errorKappa", "limits"])
         fitpmx = Fitpmx(D[0], fc[0], sigma[0], beta[0],
                        kappa[0], eBeta[0], eKappa[0],
                        limit[0])
@@ -497,7 +501,7 @@ def calibration_file(file, headerLines=7, columns=[0,1,2,3], type="pandas", visc
                 limit[3])
 
         fitpm = Fitpm(fitpmx, fitpmy)
-        fitaod = Fitpm(fitaodx, fitaody)
+        fitaod = Fitaod(fitaodx, fitaody)
 
 
     fit = Fit(fitpm, fitaod)
