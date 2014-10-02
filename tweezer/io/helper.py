@@ -30,7 +30,8 @@ def get_files(path, suffix=None, prefix=None, parent=None, recursive=False, hidd
     for element in path.iterdir():
         if element.is_dir() and recursive:
             # recursively call the function on subdirectories
-            get_files(element, suffix=suffix, prefix=prefix, parent=parent, hiddenFiles=hiddenFiles)
+            res += get_files(element, suffix=suffix, prefix=prefix, parent=parent, recursive=recursive,
+                      hiddenFiles=hiddenFiles)
         else:
             # store the element
             candidate = element
