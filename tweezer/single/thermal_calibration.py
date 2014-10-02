@@ -268,6 +268,10 @@ def calculate_psd(data, blockLength=2**14, sFreq=80000, overlap=0):
 
     fRaw, psdRaw = welch(data, nperseg=blockLength, fs=sFreq, noverlap=overlap)
 
+    # if there is a value for 0 Hz, delete it
+    if fRaw[0] == 0:
+        fRaw = np.delete(fRaw, 0)
+        psdRaw = np.delete(psdRaw, 0)
     #set format to pandas
     psd = pd.DataFrame({"psd": psdRaw, "f": fRaw})
 
