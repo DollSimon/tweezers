@@ -391,7 +391,7 @@ def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**1
     kappa = trap_stiffness(fc, radius, viscosity)
     eBeta = (sigma[0]/D)*beta
     eKappa=(sigma[1]/fc)*kappa
-
+    limits[1] = int(limits[1])
 
     Fit = namedtuple("Fit", ["D", "fc", "sigma", "beta", "kappa", "eBeta", "eKappa", "limits"])
     fitPsd = Fit(D, fc, sigma, beta, kappa, eBeta, eKappa, limits)

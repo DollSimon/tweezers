@@ -171,7 +171,6 @@ def read_mpi_data_old(fileName):
     return data
 
 
-
 def get_default_metadata():
     """
     Returns the default header information. Use this to make sure the metadata dictionary contains certain
