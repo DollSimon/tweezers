@@ -268,10 +268,6 @@ def calculate_psd(data, blockLength=2**14, sFreq=80000, overlap=0):
 
     fRaw, psdRaw = welch(data, nperseg=blockLength, fs=sFreq, noverlap=overlap)
 
-    # if there is a value for 0 Hz, delete it
-    if fRaw[0] == 0:
-        fRaw = np.delete(fRaw, 0)
-        psdRaw = np.delete(psdRaw, 0)
     #set format to pandas
     psd = pd.DataFrame({"psd": psdRaw, "f": fRaw})
 
@@ -284,7 +280,7 @@ def single_calibration(psd, limit, n, plot=False, mode="mle"):
 
     Args:
         psd (pandas.DataFrame): frequency in [Hz] and power spectrum density in [V^2]
-        limit (int): sets the maximum frequency to be considered in the fit
+        limit (list of int): sets the minimum and maximum frequency to be considered in the fit
         n (float): number of averaged power spectra (total data points divided by the block length)
         plot (bool): when True, it plots the PSD and the fit (Default: False)
 
@@ -297,8 +293,8 @@ def single_calibration(psd, limit, n, plot=False, mode="mle"):
     """
     
     #eliminate the points out of the limit range
-    fLim = psd["f"][:int(limit)]
-    pLim = psd["psd"][:int(limit)]
+    fLim = psd["f"][int(limit[0]):int(limit[1])]
+    pLim = psd["psd"][int(limit[0]):int(limit[1])]
 
     #calculate parameters from data
     if(mode=="mle"):
@@ -362,29 +358,31 @@ def calibration_psd(psd, viscosity=8.93e-10, T=25, radius=1000, blockLength=2**1
 
     #Maximum value considered in the fit
     limMax = next(a[0] for a in enumerate(psd["psd"]) if a[1] < maxThreshold)
+    # minimum value considered in the fit
+    limMin = next(a[0] for a in enumerate(psd['f']) if a[1] > 0)
 
     #starting limit is the maximum limit
-    limits = limMax
+    limits = [limMin, limMax]
     #the first step is taken in the negative direction
     step = -limMax//stepInitial
 
     D, fc, sigma, chiSqr = single_calibration(psd, limit=limits, n=nBlocks, mode=mode)
-    D, fc, sigma, chiSqrNext = single_calibration(psd, limit=limits+step, n=nBlocks, mode=mode)
+    D, fc, sigma, chiSqrNext = single_calibration(psd, limit=[limits[0], limits[1] + step], n=nBlocks, mode=mode)
 
     while abs((chiSqr-chiSqrNext)/chiSqr)*100 > precision:
 
         chiSqrNext = chiSqr
-        D, fc, sigma, chiSqr = single_calibration(psd, limit=limits+step, n=nBlocks, mode=mode)
+        D, fc, sigma, chiSqr = single_calibration(psd, limit=[limits[0], limits[1] + step], n=nBlocks, mode=mode)
 
         #iteration algorithm: after a step is made, if the fit is better (chiSqr is smaller) a new, smaller step in the
         #same direction is made ONLY if it will not go out of the maximum limit.
         #If some of the conditions fail, the step is made in the opposite direction
-        if chiSqr < chiSqrNext and limits <= limMax and limits+step <= limMax:
+        if chiSqr < chiSqrNext and limits[1] <= limMax and limits[1]+step <= limMax:
             step = step//1.2
         else:
             step = -step//1.25
 
-        limits = limits + step
+        limits[1] += step
 
     #evaluate the final result in case the user wants to plot
     D, fc, sigma, chiSqr = single_calibration(psd, limits, nBlocks, plot, mode)
