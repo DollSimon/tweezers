@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import unittest
-import sure
-
 import os
 
 from clint.textui import colored, puts, indent
 
+
 try:
-    from tweezer.cli.utils import collect_files_per_trial
-    from tweezer.cli.utils import list_tweezer_files
-    from tweezer.cli.utils import sort_files_by_trial
-    from tweezer.cli.utils import collect_data_per_trial
+    from tweezer.legacy.cli.utils import collect_files_per_trial
+    from tweezer.legacy.cli.utils import list_tweezer_files
+    from tweezer.legacy.cli.utils import sort_files_by_trial
+    from tweezer.legacy.cli.utils import collect_data_per_trial
 except ImportError as err:
     puts('')
     with indent(2):

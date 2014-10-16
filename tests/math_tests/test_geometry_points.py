@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from tweezer.math.geometry import Point
+from tweezer.legacy.math.geometry import Point
 
 
 def test_simple_point_instantiation():

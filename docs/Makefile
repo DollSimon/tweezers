@@ -38,6 +38,9 @@ help:
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
+apidoc:
+	sphinx-apidoc -o source/ -f ../tweezer/
+
 clean:
 	-rm -rf $(BUILDDIR)/*
 

@@ -6,7 +6,7 @@ except ImportError:
     import json
 
 from tweezer import path_to_sample_data
-from tweezer.ixo.json_ import calibration_to_json
+from tweezer.legacy.ixo2.json_ import calibration_to_json
 
 
 @pytest.fixture

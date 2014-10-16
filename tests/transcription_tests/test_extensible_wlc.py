@@ -4,7 +4,7 @@
 from clint.textui import colored, puts, indent
 
 try:
-    from tweezer.core.polymer import ExtensibleWormLikeChain
+    from tweezer.legacy.core.polymer import ExtensibleWormLikeChain
 except ImportError as err:
     puts('')
     with indent(2):

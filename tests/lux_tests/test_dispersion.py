@@ -1,6 +1,6 @@
 # coding=utf-8
-from tweezer.physics.materials import SellmeierCoefficients
-from tweezer.lux.dispersion import dispersion
+from tweezer.legacy.lux import dispersion
+from tweezer.legacy.physics2.materials import SellmeierCoefficients
 
 SELLMEIER_COEFFICIENTS_BK7 = SellmeierCoefficients(1.03961212,
                                                    0.231792344,

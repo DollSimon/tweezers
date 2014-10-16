@@ -1,6 +1,6 @@
 from numpy.testing import assert_approx_equal
 
-from tweezer.physics.constants import kB, NA, h
+from tweezer.legacy.physics2.constants import kB, NA, h
 from tweezer.physics import thermal_energy
 
 

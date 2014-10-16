@@ -1,15 +1,10 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import os, shutil
-
-import sure
-import unittest
-import nose
-
-import pandas as pd
+import os
 
 from clint.textui import colored, puts, indent
+
 
 try:
     import simplejson as json
@@ -27,7 +22,7 @@ try:
     from tweezer import _TWEEBOT_CONFIG
     from tweezer import path_to_sample_data
     from tweezer import read
-    from tweezer.cli.utils import list_tweezer_files
+    from tweezer.legacy.cli.utils import list_tweezer_files
 except ImportError as err:
     puts('')
     with indent(2):

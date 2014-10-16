@@ -7,31 +7,25 @@ Subpackages
 .. toctree::
 
     tweezer.analysis
-    tweezer.bot
-    tweezer.cli
-    tweezer.core
-    tweezer.db
-    tweezer.dia
-    tweezer.dual
-    tweezer.ixo
-    tweezer.learn
-    tweezer.lux
-    tweezer.math
-    tweezer.noise
-    tweezer.physics
-    tweezer.polymer
-    tweezer.rnap
-    tweezer.simulate
-    tweezer.single
-    tweezer.statistics
+    tweezer.io
+    tweezer.legacy
+    tweezer.plot
 
 Submodules
 ----------
 
-tweezer.io module
------------------
+tweezer.container module
+------------------------
 
-.. automodule:: tweezer.io
+.. automodule:: tweezer.container
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+tweezer.debug module
+--------------------
+
+.. automodule:: tweezer.debug
     :members:
     :undoc-members:
     :show-inheritance:

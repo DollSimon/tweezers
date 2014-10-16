@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 import pytest
-
 from numpy.testing import assert_almost_equal as aae
 
-from tweezer.physics.viscosity import dynamic_viscosity_of_mixture
+from tweezer.legacy.physics2.viscosity import dynamic_viscosity_of_mixture
 
 
 @pytest.mark.algorithm

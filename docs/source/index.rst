@@ -34,22 +34,8 @@ Overview
 
     tweezer
     tweezer.analysis
-    tweezer.bot
-    tweezer.cli
-    tweezer.core
-    tweezer.db
-    tweezer.dual
-    tweezer.ixo
-    tweezer.learn
-    tweezer.lux
-    tweezer.math
-    tweezer.noise
-    tweezer.physics
-    tweezer.polymer
-    tweezer.rnap
-    tweezer.simulate
-    tweezer.single
-    tweezer.statistics
+    tweezer.io
+    tweezer.plot
 
 Contents:
 

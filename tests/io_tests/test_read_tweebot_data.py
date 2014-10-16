@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import pytest
-import os
-
 import datetime
+
+import pytest
 
 from tweezer.io import read_tweebot_data
 from tweezer import path_to_sample_data
-from tweezer.core.parsers import classify
+from tweezer.legacy.core.parsers import classify
 
 # get example file
 bot_file = path_to_sample_data('bot_data')

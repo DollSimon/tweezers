@@ -4,10 +4,10 @@ tweezer.analysis package
 Submodules
 ----------
 
-tweezer.analysis.utils module
------------------------------
+tweezer.analysis.psd module
+---------------------------
 
-.. automodule:: tweezer.analysis.utils
+.. automodule:: tweezer.analysis.psd
     :members:
     :undoc-members:
     :show-inheritance:

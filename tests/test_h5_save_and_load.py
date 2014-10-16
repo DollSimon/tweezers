@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import os, shutil
-
-import sure
-import unittest
-import nose
+import os
+import shutil
 
 import pandas as pd
-
 from clint.textui import colored, puts, indent
+
 
 try:
     import simplejson as json
@@ -23,7 +20,7 @@ except:
     raise ImportError('Probably the rpy2 library is not working...')
 
 try:
-    from tweezer.ixo.pandas_ import (h5_save, h5_load, rdata_save)
+    from tweezer.legacy.ixo2.pandas_ import (h5_save, h5_load, rdata_save)
 except ImportError as err:
     puts('')
     with indent(2):

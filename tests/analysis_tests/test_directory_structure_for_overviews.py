@@ -5,12 +5,11 @@ import os
 import shutil
 
 import pytest
-from pathlib import Path
 
-from tweezer.cli.utils import collect_files_per_trial, list_tweezer_files
-from tweezer.cli.utils import sort_files_by_trial
-from tweezer.ixo.os_ import get_subdirs, get_new_subdirs
-from tweezer.core.analysis import set_up_directories
+from tweezer.legacy.cli.utils import sort_files_by_trial
+from tweezer.legacy.ixo2.os_ import get_subdirs, get_new_subdirs
+from tweezer.legacy.core.analysis import set_up_directories
+
 
 # preparation
 CURRENT = os.getcwd()

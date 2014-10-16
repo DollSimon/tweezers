@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import pytest
-
 import os
 
+import pytest
 from clint.textui import colored, puts, indent
 
+
 try:
-    from tweezer.cli.utils import list_tweezer_files
+    from tweezer.legacy.cli.utils import list_tweezer_files
 except ImportError as err:
     puts('')
     with indent(2):

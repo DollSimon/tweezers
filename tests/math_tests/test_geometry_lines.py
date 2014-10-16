@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-import numpy as np
-
-from tweezer.math.geometry import Point, Line
+from tweezer.legacy.math.geometry import Point, Line
 
 
 def test_line_instantiation_from_points():

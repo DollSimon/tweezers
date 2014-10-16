@@ -5,7 +5,7 @@ import pandas as pd
 from numpy.testing import assert_allclose
 
 try:
-    from tweezer.statistics import fit_wlc
+    from tweezer.legacy.statistics import fit_wlc
 except ImportError as err:
     print('The tweezer package has not been correctly installed or updated.')
     raise err

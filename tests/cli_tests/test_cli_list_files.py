@@ -1,22 +1,16 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import unittest
-import sure
-from sure import expect
-
 import os
+
 import envoy
-
 from colorama import init
-
-from collections import defaultdict
-
 from clint.textui import puts, indent, colored
 
+
 try:
-    from tweezer.cli.utils import list_tweezer_files
-    from tweezer.cli.utils import CACHING_FILE
+    from tweezer.legacy.cli.utils import list_tweezer_files
+    from tweezer.legacy.cli.utils import CACHING_FILE
 except ImportError as err:
     puts('')
     with indent(2):

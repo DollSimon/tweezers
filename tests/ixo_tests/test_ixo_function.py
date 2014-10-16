@@ -4,9 +4,8 @@
 import inspect
 
 import pytest
-import sure
 
-from tweezer.ixo.functions import build_argument_signature
+from tweezer.legacy.ixo2.functions import build_argument_signature
 
 
 def my_func(a, x=4, y=5):

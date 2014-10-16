@@ -2,14 +2,9 @@
 #-*- coding: utf-8 -*-
 
 import os
-import unittest
-import sure
-import pytest
-import nose
-from nose.tools import *
 
-from tweezer.cli.utils import collect_files_per_trial, list_tweezer_files
-from tweezer.cli.utils import sort_files_by_trial
+from tweezer.legacy.cli.utils import list_tweezer_files
+from tweezer.legacy.cli.utils import sort_files_by_trial
 
 # preparation
 ORIGINAL = os.getcwd()

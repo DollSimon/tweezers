@@ -2,9 +2,10 @@
 
 import os
 import random
+
 import pytest
 
-from tweezer.cli.utils import list_tweezer_files, sort_files_by_trial
+from tweezer.legacy.cli.utils import list_tweezer_files
 
 
 @pytest.fixture

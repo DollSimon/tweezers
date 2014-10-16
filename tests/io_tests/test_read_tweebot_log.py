@@ -7,7 +7,7 @@ import pytest
 
 from tweezer.io import read_tweebot_logs
 from tweezer import path_to_sample_data
-from tweezer.core.parsers import classify
+from tweezer.legacy.core.parsers import classify
 
 # get example file
 logFile = path_to_sample_data('bot_log')

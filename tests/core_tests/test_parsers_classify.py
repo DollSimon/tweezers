@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
-import unittest
-from nose.tools import *
-import sure
-
 from collections import namedtuple
 from itertools import izip
 
-from tweezer.core.parsers import classify, classify_all, parse_tweezer_file_name
+from tweezer.legacy.core.parsers import classify_all, parse_tweezer_file_name
+
 
 # Valid TweeBot files
 BOT_DATA = ['path/39.Datalog.2013.02.20.04.14.20.datalog.txt','39.Datalog.2013.02.20.04.14.20.datalog.txt']

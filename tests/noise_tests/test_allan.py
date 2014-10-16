@@ -7,8 +7,8 @@ from numpy.testing import assert_approx_equal
 try:
     from tweezer import path_to_sample_data
     from tweezer.io import read_thermal_calibration
-    from tweezer.noise.allan import allan_variance_r_port as allan_var
-    from tweezer.noise.allan import allan_variance
+    from tweezer.legacy.noise.allan import allan_variance_r_port as allan_var
+    from tweezer.legacy.noise.allan import allan_variance
 except ImportError as err:
     print('The tweezer package has not been correctly installed or updated.')
     raise err
