@@ -11,14 +11,18 @@ LONG_DESCRIPTION = """
  of dual-trap optical tweezer experiments.
 """
 
-DEPENDENCIES = ['pytest',
+DEPENDENCIES = [# documentation stuff
+                'sphinx',
+                'sphinx_rtd_theme>=0.1'
+                'sphinxcontrib-napoleon',
+                'pytest',
                 'pandas>=0.11',
                 'numpy>=1.8',
                 'matplotlib>=1.2.1',
-                # documentation stuff
-                'sphinx',
-                'sphinx_rtd_theme>=0.1'
-                'sphinxcontrib-napoleon', 'scipy'
+                'ixo',
+                'physics',
+                'scipy',
+                'seaborn'
 ]
 
 CLASSIFIERS = [

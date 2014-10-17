@@ -43,8 +43,7 @@ tox.ini
 tweezer.egg-info/
 
 # certain ipython notebook files
-Sandbox.ipynb
-!notebooks/*.ipynb
+notebooks/.ipynb_checkpoints
 
 # sublime project files
 *.sublime-project

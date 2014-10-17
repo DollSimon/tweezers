@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import seaborn
-from mpl_toolkits.axes_grid.anchored_artists import AnchoredText
 
 
 class PsdPlot():
@@ -15,7 +14,7 @@ class PsdPlot():
         and additional arguements areforwarded.
 
         Args:
-            container (:class:`tweezer.container.Data`): data container
+            container (:class:`tweezer.TweezerData`): data container
         """
 
         self.fig = None
@@ -27,7 +26,7 @@ class PsdPlot():
         Initialize the plotting environment (figure, axes, ...). Called automatically.
 
         Args:
-            container (:class:`tweezer.container.Data`): data container
+            container (:class:`tweezer.TweezerData`): data container
         """
 
         # count PSD columns and store their titles
@@ -65,12 +64,12 @@ class PsdPlot():
         add data.
 
         Args:
-            container (:class:`tweezer.container.Data`): data container
-            psd (bool): plot the PSD in :attr:`tweezer.container.Data.psd`?
-            psdSource (bool): plot the PSD in :attr:`tweezer.container.Data.psdSource`?
-            fit (bool): plot the fit to the PSD in :attr:`tweezer.container.Data.psd`? if no 'fit' columns are
+            container (:class:`tweezer.TweezerData`): data container
+            psd (bool): plot the PSD in :attr:`tweezer.TweezerData.psd`?
+            psdSource (bool): plot the PSD in :attr:`tweezer.TweezerData.psdSource`?
+            fit (bool): plot the fit to the PSD in :attr:`tweezer.TweezerData.psd`? if no 'fit' columns are
                         available, this is skipped
-            fitSource (bool): plot the fit to the PSD in :attr:`tweezer.container.Data.psdSource`?
+            fitSource (bool): plot the fit to the PSD in :attr:`tweezer.TweezerData.psdSource`?
 
         Returns:
             :class:`tweezer.plot.psd.PsdPlot`
@@ -150,7 +149,7 @@ class PsdPlot():
 
         Args:
             fit (:class:`pandas.DataFrame`): fit data to plot
-            meta (:class:`tweezer.container.MetaDict`): metadata container with fit result data (stiffness,
+            meta (:class:`tweezer.MetaDict`): metadata container with fit result data (stiffness,
                                                         corner frequency, r2)
         """
 

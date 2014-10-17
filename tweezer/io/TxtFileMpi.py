@@ -1,11 +1,12 @@
 from pathlib import Path
 import re
-from tweezer.container import UnitDict
+from tweezer import UnitDict
 
 
 class TxtFileMpi():
     """
-
+    A helper object to extract data from MPI-styled txt-files. Especially to get all header lines and all data lines.
+    Note that this reads the files with `UTF-8` encoding.
     """
 
     def __init__(self, path):
@@ -13,7 +14,8 @@ class TxtFileMpi():
         Constructor for TxtFileMpi
 
         Args:
-            path
+            path (:class:`patlhlib.Path`): path to file to read, if the input is of a different type, it is given to
+                                           :class:`pathlibh.Path` to try to create an instance
         """
 
         # adjust input to the correct format
@@ -23,7 +25,7 @@ class TxtFileMpi():
             self.path = path
 
         # JSON header present?
-        with self.path.open() as f:
+        with self.path.open(encoding='utf-8') as f:
             firstLine = f.readline().strip()
         if firstLine.startswith('{'):
             self.isJson = True
@@ -32,13 +34,11 @@ class TxtFileMpi():
 
     def get_header(self):
         """
-
-
-        Args:
-            self
+        Returns all header lines of the file and if applicable (no JSON header) a :class:`tweezer.UnitDict` with the
+        units of the data columns.
 
         Returns:
-
+            :class:`list` of :class:`str` and either ``None`` or :class:`tweezer.UnitDict`
         """
 
         if self.isJson:
@@ -48,7 +48,10 @@ class TxtFileMpi():
 
     def get_data(self):
         """
+        Returns the column header and all data lines from the file as one big string.
 
+        Returns:
+            :class:`list` of :class:`str` and :class:`str`
         """
 
         if self.isJson:
@@ -79,7 +82,7 @@ class TxtFileMpi():
             if 'get' is 'header': headerLines (:class:`list` of :class:`str`)
         """
 
-        with self.path.open() as f:
+        with self.path.open(encoding='utf-8') as f:
             # generator to strip each line
             strippedLines = (line.strip() for line in f)
             if get == 'header':
@@ -134,7 +137,7 @@ class TxtFileMpi():
         columnHeader = None
         dataLines = ''
 
-        with self.path.open() as f:
+        with self.path.open(encoding='utf-8') as f:
             # generator to strip each line
             strippedLines = (line.strip() for line in f)
             for line in strippedLines:

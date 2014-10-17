@@ -16,7 +16,7 @@ class PsdComputation():
         Constructor for PsdAnalysis
 
         Args:
-            container (:class:`tweezer.container.Data`): data container
+            container (:class:`tweezer.TweezerData`): data container
             blockLength (float): number of data points per block (default: 2**13)
             nBlocks (int): The number of blocks determines the overlap between them. If set to ``None``, the number
                            is computed such that the overlap is 0.
@@ -78,7 +78,7 @@ class PsdFit():
         Constructor for PsdFit
 
         Args:
-            container (:class:`tweezer.container.Data`): data container
+            container (:class:`tweezer.TweezerData`): data container
             fitCls (:class:`ixo.fit.Fit`): class to use for fitting, must implement the methods given in the
                                             reference class
         """
@@ -110,7 +110,8 @@ class PsdFit():
             # store results
             self.D[title] = res[0]
             self.fc[title] = res[1]
-            self.std[title] = res[2]
+            # convert std from numpy array to list, this is necessary to keep the MetaDict serializable as JSON-string
+            self.std[title] = list(res[2])
             self.r2[title] = res[3]
 
         # update values in data structure

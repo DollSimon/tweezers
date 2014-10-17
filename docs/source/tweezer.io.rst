@@ -4,6 +4,14 @@ tweezer.io package
 Submodules
 ----------
 
+tweezer.io.BaseSource module
+----------------------------
+
+.. automodule:: tweezer.io.BaseSource
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 tweezer.io.TxtFileMpi module
 ----------------------------
 
@@ -12,10 +20,10 @@ tweezer.io.TxtFileMpi module
     :undoc-members:
     :show-inheritance:
 
-tweezer.io.source module
-------------------------
+tweezer.io.TxtSourceMpi module
+------------------------------
 
-.. automodule:: tweezer.io.source
+.. automodule:: tweezer.io.TxtSourceMpi
     :members:
     :undoc-members:
     :show-inheritance:

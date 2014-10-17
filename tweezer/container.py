@@ -35,7 +35,7 @@ class MetaBaseDict(OrderedDict):
         except KeyError:
             try:
                 value = self.defaults[item]
-                print('[Warning] Default metadata value used for key: ' + item)
+                print('[Info] Default metadata value used for key: ' + item)
                 return value
             except KeyError:
                 pass
@@ -56,7 +56,7 @@ class MetaBaseDict(OrderedDict):
 
     def get_alias(self, key):
         """
-        Check if the given key corresponds to an alias in :attr:`tweezer.container.MetaBaseDict.aliases`.
+        Check if the given key corresponds to an alias in :attr:`tweezer.MetaBaseDict.aliases`.
 
         Args:
             key (str): string to check
@@ -74,10 +74,10 @@ class MetaBaseDict(OrderedDict):
         """
         Construct a key name for this dictionary from the input.
         If the input is a string, it is checked whether it exists or has an valid alias in the
-        :attr:`tweezer.container.MetaBaseDict.aliases` attribute.
+        :attr:`tweezer.MetaBaseDict.aliases` attribute.
         If the input is a list of strings the elements are basically concatenated with the exception of the first
         element being of type ``pmx``. In this case e.g. ``['pmx', 'Stiffness']`` becomes ``pmStiffnessX``. Each of
-        the list elements is checked for an valid alias with :meth:`tweezer.container.MetaBaseDict.get_alias`.
+        the list elements is checked for an valid alias with :meth:`tweezer.MetaBaseDict.get_alias`.
 
         Args:
             keyElement (:class:`str` or :class:`list` of :class:`str`): element(s) that describe the key to construct
@@ -122,7 +122,7 @@ class MetaBaseDict(OrderedDict):
     
     def get(self, *k):
         """
-        The input is forwarded to :meth:`tweezer.container.MetaBaseDict.get_key` which gives a key. This method
+        The input is forwarded to :meth:`tweezer.MetaBaseDict.get_key` which gives a key. This method
         returns the corresponding value in the dictionary if it exists.
         
         Args:
@@ -137,7 +137,7 @@ class MetaBaseDict(OrderedDict):
 
     def set(self, *k):
         """
-        Set a value for the key that is returned by :meth:`tweezer.container.MetaBaseDict.get_key`. The last
+        Set a value for the key that is returned by :meth:`tweezer.MetaBaseDict.get_key`. The last
         parameter is the value to be set.
 
         Args:
@@ -165,9 +165,9 @@ class UnitDict(MetaBaseDict):
     defaults = {'viscosity': 'pN s / nm^2'}
 
 
-class Data():
+class TweezerData():
     """
-    Data structure for tweezers experiment data and metadata. It requires a data source object that provides certain
+    TweezerData structure for tweezers experiment data and metadata. It requires a data source object that provides certain
     methods That populate the properties of this class. Note that not all of these methods must be implemented,
     depending of your usage of the class. However, if your data source does not implement a certain method, the code
     will fail only when the according property is called since all of them are evaluated lazily.
@@ -177,8 +177,8 @@ class Data():
         ============ ================================== ===================================
         property     required method in data source     data type
         ============ ================================== ===================================
-        meta         get_metadata                       :class:`tweezer.container.MetaDict`
-        units        get_metadata                       :class:`tweezer.container.UnitDict`
+        meta         get_metadata                       :class:`tweezer.MetaDict`
+        units        get_metadata                       :class:`tweezer.UnitDict`
         data         get_data                           :class:`pandas.DataFrame`
         psdSource    get_psd                            :class:`pandas.DataFrame`
         ts           get_ts                             :class:`pandas.DataFrame`
@@ -215,7 +215,7 @@ class Data():
         when required.
 
         Returns:
-            :class:`tweezer.container.MetaDict`
+            :class:`tweezer.MetaDict`
         """
 
         meta, units = self.dataSource.get_metadata()
@@ -229,7 +229,7 @@ class Data():
         ``get_metadata`` method as well. Evaluated lazily.
 
         Returns:
-            :class:`tweezer.container.UnitDict`
+            :class:`tweezer.UnitDict`
         """
 
         meta, units = self.dataSource.get_metadata()
@@ -265,7 +265,7 @@ class Data():
         """
         Attribute to hold the power spectrum density. If called for the first time it will compute the PSD using the
         :class:`tweezer.psd.PsdComputation` class and its default values. For custom values,
-        use the :meth:`tweezer.container.Data.compute_psd` method.
+        use the :meth:`tweezer.Data.compute_psd` method.
         """
 
         psdObj = PsdComputation(self)
@@ -277,7 +277,7 @@ class Data():
         All Arguments are forwarded to :class:`tweezer.psd.PsdComputation`
 
         Returns:
-            :class:`tweezer.container.Data`
+            :class:`tweezer.TweezerData`
         """
 
         psdObj = PsdComputation(self, **kwargs)
@@ -289,7 +289,7 @@ class Data():
         Fits the PSD. All input is forwarded to the :class:`tweezer.analysis.psd.PsdFit` object.
 
         Returns:
-            :class:`tweezer.container.Data`
+            :class:`tweezer.TweezerData`
         """
 
         fitObj = PsdFit(self, *args, **kwargs)
