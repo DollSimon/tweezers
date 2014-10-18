@@ -97,6 +97,14 @@ class TxtSourceMpi(BaseSource):
             self.rename_key(meta, units, 'aodCornerFreqX', 'aodCornerFreqXSource')
             self.rename_key(meta, units, 'aodCornerFreqY', 'aodCornerFreqYSource')
 
+            # rename variables for the sake of consistency and compatibility with Matlab and because the naming is
+            # confusing: samplingRate is actually the acquisition rate since the DAQ card averages the data already
+            # the sampling rate should describe the actual time step between data points not something else
+            if 'recordingRate' in meta:
+                self.rename_key(meta, units, 'samplingRate', 'acquisitionRate')
+                self.rename_key(meta, units, 'recordingRate', 'samplingRate')
+                self.rename_key(meta, None, 'nSamples', 'nAcquisitionPerSample')
+
         # add title string to metadata, used for plots
         self.set_title(meta)
 
@@ -210,7 +218,7 @@ class TxtSourceMpi(BaseSource):
             #   - optional whitespace followed by any character
             #   - anything without whitespaces (required for lines without ':' as separator)
             # - optional final unit consisting of any letter except 'PM' (exclude time stuff)
-            regex = re.compile('^(# )?(?P<name>[^(:\d]*)\s?(\((?P<unit>[^:]*?)\))?(:|\s)(?P<value>\s?.+?|[^\s]+)(?! PM)(?P<unit2>\s\D+)?$')
+            regex = re.compile('^(# )?(?P<name>[^(:\d]*)\s?(\((?P<unit>[^:]*?)\)\s?)?(:|\s)(?P<value>\s?.+?|[^\s]+)(?! PM)(?P<unit2>\s\D+)?$')
             for line in header:
                 # check if line should be ignored
                 if TxtSourceMpi.is_ignored_header(line):
@@ -233,6 +241,15 @@ class TxtSourceMpi(BaseSource):
             # insert units from column headers if present
             if columnUnits:
                 units.update(columnUnits)
+
+            # ensure bead diameter, tweebot files have radius
+            if self.get_standard_identifier('pmBeadRadius') in meta:
+                # using rename_key here to make sure get_standard_identifier is called on key names
+                # useful when renaming key in the future
+                self.rename_key(meta, None, 'pmBeadRadius', 'pmBeadDiameter')
+                meta[self.get_standard_identifier('pmBeadDiameter')] *= 2
+                self.rename_key(meta, None, 'aodBeadRadius', 'aodBeadDiameter')
+                meta[self.get_standard_identifier('aodBeadDiameter')] *= 2
 
             # eye candy
             if units['viscosity']:
@@ -300,18 +317,22 @@ class TxtSourceMpi(BaseSource):
         """
 
         if target is None:
-            target = self.data
+            target = self.data.path
         else:
             if not isinstance(target, Path):
                 target = Path(target)
 
+        # we have to store the data here so it is evaluated BEFORE we write to the file, caveat of the laziness...
+        header = OrderedDict([('meta', container.meta), ('units', container.units)])
+        data = container.data
         with target.open(mode='w', encoding='utf-8') as f:
-            f.write(json.dumps(OrderedDict([('meta', container.meta), ('units', container.units)]),
+            f.write(json.dumps(header,
                                indent=4,
-                               ensure_ascii=False))
+                               ensure_ascii=False,
+                               sort_keys=True))
             f.write("\n\n#### DATA ####\n\n")
 
-        container.data.to_csv(path_or_buf=target.__str__(), sep='\t', mode='a', index=False)
+        data.to_csv(path_or_buf=str(target), sep='\t', mode='a', index=False)
 
     def get_default_meta(self):
         """
@@ -325,8 +346,10 @@ class TxtSourceMpi(BaseSource):
         units = c.UnitDict()
 
         meta[self.get_standard_identifier('samplingRateTs')] = 80000
+        meta[self.get_standard_identifier('laserDiodeTemp')] = None
 
         units[self.get_standard_identifier('samplingRateTs')] = 'Hz'
+        units[self.get_standard_identifier('laserDiodeTemp')] = '°C'
 
         return meta, units
 
@@ -350,7 +373,8 @@ class TxtSourceMpi(BaseSource):
         oldKey = self.get_standard_identifier(oldKey)
         newKey = self.get_standard_identifier(newKey)
         meta.replace_key(oldKey, newKey)
-        units.replace_key(oldKey, newKey)
+        if units:
+            units.replace_key(oldKey, newKey)
 
     @staticmethod
     def get_value_type(key, value):
@@ -387,6 +411,9 @@ class TxtSourceMpi(BaseSource):
             'laserDiodeCurrent': float,
 
             'errors': lambda x: [int(error) for error in x.split('\t')],
+
+            'startOfMeasurement': int,
+            'endOfMeasurement': int,
 
             # aod variables
             'aodCornerFreqX': float,
@@ -440,7 +467,9 @@ class TxtSourceMpi(BaseSource):
 
             # bead
             'pmBeadDiameter': float,
+            'pmBeadRadius': float,
             'aodBeadDiameter': float,
+            'aodBeadRadius': float,
 
             # andor camera specifics
             'andorPixelSizeX': float,
@@ -475,7 +504,8 @@ class TxtSourceMpi(BaseSource):
         key_mapper = {
             # general stuff
             'Date of Experiment': 'date',
-            'measurement starttime': 'startTime',
+            'Time of Experiment': 'time',
+            'measurement starttime': 'time',
             'data averaged to while-loop': 'isDataAveraged',
 
             'number of samples': 'nSamples',
@@ -492,6 +522,10 @@ class TxtSourceMpi(BaseSource):
             'samplingRatePsd': 'samplingRatePsd',
             'samplingRateTs': 'samplingRateTs',
 
+            'acquisitionRate': 'acquisitionRate',
+            'recordingRate': 'recordingRate',
+            'nAcquisitionPerSample': 'nAcquisitionPerSample',
+
             'rate of while-loop': 'recordingRate',
             'duration of measurement': 'measurementDuration',
             'dt': 'timeStep',
@@ -506,6 +540,7 @@ class TxtSourceMpi(BaseSource):
             'viscosity': 'viscosity',
 
             'Laser Diode Temp': 'laserDiodeTemp',
+            'laserDiodeTemp': 'laserDiodeTemp',
             'Laser Diode Operating Hours': 'laserDiodeHours',
             'Laser Diode Current': 'laserDiodeCurrent',
 
@@ -632,9 +667,15 @@ class TxtSourceMpi(BaseSource):
             # bead
             'PM bead diameter': 'pmBeadDiameter',
             'diameterT1.um': 'pmBeadDiameter',
+            'pmBeadDiameter': 'pmBeadDiameter',
+            'PM bead radius': 'pmBeadRadius',
+            'pmBeadRadius': 'pmBeadRadius',
 
             'AOD bead diameter': 'aodBeadDiameter',
             'diameterT2.um': 'aodBeadDiameter',
+            'aodBeadDiameter': 'aodBeadDiameter',
+            'AOD bead radius': 'aodBeadRadius',
+            'aodBeadRadius': 'aodBeadRadius',
 
             # andor camera specifics
             'ANDOR pixel size x': 'andorPixelSizeX',
@@ -661,10 +702,12 @@ class TxtSourceMpi(BaseSource):
 
         ignoredLines = [
             '# Laser Diode Status',
-            '# results thermal calibration:'
+            '# results thermal calibration:',
         ]
 
         if line in ignoredLines:
+            return True
+        elif line.startswith('### File created by selecting data between'):
             return True
         else:
             return False

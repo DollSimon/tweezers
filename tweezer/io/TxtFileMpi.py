@@ -24,6 +24,10 @@ class TxtFileMpi():
         else:
             self.path = path
 
+        # check for empty file
+        if self.path.stat().st_size == 0:
+            raise ValueError('Empty file given: ' + str(self.path))
+
         # JSON header present?
         with self.path.open(encoding='utf-8') as f:
             firstLine = f.readline().strip()
@@ -159,15 +163,17 @@ class TxtFileMpi():
                     headerLines.append(line)
 
         # get column units for metadata
-        regex = re.compile('(\w+(\s\w+)?)( \(([^)]*)\))?')
+        regex = re.compile('(\w+(?:\s\w+)*)(?:\s*\(([^)]*)\))?')
         res = regex.findall(columnHeader)
         units = UnitDict()
-        for (column, tmp, bUnit, unit) in res:
+        columns = []
+        # get column titles, delete whitespaces for consistency and store unit if available
+        for (column, unit) in res:
+            column = column.replace(' ', '')
+            columns.append(column)
             if unit:
                 # if unit present, store it
                 units[column] = unit
-        # get column titles, delete whitespaces for consistency
-        columns = [title[0].replace(' ', '') for title in res]
 
         if get == 'data':
             return columns, dataLines
