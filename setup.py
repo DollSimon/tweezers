@@ -13,7 +13,7 @@ LONG_DESCRIPTION = """
 
 DEPENDENCIES = [# documentation stuff
                 'sphinx',
-                'sphinx_rtd_theme>=0.1'
+                'sphinx_rtd_theme>=0.1',
                 'sphinxcontrib-napoleon',
                 'pytest',
                 'pandas>=0.11',
@@ -34,7 +34,7 @@ CLASSIFIERS = [
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.4',
-    'Topic :: Scientific/Engineering',
+    'Topic :: Scientific/Engineering'
 ]
 
 setup(
@@ -46,7 +46,7 @@ setup(
     author='Marcus Jahnel, MPI-CBG',
     author_email='jahnel@mpi-cbg.de',
     install_requires=DEPENDENCIES,
-    packages=find_packages,
+    packages=find_packages(),
     package_data={'tweezer': ['data/*/*',
                               'templates/*/*',
                               'kernel/*/*',
@@ -58,5 +58,5 @@ setup(
             'tweezer=tweezer.cli.main:start'
         ],
     },
-    classifiers=CLASSIFIERS,
+    classifiers=CLASSIFIERS
 )
