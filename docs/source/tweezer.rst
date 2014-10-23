@@ -22,10 +22,10 @@ tweezer.container module
     :undoc-members:
     :show-inheritance:
 
-tweezer.debug2 module
----------------------
+tweezer.debug module
+--------------------
 
-.. automodule:: tweezer.debug2
+.. automodule:: tweezer.debug
     :members:
     :undoc-members:
     :show-inheritance:

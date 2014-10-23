@@ -134,7 +134,7 @@ class TxtFileMpi():
 
         Returns:
             if 'get' is 'data: columnHeader (:class:`list` of :class:`str`), dataLines (:class:`str`)
-            if 'get' is 'header': headerLines (:class:`list` of :class:`str`), units (:class:`collections.OrderedDict`)
+            if 'get' is 'header': headerLines (:class:`list` of :class:`str`), units (:class:`tweezer.UnitDict`)
         """
 
         headerLines = []
@@ -163,8 +163,10 @@ class TxtFileMpi():
                     headerLines.append(line)
 
         # get column units for metadata
+        # to extract them we need special treatment
         regex = re.compile('(\w+(?:\s\w+)*)(?:\s*\(([^)]*)\))?')
         res = regex.findall(columnHeader)
+        # units are returned already as UnitDict
         units = UnitDict()
         columns = []
         # get column titles, delete whitespaces for consistency and store unit if available

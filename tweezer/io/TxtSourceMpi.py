@@ -59,51 +59,58 @@ class TxtSourceMpi(BaseSource):
         # sequence is important since later calls overwrite earlier ones so if a header is present in "psd" and
         # "data", the value from "data" will be returned
         if self.ts:
+            # get header data from file
             metaTmp, unitsTmp = self.ts.get_header()
+            # convert header to corresponding dict format
             metaTmp, unitsTmp = self.convert_header(metaTmp, unitsTmp)
-            meta.update(metaTmp)
-            units.update(unitsTmp)
 
             # make sure we don't override important stuff that by accident has the same name
-            self.rename_key(meta, units, 'nSamples', 'nSamplesTs')
-            self.rename_key(meta, units, 'timeStep', 'timeStepTs')
+            self.rename_key(metaTmp, unitsTmp, 'nSamples', 'nSamplesTs')
+            self.rename_key(metaTmp, unitsTmp, 'timeStep', 'timeStepTs')
+
+            # update the dictionaries with newly found values
+            meta.update(metaTmp)
+            units.update(unitsTmp)
 
         if self.psd:
             metaTmp, unitsTmp = self.psd.get_header()
-            # adjust psd column headers in unit dict (if present)
-            unitsTmp = self.convert_psd_columns(unitsTmp)
             metaTmp, unitsTmp = self.convert_header(metaTmp, unitsTmp)
-            meta.update(metaTmp)
-            units.update(unitsTmp)
 
             # make sure we don't override important stuff that by accident has the same name
-            self.rename_key(meta, units, 'nSamples', 'nSamplesPsd')
-            self.rename_key(meta, units, 'samplingRate', 'samplingRatePsd')
+            self.rename_key(metaTmp, unitsTmp, 'nSamples', 'nSamplesPsd')
+            self.rename_key(metaTmp, unitsTmp, 'samplingRate', 'samplingRatePsd')
+
+            meta.update(metaTmp)
+            units.update(unitsTmp)
 
         if self.data:
             metaTmp, unitsTmp = self.data.get_header()
             metaTmp, unitsTmp = self.convert_header(metaTmp, unitsTmp)
-            meta.update(metaTmp)
-            units.update(unitsTmp)
-            meta['trial'] = self.data.get_trial_number()
 
             # rename fitting variables to 'Source' to make clear they are coming from the LV fitting
-            self.rename_key(meta, units, 'pmStiffnessX', 'pmStiffnessXSource')
-            self.rename_key(meta, units, 'pmStiffnessY', 'pmStiffnessYSource')
-            self.rename_key(meta, units, 'aodStiffnessX', 'aodStiffnessXSource')
-            self.rename_key(meta, units, 'aodStiffnessY', 'aodStiffnessYSource')
-            self.rename_key(meta, units, 'pmCornerFreqX', 'pmCornerFreqXSource')
-            self.rename_key(meta, units, 'pmCornerFreqY', 'pmCornerFreqYSource')
-            self.rename_key(meta, units, 'aodCornerFreqX', 'aodCornerFreqXSource')
-            self.rename_key(meta, units, 'aodCornerFreqY', 'aodCornerFreqYSource')
+            self.rename_key(metaTmp, unitsTmp, 'pmXStiffness', 'pmXSourceStiffness')
+            self.rename_key(metaTmp, unitsTmp, 'pmYStiffness', 'pmYSourceStiffness')
+            self.rename_key(metaTmp, unitsTmp, 'aodXStiffness', 'aodXSourceStiffness')
+            self.rename_key(metaTmp, unitsTmp, 'aodYStiffness', 'aodYSourceStiffness')
+            self.rename_key(metaTmp, unitsTmp, 'pmXCornerFreq', 'pmXSourceCornerFreq')
+            self.rename_key(metaTmp, unitsTmp, 'pmYCornerFreq', 'pmYSourceCornerFreq')
+            self.rename_key(metaTmp, unitsTmp, 'aodXCornerFreq', 'aodXSourceCornerFreq')
+            self.rename_key(metaTmp, unitsTmp, 'aodYCornerFreq', 'aodYSourceCornerFreq')
 
             # rename variables for the sake of consistency and compatibility with Matlab and because the naming is
             # confusing: samplingRate is actually the acquisition rate since the DAQ card averages the data already
             # the sampling rate should describe the actual time step between data points not something else
-            if 'recordingRate' in meta:
-                self.rename_key(meta, units, 'samplingRate', 'acquisitionRate')
-                self.rename_key(meta, units, 'recordingRate', 'samplingRate')
-                self.rename_key(meta, None, 'nSamples', 'nAcquisitionPerSample')
+            if 'recordingRate' in metaTmp:
+                self.rename_key(metaTmp, unitsTmp, 'samplingRate', 'acquisitionRate')
+                self.rename_key(metaTmp, unitsTmp, 'recordingRate', 'samplingRate')
+                self.rename_key(metaTmp, None, 'nSamples', 'nAcquisitionPerSample')
+
+            # add trial number
+            metaTmp['trial'] = self.data.get_trial_number()
+
+            # update dictionaries
+            meta.update(metaTmp)
+            units.update(unitsTmp)
 
         # add title string to metadata, used for plots
         self.set_title(meta)
@@ -121,26 +128,41 @@ class TxtSourceMpi(BaseSource):
         if not self.data:
             raise ValueError('No data file given.')
 
+        # read the data and column headers from file
         columnHeader, data = self.data.get_data()
+        # convert the column headers to a standardized format
+        columnHeader = self.convert_columns(columnHeader)
+        # convert the data to a standardized format
         data = self.convert_data(columnHeader, data)
         return data
 
     def get_psd(self):
         """
-        Return the PSD of the thermal calibration of the experiment.
+        Return the PSD of the thermal calibration of the experiment as computed by LabView.
 
         Returns:
             :class:`pandas.DataFrame`
         """
 
-        if not self.psd:
-            raise ValueError('No PSD file given.')
+        # read psd file which also contains the fitting
+        data = self.read_psd()
+        # ignore the fitting
+        titles = [title for title, column in data.iteritems() if not title.endswith('Fit')]
+        return data[titles]
 
-        columnHeader, data = self.psd.get_data()
-        # convert PSD column titles to standardized format
-        columnHeader = self.convert_psd_columns(columnHeader)
-        data = self.convert_data(columnHeader, data)
-        return data
+    def get_psd_fit(self):
+        """
+        Return the LabView fit of the Lorentzian to the PSD.
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        # the fit is in the psd file
+        data = self.read_psd()
+        # only choose frequency and fit columns
+        titles = [title for title, column in data.iteritems() if title.endswith('Fit') or title == 'f']
+        return data[titles]
 
     def get_ts(self):
         """
@@ -154,8 +176,29 @@ class TxtSourceMpi(BaseSource):
             raise ValueError('No time series file given.')
 
         columnHeader, data = self.ts.get_data()
+        columnHeader = self.convert_columns(columnHeader)
         data = self.convert_data(columnHeader, data)
         return data
+
+    def read_psd(self):
+        """
+        Read the PSD file given by LabView which actually contains the PSD and the LabView fit to it.
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        if not self.psd:
+            raise ValueError('No PSD file given.')
+
+        # read the psd
+        columnHeader, data = self.psd.get_data()
+        # convert column titles to standardized format
+        columnHeader = self.convert_columns(columnHeader)
+        # convert data to correct format
+        data = self.convert_data(columnHeader, data)
+        return data
+
 
     def set_title(self, meta):
         """
@@ -240,7 +283,8 @@ class TxtSourceMpi(BaseSource):
 
             # insert units from column headers if present
             if columnUnits:
-                units.update(columnUnits)
+                # they need to be checked for standardized identifier before being added
+                units.update(self.convert_columns(columnUnits))
 
             # ensure bead diameter, tweebot files have radius
             if self.get_standard_identifier('pmBeadRadius') in meta:
@@ -256,38 +300,6 @@ class TxtSourceMpi(BaseSource):
                 units['viscosity'] = units['viscosity'].replace('^2', '²')
 
         return meta, units
-
-    def convert_psd_columns(self, struct):
-        """
-        Convert PSD-file column header to standardized format. Works with lists or dictionary by replacing the keys.
-
-        Args:
-            columnHeader (:class:`list` of :class:`str`)
-
-        Returns:
-            :class:`list` of :class:`str`
-        """
-
-        lookup = {'freq': 'f',
-                  'PSDPMx': 'PMx',
-                  'PSDPMy': 'PMy',
-                  'PSDAODx': 'AODx',
-                  'PSDAODy': 'AODy',
-                  'FitPMx': 'fitPMx',
-                  'FitPMy': 'fitPMy',
-                  'FitAODx': 'fitAODx',
-                  'FitAODy': 'fitAODy'
-        }
-
-        if type(struct) == 'dict':
-            for key in struct:
-                if key in lookup:
-                    struct[lookup[key]] = struct.pop(key)
-        else:
-            for i in range(len(struct)):
-                if struct[i] in lookup:
-                    struct[i] = lookup[struct[i]]
-        return struct
 
     def convert_data(self, columnHeader, data):
         """
@@ -376,6 +388,30 @@ class TxtSourceMpi(BaseSource):
         if units:
             units.replace_key(oldKey, newKey)
 
+    def convert_columns(self, struct):
+        """
+        Convert column header to standardized format. Works with lists or dictionary by replacing the values (list)
+        or the keys (dict).
+
+        Args:
+            columnHeader (:class:`list` of :class:`str` or :class:`dict`)
+
+        Returns:
+            :class:`list` of :class:`str` or :class:`dict`
+        """
+
+        if isinstance(struct, dict):
+            # we have to get a list of keys first since we modify the dict in place and would get an infinite loop
+            # else (at least in case of OrderedDict)
+            keys = list(struct.keys())
+            for key in keys:
+                newKey = self.get_standard_identifier(key)
+                struct[newKey] = struct.pop(key)
+        else:
+            for i in range(len(struct)):
+                struct[i] = self.get_standard_identifier(struct[i])
+        return struct
+
     @staticmethod
     def get_value_type(key, value):
         """
@@ -392,6 +428,7 @@ class TxtSourceMpi(BaseSource):
 
         key_mapper = {
             # general stuff
+            'date': lambda x: x.replace('\t', ' '),
             'isDataAveraged': ixo.str_to_bool,
             'nSamples': lambda x: int(float(x)),
             'nSamplesPsd': int,
@@ -416,54 +453,54 @@ class TxtSourceMpi(BaseSource):
             'endOfMeasurement': int,
 
             # aod variables
-            'aodCornerFreqX': float,
-            'aodCornerFreqY': float,
+            'aodXCornerFreq': float,
+            'aodYCornerFreq': float,
 
-            'aodDetectorOffsetX': float,
-            'aodDetectorOffsetY': float,
-            'aodDetectorOffsetZ': float,
+            'aodXDetectorOffset': float,
+            'aodYDetectorOffset': float,
+            'aodZDetectorOffset': float,
 
-            'aodStiffnessX': float,
-            'aodStiffnessY': float,
+            'aodXStiffness': float,
+            'aodYStiffness': float,
 
-            'aodDisplacementSensitivityX': float,
-            'aodDisplacementSensitivityY': float,
+            'aodXDisplacementSensitivity': float,
+            'aodYDisplacementSensitivity': float,
 
             # pm variables
-            'pmCornerFreqX': float,
-            'pmCornerFreqY': float,
+            'pmXCornerFreq': float,
+            'pmYCornerFreq': float,
 
-            'pmDetectorOffsetX': float,
-            'pmDetectorOffsetY': float,
-            'pmDetectorOffsetZ': float,
+            'pmXDetectorOffset': float,
+            'pmYDetectorOffset': float,
+            'pmZDetectorOffset': float,
 
-            'pmStiffnessX': float,
-            'pmStiffnessY': float,
+            'pmXStiffness': float,
+            'pmYStiffness': float,
 
-            'pmDisplacementSensitivityX': float,
-            'pmDisplacementSensitivityY': float,
+            'pmXDisplacementSensitivity': float,
+            'pmYDisplacementSensitivity': float,
 
             # aod tweebot camera variables
-            'andorAodCenterX': float,
-            'andorAodCenterY': float,
-            'andorAodRangeX': float,
-            'andorAodRangeY': float,
+            'andorAodXCenter': float,
+            'andorAodYCenter': float,
+            'andorAodXRange': float,
+            'andorAodYRange': float,
 
-            'ccdAodCenterX': float,
-            'ccdAodCenterY': float,
-            'ccdAodRangeX': float,
-            'ccdAodRangeY': float,
+            'ccdAodXCenter': float,
+            'ccdAodYCenter': float,
+            'ccdAodXRange': float,
+            'ccdAodYRange': float,
 
             # pm tweebot camera variables
-            'andorPmCenterX': float,
-            'andorPmCenterY': float,
-            'andorPmRangeX': float,
-            'andorPmRangeY': float,
+            'andorPmXCenter': float,
+            'andorPmYCenter': float,
+            'andorPmXRange': float,
+            'andorPmYRange': float,
 
-            'ccdPmCenterX': float,
-            'ccdPmCenterY': float,
-            'ccdPmRangeX': float,
-            'ccdPmRangeY': float,
+            'ccdPmXCenter': float,
+            'ccdPmYCenter': float,
+            'ccdPmXRange': float,
+            'ccdPmYRange': float,
 
             # bead
             'pmBeadDiameter': float,
@@ -472,12 +509,12 @@ class TxtSourceMpi(BaseSource):
             'aodBeadRadius': float,
 
             # andor camera specifics
-            'andorPixelSizeX': float,
-            'andorPixelSizeY': float,
+            'andorXPixelSize': float,
+            'andorYPixelSize': float,
 
             # ccd camera specifics
-            'ccdPixelSizeX': float,
-            'ccdPixelSizeY': float,
+            'ccdXPixelSize': float,
+            'ccdYPixelSize': float,
         }
 
         if key in key_mapper:
@@ -502,6 +539,35 @@ class TxtSourceMpi(BaseSource):
         key = key.strip()
 
         key_mapper = {
+            # column titles
+            'freq': 'f',
+            'PMx': 'pmX',
+            'PMy': 'pmY',
+            'AODx': 'aodX',
+            'AODy': 'aodY',
+            'PSDPMx': 'pmX',
+            'PSDPMy': 'pmY',
+            'PSDAODx': 'aodX',
+            'PSDAODy': 'aodY',
+            'FitPMx': 'pmXFit',
+            'FitPMy': 'pmYFit',
+            'FitAODx': 'aodXFit',
+            'FitAODy': 'aodYFit',
+            'PMxdiff': 'pmXDiff',
+            'PMydiff': 'pmYDiff',
+            'PMxsum': 'pmXSum',
+            'AODxdiff': 'aodXDiff',
+            'AODydiff': 'aodYDiff',
+            'AODxsum': 'aodXSum',
+            'FBxsum': 'fbXSum',
+            'FBx': 'fbX',
+            'FBy': 'fbY',
+            'xdist': 'xDist',
+            'ydist': 'yDist',
+            'PMsensorx': 'pmXSensor',
+            'PMsensory': 'pmYSensor',
+            'TrackingReferenceTime': 'trackingReferenceTime',
+
             # general stuff
             'Date of Experiment': 'date',
             'Time of Experiment': 'time',
@@ -549,120 +615,120 @@ class TxtSourceMpi(BaseSource):
             'end of measurement': 'endOfMeasurement',
 
             # aod variables
-            'aodCornerFreqX': 'aodCornerFreqX',
-            'aodCornerFreqY': 'aodCornerFreqY',
-            'aodCornerFreqXSource': 'aodCornerFreqXSource',
-            'aodCornerFreqYSource': 'aodCornerFreqYSource',
-            'AOD horizontal corner frequency': 'aodCornerFreqX',
-            'AOD vertical corner frequency': 'aodCornerFreqY',
+            'aodXCornerFreq': 'aodXCornerFreq',
+            'aodYCornerFreq': 'aodYCornerFreq',
+            'aodXSourceCornerFreq': 'aodXSourceCornerFreq',
+            'aodYSourceCornerFreq': 'aodYSourceCornerFreq',
+            'AOD horizontal corner frequency': 'aodXCornerFreq',
+            'AOD vertical corner frequency': 'aodYCornerFreq',
 
-            'AOD detector horizontal offset': 'aodDetectorOffsetX',
-            'AOD detector vertical offset': 'aodDetectorOffsetY',
+            'AOD detector horizontal offset': 'aodXDetectorOffset',
+            'AOD detector vertical offset': 'aodYDetectorOffset',
 
-            'aodStiffnessX': 'aodStiffnessX',
-            'aodStiffnessY': 'aodStiffnessY',
-            'aodStiffnessXSource': 'aodStiffnessXSource',
-            'aodStiffnessYSource': 'aodStiffnessYSource',
-            'AOD horizontal trap stiffness': 'aodStiffnessX',
-            'AOD vertical trap stiffness': 'aodStiffnessY',
+            'aodXStiffness': 'aodXStiffness',
+            'aodYStiffness': 'aodYStiffness',
+            'aodXSourceStiffness': 'aodXSourceStiffness',
+            'aodYSourceStiffness': 'aodYStiffness',
+            'AOD horizontal trap stiffness': 'aodXStiffness',
+            'AOD vertical trap stiffness': 'aodYStiffness',
 
-            'AOD horizontal OLS': 'aodDisplacementSensitivityX',
-            'AOD vertical OLS': 'aodDisplacementSensitivityY',
+            'AOD horizontal OLS': 'aodXDisplacementSensitivity',
+            'AOD vertical OLS': 'aodYDisplacementSensitivity',
 
             # pm variables
-            'pmCornerFreqX': 'pmCornerFreqX',
-            'pmCornerFreqY': 'pmCornerFreqY',
-            'pmCornerFreqXSource': 'pmCornerFreqXSource',
-            'pmCornerFreqYSource': 'pmCornerFreqYSource',
-            'PM horizontal corner frequency': 'pmCornerFreqX',
-            'PM vertical corner frequency': 'pmCornerFreqY',
+            'pmXCornerFreq': 'pmXCornerFreq',
+            'pmYCornerFreq': 'pmYCornerFreq',
+            'pmXSourceCornerFreq': 'pmXSourceCornerFreq',
+            'pmYSourceCornerFreq': 'pmYSourceCornerFreq',
+            'PM horizontal corner frequency': 'pmXCornerFreq',
+            'PM vertical corner frequency': 'pmYCornerFreq',
 
-            'PM detector horizontal offset': 'pmDetectorOffsetX',
-            'PM detector vertical offset': 'pmDetectorOffsetY',
+            'PM detector horizontal offset': 'pmXDetectorOffset',
+            'PM detector vertical offset': 'pmYDetectorOffset',
 
-            'pmStiffnessX': 'pmStiffnessX',
-            'pmStiffnessY': 'pmStiffnessY',
-            'pmStiffnessXSource': 'pmStiffnessXSource',
-            'pmStiffnessYSource': 'pmStiffnessYSource',
-            'PM horizontal trap stiffness': 'pmStiffnessX',
-            'PM vertical trap stiffness': 'pmStiffnessY',
+            'pmXStiffness': 'pmXStiffness',
+            'pmYStiffness': 'pmYStiffness',
+            'pmXSourceStiffness': 'pmXSourceStiffness',
+            'pmYSourceStiffness': 'pmYSourceStiffness',
+            'PM horizontal trap stiffness': 'pmXStiffness',
+            'PM vertical trap stiffness': 'pmYStiffness',
 
-            'PM horizontal OLS': 'pmDisplacementSensitivityX',
-            'PM vertical OLS': 'pmDisplacementSensitivityY',
+            'PM horizontal OLS': 'pmXDisplacementSensitivity',
+            'PM vertical OLS': 'pmYDisplacementSensitivity',
 
             # aod tweebot variables
-            'AOD detector x offset': 'aodDetectorOffsetX',
-            'AOD detector y offset': 'aodDetectorOffsetY',
+            'AOD detector x offset': 'aodXDetectorOffset',
+            'AOD detector y offset': 'aodYDetectorOffset',
 
-            'AOD trap stiffness x': 'aodStiffnessX',
-            'AOD trap stiffness y': 'aodStiffnessY',
+            'AOD trap stiffness x': 'aodXStiffness',
+            'AOD trap stiffness y': 'aodYStiffness',
 
-            'xStiffnessT2.pNperNm': 'aodStiffnessX',
-            'yStiffnessT2.pNperNm': 'aodStiffnessY',
+            'xStiffnessT2.pNperNm': 'aodXStiffness',
+            'yStiffnessT2.pNperNm': 'aodYStiffness',
 
-            'AOD trap distance conversion x': 'aodDisplacementSensitivityX',
-            'AOD trap distance conversion y': 'aodDisplacementSensitivityY',
+            'AOD trap distance conversion x': 'aodXDisplacementSensitivity',
+            'AOD trap distance conversion y': 'aodYDisplacementSensitivity',
 
-            'xDistConversionT2.VperNm': 'aodDisplacementSensitivityX',
-            'yDistConversionT2.VperNm': 'aodDisplacementSensitivityY',
+            'xDistConversionT2.VperNm': 'aodXDisplacementSensitivity',
+            'yDistConversionT2.VperNm': 'aodYDisplacementSensitivity',
 
-            'xCornerFreqT2.Hz': 'aodCornerFreqX',
-            'xCornerFreqT2': 'aodCornerFreqX',
-            'yCornerFreqT2.Hz': 'aodCornerFreqY',
-            'yCornerFreqT2': 'aodCornerFreqY',
+            'xCornerFreqT2.Hz': 'aodXCornerFreq',
+            'xCornerFreqT2': 'aodXCornerFreq',
+            'yCornerFreqT2.Hz': 'aodYCornerFreq',
+            'yCornerFreqT2': 'aodYCornerFreq',
 
-            'xOffsetT2.V': 'aodDetectorOffsetX',
-            'yOffsetT2.V': 'aodDetectorOffsetY',
-            'zOffsetT2.V': 'aodDetectorOffsetZ',
+            'xOffsetT2.V': 'aodXDetectorOffset',
+            'yOffsetT2.V': 'aodYDetectorOffset',
+            'zOffsetT2.V': 'aodZDetectorOffset',
 
             # pm tweebot variables
-            'PM detector x offset': 'pmDetectorOffsetX',
-            'PM detector y offset': 'pmDetectorOffsetY',
+            'PM detector x offset': 'pmXDetectorOffset',
+            'PM detector y offset': 'pmYDetectorOffset',
 
-            'PM trap stiffness x': 'pmStiffnessX',
-            'PM trap stiffness y': 'pmStiffnessY',
+            'PM trap stiffness x': 'pmXStiffness',
+            'PM trap stiffness y': 'pmYStiffness',
 
-            'xStiffnessT1.pNperNm': 'pmStiffnessX',
-            'yStiffnessT1.pNperNm': 'pmStiffnessY',
+            'xStiffnessT1.pNperNm': 'pmXStiffness',
+            'yStiffnessT1.pNperNm': 'pmYStiffness',
 
-            'PM trap distance conversion x': 'pmDisplacementSensitivityX',
-            'PM trap distance conversion y': 'pmDisplacementSensitivityY',
+            'PM trap distance conversion x': 'pmXDisplacementSensitivity',
+            'PM trap distance conversion y': 'pmYDisplacementSensitivity',
 
-            'xDistConversionT1.VperNm': 'pmDisplacementSensitivityX',
-            'yDistConversionT1.VperNm': 'pmDisplacementSensitivityY',
+            'xDistConversionT1.VperNm': 'pmXDisplacementSensitivity',
+            'yDistConversionT1.VperNm': 'pmYDisplacementSensitivity',
 
-            'xCornerFreqT1.Hz': 'pmCornerFreqX',
-            'xCornerFreqT1': 'pmCornerFreqX',
-            'yCornerFreqT1.Hz': 'pmCornerFreqY',
-            'yCornerFreqT1': 'pmCornerFreqY',
+            'xCornerFreqT1.Hz': 'pmXCornerFreq',
+            'xCornerFreqT1': 'pmXCornerFreq',
+            'yCornerFreqT1.Hz': 'pmYCornerFreq',
+            'yCornerFreqT1': 'pmYCornerFreq',
 
-            'xOffsetT1.V': 'pmDetectorOffsetX',
-            'xOffsetT1': 'pmDetectorOffsetX',
-            'yOffsetT1.V': 'pmDetectorOffsetY',
-            'yOffsetT1': 'pmDetectorOffsetY',
-            'zOffsetT1.V': 'pmDetectorOffsetZ',
+            'xOffsetT1.V': 'pmXDetectorOffset',
+            'xOffsetT1': 'pmXDetectorOffset',
+            'yOffsetT1.V': 'pmYDetectorOffset',
+            'yOffsetT1': 'pmYDetectorOffset',
+            'zOffsetT1.V': 'pmZDetectorOffset',
 
             # aod tweebot camera variables
-            'AOD ANDOR center x': 'andorAodCenterX',
-            'AOD ANDOR center y': 'andorAodCenterY',
-            'AOD ANDOR range x': 'andorAodRangeX',
-            'AOD ANDOR range y': 'andorAodRangeY',
+            'AOD ANDOR center x': 'andorAodXCenter',
+            'AOD ANDOR center y': 'andorAodYCenter',
+            'AOD ANDOR range x': 'andorAodXRange',
+            'AOD ANDOR range y': 'andorAodYRange',
 
-            'AOD CCD center x': 'ccdAodCenterX',
-            'AOD CCD center y': 'ccdAodCenterY',
-            'AOD CCD range x': 'ccdAodRangeX',
-            'AOD CCD range y': 'ccdAodRangeY',
+            'AOD CCD center x': 'ccdAodXCenter',
+            'AOD CCD center y': 'ccdAodYCenter',
+            'AOD CCD range x': 'ccdAodXRange',
+            'AOD CCD range y': 'ccdAodYRange',
 
             # pm tweebot camera variables
-            'PM ANDOR center x': 'andorPmCenterX',
-            'PM ANDOR center y': 'andorPmCenterY',
-            'PM ANDOR range x': 'andorPmRangeX',
-            'PM ANDOR range y': 'andorPmRangeY',
+            'PM ANDOR center x': 'andorPmXCenter',
+            'PM ANDOR center y': 'andorPmYCenter',
+            'PM ANDOR range x': 'andorPmXRange',
+            'PM ANDOR range y': 'andorPmYRange',
 
-            'PM CCD center x': 'ccdPmCenterX',
-            'PM CCD center y': 'ccdPmCenterY',
-            'PM CCD range x': 'ccdPmRangeX',
-            'PM CCD range y': 'ccdPmRangeY',
+            'PM CCD center x': 'ccdXPmCenter',
+            'PM CCD center y': 'ccdYPmCenter',
+            'PM CCD range x': 'ccdXPmRange',
+            'PM CCD range y': 'ccdYPmRange',
 
             # bead
             'PM bead diameter': 'pmBeadDiameter',
@@ -678,12 +744,12 @@ class TxtSourceMpi(BaseSource):
             'aodBeadRadius': 'aodBeadRadius',
 
             # andor camera specifics
-            'ANDOR pixel size x': 'andorPixelSizeX',
-            'ANDOR pixel size y': 'andorPixelSizeY',
+            'ANDOR pixel size x': 'andorXPixelSize',
+            'ANDOR pixel size y': 'andorYPixelSize',
 
             # ccd camera specifics
-            'CCD pixel size x': 'ccdPixelSizeX',
-            'CCD pixel size y': 'ccdPixelSizeY'
+            'CCD pixel size x': 'ccdXPixelSize',
+            'CCD pixel size y': 'ccdYPixelSize'
         }
 
         return key_mapper[key]

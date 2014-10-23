@@ -11,7 +11,7 @@ class PsdComputation():
     Object to compute a PSD using Welch's method (:func:`scipy.signal.welch`).
     """
 
-    def __init__(self, container, blockLength=2**13, nBlocks=None):
+    def __init__(self, container, blockLength=2**13, overlap=None, nBlocks=None):
         """
         Constructor for PsdAnalysis
 
@@ -23,7 +23,11 @@ class PsdComputation():
         """
 
         self.c = container
-        self.blockLength = blockLength
+        self.blockLength = int(blockLength)
+        if overlap:
+            self.overlap = int(overlap)
+        else:
+            self.overlap = overlap
         self.nBlocks = nBlocks
 
     def psd(self):
@@ -35,24 +39,38 @@ class PsdComputation():
             :class:`pandas.DataFrame`
         """
 
-        # get nBlocks if set to 'None'
-        # this corresponds to no overlap
-        if not self.nBlocks:
-            self.nBlocks = len(self.c.ts.ix[:, 0]) / self.blockLength
+
+        lenData = len(self.c.ts.ix[:, 0])
+
+        # get nBlocks
+        if self.overlap:
+            # if overlap was given, it has priority over nBlocks
+            self.nBlocks = lenData // (self.blockLength - self.overlap)
+        elif self.nBlocks:
+            # else, compute overlap from nBlocks
+            self.overlap = self.blockLength - lenData / self.nBlocks
+        else:
+            # default: no overlap
+            self.overlap = 0
+            self.nBlocks = lenData // self.blockLength
 
         psd = pd.DataFrame()
         for title, column in self.c.ts.items():
             fRaw, psdRaw = welch(column,
                                  fs=self.c.meta['samplingRateTs'],
                                  nperseg=self.blockLength,
-                                 noverlap=self.overlap(column))
+                                 noverlap=self.overlap)
 
             # store psd, overwrites 'f' but it should be the same for all the axes so no problem here
             psd['f'] = fRaw
             # get rid of the 'diff' at the end of the title strings, should be there by convention
-            titleNew = title.split('diff')[0]
+            titleNew = title.split('Diff')[0]
             self.c.units[titleNew] = self.c.units[title] + '² / Hz'
             psd[titleNew] = psdRaw
+            # update metadata dict
+            self.c.meta.set(title, 'PsdBlockLength', self.blockLength)
+            self.c.meta.set(title, 'PsdNBlocks', self.nBlocks)
+            self.c.meta.set(title, 'PsdOverlap', self.overlap)
 
         return psd
 
@@ -64,8 +82,11 @@ class PsdComputation():
         Returns:
             :class:`int`
         """
+        overlap = self.blockLength - len(data) / self.nBlocks
+        if overlap < 0:
+            print(str(self.blockLength) + ' ' + str(len(data)) + ' ' + str(self.nBlocks))
 
-        return self.blockLength - len(data) / self.nBlocks
+        return overlap
 
 
 class PsdFit():
@@ -73,7 +94,7 @@ class PsdFit():
     Fit the PSD.
     """
 
-    def __init__(self, container, fitCls=LeastSquaresFit):
+    def __init__(self, container, fitCls=LeastSquaresFit, minF=5, maxF=3*10**3, residuals=True):
         """
         Constructor for PsdFit
 
@@ -81,11 +102,19 @@ class PsdFit():
             container (:class:`tweezer.TweezerData`): data container
             fitCls (:class:`ixo.fit.Fit`): class to use for fitting, must implement the methods given in the
                                             reference class
+            minF (float): only data points with frequencies above this limit are fitted
+            maxF (float): only data points with frequencies below this limit are fitted
+            r (bool): compute the residuals for the fit, they are added as columns to the PSD data in the container
+                      structure
         """
 
         self.c = container
         # fit class to use
         self.fitCls = fitCls
+        # fit limits
+        self.minF = minF
+        self.maxF = maxF
+        self.residuals = residuals
 
         # hold fit results when required
         self.fitObj = {}
@@ -101,11 +130,16 @@ class PsdFit():
         """
 
         for title, column in self.c.psd.iteritems():
-            if title == 'f' or title.startswith('fit'):
+            if title == 'f' or title.endswith('fit'):
                 # skip frequency and possibly present 'fit...' columns
                 continue
+
+            # pick data for fitting based on given limits
+            data = self.c.psd[['f', title]]
+            data = data[(data['f'] >= self.minF) & (data['f'] <= self.maxF)]
+
             # create fit object and do the fit
-            self.fitObj[title] = self.fitCls(self.c.psd['f'], column, self.lorentzian)
+            self.fitObj[title] = self.fitCls(data['f'], data[title], self.lorentzian)
             res = self.fitObj[title].fit()
             # store results
             self.D[title] = res[0]
@@ -114,6 +148,7 @@ class PsdFit():
             self.std[title] = list(res[2])
             self.r2[title] = res[3]
 
+        psdFit = self.c.psd[['f']][(self.c.psd['f'] >= self.minF) & (self.c.psd['f'] <= self.maxF)]
         # update values in data structure
         for title, D in self.D.items():
             # update metadata
@@ -121,6 +156,8 @@ class PsdFit():
             self.c.meta.set(title, 'fc', self.fc[title])
             self.c.meta.set(title, 'r2', self.r2[title])
             self.c.meta.set(title, 'PsdFitStd', self.std[title])
+            self.c.meta.set(title, 'FitMinF', self.minF)
+            self.c.meta.set(title, 'FitMaxF', self.maxF)
 
             # get stiffness and store it
             beadKey = self.c.meta.get_key(title, 'BeadDiameter')
@@ -132,8 +169,16 @@ class PsdFit():
                                        viscosity=self.c.meta['viscosity'])
             self.c.meta.set(title, 'k', stiffness)
 
-            # append plotting data to psd
-            self.c.psd['fit' + title] = self.lorentzian(self.c.psd['f'], D, self.fc[title])
+            # append plotting data to psd only for fitting range
+            # pick data for fitting based on given limits
+            psdFit[title + 'Fit'] = self.lorentzian(psdFit['f'], D, self.fc[title])
+
+            # compute residuals
+            if self.residuals:
+                psdFit[title + 'Residuals'], meanResidual = self.fitObj[title].residuals()
+                self.c.meta.set(title, 'MeanResidualPsd')
+
+        return psdFit
 
     @staticmethod
     def lorentzian(f, D, fc):

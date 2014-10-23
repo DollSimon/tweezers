@@ -3,6 +3,8 @@ from collections import OrderedDict
 import pprint
 import re
 from tweezer.analysis.psd import PsdComputation, PsdFit
+import pandas as pd
+import logging as log
 
 
 class MetaBaseDict(OrderedDict):
@@ -35,7 +37,7 @@ class MetaBaseDict(OrderedDict):
         except KeyError:
             try:
                 value = self.defaults[item]
-                print('[Info] Default metadata value used for key: ' + item)
+                log.info('Default metadata value used for key: %s', item)
                 return value
             except KeyError:
                 pass
@@ -86,36 +88,34 @@ class MetaBaseDict(OrderedDict):
             :class:`str`
         """
 
-        if type(keyElement) == 'str':
-            # check for direct key
-            if not keyElement in self:
-                # check in alias list
-                keyElement = self.get_alias(keyElement)
-            return keyElement
+        # keyElement is a list
+        # check if the list begins with something like 'pmx'
+        regex = re.compile('^(?P<beam>pm|aod)?\s?(?P<axes>x|y)?\s?(?P<source>source)?.*', re.IGNORECASE)
+        res = regex.search(keyElement[0])
+        prefixElements = []
+        if res:
+            if res.group('beam'):
+                prefixElements.append(res.group('beam').lower())
+            if res.group('axes'):
+                prefixElements.append(res.group('axes').upper())
+            if res.group('source'):
+                prefixElements.append('Source')
         else:
-            # let's assume that keyElement is a list, else this is going to blow up
-            # check if the list begins with something like 'pmx'
-            regex = re.compile('.*(?P<beam>pm|PM|aod|AOD)\s?(?P<axes>x|X|y|Y).*')
-            res = regex.search(keyElement[0])
-            if res and res.group('beam'):
-                key = res.group('beam').lower()
-            else:
-                key = self.get_alias(keyElement[0])
+            prefixElements.append(self.get_alias(keyElement[0]))
 
-            # add keyElement[1]
-            key += self.get_alias(keyElement[1])
+        # add all other elements
+        suffix = ''
+        for i in range(1, len(keyElement)):
+            suffix += self.get_alias(keyElement[i])
 
-            # maybe we don't require the direction (x or y)? e.g. for bead diameter
-            # this should be safe to do since a quantity that is direction specific will not have a key without the
-            # direction and vice versa
-            if not key in self:
-                # maybe we need the axes and the rest of the input list
-                if res and res.group('axes'):
-                    key += res.group('axes').upper()
-
-                # add all other elements
-                for i in range(2, len(keyElement)):
-                    key += self.get_alias(keyElement[i])
+        # lets check for existing keys
+        # if one is found, return it; this actually returns the first matching key but that should be fine
+        prefix = ''
+        for pre in prefixElements:
+            prefix += pre
+            key = prefix + suffix
+            if key in self:
+                break
 
         # here, we don't care if the key actually exists so just return it, it could be a new one
         return key
@@ -148,6 +148,30 @@ class MetaBaseDict(OrderedDict):
         k = self.get_key(*k[:-1])
         self[k] = value
 
+    def get_facets(self):
+        """
+
+
+        Args:
+
+
+        Returns:
+
+        """
+
+        facets = {'pmX': {}, 'pmY': {}, 'aodX': {}, 'aodY': {}}
+
+        for key, value in self.items():
+            regex = re.compile('^(?P<beam>pm|aod)(?P<axes>x|y)(?P<element>.*)$', re.IGNORECASE)
+            res = regex.search(key)
+            if not res:
+                continue
+            axes = res.group('beam').lower() + res.group('axes').upper()
+            facets[axes]['title'] = self['title']
+            facets[axes]['axes'] = axes
+            facets[axes][res.group('element')] = value
+
+        return list(facets.values())
 
 class MetaDict(MetaBaseDict):
     """
@@ -162,7 +186,12 @@ class UnitDict(MetaBaseDict):
     """
     Store units corresponding to metadata.
     """
-    defaults = {'viscosity': 'pN s / nm^2'}
+    defaults = {'viscosity': 'pN s / nm^2',
+                'pmXDiff': 'V',
+                'pmYDiff': 'V',
+                'aodXDiff': 'V',
+                'aodYDiff': 'V'
+    }
 
 
 class TweezerData():
@@ -197,7 +226,7 @@ class TweezerData():
         =============== =============================================================================================
     """
 
-    def __init__(self, dataSource):
+    def __init__(self, dataSource, verbose=True):
         """
         Constructor for Data
 
@@ -207,6 +236,14 @@ class TweezerData():
 
         # store dataSource object
         self.dataSource = dataSource
+
+        logger = log.getLogger()
+        # logger.
+        if verbose:
+            logger.setLevel(log.INFO)
+        else:
+            logger.setLevel(log.WARNING)
+        # log.basicConfig(format='%(levelname)s:%(message)s', level=level)
 
     @lazy
     def meta(self):
@@ -261,6 +298,20 @@ class TweezerData():
         return self.dataSource.get_psd()
 
     @lazy
+    def psdFitSource(self):
+        """
+
+
+        Args:
+
+
+        Returns:
+
+        """
+
+        return self.dataSource.get_psd_fit()
+
+    @lazy
     def psd(self):
         """
         Attribute to hold the power spectrum density. If called for the first time it will compute the PSD using the
@@ -283,8 +334,24 @@ class TweezerData():
         psdObj = PsdComputation(self, **kwargs)
         setattr(self, 'psd', psdObj.psd())
         return self
-    
-    def fit_psd(self, *args, **kwargs):
+
+    @lazy
+    def psdFit(self):
+        """
+
+
+        Args:
+
+
+        Returns:
+
+        """
+
+        psdFitObj = PsdFit(self)
+        return psdFitObj.fit()
+
+
+    def fit_psd(self, **kwargs):
         """
         Fits the PSD. All input is forwarded to the :class:`tweezer.analysis.psd.PsdFit` object.
 
@@ -292,8 +359,8 @@ class TweezerData():
             :class:`tweezer.TweezerData`
         """
 
-        fitObj = PsdFit(self, *args, **kwargs)
-        fitObj.fit()
+        psdFitObj = PsdFit(self, **kwargs)
+        setattr(self, 'psdFit', psdFitObj.fit())
         return self
 
     @lazy
