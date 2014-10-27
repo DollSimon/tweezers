@@ -18,3 +18,5 @@ tweezer/legacy/templates/pytex/*
 
 .DS_Store
 docs/build
+build
+dist
