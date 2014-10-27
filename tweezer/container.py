@@ -13,6 +13,7 @@ class MetaBaseDict(OrderedDict):
     prints a warning.
     """
     # TODO should this dictionary be ordered alphabetically?
+
     defaults = {}
 
     # all aliases should be lower case
@@ -22,12 +23,10 @@ class MetaBaseDict(OrderedDict):
                'PsdFitR2': ['r2'],
                'PsdFitChi2': ['chi2']}
 
+    warningString = ''
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # TODO Do we want a warning if a default value is used? If so, use the __getitem__ method
-        # add default values here, example:
-        #self.setdefault('viscosity', 1.2e-9)
 
     def __str__(self):
         return pprint.pformat(self)
@@ -38,7 +37,7 @@ class MetaBaseDict(OrderedDict):
         except KeyError:
             try:
                 value = self.defaults[item]
-                log.info('Default metadata value used for key: %s', item)
+                log.info('%sDefault metadata value used for key: %s', self.warningString, item)
                 return value
             except KeyError:
                 pass
@@ -174,6 +173,7 @@ class MetaBaseDict(OrderedDict):
 
         return list(facets.values())
 
+
 class MetaDict(MetaBaseDict):
     """
     An class to hold metadata.
@@ -181,6 +181,8 @@ class MetaDict(MetaBaseDict):
     # TODO order keys by alphabet
 
     defaults = {'title': 'no title'}
+
+    warningString = 'Meta values: '
 
 
 class UnitDict(MetaBaseDict):
@@ -193,6 +195,8 @@ class UnitDict(MetaBaseDict):
                 'aodXDiff': 'V',
                 'aodYDiff': 'V'
     }
+
+    warningString = 'Units: '
 
 
 class TweezerData():
@@ -350,7 +354,6 @@ class TweezerData():
 
         psdFitObj = PsdFit(self)
         return psdFitObj.fit()
-
 
     def fit_psd(self, **kwargs):
         """
