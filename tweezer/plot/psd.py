@@ -42,7 +42,7 @@ class PsdPlotBase():
         self.nPsdAxes = 0
         self.psdTitles = []
         for title in container.psd.columns:
-                if title != 'f':
+                if title.endswith('X') or title.endswith('Y'):
                     self.nPsdAxes += 1
                     self.psdTitles.append(title)
 
@@ -170,9 +170,9 @@ class PsdFitPlot(PsdPlotBase):
             self.plot_psd(psdAxes, self.c.psd['f'], self.c.psd[title], units=self.c.units[title],
                           label='PSD', **kwargs)
             # plot fit
-            label = 'k = {:.5}, fc = {:.4}, r2 = {:.4}'.format(self.c.meta.get(title, 'Stiffness'),
+            label = 'k = {:.5}, fc = {:.4}, Chi2 = {:.4}'.format(self.c.meta.get(title, 'Stiffness'),
                                                                self.c.meta.get(title, 'CornerFreq'),
-                                                               self.c.meta.get(title, 'PsdFitR2'))
+                                                               self.c.meta.get(title, 'PsdFitChi2'))
             self.plot_psd_fit(psdAxes, self.c.psdFit['f'], self.c.psdFit[title + 'Fit'],
                               label=label, **kwargs)
             # add legend to PSD plot

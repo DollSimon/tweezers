@@ -19,7 +19,8 @@ class MetaBaseDict(OrderedDict):
     aliases = {'DiffCoeff': ['d'],
                'Stiffness': ['k'],
                'CornerFreq': ['fc'],
-               'PsdFitR2': ['r2']}
+               'PsdFitR2': ['r2'],
+               'PsdFitChi2': ['chi2']}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
