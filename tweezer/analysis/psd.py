@@ -10,15 +10,18 @@ class PsdComputation():
     Object to compute a PSD using Welch's method (:func:`scipy.signal.welch`).
     """
 
-    def __init__(self, container, blockLength=2**13, overlap=None, nBlocks=None):
+    def __init__(self, container, blockLength=2**13, overlap=None, nBlocks=None, blockData=False):
         """
         Constructor for PsdAnalysis
 
         Args:
             container (:class:`tweezer.TweezerData`): data container
             blockLength (float): number of data points per block (default: 2**13)
+            overlap (int): The number of datapoints that should overlap. If not ``None``, this will take precedence
+                           over ``nBlocks``. If nothing is given, the overlap is 0.
             nBlocks (int): The number of blocks determines the overlap between them. If set to ``None``, the number
                            is computed such that the overlap is 0.
+            blockData (bool): Should the PSD for each block also be returned?
         """
 
         self.c = container
@@ -28,6 +31,7 @@ class PsdComputation():
         else:
             self.overlap = overlap
         self.nBlocks = nBlocks
+        self.blockData = blockData
 
     def psd(self):
         """
@@ -263,7 +267,7 @@ class PsdFit():
     Fit the PSD.
     """
 
-    def __init__(self, container, fitCls=PsdFitLeastSquares, minF=5, maxF=3*10**3, residuals=True):
+    def __init__(self, container, fitCls=PsdFitLeastSquares, minF=5, maxF=3*10**3, residuals=True, **fitargs):
         """
         Constructor for PsdFit
 
@@ -273,8 +277,9 @@ class PsdFit():
                                             reference class
             minF (float): only data points with frequencies above this limit are fitted
             maxF (float): only data points with frequencies below this limit are fitted
-            r (bool): compute the residuals for the fit, they are added as columns to the PSD data in the container
-                      structure
+            residuals (bool): compute the residuals for the fit, they are added as columns to the PSD data in the
+                              container structure
+            startingValues (list): starting values for the fitting routine, optional
         """
 
         self.c = container
@@ -284,6 +289,7 @@ class PsdFit():
         self.minF = minF
         self.maxF = maxF
         self.residuals = residuals
+        self.fitargs = fitargs
 
         # hold fit results when required
         self.fitObj = {}
@@ -318,7 +324,8 @@ class PsdFit():
                                  data[title],
                                  fcn=self.lorentzian,
                                  std=data[title + 'Std'],
-                                 container=self.c)
+                                 container=self.c,
+                                 **self.fitargs)
             res = fitObj.fit()
 
             # store results

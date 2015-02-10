@@ -3,6 +3,7 @@ import seaborn as sns
 from itertools import chain
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MaxNLocator
+import numpy as np
 
 
 class PsdPlotBase():
@@ -66,6 +67,26 @@ class PsdPlotBase():
         ax.set_ylabel(labelY)
         line = ax.loglog(f, psd, *args, **kwargs)
         return line
+
+    def plot_psd_errors(self, ax, f, psd, errors, *args, **kwargs):
+        """
+
+
+        Args:
+            ax, f, psd, errors, *args, **kwargs
+
+        Returns:
+
+        """
+
+        lowerLimit = psd - errors
+        lowerLimit[lowerLimit <= 0] = 1e-15
+
+        # set alpha
+        kwargs['alpha'] = 0.4
+
+        ax.fill_between(f, psd + errors, lowerLimit, *args, **kwargs)
+
 
     def plot_residuals(self, ax, f, res, *args, **kwargs):
         """
@@ -167,8 +188,15 @@ class PsdFitPlot(PsdPlotBase):
             # prepare psd axes
             psdAxes = plt.subplot(innerGrid[1:])
             # plot psd
-            self.plot_psd(psdAxes, self.c.psd['f'], self.c.psd[title], units=self.c.units[title],
-                          label='PSD', **kwargs)
+            psdLine = self.plot_psd(psdAxes, self.c.psd['f'], self.c.psd[title], units=self.c.units[title],
+                                    label='PSD', **kwargs)
+            # plot psd errors
+            # calucate standard error
+            errors = self.c.psd[title + 'Std'] / np.sqrt(self.c.meta['nBlocks'])
+            self.plot_psd_errors(psdAxes, self.c.psd['f'], self.c.psd[title],
+                                 errors,
+                                 color=self.get_color(psdLine))
+
             # plot fit
             label = 'k = {:.5}, fc = {:.4}, Chi2 = {:.4}'.format(self.c.meta.get(title, 'Stiffness'),
                                                                self.c.meta.get(title, 'CornerFreq'),
