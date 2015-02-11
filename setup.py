@@ -4,11 +4,11 @@
 from setuptools import setup, find_packages
 
 DESCRIPTION = ("Tools to read, analyse and interpret dual-trap\
- optical tweezer experiments")
+ optical tweezers experiments")
 
 LONG_DESCRIPTION = """
-**tweezer** is an extensible Python package for the analysis\
- of dual-trap optical tweezer experiments.
+**tweezers** is an extensible Python package for the analysis\
+ of dual-trap optical tweezers experiments.
 """
 
 DEPENDENCIES = [# documentation stuff
@@ -38,7 +38,7 @@ CLASSIFIERS = [
 ]
 
 setup(
-    name='tweezer',
+    name='tweezers',
     version='0.0.2',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
@@ -47,15 +47,10 @@ setup(
     author_email='jahnel@mpi-cbg.de',
     install_requires=DEPENDENCIES,
     packages=find_packages(),
-    package_data={'tweezer': ['data/*/*',
-                              'templates/*/*',
-                              'kernel/*/*',
-                              'data/settings/default_settings.json',
-                              'data/settings/default.config.txt']},
     entry_points={
         'console_scripts': [
-            'dt=tweezer.cli.main:start',
-            'tweezer=tweezer.cli.main:start'
+            'dt=tweezers.cli.main:start',
+            'tweezers=tweezers.cli.main:start'
         ],
     },
     classifiers=CLASSIFIERS

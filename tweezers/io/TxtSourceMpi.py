@@ -8,7 +8,7 @@ from collections import OrderedDict
 from .TxtFileMpi import TxtFileMpi
 from .BaseSource import BaseSource
 
-import tweezer as c
+import tweezers as c
 import ixo.utils as ixo
 
 
@@ -49,7 +49,7 @@ class TxtSourceMpi(BaseSource):
         Return the metadata of the experiment.
 
         Returns:
-            :class:`tweezer.MetaDict`
+            :class:`tweezers.MetaDict`
         """
 
         # keep variables local so they are not stored in memory
@@ -213,7 +213,7 @@ class TxtSourceMpi(BaseSource):
             meta
 
         Returns:
-            :class:`tweezer.MetaDict`
+            :class:`tweezers.MetaDict`
         """
 
         title = ''
@@ -238,7 +238,7 @@ class TxtSourceMpi(BaseSource):
             existing values
 
         Returns:
-            :class:`tweezer.MetaDict` and :class:`tweezer.UnitDict`
+            :class:`tweezers.MetaDict` and :class:`tweezers.UnitDict`
         """
 
         # JSON header?
@@ -328,7 +328,7 @@ class TxtSourceMpi(BaseSource):
         but used here to convert the header to JSON.
 
         Args:
-            container (:class:`tweezer.TweezerData`): data container
+            container (:class:`tweezers.TweezerData`): data container
             target (:class:`pathlib.Path`): path where to write the file, if set to ``None`` the input path will be used
         """
 
@@ -355,7 +355,7 @@ class TxtSourceMpi(BaseSource):
         Set default values for metadata and units. This will be overwritten by values in the data files if they exist.
 
         Returns:
-            :class:`tweezer.MetaDict` and :class:`tweezer.UnitDict`
+            :class:`tweezers.MetaDict` and :class:`tweezers.UnitDict`
         """
 
         meta = c.MetaDict()
@@ -372,12 +372,12 @@ class TxtSourceMpi(BaseSource):
     def rename_key(self, meta, units, oldKey, newKey):
         """
         Rename a key in the meta- and units-dictionaries. This uses
-        :meth:`tweezer.io.source.TxtFileMpi.get_standard_identifier` for compatibility in case a default identifier
+        :meth:`tweezers.io.source.TxtFileMpi.get_standard_identifier` for compatibility in case a default identifier
         is renamed.
 
         Args:
-            meta (:class:`tweezer.MetaDict`): meta dictionary
-            units (:class:`tweezer.UnitDict`): units dictionary
+            meta (:class:`tweezers.MetaDict`): meta dictionary
+            units (:class:`tweezers.UnitDict`): units dictionary
             oldKey (str): key to be renamed
             newKey (str): new key name
 

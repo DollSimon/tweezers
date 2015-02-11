@@ -1,6 +1,6 @@
 from pathlib import Path
 import re
-from tweezer import UnitDict
+from tweezers import UnitDict
 
 
 class TxtFileMpi():
@@ -38,11 +38,11 @@ class TxtFileMpi():
 
     def get_header(self):
         """
-        Returns all header lines of the file and if applicable (no JSON header) a :class:`tweezer.UnitDict` with the
+        Returns all header lines of the file and if applicable (no JSON header) a :class:`tweezers.UnitDict` with the
         units of the data columns.
 
         Returns:
-            :class:`list` of :class:`str` and either ``None`` or :class:`tweezer.UnitDict`
+            :class:`list` of :class:`str` and either ``None`` or :class:`tweezers.UnitDict`
         """
 
         if self.isJson:
@@ -134,7 +134,7 @@ class TxtFileMpi():
 
         Returns:
             if 'get' is 'data: columnHeader (:class:`list` of :class:`str`), dataLines (:class:`str`)
-            if 'get' is 'header': headerLines (:class:`list` of :class:`str`), units (:class:`tweezer.UnitDict`)
+            if 'get' is 'header': headerLines (:class:`list` of :class:`str`), units (:class:`tweezers.UnitDict`)
         """
 
         headerLines = []

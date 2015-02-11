@@ -2,7 +2,7 @@ from ixo.decorators import lazy
 from collections import OrderedDict
 import pprint
 import re
-from tweezer.analysis.psd import PsdComputation, PsdFit
+from tweezers.analysis.psd import PsdComputation, PsdFit
 import pandas as pd
 import logging as log
 
@@ -58,7 +58,7 @@ class MetaBaseDict(OrderedDict):
 
     def get_alias(self, key):
         """
-        Check if the given key corresponds to an alias in :attr:`tweezer.MetaBaseDict.aliases`.
+        Check if the given key corresponds to an alias in :attr:`tweezers.MetaBaseDict.aliases`.
 
         Args:
             key (str): string to check
@@ -76,10 +76,10 @@ class MetaBaseDict(OrderedDict):
         """
         Construct a key name for this dictionary from the input.
         If the input is a string, it is checked whether it exists or has an valid alias in the
-        :attr:`tweezer.MetaBaseDict.aliases` attribute.
+        :attr:`tweezers.MetaBaseDict.aliases` attribute.
         If the input is a list of strings the elements are basically concatenated with the exception of the first
         element being of type ``pmx``. In this case e.g. ``['pmx', 'Stiffness']`` becomes ``pmStiffnessX``. Each of
-        the list elements is checked for an valid alias with :meth:`tweezer.MetaBaseDict.get_alias`.
+        the list elements is checked for an valid alias with :meth:`tweezers.MetaBaseDict.get_alias`.
 
         Args:
             keyElement (:class:`str` or :class:`list` of :class:`str`): element(s) that describe the key to construct
@@ -122,7 +122,7 @@ class MetaBaseDict(OrderedDict):
     
     def get(self, *k):
         """
-        The input is forwarded to :meth:`tweezer.MetaBaseDict.get_key` which gives a key. This method
+        The input is forwarded to :meth:`tweezers.MetaBaseDict.get_key` which gives a key. This method
         returns the corresponding value in the dictionary if it exists.
         
         Args:
@@ -137,7 +137,7 @@ class MetaBaseDict(OrderedDict):
 
     def set(self, *k):
         """
-        Set a value for the key that is returned by :meth:`tweezer.MetaBaseDict.get_key`. The last
+        Set a value for the key that is returned by :meth:`tweezers.MetaBaseDict.get_key`. The last
         parameter is the value to be set.
 
         Args:
@@ -211,8 +211,8 @@ class TweezerData():
         ============ ================================== ===================================
         property     required method in data source     data type
         ============ ================================== ===================================
-        meta         get_metadata                       :class:`tweezer.MetaDict`
-        units        get_metadata                       :class:`tweezer.UnitDict`
+        meta         get_metadata                       :class:`tweezers.MetaDict`
+        units        get_metadata                       :class:`tweezers.UnitDict`
         data         get_data                           :class:`pandas.DataFrame`
         psdSource    get_psd                            :class:`pandas.DataFrame`
         ts           get_ts                             :class:`pandas.DataFrame`
@@ -236,7 +236,7 @@ class TweezerData():
         Constructor for Data
 
         Args:
-            dataSource: a data source object like e.g. :class:`tweezer.io.source.TxtSourceMpi`
+            dataSource: a data source object like e.g. :class:`tweezers.io.source.TxtSourceMpi`
         """
 
         # store dataSource object
@@ -257,7 +257,7 @@ class TweezerData():
         when required.
 
         Returns:
-            :class:`tweezer.MetaDict`
+            :class:`tweezers.MetaDict`
         """
 
         meta, units = self.dataSource.get_metadata()
@@ -271,7 +271,7 @@ class TweezerData():
         ``get_metadata`` method as well. Evaluated lazily.
 
         Returns:
-            :class:`tweezer.UnitDict`
+            :class:`tweezers.UnitDict`
         """
 
         meta, units = self.dataSource.get_metadata()
@@ -327,7 +327,7 @@ class TweezerData():
 
     def psd(self):
         """
-        Attribute to hold the power spectrum density. If called before :meth:`tweezer.Data.compute_psd`, an exception is
+        Attribute to hold the power spectrum density. If called before :meth:`tweezers.Data.compute_psd`, an exception is
         raised.
         """
 
@@ -336,7 +336,7 @@ class TweezerData():
     def psdFit(self):
         """
         Attribute to hold the Lorentzian fit to the power spectrum density. If called before
-        :meth:`tweezer.Data.fit_psd`, an exception is raised.
+        :meth:`tweezers.Data.fit_psd`, an exception is raised.
         """
 
         raise ValueError('PSD fit not yet computed. Please call "fit_psd"-method first.')
@@ -344,10 +344,10 @@ class TweezerData():
     def compute_psd(self, **kwargs):
         """
         Compute the power spectrum density from the experiments time series which is stored in the ``psd`` attribute.
-        All Arguments are forwarded to :class:`tweezer.psd.PsdComputation`.
+        All Arguments are forwarded to :class:`tweezers.psd.PsdComputation`.
 
         Returns:
-            :class:`tweezer.TweezerData`
+            :class:`tweezers.TweezerData`
         """
 
         psdObj = PsdComputation(self, **kwargs)
@@ -356,10 +356,10 @@ class TweezerData():
 
     def fit_psd(self, **kwargs):
         """
-        Fits the PSD. All input is forwarded to the :class:`tweezer.analysis.psd.PsdFit` object.
+        Fits the PSD. All input is forwarded to the :class:`tweezers.analysis.psd.PsdFit` object.
 
         Returns:
-            :class:`tweezer.TweezerData`
+            :class:`tweezers.TweezerData`
         """
 
         psdFitObj = PsdFit(self, **kwargs)
@@ -368,13 +368,13 @@ class TweezerData():
 
     def thermal_calibration(self):
         """
-        Perform a thermal calibration. Requires :meth:`tweezer.TweezerData.psd` and :meth:`tweezer.TweezerData.psdFit`
+        Perform a thermal calibration. Requires :meth:`tweezers.TweezerData.psd` and :meth:`tweezers.TweezerData.psdFit`
 
         Args:
             self
 
         Returns:
-            :class:`tweezer.TweezerData`
+            :class:`tweezers.TweezerData`
         """
 
         return self

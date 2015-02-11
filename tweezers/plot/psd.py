@@ -16,7 +16,7 @@ class PsdPlotBase():
         Constructor for PsdPlotBase
 
         Args:
-            container (:class:`tweezer.TweezerData`): container that holds PSD data to plot
+            container (:class:`tweezers.TweezerData`): container that holds PSD data to plot
             title (str): title for the plot, optional to override default value used
         """
 
@@ -33,11 +33,11 @@ class PsdPlotBase():
 
     def get_title_list(self, container):
         """
-        Get a list of column titles in the PSD :class:`tweezer.TweezerData` container. These titles are by default
+        Get a list of column titles in the PSD :class:`tweezers.TweezerData` container. These titles are by default
         used as subplot titles. The result is stored in ``self.psdTitles``.
 
         Args:
-            container (:class:`tweezer.TweezerData`): tweezer data container
+            container (:class:`tweezers.TweezerData`): tweezers data container
         """
 
         self.nPsdAxes = 0
@@ -138,7 +138,7 @@ class PsdPlotBase():
             method (str): name of the method
 
         Returns:
-            :class:`tweezer.plot.psd.PsdPlotBase`
+            :class:`tweezers.plot.psd.PsdPlotBase`
         """
 
         for ax in self.ax:
@@ -155,10 +155,10 @@ class PsdFitPlot(PsdPlotBase):
 
     def __init__(self, container, title=None, **kwargs):
         """
-        Constructor for PsdFitPlot. Additional arguments are passed on to :meth:`tweezer.plot.psd.PsdFitPlot.plot`.
+        Constructor for PsdFitPlot. Additional arguments are passed on to :meth:`tweezers.plot.psd.PsdFitPlot.plot`.
 
         Args:
-            container (:class:`tweezer.TweezerData`): container that holds PSD data to plot
+            container (:class:`tweezers.TweezerData`): container that holds PSD data to plot
             title (str): title for the plot, optional to override default value used
         """
 
@@ -231,12 +231,12 @@ class PsdPlot(PsdPlotBase):
 
     def __init__(self, container=None, title=None, **kwargs):
         """
-        Constructor for PsdPlot. If ``container`` is set, the :meth:`tweezer.plot.psd.PsdPlotBase.add` method
+        Constructor for PsdPlot. If ``container`` is set, the :meth:`tweezers.plot.psd.PsdPlotBase.add` method
         is executed
         and additional arguements areforwarded.
 
         Args:
-            container (:class:`tweezer.TweezerData`): data container
+            container (:class:`tweezers.TweezerData`): data container
         """
 
         super().__init__(None, title)
@@ -248,7 +248,7 @@ class PsdPlot(PsdPlotBase):
         Initialize the plotting environment (figure, axes, ...). Called automatically.
 
         Args:
-            container (:class:`tweezer.TweezerData`): data container
+            container (:class:`tweezers.TweezerData`): data container
         """
 
         # count PSD columns and store their titles
@@ -273,19 +273,19 @@ class PsdPlot(PsdPlotBase):
     def add(self, container, psd=True, psdSource=False, fit=False, fitSource=False, **kwargs):
         """
         Add a PSD to the plot. A figure is shown for each axes of the PSD. Additional arguments are forwarded to
-        :meth:`tweezer.plot.psd.PsdPlotBase.add_psd` and :meth:`tweezer.plot.psd.PsdPlotBase.add_fit`. Use this method to
+        :meth:`tweezers.plot.psd.PsdPlotBase.add_psd` and :meth:`tweezers.plot.psd.PsdPlotBase.add_fit`. Use this method to
         add data.
 
         Args:
-            container (:class:`tweezer.TweezerData`): data container
-            psd (bool): plot the PSD in :attr:`tweezer.TweezerData.psd`?
-            psdSource (bool): plot the PSD in :attr:`tweezer.TweezerData.psdSource`?
-            fit (bool): plot the fit to the PSD in :attr:`tweezer.TweezerData.psd`? if no 'fit' columns are
+            container (:class:`tweezers.TweezerData`): data container
+            psd (bool): plot the PSD in :attr:`tweezers.TweezerData.psd`?
+            psdSource (bool): plot the PSD in :attr:`tweezers.TweezerData.psdSource`?
+            fit (bool): plot the fit to the PSD in :attr:`tweezers.TweezerData.psd`? if no 'fit' columns are
                         available, this is skipped
-            fitSource (bool): plot the fit to the PSD in :attr:`tweezer.TweezerData.psdSource`?
+            fitSource (bool): plot the fit to the PSD in :attr:`tweezers.TweezerData.psdSource`?
 
         Returns:
-            :class:`tweezer.plot.psd.PsdPlotBase`
+            :class:`tweezers.plot.psd.PsdPlotBase`
         """
 
         if not self.fig:
@@ -344,7 +344,7 @@ class PsdPlot(PsdPlotBase):
 
         Args:
             fit (:class:`pandas.DataFrame`): fit data to plot
-            meta (:class:`tweezer.MetaDict`): metadata container with fit result data (stiffness,
+            meta (:class:`tweezers.MetaDict`): metadata container with fit result data (stiffness,
                                                         corner frequency, r2)
         """
 

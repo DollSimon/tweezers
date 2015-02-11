@@ -2,10 +2,10 @@ class BaseSource():
     """
     Base class for data sources. Inherit from this class when creating a new data source. Keep in mind that not all
     methods described here must be implemented since they are only called when the associated property of the
-    :class:`tweezer.TweezerData` object is requested, depending on your analysis.
+    :class:`tweezers.TweezerData` object is requested, depending on your analysis.
 
     Keep in mind that this object should not hold the actual data but rather be an standardized interface to `get`
-    the data from wherever it is. This allows the :class:`tweezer.TweezerData` to lazily load the data only when
+    the data from wherever it is. This allows the :class:`tweezers.TweezerData` to lazily load the data only when
     required.
     """
 
@@ -14,7 +14,7 @@ class BaseSource():
         Returns the metadata of the experiment.
 
         Returns:
-            :class:`tweezer.MetaDict` and :class:`tweezer.UnitDict`
+            :class:`tweezers.MetaDict` and :class:`tweezers.UnitDict`
         """
 
         raise NotImplementedError()

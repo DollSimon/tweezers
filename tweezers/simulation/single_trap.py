@@ -60,7 +60,7 @@ class SingleTrap():
         Args:
             stiffness (float): Stiffness of the trap in [pN/nm] (Default: 0.1 pN/nm)
             obj: an object that provides methods to calculate mass, drag coefficient and diffusion coefficent (e.g.
-            :class:`tweezer.simulation.single_trap.Sphere`.
+            :class:`tweezers.simulation.single_trap.Sphere`.
             timeStep (float): Difference between two time points in [s]; delta time (Default: 0.001 s)
 
         """

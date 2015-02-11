@@ -15,7 +15,7 @@ class PsdComputation():
         Constructor for PsdAnalysis
 
         Args:
-            container (:class:`tweezer.TweezerData`): data container
+            container (:class:`tweezers.TweezerData`): data container
             blockLength (float): number of data points per block (default: 2**13)
             overlap (int): The number of datapoints that should overlap. If not ``None``, this will take precedence
                            over ``nBlocks``. If nothing is given, the overlap is 0.
@@ -135,7 +135,7 @@ class PsdFitLeastSquares(ixo.fit.LeastSquaresFit):
         Constructor for PsdFitLeastSquares
 
         Args:
-            container (:class:`tweezer.TweezerData`): data container
+            container (:class:`tweezers.TweezerData`): data container
 
         """
 
@@ -153,7 +153,7 @@ class PsdFitMle(ixo.fit.Fit):
         Constructor for PsdFitMle
 
         Args:
-            container (:class:`tweezer.TweezerData`): data container
+            container (:class:`tweezers.TweezerData`): data container
         """
 
         super().__init__(*args, **kwargs)
@@ -272,7 +272,7 @@ class PsdFit():
         Constructor for PsdFit
 
         Args:
-            container (:class:`tweezer.TweezerData`): data container
+            container (:class:`tweezers.TweezerData`): data container
             fitCls (:class:`ixo.fit.Fit`): class to use for fitting, must implement the methods given in the
                                             reference class
             minF (float): only data points with frequencies above this limit are fitted

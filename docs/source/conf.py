@@ -18,7 +18,7 @@ import sys, os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath(os.path.join('..','..')))
-sys.path.insert(0, os.path.abspath(os.path.join('..','..', 'tweezer')))
+sys.path.insert(0, os.path.abspath(os.path.join('..','..', 'tweezers')))
 
 # Tikz extesnion
 # sys.path.append(os.path.expanduser('~/Sphinx/tikz/'))
@@ -81,7 +81,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Tweezer'
+project = u'Tweezers'
 copyright = u'2012, Marcus Jahnel'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -239,7 +239,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Tweezerdoc'
+htmlhelp_basename = 'Tweezersdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -266,7 +266,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Tweezer.tex', u'Tweezer Documentation',
+  ('index', 'Tweezers.tex', u'Tweezers Documentation',
    u'Marcus Jahnel', 'manual'),
 ]
 
@@ -297,7 +297,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'tweezer', u'Tweezer Documentation',
+    ('index', 'tweezers', u'Tweezers Documentation',
      [u'Marcus Jahnel'], 1)
 ]
 
@@ -311,8 +311,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Tweezer', u'Tweezer Documentation',
-   u'Marcus Jahnel', 'Tweezer', 'One line description of project.',
+  ('index', 'Tweezers', u'Tweezers Documentation',
+   u'Marcus Jahnel', 'Tweezers', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -329,7 +329,7 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'Tweezer'
+epub_title = u'Tweezers'
 epub_author = u'Marcus Jahnel'
 epub_publisher = u'Marcus Jahnel'
 epub_copyright = u'2012, Marcus Jahnel'
