@@ -1,7 +1,7 @@
 import ixo.fit
 from scipy.signal import welch
 import pandas as pd
-from physics.tweezers import trap_stiffness
+from physics.tweezers import trap_stiffness, distance_calibration
 import numpy as np
 
 
@@ -344,10 +344,16 @@ class PsdFit():
             radius = self.c.meta[beadKey] / 2
             if self.c.units[beadKey] in ['um', 'µm']:
                 radius *= 1000
+            dist_calib = distance_calibration(D=D,
+                                              radius=radius,
+                                              viscosity=self.c.meta['viscosity'],
+                                              T=self.c.meta['temperature'])
             stiffness = trap_stiffness(fc=fc,
                                        radius=radius,
                                        viscosity=self.c.meta['viscosity'])
             self.c.meta.set(title, 'k', stiffness)
+            # TODO check if units are there for stiffness, distance_calibration and temperature!!!!!
+            self.c.meta.set(title, 'beta', dist_calib)
 
             # append plotting data to psd only for fitting range
             # pick data for fitting based on given limits

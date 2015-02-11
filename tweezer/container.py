@@ -291,6 +291,17 @@ class TweezerData():
         return self.dataSource.get_data()
 
     @lazy
+    def ts(self):
+        """
+        Attribute to hold the time series used for the thermal calibration. Evaluated lazily.
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        return self.dataSource.get_ts()
+
+    @lazy
     def psdSource(self):
         """
         Attribute to hold the power spectrum of the thermal calibration of the experiment as read from the DataSource.
@@ -305,32 +316,35 @@ class TweezerData():
     @lazy
     def psdFitSource(self):
         """
-
-
-        Args:
-
+        Attribute to hold the fit of the Lorentzian to the power spectrum of the thermal calibration of the
+        experiment as read from the DataSource. Also evaluated lazily.
 
         Returns:
-
+            :class:`pandas.DataFrame`
         """
 
         return self.dataSource.get_psd_fit()
 
-    @lazy
     def psd(self):
         """
-        Attribute to hold the power spectrum density. If called for the first time it will compute the PSD using the
-        :class:`tweezer.psd.PsdComputation` class and its default values. For custom values,
-        use the :meth:`tweezer.Data.compute_psd` method.
+        Attribute to hold the power spectrum density. If called before :meth:`tweezer.Data.compute_psd`, an exception is
+        raised.
         """
 
-        psdObj = PsdComputation(self)
-        return psdObj.psd()
+        raise ValueError('PSD not yet computed. Please call "compute_psd"-method first.')
+
+    def psdFit(self):
+        """
+        Attribute to hold the Lorentzian fit to the power spectrum density. If called before
+        :meth:`tweezer.Data.fit_psd`, an exception is raised.
+        """
+
+        raise ValueError('PSD fit not yet computed. Please call "fit_psd"-method first.')
 
     def compute_psd(self, **kwargs):
         """
         Compute the power spectrum density from the experiments time series which is stored in the ``psd`` attribute.
-        All Arguments are forwarded to :class:`tweezer.psd.PsdComputation`
+        All Arguments are forwarded to :class:`tweezer.psd.PsdComputation`.
 
         Returns:
             :class:`tweezer.TweezerData`
@@ -339,21 +353,6 @@ class TweezerData():
         psdObj = PsdComputation(self, **kwargs)
         setattr(self, 'psd', psdObj.psd())
         return self
-
-    @lazy
-    def psdFit(self):
-        """
-
-
-        Args:
-
-
-        Returns:
-
-        """
-
-        psdFitObj = PsdFit(self)
-        return psdFitObj.fit()
 
     def fit_psd(self, **kwargs):
         """
@@ -367,13 +366,15 @@ class TweezerData():
         setattr(self, 'psdFit', psdFitObj.fit())
         return self
 
-    @lazy
-    def ts(self):
+    def thermal_calibration(self):
         """
-        Attribute to hold the time series used for the thermal calibration. Evaluated lazily.
+        Perform a thermal calibration. Requires :meth:`tweezer.TweezerData.psd` and :meth:`tweezer.TweezerData.psdFit`
+
+        Args:
+            self
 
         Returns:
-            :class:`pandas.DataFrame`
+            :class:`tweezer.TweezerData`
         """
 
-        return self.dataSource.get_ts()
+        return self
