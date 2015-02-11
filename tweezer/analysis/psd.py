@@ -336,8 +336,8 @@ class PsdFit():
             self.c.meta.set(title, 'PsdFitError', list(fitObj.fitError))  # convert to list for conversion to JSON
             self.c.meta.set(title, 'r2', fitObj.rsquared())
             self.c.meta.set(title, 'chi2', fitObj.chisquared())
-            self.c.meta.set(title, 'FitMinF', self.minF)
-            self.c.meta.set(title, 'FitMaxF', self.maxF)
+            self.c.meta.set(title, 'PsdFitMinF', self.minF)
+            self.c.meta.set(title, 'PsdFitMaxF', self.maxF)
 
             # get stiffness and store it
             beadKey = self.c.meta.get_key(title, 'BeadDiameter')
@@ -353,7 +353,7 @@ class PsdFit():
                                        viscosity=self.c.meta['viscosity'])
             self.c.meta.set(title, 'k', stiffness)
             # TODO check if units are there for stiffness, distance_calibration and temperature!!!!!
-            self.c.meta.set(title, 'beta', dist_calib)
+            self.c.meta.set(title, 'DisplacementSensitivity', dist_calib)
 
             # append plotting data to psd only for fitting range
             # pick data for fitting based on given limits
@@ -362,7 +362,7 @@ class PsdFit():
             # compute residuals
             if self.residuals:
                 psdFit[title + 'Residuals'], meanResidual = fitObj.residuals()
-                self.c.meta.set(title, 'MeanResidualPsd', meanResidual)
+                self.c.meta.set(title, 'PsdFitMeanResidual', meanResidual)
 
         return psdFit
 

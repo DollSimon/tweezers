@@ -96,6 +96,10 @@ class TxtSourceMpi(BaseSource):
             self.rename_key(metaTmp, unitsTmp, 'pmYCornerFreq', 'pmYSourceCornerFreq')
             self.rename_key(metaTmp, unitsTmp, 'aodXCornerFreq', 'aodXSourceCornerFreq')
             self.rename_key(metaTmp, unitsTmp, 'aodYCornerFreq', 'aodYSourceCornerFreq')
+            self.rename_key(metaTmp, unitsTmp, 'pmXDisplacementSensitivity', 'pmXSourceDisplacementSensitivity')
+            self.rename_key(metaTmp, unitsTmp, 'pmYDisplacementSensitivity', 'pmYSourceDisplacementSensitivity')
+            self.rename_key(metaTmp, unitsTmp, 'aodXDisplacementSensitivity', 'aodXSourceDisplacementSensitivity')
+            self.rename_key(metaTmp, unitsTmp, 'aodYDisplacementSensitivity', 'aodYSourceDisplacementSensitivity')
 
             # rename variables for the sake of consistency and compatibility with Matlab and because the naming is
             # confusing: samplingRate is actually the acquisition rate since the DAQ card averages the data already
@@ -632,6 +636,10 @@ class TxtSourceMpi(BaseSource):
             'AOD horizontal trap stiffness': 'aodXStiffness',
             'AOD vertical trap stiffness': 'aodYStiffness',
 
+            'aodXDisplacementSensitivity': 'aodXDisplacementSensitivity',
+            'aodYDisplacementSensitivity': 'aodYDisplacementSensitivity',
+            'aodXSourceDisplacementSensitivity': 'aodXSourceDisplacementSensitivity',
+            'aodYSourceDisplacementSensitivity': 'aodYSourceDisplacementSensitivity',
             'AOD horizontal OLS': 'aodXDisplacementSensitivity',
             'AOD vertical OLS': 'aodYDisplacementSensitivity',
 
@@ -653,6 +661,10 @@ class TxtSourceMpi(BaseSource):
             'PM horizontal trap stiffness': 'pmXStiffness',
             'PM vertical trap stiffness': 'pmYStiffness',
 
+            'pmXDisplacementSensitivity': 'pmXDisplacementSensitivity',
+            'pmYDisplacementSensitivity': 'pmYDisplacementSensitivity',
+            'pmXSourceDisplacementSensitivity': 'pmXSourceDisplacementSensitivity',
+            'pmYSourceDisplacementSensitivity': 'pmYSourceDisplacementSensitivity',
             'PM horizontal OLS': 'pmXDisplacementSensitivity',
             'PM vertical OLS': 'pmYDisplacementSensitivity',
 
