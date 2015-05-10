@@ -1,5 +1,6 @@
 import logging as log
 import copy
+import pandas as pd
 
 from ixo.decorators import lazy
 from tweezers.analysis.psd import PsdComputation, PsdFit
@@ -208,13 +209,43 @@ class TweezersData():
         axes = self.meta.subDictKeys()
 
         for ax in axes:
-            print(ax)
-            res, units = thermalCalibration(diffCoeff=self.meta[ax]['diffusionCoefficient'],
+            res, units = thermalCalibration(diffCoeff=self.meta[ax]['diffusionCofficient'],
                                             cornerFreq=self.meta[ax]['cornerFrequency'],
                                             viscosity=self.meta['viscosity'],
-                                            beadDiameter=self.meta[ax]['beadDiameter'],
+                                            beadRadius=self.meta[ax]['beadRadius'],
                                             temperature=self.meta['temperature'])
 
             self.meta.update({ax: res})
             self.units.update({ax: units})
         return self
+
+    def getFacet(self, data, colName='Value'):
+        """
+        Returns a :class:`pandas.DataFrame` suitable for a :class:`seaborn.FacetGrid`, i.e. the axis of a value is
+        specified in an extra column instead of having one column per axis.
+
+        Args:
+            data (:class:`pandas.DataFrame`): input data
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        # in case we have frequency or time data, keep that as index
+        index = []
+        if 'f' in data.columns:
+            index = ['f']
+        elif 't' in data.columns:
+            index = ['t']
+
+        resDf = pd.DataFrame()
+        for col in data.columns:
+            # skip index columns
+            if col in index:
+                continue
+
+            tmpDf = data[index + [col]].rename(columns={col: colName})
+            tmpDf.loc[:, 'Axis'] = col
+            resDf = resDf.append(tmpDf)
+
+        return resDf

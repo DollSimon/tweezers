@@ -1,8 +1,8 @@
 from collections import OrderedDict
-from physics.tweezers import distance_calibration, trap_stiffness
+from physics.tweezers import distanceCalibration, trapStiffness
 
 
-def thermalCalibration(diffCoeff, cornerFreq, viscosity, beadDiameter, temperature=25):
+def thermalCalibration(diffCoeff, cornerFreq, viscosity, beadRadius, temperature=25):
     """
     Perform the thermal calibration for the given input parameters. This calculates the trap stiffness, displacement
     sensitivity and force sensitivity of the trap.
@@ -21,9 +21,8 @@ def thermalCalibration(diffCoeff, cornerFreq, viscosity, beadDiameter, temperatu
         `ForceSensitivity` in units of [V/pN]
     """
 
-    radius = beadDiameter / 2
-    stiffness = trap_stiffness(fc=cornerFreq, radius=radius, viscosity=viscosity)
-    dispSens = distance_calibration(D=diffCoeff, radius=radius, viscosity=viscosity, T=temperature)
+    stiffness = trapStiffness(fc=cornerFreq, radius=beadRadius, viscosity=viscosity)
+    dispSens = distanceCalibration(D=diffCoeff, radius=beadRadius, viscosity=viscosity, T=temperature)
     forceSens = dispSens / stiffness
 
     res = OrderedDict([('stiffness', stiffness),

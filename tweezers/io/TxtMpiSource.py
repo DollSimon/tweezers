@@ -311,10 +311,10 @@ class TxtMpiSource(BaseSource):
                 if unit:
                     self.setMeta(units, key, unit)
 
-                # ensure bead diameter, tweebot files have radius
-                if key[-1] == 'beadRadius':
-                    key[-1] = 'beadDiameter'
-                    value *= 2
+                # ensure bead radius, some have only diameter
+                if key[-1] == 'beadDiameter':
+                    key[-1] = 'beadRadius'
+                    value /= 2
                     self.setMeta(meta, key, value)
                     if unit:
                         self.setMeta(units, key, unit)
@@ -497,7 +497,7 @@ class TxtMpiSource(BaseSource):
         keyMapper = {
             # general stuff
             'date': lambda x: x.replace('\t', ' '),
-            'isDataAveraged': ixo.str_to_bool,
+            'isDataAveraged': ixo.strToBool,
             'nSamples': lambda x: int(float(x)),
             'psdNSamples': int,
             'psdSamplingRate': int,
