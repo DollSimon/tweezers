@@ -36,7 +36,7 @@ class TxtFileMpi():
         else:
             self.isJson = False
 
-    def get_header(self):
+    def getHeader(self):
         """
         Returns all header lines of the file and if applicable (no JSON header) a :class:`tweezers.UnitDict` with the
         units of the data columns.
@@ -46,11 +46,11 @@ class TxtFileMpi():
         """
 
         if self.isJson:
-            return self.read_data_json(get='header')
+            return self.readDataJson(get='header')
         else:
-            return self.read_data(get='header')
+            return self.readData(get='header')
 
-    def get_data(self):
+    def getData(self):
         """
         Returns the column header and all data lines from the file as one big string.
 
@@ -59,11 +59,11 @@ class TxtFileMpi():
         """
 
         if self.isJson:
-            return self.read_data_json(get='data')
+            return self.readDataJson(get='data')
         else:
-            return self.read_data(get='data')
+            return self.readData(get='data')
 
-    def get_trial_number(self):
+    def getTrialNumber(self):
         """
         Extract the trial number from the file name. The trial number is everything before the first '_' in the name.
         If no '_' is present, the whole name without the suffix is returned
@@ -74,7 +74,7 @@ class TxtFileMpi():
 
         return self.path.stem.split('_')[0]
 
-    def read_data_json(self, get='data'):
+    def readDataJson(self, get='data'):
         """
         Read a data file with a JSON styled header.
 
@@ -99,8 +99,8 @@ class TxtFileMpi():
                     headerLines.append(line)
                 return headerLines, None
             else:
-                # TODO With pandas 0.15, this can probably be simplified a bit since it will support skipping empty
-                # lines (a potential empty line between column header and data requires all this Affenzirkus)
+                # when reading a JSON formatted file, this could be solved much easier but we want to keep the same
+                # API for JSON and old-style formatted files so we have to return strings instead of dataframes
                 columnHeader = None
                 dataLines = ''
                 # go until beginning of data
@@ -123,7 +123,7 @@ class TxtFileMpi():
                 columnHeader = columnHeader.split(sep='\t')
                 return columnHeader, dataLines
 
-    def read_data(self, get='data'):
+    def readData(self, get='data'):
         """
         Reads the data file and splits its content between header lines and data lines. The 'get' parameter
         determines what should be returned. Even if only the header should be returned, we still have to scan through

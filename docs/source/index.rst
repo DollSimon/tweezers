@@ -32,10 +32,10 @@ Overview
 
 .. autosummary::
 
-    tweezer
-    tweezer.analysis
-    tweezer.io
-    tweezer.plot
+    tweezers
+    tweezers.analysis
+    tweezers.io
+    tweezers.plot
 
 Contents:
 

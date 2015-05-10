@@ -16,7 +16,7 @@ DEPENDENCIES = [# documentation stuff
                 'sphinx_rtd_theme>=0.1',
                 'sphinxcontrib-napoleon',
                 'pytest',
-                'pandas>=0.11',
+                'pandas>=0.15',
                 'numpy>=1.8',
                 'matplotlib>=1.2.1',
                 'ixo',

@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
-from itertools import chain
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MaxNLocator
+import seaborn as sns
 import numpy as np
+import math
 
 
 class PsdPlotBase():
@@ -11,43 +11,43 @@ class PsdPlotBase():
     Base class for plotting PSDs. It implements some basic functionality and declares required variables.
     """
 
-    def __init__(self, container=None, title=None):
+    def __init__(self, container, title=None):
         """
         Constructor for PsdPlotBase
 
         Args:
-            container (:class:`tweezers.TweezerData`): container that holds PSD data to plot
+            container (:class:`tweezers.TweezersData`): container that holds PSD data to plot
             title (str): title for the plot, optional to override default value used
         """
 
         self.c = container
-        self.title = title
+        # get figure title
+        if title:
+            self.title = title
+        else:
+            self.title = self.c.meta['title']
+
         self.fig = None
         self.ax = None
-        self.nPsdAxes = 0
-        self.psdTitles = []
+        self.psdAxes = []
 
         # count PSD columns and store their titles if container given
-        if self.c:
-            self.get_title_list(self.c)
+        self.getTitleList(self.c)
 
-    def get_title_list(self, container):
+    def getTitleList(self, container):
         """
-        Get a list of column titles in the PSD :class:`tweezers.TweezerData` container. These titles are by default
-        used as subplot titles. The result is stored in ``self.psdTitles``.
+        Get a list of column titles that do not end on 'Std' in the PSD :class:`tweezers.TweezersData` container. These
+        titles are by default used as subplot titles. The result is stored in ``self.psdTitles``.
 
         Args:
-            container (:class:`tweezers.TweezerData`): tweezers data container
+            container (:class:`tweezers.TweezersData`): tweezers data container
         """
 
-        self.nPsdAxes = 0
-        self.psdTitles = []
         for title in container.psd.columns:
-                if title.endswith('X') or title.endswith('Y'):
-                    self.nPsdAxes += 1
-                    self.psdTitles.append(title)
+            if title is not 'f' and not title.lower().endswith('std'):
+                self.psdAxes.append(title)
 
-    def plot_psd(self, ax, f, psd, units=None, *args, **kwargs):
+    def plotPsd(self, ax, f, psd, units=None, *args, **kwargs):
         """
         Plot a PSD into the given axes. Additional arguments are forwarded to :meth:`matplotlib.axes.Axes.loglog`.
 
@@ -58,7 +58,7 @@ class PsdPlotBase():
             units (str): units of the PSD
         """
 
-        ax.set_ylim([10e-12, 10e-8])
+        ax.set_ylim([10e-14, 10e-8])
         labelX = 'f [Hz]'
         labelY = 'PSD'
         if units:
@@ -68,27 +68,27 @@ class PsdPlotBase():
         line = ax.loglog(f, psd, *args, **kwargs)
         return line
 
-    def plot_psd_errors(self, ax, f, psd, errors, *args, **kwargs):
+    def plotPsdErrors(self, ax, f, psd, errors, *args, **kwargs):
         """
-
+        Plot PSD errors into the given axes. Additional arguments are forwarded to
+        :meth:`matplotlib.axes.Axes.fill_between`.
 
         Args:
-            ax, f, psd, errors, *args, **kwargs
-
-        Returns:
-
+            ax (:class:`matplotlib.axes.Axes`): axes for plotting the PSD
+            f (array-like): frequencies
+            psd (array-like): PSD values to plot
+            errors (array-like): errors for each data point of the PSD
         """
 
         lowerLimit = psd - errors
         lowerLimit[lowerLimit <= 0] = 1e-15
 
         # set alpha
-        kwargs['alpha'] = 0.4
+        kwargs['alpha'] = 0.3
 
         ax.fill_between(f, psd + errors, lowerLimit, *args, **kwargs)
 
-
-    def plot_residuals(self, ax, f, res, *args, **kwargs):
+    def plotResiduals(self, ax, f, res, *args, **kwargs):
         """
         Plot the residuals of the PSD fit into the given axes. Additional arguments are passed to
         :meth:`matplotlib.axes.Axes.plot`.
@@ -105,7 +105,7 @@ class PsdPlotBase():
         line = ax.plot(f, res * 100, *args, **kwargs)
         return line
 
-    def plot_psd_fit(self, ax, f, fit, *args, **kwargs):
+    def plotPsdFits(self, ax, f, fit, *args, **kwargs):
         """
         Plot the fit of the PSD into the given axes. Additional arguments are passed to
         :meth:`matplotlib.axes.Axes.plot`.
@@ -119,7 +119,7 @@ class PsdPlotBase():
         line = ax.loglog(f, fit, *args, **kwargs)
         return line
 
-    def get_color(self, line):
+    def getColor(self, line):
         """
         Return the color of a :class:`matplotlib.lines.Line2D` object.
 
@@ -147,220 +147,172 @@ class PsdPlotBase():
 
         return self
 
+    def legend(self, ax, **kwargs):
+        """
+        Adds a legend to the given axis, also used to update the legend after adding content. All
+        parameters are forwarded to :meth:`matplotlib.axes.Axes.legend`.
+        """
+
+        ax.legend(loc=3)
+
+    def save(self, path, **kwargs):
+        """
+        Save the current figure to ``path``. All further arguments are forwarded to :meth:`matplotlib.figure.savefig`.
+
+        Args:
+            path (str): filename to save the figure to
+        """
+
+        if type(path) is not str:
+            path = str(path)
+
+        self.fig.savefig(path, **kwargs)
+
 
 class PsdFitPlot(PsdPlotBase):
     """
     Plot a PSD and the corresponding fit with residuals.
     """
 
-    def __init__(self, container, title=None, **kwargs):
+    def __init__(self, container, title=None, residuals=True, **kwargs):
         """
         Constructor for PsdFitPlot. Additional arguments are passed on to :meth:`tweezers.plot.psd.PsdFitPlot.plot`.
 
         Args:
-            container (:class:`tweezers.TweezerData`): container that holds PSD data to plot
+            container (:class:`tweezers.TweezersData`): container that holds PSD data to plot
             title (str): title for the plot, optional to override default value used
         """
 
         super().__init__(container=container, title=title)
+        self.residuals = residuals
         self.plot(**kwargs)
 
     def plot(self, **kwargs):
         """
-        Do the plot. Parameters are passe on to the plotting routines of the base class.
+        Do the plot. Parameters are passed on to the plotting routines of the base class.
         """
 
-        # set up the figure with default properties
-        self.fig = plt.figure(figsize=[18, 15])
-        # check if title was given, if not use default
-        if not self.title:
-            self.title = self.c.meta['title']
+        # set figure height depending if we should plot the residuals
+        nrows = math.ceil(len(self.psdAxes) / 2)
+        if self.residuals:
+            figureSize = [15, 5 * nrows + 2]
+        else:
+            figureSize = [18, 6 * nrows]
+
+        # set up the figure
+        self.fig = plt.figure(figsize=figureSize)
         self.fig.suptitle(self.title, fontsize=16)
-        # will break up when self.nPsdAxes is odd, too lazy to fix now ;)
-        grid = gridspec.GridSpec(self.nPsdAxes//2, 2)
+        # create grid for all the PSDs
+        grid = gridspec.GridSpec(nrows, 2)
 
-        resAxis = []
-        psdAxis = []
-        for n, gridEl in enumerate(grid):
-            title = self.psdTitles[n]
-            innerGrid = gridspec.GridSpecFromSubplotSpec(4, 1, subplot_spec=gridEl, hspace=0.01)
+        f = self.c.psd['f']
+        fFit = self.c.psdFit['f']
 
-            # prepare psd axes
-            psdAxes = plt.subplot(innerGrid[1:])
+        for n, axis in enumerate(self.psdAxes):
+            gridEl = grid[n]
+
+            # prepare axes
+            if self.residuals:
+                innerGrid = gridspec.GridSpecFromSubplotSpec(100, 1, subplot_spec=gridEl, hspace=0.01)
+                psdAxes = plt.subplot(innerGrid[20:])
+            else:
+                psdAxes = plt.subplot(gridEl)
+                psdAxes.set_title(axis)
+
             # plot psd
-            psdLine = self.plot_psd(psdAxes, self.c.psd['f'], self.c.psd[title], units=self.c.units[title],
-                                    label='PSD', **kwargs)
-            # plot psd errors
-            # calucate standard error
-            errors = self.c.psd[title + 'Std'] / np.sqrt(self.c.meta['nBlocks'])
-            self.plot_psd_errors(psdAxes, self.c.psd['f'], self.c.psd[title],
-                                 errors,
-                                 color=self.get_color(psdLine))
+            psdLine = self.plotPsd(psdAxes, f, self.c.psd[axis],
+                                   units=self.c.units['psd'],
+                                   label='PSD',
+                                   **kwargs)
+
+            # plot psd errors if available
+            if axis + 'Std' in self.c.psd.columns:
+                # calculate standard error
+                errors = self.c.psd[axis + 'Std'] / np.sqrt(self.c.meta['psdNBlocks'])
+                self.plotPsdErrors(psdAxes, f, self.c.psd[axis],
+                                   errors,
+                                   color=self.getColor(psdLine),
+                                   **kwargs)
 
             # plot fit
-            label = 'k = {:.5}, fc = {:.4}, Chi2 = {:.4}'.format(self.c.meta.get(title, 'Stiffness'),
-                                                               self.c.meta.get(title, 'CornerFreq'),
-                                                               self.c.meta.get(title, 'PsdFitChi2'))
-            self.plot_psd_fit(psdAxes, self.c.psdFit['f'], self.c.psdFit[title + 'Fit'],
-                              label=label, **kwargs)
+            # we want a label with stiffness but take diffusion coeff if it is not there
+            if 'stiffness' in self.c.meta[axis]:
+                label = 'k = {:.5} {}, fc = {:.1f} Hz\n$\\beta$ = {:.4} {}'.format(
+                    self.c.meta[axis]['stiffness'],
+                    self.c.units[axis]['stiffness'],
+                    self.c.meta[axis]['cornerFrequency'],
+                    self.c.meta[axis]['displacementSensitivity'],
+                    self.c.units[axis]['displacementSensitivity'])
+            else:
+                label = 'D = {:.5} {}, fc = {:.1f} Hz'.format(self.c.meta[axis]['diffusionCoefficient'],
+                                                              self.c.units[axis]['diffusionCoefficient'],
+                                                              self.c.meta[axis]['cornerFrequency'])
+            # check if chi2 is available
+            if 'psdFitChi2' in self.c.meta[axis]:
+                label += ', $\\chi^2$ = {:.4}'.format(self.c.meta[axis]['psdFitChi2'])
+            # plot fit
+            self.plotPsdFits(psdAxes, fFit, self.c.psdFit[axis + 'Fit'],
+                             label=label, **kwargs)
             # add legend to PSD plot
-            psdAxes.legend(loc=3)
+            self.legend(psdAxes)
 
-            # prepare residuals axes
-            resAxes = plt.subplot(innerGrid[0], sharex=psdAxes)
-            plt.setp(resAxes.get_xticklabels(), visible=False)
-            resAxes.set_title(title)
-            # plot residuals
-            self.plot_residuals(resAxes, self.c.psdFit['f'], self.c.psdFit[title + 'Residuals'], **kwargs)
-            # remove lowest tick label so they don't overlap
-            nbins = len(resAxes.get_yticklabels())
-            resAxes.yaxis.set_major_locator(MaxNLocator(nbins=nbins, prune='lower'))
-
-            # store references to axis
-            psdAxis.append(psdAxes)
-            resAxis.append(resAxes)
+            # plot residuals if required
+            if self.residuals:
+                residualAxes = plt.subplot(innerGrid[:20], sharex=psdAxes)
+                plt.setp(residualAxes.get_xticklabels(), visible=False)
+                residualAxes.set_title(axis)
+                # plot residuals
+                self.plotResiduals(residualAxes, fFit, self.c.psdFit[axis + 'Residuals'], **kwargs)
+                # remove lowest tick label so they don't overlap
+                nbins = len(residualAxes.get_yticklabels())
+                residualAxes.yaxis.set_major_locator(MaxNLocator(nbins=nbins, prune='lower'))
 
         self.fig.subplots_adjust(top=0.94)
 
 
 class PsdPlot(PsdPlotBase):
     """
-    Plot PSD(s). The plot consists of distinct figures for each axis along which the PSD is available (variable
-    number).
+    Plot all PSDs in a :class:`tweezers.TweezersData` object.
     """
 
-    def __init__(self, container=None, title=None, **kwargs):
+    def __init__(self, container, title=None, **kwargs):
+        super().__init__(container, title=title)
+        self.plot(**kwargs)
+
+    def plot(self, **kwargs):
         """
-        Constructor for PsdPlot. If ``container`` is set, the :meth:`tweezers.plot.psd.PsdPlotBase.add` method
-        is executed
-        and additional arguements areforwarded.
-
-        Args:
-            container (:class:`tweezers.TweezerData`): data container
-        """
-
-        super().__init__(None, title)
-        if container:
-            self.add(container, **kwargs)
-
-    def initialize(self, container):
-        """
-        Initialize the plotting environment (figure, axes, ...). Called automatically.
-
-        Args:
-            container (:class:`tweezers.TweezerData`): data container
-        """
-
-        # count PSD columns and store their titles
-        self.get_title_list(container)
-
-        # this will break for odd number of axes, use gridspec instead and create axis only where required
-        self.fig, self.ax = plt.subplots(nrows=self.nPsdAxes//2, ncols=2)
-        # flatten axis list
-        self.ax = self.ax.flatten()
-        # figure properties
-        self.fig.set_figwidth(18)
-        self.fig.set_figheight(15)
-        # set figure title, use default if none was provided
-        if not self.title:
-            self.title = container.meta['title']
-        self.fig.suptitle(self.title, fontsize=16)
-        # set axes properties to default values
-        for ax in self.ax:
-            title = self.psdTitles.pop(0)
-            ax.set_title(title)
-
-    def add(self, container, psd=True, psdSource=False, fit=False, fitSource=False, **kwargs):
-        """
-        Add a PSD to the plot. A figure is shown for each axes of the PSD. Additional arguments are forwarded to
-        :meth:`tweezers.plot.psd.PsdPlotBase.add_psd` and :meth:`tweezers.plot.psd.PsdPlotBase.add_fit`. Use this method to
-        add data.
-
-        Args:
-            container (:class:`tweezers.TweezerData`): data container
-            psd (bool): plot the PSD in :attr:`tweezers.TweezerData.psd`?
-            psdSource (bool): plot the PSD in :attr:`tweezers.TweezerData.psdSource`?
-            fit (bool): plot the fit to the PSD in :attr:`tweezers.TweezerData.psd`? if no 'fit' columns are
-                        available, this is skipped
-            fitSource (bool): plot the fit to the PSD in :attr:`tweezers.TweezerData.psdSource`?
+        Plot the PSDs. All arguments are forwarded to the plotting functions of ``matplotlib``.
 
         Returns:
-            :class:`tweezers.plot.psd.PsdPlotBase`
+            :class:`tweezers.plot.psd.PsdPlot`
         """
 
-        if not self.fig:
-            self.initialize(container)
+        self.fig, self.ax = plt.subplots()
+        self.fig.set_figheight(6)
+        self.fig.set_figwidth(8)
+        self.fig.suptitle(self.title, fontsize=16)
 
-        # get label to adjust for all three options below
-        try:
-            label = kwargs.pop('label')
-        except KeyError:
-            label = 'PSD'
+        # get general info
+        f = self.c.psd['f']
+        unit = self.c.units['psd']
+        # plot all PSDs
+        for psd in self.psdAxes:
+            psdLine = self.plotPsd(self.ax,
+                                    f,
+                                    self.c.psd[psd],
+                                    label=psd,
+                                    units=unit,
+                                    **kwargs)
+            # check if error column exists
+            if psd + 'Std' in self.c.psd.columns:
+                # calculate standard error
+                errors = self.c.psd[psd + 'Std'] / np.sqrt(self.c.meta['psdNBlocks'])
+                self.plotPsdErrors(self.ax,
+                                     f,
+                                     self.c.psd[psd],
+                                     errors,
+                                     color=self.getColor(psdLine),
+                                     **kwargs)
 
-        # variables to hold PSD colors so that the fits can have the same one
-        color = None
-        colorSource = None
-        if psd:
-            color = self.add_psd(container.psd, label=label, **kwargs)
-        if psdSource:
-            colorSource = self.add_psd(container.psdSource, label=label + ' source', **kwargs)
-        if fit:
-            self.add_fit(container.psdFit, meta=container.meta, label=label + ' fit', color=color, **kwargs)
-        if fitSource:
-            self.add_fit(container.psdFitSource,
-                         meta=container.meta,
-                         label=label + ' fit',
-                         color=colorSource,
-                         titleSuffix='Source',
-                         **kwargs)
-        # post-add stuff to adjust axes and figure
-        for ax in self.ax:
-            ax.legend(loc=3)
-        self.fig.tight_layout()
-        self.fig.subplots_adjust(top=0.95)
-
-        return self
-
-    def add_psd(self, psd, *args, **kwargs):
-        """
-        Adds PSD from container data to plot. Additional arguments are forwarded to :meth:`matplotlib.axes.Axes.loglog`.
-
-        Args:
-            psd (:class:`pandas.DataFrame`): PSD data to plot
-        """
-
-        for ax in self.ax:
-            title = ax.get_title()
-            line = self.plot_psd(ax, psd['f'], psd[title], *args, **kwargs)
-            color = self.get_color(line)
-        # return the color of the added line, it is assumed that all axes objects are at the same point in their
-        # color cycle
-        return color
-
-    def add_fit(self, fit, meta, label='', titleSuffix='', **kwargs):
-        """
-        Adds the PSD fit from the container data to the plot. Additional arguments are forwarded to
-        :meth:`matplotlib.axes.Axes.loglog`.
-
-        Args:
-            fit (:class:`pandas.DataFrame`): fit data to plot
-            meta (:class:`tweezers.MetaDict`): metadata container with fit result data (stiffness,
-                                                        corner frequency, r2)
-        """
-
-        for ax in self.ax:
-            title = ax.get_title()
-            locLabel = label + '\nk = {:.5}, fc = {:.4}'.format(
-                meta.get(title + titleSuffix, 'Stiffness'),
-                meta.get(title + titleSuffix, 'CornerFreq'))
-            # check for r2 value since it might not be present everywhere
-            try:
-                value = meta.get(title + titleSuffix, 'PsdFitR2')
-                locLabel += ', r2 = {:.4}'.format(value)
-            except KeyError:
-                pass
-
-            # check if plotting color was given
-            if 'color' in kwargs and kwargs['color'] is None:
-                kwargs.pop('color')
-            self.plot_psd_fit(ax, fit['f'], fit[title + 'Fit'], label=locLabel, **kwargs)
+        # add legend
+        self.legend(self.ax)

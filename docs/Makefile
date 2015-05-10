@@ -39,7 +39,7 @@ help:
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
 apidoc:
-	sphinx-apidoc -o source/ -f ../tweezer/
+	sphinx-apidoc -o source/ -f ../tweezers/
 
 clean:
 	-rm -rf $(BUILDDIR)/*

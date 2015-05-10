@@ -1,8 +1,8 @@
 import ixo.fit
 from scipy.signal import welch
 import pandas as pd
-from physics.tweezers import trap_stiffness, distance_calibration
 import numpy as np
+from collections import OrderedDict
 
 
 class PsdComputation():
@@ -10,13 +10,14 @@ class PsdComputation():
     Object to compute a PSD using Welch's method (:func:`scipy.signal.welch`).
     """
 
-    def __init__(self, container, blockLength=2**13, overlap=None, nBlocks=None, blockData=False):
+    def __init__(self, timeSeries, blockLength=2**13, samplingRate=80000, overlap=None, nBlocks=None, blockData=False):
         """
         Constructor for PsdAnalysis
 
         Args:
-            container (:class:`tweezers.TweezerData`): data container
+            timeSeries (:class:`pandas.DataFrame`): data frame, PSD will be computed for each column
             blockLength (float): number of data points per block (default: 2**13)
+            samplingRate (float): sampling frequency of the time series data in [Hz] (default: 80000)
             overlap (int): The number of datapoints that should overlap. If not ``None``, this will take precedence
                            over ``nBlocks``. If nothing is given, the overlap is 0.
             nBlocks (int): The number of blocks determines the overlap between them. If set to ``None``, the number
@@ -24,8 +25,9 @@ class PsdComputation():
             blockData (bool): Should the PSD for each block also be returned?
         """
 
-        self.c = container
+        self.timeSeries = timeSeries
         self.blockLength = int(blockLength)
+        self.samplingRate = samplingRate
         if overlap:
             self.overlap = int(overlap)
         else:
@@ -35,14 +37,14 @@ class PsdComputation():
 
     def psd(self):
         """
-        Compute the PSDs for all axes in the data object. The units of the PSD are directly stored in the data
-        container object.
+        Compute the PSDs for all axes in the data object. The units of the PSD are `<time series units>² /
+        <samplingFreq units>`.
 
         Returns:
             :class:`pandas.DataFrame`
         """
 
-        lenData = len(self.c.ts.ix[:, 0])
+        lenData = len(self.timeSeries.ix[:, 0])
 
         # get nBlocks
         if self.overlap:
@@ -57,25 +59,22 @@ class PsdComputation():
             self.nBlocks = lenData // self.blockLength
 
         psd = pd.DataFrame()
-        for title, column in self.c.ts.items():
-            psdRaw = self.compute_psd(column,
-                                      samplingFreq=self.c.meta['samplingRateTs'],
+        for title, column in self.timeSeries.items():
+            psdRaw = self.computePsd(column,
+                                      samplingFreq=self.samplingRate,
                                       blockLength=self.blockLength,
                                       overlap=self.overlap)
 
             # store psd, overwrites 'f' but it should be the same for all the axes so no problem here
             psd['f'] = psdRaw[0]
-            # get rid of the 'diff' at the end of the title strings, should be there by convention
-            titleNew = title.split('Diff')[0]
-            self.c.units[titleNew] = self.c.units[title] + '² / Hz'
-            psd[titleNew] = psdRaw[1]
-            psd[titleNew + 'Std'] = psdRaw[2]
-            # update metadata dict
-            self.c.meta.set(title, 'PsdBlockLength', self.blockLength)
-            self.c.meta.set(title, 'PsdNBlocks', self.nBlocks)
-            self.c.meta.set(title, 'PsdOverlap', self.overlap)
+            psd[title] = psdRaw[1]
+            psd[title + 'Std'] = psdRaw[2]
 
-        return psd
+        psdMeta = OrderedDict([('psdBlockLength', self.blockLength),
+                               ('psdNBlocks', self.nBlocks),
+                               ('psdOverlap', self.overlap)])
+
+        return psdMeta, psd
 
     def overlap(self, data):
         """
@@ -92,7 +91,7 @@ class PsdComputation():
         return overlap
     
     @staticmethod
-    def compute_psd(data, samplingFreq=80000, blockLength=2**13, overlap=0):
+    def computePsd(data, samplingFreq=80000, blockLength=2**13, overlap=0):
         """
         Compute the PSD using :fcn:`scipy.signal.welch` for each block but do the averaging of the blocks in this
         function. This allows to also return the standard deviation of the data for each frequency and the individual
@@ -125,24 +124,6 @@ class PsdComputation():
         return f, psdAv, psdStd, psdList
 
 
-class PsdFitLeastSquares(ixo.fit.LeastSquaresFit):
-    """
-
-    """
-
-    def __init__(self, *args, container=None, **kwargs):
-        """
-        Constructor for PsdFitLeastSquares
-
-        Args:
-            container (:class:`tweezers.TweezerData`): data container
-
-        """
-
-        super().__init__(*args, **kwargs)
-        self.c = container
-
-
 class PsdFitMle(ixo.fit.Fit):
     """
     Perform a maximum likelihood fit as described in the Norrelyke paper.
@@ -153,7 +134,7 @@ class PsdFitMle(ixo.fit.Fit):
         Constructor for PsdFitMle
 
         Args:
-            container (:class:`tweezers.TweezerData`): data container
+            container (:class:`tweezers.TweezersData`): data container
         """
 
         super().__init__(*args, **kwargs)
@@ -170,16 +151,16 @@ class PsdFitMle(ixo.fit.Fit):
 
         # number of blocks in PSD
         n = self.c.meta['nBlocks']
-        s = self.mle_factors(self.y)
-        a, b = self.mle_ab(s, n)
-        D, fc = self.mle_parameters(a, b, n)
+        s = self.mleFactors(self.y)
+        a, b = self.mleAB(s, n)
+        D, fc = self.mleParameters(a, b, n)
         self.fitResult = [D, fc]
 
-        self.fitError = self.mle_errors(D, fc, a, b, n)
+        self.fitError = self.mleErrors(D, fc, a, b, n)
 
         return self.fitResult
 
-    def mle_factors(self, P):
+    def mleFactors(self, P):
         """
         Calculation of the S coefficients related to the MLE, according to the paper of Norrelyke
 
@@ -200,7 +181,7 @@ class PsdFitMle(ixo.fit.Fit):
 
         return s
 
-    def mle_ab(self, s, n):
+    def mleAB(self, s, n):
         """
         Calculation of the pre-parameters a and b, according to the paper of Norrelyke
 
@@ -216,7 +197,7 @@ class PsdFitMle(ixo.fit.Fit):
         b = ((1+1/n)/(s[0][2]*s[2][2]-s[1][2]*s[1][2])) * (s[1][1]*s[0][2]-s[0][1]*s[1][2])
         return a, b
 
-    def mle_parameters(self, a, b, n):
+    def mleParameters(self, a, b, n):
         """Calculate parameters from the factors of the MLE
 
         Args:
@@ -237,7 +218,7 @@ class PsdFitMle(ixo.fit.Fit):
 
         return D, fc
 
-    def mle_errors(self, D, fc, a, b, n):
+    def mleErrors(self, D, fc, a, b, n):
         """Function to get the standard deviation of the parameters according to the paper of Norrelyke
 
         Args:
@@ -251,7 +232,7 @@ class PsdFitMle(ixo.fit.Fit):
             errosMle (np.array): with sigma(D) and sigma(fc)
         """
 
-        s = self.mle_factors(self.yFit)
+        s = self.mleFactors(self.yFit)
         sB = [[(n+1)/n*s[0][2], (n+1)/n*s[1][2]], [(n+1)/n*s[1][2], (n+1)/n*s[2][2]]]
         sError = 1/(len(self.x)*n)*(n+3)/n*np.linalg.inv(sB)
 
@@ -267,22 +248,24 @@ class PsdFit():
     Fit the PSD.
     """
 
-    def __init__(self, container, fitCls=PsdFitLeastSquares, minF=5, maxF=3*10**3, residuals=True, **fitargs):
+    def __init__(self, psd, fitCls=ixo.fit.LeastSquaresFit, minF=5, maxF=7*10**3, residuals=True, **fitargs):
         """
         Constructor for PsdFit
 
         Args:
-            container (:class:`tweezers.TweezerData`): data container
+            psd (:class:`pandas.DataFrame`): data container, data columns ending with `Std` are interpreted as
+                                             standard deviation of the data with the otherwise same column name and
+                                             used for weighted fits, a column `f` must be present with the frequency
+                                             values
             fitCls (:class:`ixo.fit.Fit`): class to use for fitting, must implement the methods given in the
                                             reference class
             minF (float): only data points with frequencies above this limit are fitted
             maxF (float): only data points with frequencies below this limit are fitted
-            residuals (bool): compute the residuals for the fit, they are added as columns to the PSD data in the
-                              container structure
-            startingValues (list): starting values for the fitting routine, optional
+            residuals (bool): compute the residuals for the fit, they are added as columns to the PSD fit data
+            others: additional arguments are passed on to the constructor of `fitCls`
         """
 
-        self.c = container
+        self.psd = psd
         # fit class to use
         self.fitCls = fitCls
         # fit limits
@@ -301,70 +284,70 @@ class PsdFit():
 
     def fit(self):
         """
-        Fit the PSD with the fitting class given in the constructor. There is no return value but the results are
-        written back to the data container object. Also, the fitted curve is added to the PSD data.
-        Note that what the value stored under ``PsdFitError`` in the data container's meta data can describe
-        different things depending on the used fitting class.
+        Fit the PSD with the fitting class given in the constructor. Note that the value stored under ``PsdFitError``
+        returned meta data can describe different things depending on the fitting class used.
+
+        Returns:
+            fitParams (dict): fit parameters and metadata as dictionary
+            psdFit (:class:`pandas.DataFrame`): data of the fitted curve
         """
 
-        # dataframe to hold result
-        psdFit = self.c.psd[['f']][(self.c.psd['f'] >= self.minF) & (self.c.psd['f'] <= self.maxF)]
+        # check for frequency column
+        if 'f' not in self.psd.columns:
+            raise ValueError('No frequency data found. The column must be called "f".')
 
-        for title, column in self.c.psd.iteritems():
-            if not title.endswith('X') and not title.endswith('Y'):
-                # only do psd columns, their data should end on 'X' or 'Y'
+        # select data based of frequency limits for fitting
+        freqQuery = '{} <= f <= {}'.format(self.minF, self.maxF)
+        psd = self.psd.query(freqQuery)
+        # dataframe to hold result
+        psdFit = psd[['f']].copy()
+        # hold fitting parameters
+        fitParams = OrderedDict()
+
+        for axis, column in psd.iteritems():
+            # skip columns ending on 'Std', they contain error data
+            if axis.lower().endswith('std') or axis is 'f':
                 continue
 
-            # pick data for fitting based on given frequency limits
-            data = self.c.psd[['f', title, title + 'Std']]
-            data = data[(data['f'] >= self.minF) & (data['f'] <= self.maxF)]
+            # check for column with error data
+            if axis + 'Std' in psd.columns:
+                psdStd = psd[axis + 'Std']
+            else:
+                psdStd = None
 
             # create fit object and do the fit
-            fitObj = self.fitCls(data['f'],
-                                 data[title],
+            fitObj = self.fitCls(psd['f'],
+                                 psd[axis],
                                  fcn=self.lorentzian,
-                                 std=data[title + 'Std'],
-                                 container=self.c,
+                                 std=psdStd,
                                  **self.fitargs)
             res = fitObj.fit()
 
-            # store results
+            # get results
             D = res[0]
             fc = res[1]
-            self.c.meta.set(title, 'D', D)
-            self.c.meta.set(title, 'fc', fc)
-            self.c.meta.set(title, 'PsdFitError', list(fitObj.fitError))  # convert to list for conversion to JSON
-            self.c.meta.set(title, 'r2', fitObj.rsquared())
-            self.c.meta.set(title, 'chi2', fitObj.chisquared())
-            self.c.meta.set(title, 'PsdFitMinF', self.minF)
-            self.c.meta.set(title, 'PsdFitMaxF', self.maxF)
 
-            # get stiffness and store it
-            beadKey = self.c.meta.get_key(title, 'BeadDiameter')
-            radius = self.c.meta[beadKey] / 2
-            if self.c.units[beadKey] in ['um', 'µm']:
-                radius *= 1000
-            dist_calib = distance_calibration(D=D,
-                                              radius=radius,
-                                              viscosity=self.c.meta['viscosity'],
-                                              T=self.c.meta['temperature'])
-            stiffness = trap_stiffness(fc=fc,
-                                       radius=radius,
-                                       viscosity=self.c.meta['viscosity'])
-            self.c.meta.set(title, 'k', stiffness)
-            # TODO check if units are there for stiffness, distance_calibration and temperature!!!!!
-            self.c.meta.set(title, 'DisplacementSensitivity', dist_calib)
+            # append fitted Lorentzian x and y data to to fit-dataframe
+            psdFit.loc[:, axis + 'Fit'] = self.lorentzian(psdFit['f'], D, fc)
 
-            # append plotting data to psd only for fitting range
-            # pick data for fitting based on given limits
-            psdFit[title + 'Fit'] = self.lorentzian(psdFit['f'], D, fc)
+            fitParams[axis] = OrderedDict()
+            fitParams[axis]['diffusionCoefficient'] = D
+            fitParams[axis]['cornerFrequency'] = fc
+            fitParams[axis]['psdFitError'] = list(fitObj.fitError) # convert to list for conversion to JSON
+            fitParams[axis]['psdFitR2'] = fitObj.rsquared()
+            # chi2 can only be computed if std data is given
+            if psdStd is not None:
+                fitParams[axis]['psdFitChi2'] = fitObj.chisquared()
 
-            # compute residuals
+            # compute residuals if required
             if self.residuals:
-                psdFit[title + 'Residuals'], meanResidual = fitObj.residuals()
-                self.c.meta.set(title, 'PsdFitMeanResidual', meanResidual)
+                psdFit.loc[:, axis + 'Residuals'], meanResidual = fitObj.residuals()
+                fitParams[axis]['psdFitMeanResidual'] = meanResidual
 
-        return psdFit
+        fitParams['psdFitMinF'] = self.minF
+        fitParams['psdFitMaxF'] = self.maxF
+
+        return fitParams, psdFit
 
     @staticmethod
     def lorentzian(f, D, fc):

@@ -1,207 +1,15 @@
-from ixo.decorators import lazy
-from collections import OrderedDict
-import pprint
-import re
-from tweezers.analysis.psd import PsdComputation, PsdFit
-import pandas as pd
 import logging as log
+import copy
+
+from ixo.decorators import lazy
+from tweezers.analysis.psd import PsdComputation, PsdFit
+from tweezers.analysis.thermal_calibration import thermalCalibration
+from tweezers.meta import MetaDict, UnitDict
 
 
-class MetaBaseDict(OrderedDict):
+class TweezersData():
     """
-    An ordered dictionary (:class:`collections.OrderedDict`) that returns a default value if a key does not exist and
-    prints a warning.
-    """
-    # TODO should this dictionary be ordered alphabetically?
-
-    defaults = {}
-
-    # all aliases should be lower case
-    aliases = {'DiffCoeff': ['d'],
-               'Stiffness': ['k'],
-               'CornerFreq': ['fc'],
-               'PsdFitR2': ['r2'],
-               'PsdFitChi2': ['chi2']}
-
-    warningString = ''
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def __str__(self):
-        return pprint.pformat(self)
-
-    def __getitem__(self, item):
-        try:
-            return super().__getitem__(item)
-        except KeyError:
-            try:
-                value = self.defaults[item]
-                log.info('%sDefault metadata value used for key: %s', self.warningString, item)
-                return value
-            except KeyError:
-                pass
-            raise
-
-    def replace_key(self, oldKey, newKey):
-        """
-        Replace a key in the dictionary but keep its value. Since this is an ordered dictionary, the new key is added
-        at the end.
-
-        Args:
-            oldKey (str): old key name
-            newKey (str): new key name
-        """
-
-        if oldKey in self:
-            self[newKey] = self.pop(oldKey)
-
-    def get_alias(self, key):
-        """
-        Check if the given key corresponds to an alias in :attr:`tweezers.MetaBaseDict.aliases`.
-
-        Args:
-            key (str): string to check
-
-        Returns:
-            :class:`str`
-        """
-
-        for name, aliasList in self.aliases.items():
-            if key.lower() == name.lower() or key.lower() in aliasList:
-                return name
-        return key
-
-    def get_key(self, *keyElement):
-        """
-        Construct a key name for this dictionary from the input.
-        If the input is a string, it is checked whether it exists or has an valid alias in the
-        :attr:`tweezers.MetaBaseDict.aliases` attribute.
-        If the input is a list of strings the elements are basically concatenated with the exception of the first
-        element being of type ``pmx``. In this case e.g. ``['pmx', 'Stiffness']`` becomes ``pmStiffnessX``. Each of
-        the list elements is checked for an valid alias with :meth:`tweezers.MetaBaseDict.get_alias`.
-
-        Args:
-            keyElement (:class:`str` or :class:`list` of :class:`str`): element(s) that describe the key to construct
-
-        Returns:
-            :class:`str`
-        """
-
-        # keyElement is a list
-        # check if the list begins with something like 'pmx'
-        regex = re.compile('^(?P<beam>pm|aod)?\s?(?P<axes>x|y)?\s?(?P<source>source)?.*', re.IGNORECASE)
-        res = regex.search(keyElement[0])
-        prefixElements = []
-        if res:
-            if res.group('beam'):
-                prefixElements.append(res.group('beam').lower())
-            if res.group('axes'):
-                prefixElements.append(res.group('axes').upper())
-            if res.group('source'):
-                prefixElements.append('Source')
-        else:
-            prefixElements.append(self.get_alias(keyElement[0]))
-
-        # add all other elements
-        suffix = ''
-        for i in range(1, len(keyElement)):
-            suffix += self.get_alias(keyElement[i])
-
-        # lets check for existing keys
-        # if one is found, return it; this actually returns the first matching key but that should be fine
-        prefix = ''
-        for pre in prefixElements:
-            prefix += pre
-            key = prefix + suffix
-            if key in self:
-                break
-
-        # here, we don't care if the key actually exists so just return it, it could be a new one
-        return key
-    
-    def get(self, *k):
-        """
-        The input is forwarded to :meth:`tweezers.MetaBaseDict.get_key` which gives a key. This method
-        returns the corresponding value in the dictionary if it exists.
-        
-        Args:
-            *k (str): any number of strings
-           
-        Returns:
-            :class:`str`
-        """
-
-        k = self.get_key(*k)
-        return self[k]
-
-    def set(self, *k):
-        """
-        Set a value for the key that is returned by :meth:`tweezers.MetaBaseDict.get_key`. The last
-        parameter is the value to be set.
-
-        Args:
-            *k (str): any number of strings followed by a value to store in the dictionary
-        """
-
-        value = k[-1]
-        k = self.get_key(*k[:-1])
-        self[k] = value
-
-    def get_facets(self):
-        """
-
-
-        Args:
-
-
-        Returns:
-
-        """
-
-        facets = {'pmX': {}, 'pmY': {}, 'aodX': {}, 'aodY': {}}
-
-        for key, value in self.items():
-            regex = re.compile('^(?P<beam>pm|aod)(?P<axes>x|y)(?P<element>.*)$', re.IGNORECASE)
-            res = regex.search(key)
-            if not res:
-                continue
-            axes = res.group('beam').lower() + res.group('axes').upper()
-            facets[axes]['title'] = self['title']
-            facets[axes]['axes'] = axes
-            facets[axes][res.group('element')] = value
-
-        return list(facets.values())
-
-
-class MetaDict(MetaBaseDict):
-    """
-    An class to hold metadata.
-    """
-    # TODO order keys by alphabet
-
-    defaults = {'title': 'no title'}
-
-    warningString = 'Meta values: '
-
-
-class UnitDict(MetaBaseDict):
-    """
-    Store units corresponding to metadata.
-    """
-    defaults = {'viscosity': 'pN s / nm^2',
-                'pmXDiff': 'V',
-                'pmYDiff': 'V',
-                'aodXDiff': 'V',
-                'aodYDiff': 'V'
-    }
-
-    warningString = 'Units: '
-
-
-class TweezerData():
-    """
-    TweezerData structure for tweezers experiment data and metadata. It requires a data source object that provides certain
+    TweezersData structure for tweezers experiment data and metadata. It requires a data source object that provides certain
     methods That populate the properties of this class. Note that not all of these methods must be implemented,
     depending of your usage of the class. However, if your data source does not implement a certain method, the code
     will fail only when the according property is called since all of them are evaluated lazily.
@@ -211,15 +19,15 @@ class TweezerData():
         ============ ================================== ===================================
         property     required method in data source     data type
         ============ ================================== ===================================
-        meta         get_metadata                       :class:`tweezers.MetaDict`
-        units        get_metadata                       :class:`tweezers.UnitDict`
-        data         get_data                           :class:`pandas.DataFrame`
-        psdSource    get_psd                            :class:`pandas.DataFrame`
-        ts           get_ts                             :class:`pandas.DataFrame`
+        meta         getMetadata                       :class:`tweezers.MetaDict`
+        units        getMetadata                       :class:`tweezers.UnitDict`
+        data         getData                           :class:`pandas.DataFrame`
+        psdSource    getPsd                            :class:`pandas.DataFrame`
+        ts           getTs                             :class:`pandas.DataFrame`
         ============ ================================== ===================================
 
     The properties require standardized keys for some fields. Additional fields can be present but the ones listed
-    here must have the specified names.
+    here must have the specified names (really? rethink!).
 
         =============== =============================================================================================
         property        standardized keys
@@ -231,24 +39,33 @@ class TweezerData():
         =============== =============================================================================================
     """
 
-    def __init__(self, dataSource, verbose=True):
+    # this variable should be set to false when the object was copied due to data-changing actions (computePsd...)
+    original = True
+
+    def __init__(self, dataSource=None, verbose=True):
         """
         Constructor for Data
 
         Args:
-            dataSource: a data source object like e.g. :class:`tweezers.io.source.TxtSourceMpi`
+            dataSource: a data source object like e.g. :class:`tweezers.io.source.TxtMpiSource`
+            verbose (bool): set the level of verbosity
         """
 
         # store dataSource object
-        self.dataSource = dataSource
+        if dataSource:
+            self.dataSource = dataSource
+        else:
+            self.dataSource = None
+            self.meta = MetaDict()
+            self.units = UnitDict()
 
+        # the basicConfig is not working in iPython notebooks :(
+        # log.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
         logger = log.getLogger()
-        # logger.
         if verbose:
             logger.setLevel(log.INFO)
         else:
             logger.setLevel(log.WARNING)
-        # log.basicConfig(format='%(levelname)s:%(message)s', level=level)
 
     @lazy
     def meta(self):
@@ -260,7 +77,8 @@ class TweezerData():
             :class:`tweezers.MetaDict`
         """
 
-        meta, units = self.dataSource.get_metadata()
+        log.info('Reading metadata from data source.')
+        meta, units = self.dataSource.getMetadata()
         self.units = units
         return meta
 
@@ -268,13 +86,13 @@ class TweezerData():
     def units(self):
         """
         Attribute that holds the units to the corresponding meta data. This should be returned by the data source's
-        ``get_metadata`` method as well. Evaluated lazily.
+        ``getMetadata`` method as well. Evaluated lazily.
 
         Returns:
             :class:`tweezers.UnitDict`
         """
 
-        meta, units = self.dataSource.get_metadata()
+        meta, units = self.dataSource.getMetadata()
         self.meta = meta
         return units
 
@@ -288,7 +106,8 @@ class TweezerData():
             :class:`pandas.DataFrame`
         """
 
-        return self.dataSource.get_data()
+        log.info('Reading data from data source.')
+        return self.dataSource.getData()
 
     @lazy
     def ts(self):
@@ -299,82 +118,103 @@ class TweezerData():
             :class:`pandas.DataFrame`
         """
 
-        return self.dataSource.get_ts()
+        log.info('Reading timeseries from data source.')
+        return self.dataSource.getTs()
 
     @lazy
-    def psdSource(self):
-        """
-        Attribute to hold the power spectrum of the thermal calibration of the experiment as read from the DataSource.
-        Also evaluated lazily.
-
-        Returns:
-            :class:`pandas.DataFrame`
-        """
-
-        return self.dataSource.get_psd()
-
-    @lazy
-    def psdFitSource(self):
-        """
-        Attribute to hold the fit of the Lorentzian to the power spectrum of the thermal calibration of the
-        experiment as read from the DataSource. Also evaluated lazily.
-
-        Returns:
-            :class:`pandas.DataFrame`
-        """
-
-        return self.dataSource.get_psd_fit()
-
     def psd(self):
         """
-        Attribute to hold the power spectrum density. If called before :meth:`tweezers.Data.compute_psd`, an exception is
-        raised.
+        Attribute to hold the power spectrum density. If called before :meth:`tweezers.Data.computePsd`,
+        it holds the PSD from the data source, otherwise the newly computed one.
         """
 
-        raise ValueError('PSD not yet computed. Please call "compute_psd"-method first.')
+        log.info('Reading PSD from data source.')
+        return self.dataSource.getPsd()
 
+    def computePsd(self, **kwargs):
+        """
+        Compute the power spectrum density from the experiments time series which is stored in the ``ts`` attribute.
+        All arguments are forwarded to :class:`tweezers.psd.PsdComputation`.
+
+        Returns:
+            :class:`tweezers.TweezersData`
+        """
+
+        # use the timeseries sampling rate as default if none is given as user input (in kwargs)
+        args = {'samplingRate': self.meta['psdSamplingRate']}
+        args.update(kwargs)
+
+        psdObj = PsdComputation(self.ts, **args)
+        psdMeta, psd = psdObj.psd()
+
+        # if we are the original object, we don't want to overwrite anything so we create a copy of the TweezerData object
+        # otherwise, we don't care, however it could be wise to clear e.g. the fitting data
+        if self.original:
+            td = copy.deepcopy(self)
+            td.original = False
+        else:
+            td = self
+
+        # store PSD in 'psd' attribute of this object
+        td.psd = psd
+        # store PSD units
+        td.units['psd'] = self.units['timeseries'] + '² / Hz'
+        # store psd metadata
+        td.meta.update(psdMeta)
+        return td
+
+    @lazy
     def psdFit(self):
         """
         Attribute to hold the Lorentzian fit to the power spectrum density. If called before
-        :meth:`tweezers.Data.fit_psd`, an exception is raised.
+        :meth:`tweezers.Data.fit_psd`, it holds the fit from the datas ource, otherwise the newly computed one.
         """
 
-        raise ValueError('PSD fit not yet computed. Please call "fit_psd"-method first.')
+        log.info('Reading PSD fit from data source.')
+        return self.dataSource.getPsdFit()
 
-    def compute_psd(self, **kwargs):
-        """
-        Compute the power spectrum density from the experiments time series which is stored in the ``psd`` attribute.
-        All Arguments are forwarded to :class:`tweezers.psd.PsdComputation`.
-
-        Returns:
-            :class:`tweezers.TweezerData`
-        """
-
-        psdObj = PsdComputation(self, **kwargs)
-        setattr(self, 'psd', psdObj.psd())
-        return self
-
-    def fit_psd(self, **kwargs):
+    def fitPsd(self, **kwargs):
         """
         Fits the PSD. All input is forwarded to the :class:`tweezers.analysis.psd.PsdFit` object.
 
         Returns:
-            :class:`tweezers.TweezerData`
+            :class:`tweezers.TweezersData`
         """
 
-        psdFitObj = PsdFit(self, **kwargs)
-        setattr(self, 'psdFit', psdFitObj.fit())
-        return self
+        # if we are the original object, we don't want to overwrite anything so we create a copy of the TweezerData object
+        if self.original:
+            td = copy.deepcopy(self)
+            td.original = False
+        else:
+            td = self
 
-    def thermal_calibration(self):
+        psdFitObj = PsdFit(td.psd, **kwargs)
+        fitParams, psdFit = psdFitObj.fit()
+        td.meta.update(fitParams)
+        setattr(td, 'psdFit', psdFit)
+        return td
+
+    def thermalCalibration(self):
         """
-        Perform a thermal calibration. Requires :meth:`tweezers.TweezerData.psd` and :meth:`tweezers.TweezerData.psdFit`
-
-        Args:
-            self
+        Perform a thermal calibration. Requires :meth:`tweezers.TweezersData.psd` and
+        :meth:`tweezers.TweezersData.psdFit`. Also returns a copy if the object is original, i.e. values from data
+        source could be overwritten.
 
         Returns:
-            :class:`tweezers.TweezerData`
+            :class:`tweezers.TweezersData`
         """
 
+        # get axes
+        axes = self.meta.subDictKeys()
+
+        for ax in axes:
+            print(ax)
+            res, units = thermalCalibration(diffCoeff=self.meta[ax]['diffusionCoefficient'],
+                                            cornerFreq=self.meta[ax]['cornerFrequency'],
+                                            viscosity=self.meta['viscosity'],
+                                            beadDiameter=self.meta[ax]['beadDiameter'],
+                                            temperature=self.meta['temperature'])
+
+            self.meta.update({ax: res})
+            self.units.update({ax: units})
         return self
