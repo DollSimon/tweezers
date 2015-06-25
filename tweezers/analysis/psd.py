@@ -61,9 +61,9 @@ class PsdComputation():
         psd = pd.DataFrame()
         for title, column in self.timeSeries.items():
             psdRaw = self.computePsd(column,
-                                      samplingFreq=self.samplingRate,
-                                      blockLength=self.blockLength,
-                                      overlap=self.overlap)
+                                     samplingFreq=self.samplingRate,
+                                     blockLength=self.blockLength,
+                                     overlap=self.overlap)
 
             # store psd, overwrites 'f' but it should be the same for all the axes so no problem here
             psd['f'] = psdRaw[0]
@@ -129,16 +129,17 @@ class PsdFitMle(ixo.fit.Fit):
     Perform a maximum likelihood fit as described in the Norrelyke paper.
     """
 
-    def __init__(self, *args, container=None, **kwargs):
+    def __init__(self, *args, nBlocks, **kwargs):
         """
         Constructor for PsdFitMle
 
         Args:
             container (:class:`tweezers.TweezersData`): data container
+            nBlocks (int): number of blocks in the PSD
         """
 
         super().__init__(*args, **kwargs)
-        self.c = container
+        self.nBlocks = nBlocks
 
     def fit(self):
         """
@@ -149,14 +150,13 @@ class PsdFitMle(ixo.fit.Fit):
             fc (float): corner frequency
         """
 
-        # number of blocks in PSD
-        n = self.c.meta['nBlocks']
+
         s = self.mleFactors(self.y)
-        a, b = self.mleAB(s, n)
-        D, fc = self.mleParameters(a, b, n)
+        a, b = self.mleAB(s, self.nBlocks)
+        D, fc = self.mleParameters(a, b, self.nBlocks)
         self.fitResult = [D, fc]
 
-        self.fitError = self.mleErrors(D, fc, a, b, n)
+        self.fitError = self.mleErrors(D, fc, a, b, self.nBlocks)
 
         return self.fitResult
 
@@ -333,7 +333,7 @@ class PsdFit():
             fitParams[axis] = OrderedDict()
             fitParams[axis]['diffusionCoefficient'] = D
             fitParams[axis]['cornerFrequency'] = fc
-            fitParams[axis]['psdFitError'] = list(fitObj.fitError) # convert to list for conversion to JSON
+            fitParams[axis]['psdFitError'] = list(fitObj.fitError)  # convert to list for conversion to JSON
             fitParams[axis]['psdFitR2'] = fitObj.rsquared()
             # chi2 can only be computed if std data is given
             if psdStd is not None:

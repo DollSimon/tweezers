@@ -204,6 +204,7 @@ class PsdFitPlot(PsdPlotBase):
         self.fig.suptitle(self.title, fontsize=16)
         # create grid for all the PSDs
         grid = gridspec.GridSpec(nrows, 2)
+        grid.update(hspace=0.25, wspace=0.22)
 
         f = self.c.psd['f']
         fFit = self.c.psdFit['f']
@@ -212,10 +213,13 @@ class PsdFitPlot(PsdPlotBase):
             gridEl = grid[n]
 
             # prepare axes
-            if self.residuals:
+            if self.residuals and axis + 'Residuals' in self.c.psdFit.columns:
                 innerGrid = gridspec.GridSpecFromSubplotSpec(100, 1, subplot_spec=gridEl, hspace=0.01)
                 psdAxes = plt.subplot(innerGrid[20:])
             else:
+                # in case we wanted to plot them but the data is not there, set it to false
+                self.residuals = False
+                # prepare axes
                 psdAxes = plt.subplot(gridEl)
                 psdAxes.set_title(axis)
 

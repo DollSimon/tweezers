@@ -120,6 +120,12 @@ class TxtMpiSource(BaseSource):
         # add title string to metadata, used for plots
         self.setTitle(meta)
 
+        # make sure all axes have the beadRadius
+        meta['pmY']['beadRadius'] = meta['pmX']['beadRadius']
+        units['pmY']['beadRadius'] = units['pmX']['beadRadius']
+        meta['aodY']['beadRadius'] = meta['aodX']['beadRadius']
+        units['aodY']['beadRadius'] = units['aodX']['beadRadius']
+
         return meta, units
 
     def getData(self):
@@ -507,7 +513,7 @@ class TxtMpiSource(BaseSource):
             'recordingRate': int,
             'measurementDuration': float,
             'timeStep': float,
-            'deltaTime': float,
+            'dt': float,
             'psdNBlocks': lambda x: int(float(x)),
             'viscosity': float,
 

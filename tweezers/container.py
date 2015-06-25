@@ -136,6 +136,8 @@ class TweezersData():
         """
         Compute the power spectrum density from the experiments time series which is stored in the ``ts`` attribute.
         All arguments are forwarded to :class:`tweezers.psd.PsdComputation`.
+        This method returns a copy of the initial :class:`tweezers.TweezersData` object to prevent e.g. overwriting of
+        data that was read from files.
 
         Returns:
             :class:`tweezers.TweezersData`
@@ -148,13 +150,8 @@ class TweezersData():
         psdObj = PsdComputation(self.ts, **args)
         psdMeta, psd = psdObj.psd()
 
-        # if we are the original object, we don't want to overwrite anything so we create a copy of the TweezerData object
-        # otherwise, we don't care, however it could be wise to clear e.g. the fitting data
-        if self.original:
-            td = copy.deepcopy(self)
-            td.original = False
-        else:
-            td = self
+        # create copy
+        td = copy.deepcopy(self)
 
         # store PSD in 'psd' attribute of this object
         td.psd = psd
@@ -177,17 +174,15 @@ class TweezersData():
     def fitPsd(self, **kwargs):
         """
         Fits the PSD. All input is forwarded to the :class:`tweezers.analysis.psd.PsdFit` object.
+        This method returns a copy of the initial :class:`tweezers.TweezersData` object to prevent e.g. overwriting of
+        data that was read from files.
 
         Returns:
             :class:`tweezers.TweezersData`
         """
 
-        # if we are the original object, we don't want to overwrite anything so we create a copy of the TweezerData object
-        if self.original:
-            td = copy.deepcopy(self)
-            td.original = False
-        else:
-            td = self
+        # create copy that will be returned
+        td = copy.deepcopy(self)
 
         psdFitObj = PsdFit(td.psd, **kwargs)
         fitParams, psdFit = psdFitObj.fit()
@@ -198,8 +193,7 @@ class TweezersData():
     def thermalCalibration(self):
         """
         Perform a thermal calibration. Requires :meth:`tweezers.TweezersData.psd` and
-        :meth:`tweezers.TweezersData.psdFit`. Also returns a copy if the object is original, i.e. values from data
-        source could be overwritten.
+        :meth:`tweezers.TweezersData.psdFit`.
 
         Returns:
             :class:`tweezers.TweezersData`
@@ -209,23 +203,32 @@ class TweezersData():
         axes = self.meta.subDictKeys()
 
         for ax in axes:
-            res, units = thermalCalibration(diffCoeff=self.meta[ax]['diffusionCofficient'],
+            # convert radius to nm (likely given in µm)
+            if self.units[ax]['beadRadius'] is 'nm':
+                radius = self.meta[ax]['beadRadius']
+            else:
+                radius = self.meta[ax]['beadRadius'] * 1000
+
+            res, units = thermalCalibration(diffCoeff=self.meta[ax]['diffusionCoefficient'],
                                             cornerFreq=self.meta[ax]['cornerFrequency'],
                                             viscosity=self.meta['viscosity'],
-                                            beadRadius=self.meta[ax]['beadRadius'],
+                                            beadRadius=radius,
                                             temperature=self.meta['temperature'])
 
             self.meta.update({ax: res})
             self.units.update({ax: units})
         return self
 
-    def getFacet(self, data, colName='Value'):
+    def getFacets(self, data, colName='Value', meta=[]):
         """
         Returns a :class:`pandas.DataFrame` suitable for a :class:`seaborn.FacetGrid`, i.e. the axis of a value is
         specified in an extra column instead of having one column per axis.
 
         Args:
             data (:class:`pandas.DataFrame`): input data
+            colName (str): column name of the "value" column
+            meta (list): list of strings, the metadata is searched for these keys and they are added as additional
+                         columns if available
 
         Returns:
             :class:`pandas.DataFrame`
@@ -246,6 +249,14 @@ class TweezersData():
 
             tmpDf = data[index + [col]].rename(columns={col: colName})
             tmpDf.loc[:, 'Axis'] = col
+
+            for m in meta:
+                if m in self.meta[col].keys():
+                    tmpDf.loc[:, m] = self.meta[col][m]
             resDf = resDf.append(tmpDf)
+
+        for m in meta:
+            if m in self.meta.keys():
+                resDf.loc[:, m] = self.meta[m]
 
         return resDf

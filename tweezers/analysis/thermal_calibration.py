@@ -11,14 +11,14 @@ def thermalCalibration(diffCoeff, cornerFreq, viscosity, beadRadius, temperature
         diffCoeff (float): diffusion coefficient in units of [V]
         cornerFreq (float): corner frequency in units of [Hz]
         viscosity (float): viscosity in units of [pN s / nm²]
-        beadDiameter (float): bead diameter in units of [nm]
+        beadRadius (float): bead radius in units of [nm]
         temperature (float): temperature in units of ˚C
 
     Returns:
         two :class:`dict` for data and units with keys:
-        `Stiffness` in units of [pN/nm]
-        `DisplacementSensitivity` in units of [V/nm]
-        `ForceSensitivity` in units of [V/pN]
+        `stiffness` in units of [pN/nm]
+        `displacementSensitivity` in units of [V/nm]
+        `forceSensitivity` in units of [V/pN]
     """
 
     stiffness = trapStiffness(fc=cornerFreq, radius=beadRadius, viscosity=viscosity)

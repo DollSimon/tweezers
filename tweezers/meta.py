@@ -91,8 +91,7 @@ class MetaBaseDict(OrderedDict):
         if oldKey in self:
             self[newKey] = self.pop(oldKey)
 
-    @property
-    def facets(self):
+    def getFacets(self):
         """
         Create a :class:`pandas.DataFrame` facet view of the metadata. Useful for facet plotting using
         :class:`seaborn.FacetGrid`.
