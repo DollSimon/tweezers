@@ -153,12 +153,21 @@ class TweezersData():
         # create copy
         td = copy.deepcopy(self)
 
+
         # store PSD in 'psd' attribute of this object
         td.psd = psd
         # store PSD units
         td.units['psd'] = self.units['timeseries'] + '² / Hz'
         # store psd metadata
         td.meta.update(psdMeta)
+
+        # delete PSD fit and thermal calibration data if present to prevent confusion with newly computed PSD and old fits
+        td.psdFit = None
+        td.meta.deleteKey('diffusionCoefficient', 'cornerFrequency', 'psdFitError', 'psdFitR2', 'psdFitChi2',
+                          'displacementSensitivity', 'forceSensitivity', 'stiffness')
+        td.units.deleteKey('diffusionCoefficient', 'cornerFrequency', 'psdFitError', 'psdFitR2', 'psdFitChi2',
+                           'displacementSensitivity', 'forceSensitivity', 'stiffness')
+
         return td
 
     @lazy
@@ -204,10 +213,12 @@ class TweezersData():
 
         for ax in axes:
             # convert radius to nm (likely given in µm)
-            if self.units[ax]['beadRadius'] is 'nm':
+            if self.units[ax]['beadRadius'] == 'nm':
                 radius = self.meta[ax]['beadRadius']
-            else:
+            elif self.units[ax]['beadRadius'] in ['um', 'µm']:
                 radius = self.meta[ax]['beadRadius'] * 1000
+            else:
+                raise ValueError('Unknown bead radius unit encountered.')
 
             res, units = thermalCalibration(diffCoeff=self.meta[ax]['diffusionCoefficient'],
                                             cornerFreq=self.meta[ax]['cornerFrequency'],

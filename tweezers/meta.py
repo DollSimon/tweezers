@@ -91,6 +91,25 @@ class MetaBaseDict(OrderedDict):
         if oldKey in self:
             self[newKey] = self.pop(oldKey)
 
+    def deleteKey(self, *args):
+        """
+        Delete one or multiple keys from the dictionary.
+
+        Args:
+            key (str): one or mulitple keys to (recursively) delete from the dictionary
+        """
+
+        keys = args
+
+        # loop through dict and check for element
+        for key, value in self.items():
+            if isinstance(value, MetaBaseDict):
+                value.deleteKey(*keys)
+            else:
+                if key in keys:
+                    self.pop(key)
+
+
     def getFacets(self):
         """
         Create a :class:`pandas.DataFrame` facet view of the metadata. Useful for facet plotting using
