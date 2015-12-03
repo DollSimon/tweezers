@@ -45,7 +45,7 @@ Contents:
    installation
    usage
    modules
-   References
+   references
 
 
 Indices and tables
