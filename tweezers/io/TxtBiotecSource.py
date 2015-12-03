@@ -3,6 +3,7 @@ import json
 from collections import OrderedDict
 import pandas as pd
 import numpy as np
+import re
 
 from .BaseSource import BaseSource
 import tweezers as t
@@ -18,6 +19,8 @@ class TxtBiotecSource(BaseSource):
     psd = None
     data = None
     ts = None
+    # path to data, not correct if files sit in different folders
+    path = None
 
     def __init__(self, data=None, psd=None, ts=None):
         """
@@ -33,19 +36,64 @@ class TxtBiotecSource(BaseSource):
 
         # order is important here for the header file
         if ts:
-            ts = self.makePath(ts)
-            self.ts = ts
-            self.header = ts
+            self.ts = Path(ts)
+            self.header = self.ts
 
         if psd:
-            psd = self.makePath(psd)
-            self.psd = psd
-            self.header = psd
+            self.psd = Path(psd)
+            self.header = self.psd
 
         if data:
-            data = self.makePath(data)
-            self.data = data
-            self.header = data
+            self.data = Path(data)
+            self.header = self.data
+
+        self.path = self.header.parent
+
+    @classmethod
+    def fromDirectory(cls, path):
+        """
+        Creates a data source from a given folder that should contain the data files (PSD, TS, data).
+
+        Args:
+            path (:class:`pathlib.Path`): path to the data folder
+
+        Returns:
+            :class:`tweezers.io.TxtBiotecSource`
+        """
+
+        pPath = Path(path)
+        if not pPath.exists() and pPath.is_dir():
+            raise ValueError('Invalid path given')
+
+        files = {'psd': ' PSD.txt', 'ts': ' TS.txt', 'data': '.txt'}
+        kwargs = {}
+        for key, value in files.items():
+            file = pPath / Path(pPath.name + value)
+            if file.exists() and cls.isDataFile(file):
+                kwargs[key] = file
+
+        if not kwargs:
+            raise ValueError('No files found at given path')
+
+        return cls(**kwargs)
+
+    @staticmethod
+    def isDataFile(path):
+        """
+        Checks if a given file is a valid data file.
+
+        Args:
+            path:
+
+        Returns:
+            bool
+        """
+
+        pPath = Path(path)
+        if re.search('\d{4}(?:_\d{2}){4}.*\.txt', pPath.name):
+            return True
+        else:
+            return False
 
     def getMetadata(self):
         """
@@ -70,6 +118,10 @@ class TxtBiotecSource(BaseSource):
         units = t.UnitDict(header.pop('units'))
         meta = t.MetaDict(header)
 
+        # add column header units
+        colHeaders, colUnits = self.readColumnTitles(self.header)
+        units.update(colUnits)
+
         return meta, units
 
     def getPsd(self):
@@ -80,7 +132,26 @@ class TxtBiotecSource(BaseSource):
             :class:`pandas.DataFrame`
         """
 
+        # get file content
         psd = self.readToDataframe(self.psd)
+        # ignore fit columns
+        cols = [s for s in psd.columns if not s.lower().endswith('fit')]
+        psd = psd[cols]
+        return psd
+
+    def getPsdFit(self):
+        """
+         Returns the fit to the PSD as performed by the data source.
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        # get file content
+        psd = self.readToDataframe(self.psd)
+        # ignore non-fit columns
+        cols = [s for s in psd.columns if s.lower().endswith('fit')]
+        psd = psd[['f'] + cols]
         return psd
 
     def getTs(self):
@@ -95,29 +166,12 @@ class TxtBiotecSource(BaseSource):
         ts = self.readToDataframe(self.ts)
         return ts
 
-    def makePath(self, path):
-        """
-        Convert input to :class:`pathlib.Path`.
-
-        Args:
-            path (str): path to be converted
-
-        Returns:
-            :class:`pathlib.Path`: path object
-        """
-
-        if not isinstance(path, Path):
-            path = Path(path)
-
-        return path
-
     def findHeaderLine(self, file):
         """
         Find the line number of the first header line, searches for '### DATA ###'
 
-
         Args:
-            :class:`pathlib.Path`: path to file
+            file (:class:`pathlib.Path`): path to file
         """
 
         n = 0
@@ -130,17 +184,54 @@ class TxtBiotecSource(BaseSource):
 
         return n + 2
 
+    def readColumnTitles(self, file):
+        """
+        Read the column titles and if available their units. They are expected to be given as 'f [Hz]', separated by
+        tabstops.
+
+        Args:
+            file: (:class:`pathlib.Path`): path to file
+
+        Returns:
+            list: column header names
+            :class:`tweezers.UnitDict`: units dictionary with available column units
+        """
+
+        # read header line
+        nHeaderLine = self.findHeaderLine(file)
+        with file.open(encoding='utf-8') as f:
+            for i, line in enumerate(f):
+                if i == nHeaderLine:
+                    headerLine = line
+                    break
+
+        # get column title names with units
+        regex = re.compile('(\w+)(?:\s\[(\w*)\])?')
+        header = regex.findall(headerLine)
+
+        # store them in a UnitDict
+        colHeaders = []
+        colUnits = t.UnitDict()
+        for (colHeader, unit) in header:
+            colHeaders.append(colHeader)
+            if unit:
+                colUnits[colHeader] = unit
+
+        return colHeaders, colUnits
+
     def readToDataframe(self, file):
         """
         Read the given file into a :class:`pandas.DataFrame` and skip the header lines.
 
         Args:
-            :class:`pathlib.Path`: path to file
+            file (:class:`pathlib.Path`): path to file
 
         Returns:
             :class:`pandas.DataFrame`
         """
 
+        colHeaders, colUnits = self.readColumnTitles(file)
         nHeaderLine = self.findHeaderLine(file)
-        df = pd.read_csv(str(file), skiprows=nHeaderLine, sep='\t', dtype=np.float64)
+        df = pd.read_csv(str(file), sep='\t', dtype=np.float64,
+                         skiprows=nHeaderLine+1, header=None, names=colHeaders)
         return df

@@ -43,7 +43,7 @@ class TweezersData():
     # this variable should be set to false when the object was copied due to data-changing actions (computePsd...)
     original = True
 
-    def __init__(self, dataSource=None, verbose=True):
+    def __init__(self, source=None, verbose=True):
         """
         Constructor for Data
 
@@ -53,10 +53,10 @@ class TweezersData():
         """
 
         # store dataSource object
-        if dataSource:
-            self.dataSource = dataSource
+        if source:
+            self.source = source
         else:
-            self.dataSource = None
+            self.source = None
             self.meta = MetaDict()
             self.units = UnitDict()
 
@@ -79,7 +79,7 @@ class TweezersData():
         """
 
         log.info('Reading metadata from data source.')
-        meta, units = self.dataSource.getMetadata()
+        meta, units = self.source.getMetadata()
         self.units = units
         return meta
 
@@ -93,7 +93,7 @@ class TweezersData():
             :class:`tweezers.UnitDict`
         """
 
-        meta, units = self.dataSource.getMetadata()
+        meta, units = self.source.getMetadata()
         self.meta = meta
         return units
 
@@ -108,7 +108,7 @@ class TweezersData():
         """
 
         log.info('Reading data from data source.')
-        return self.dataSource.getData()
+        return self.source.getData()
 
     @lazy
     def ts(self):
@@ -120,7 +120,7 @@ class TweezersData():
         """
 
         log.info('Reading timeseries from data source.')
-        return self.dataSource.getTs()
+        return self.source.getTs()
 
     @lazy
     def psd(self):
@@ -130,7 +130,7 @@ class TweezersData():
         """
 
         log.info('Reading PSD from data source.')
-        return self.dataSource.getPsd()
+        return self.source.getPsd()
 
     def computePsd(self, **kwargs):
         """
@@ -174,11 +174,11 @@ class TweezersData():
     def psdFit(self):
         """
         Attribute to hold the Lorentzian fit to the power spectrum density. If called before
-        :meth:`tweezers.Data.fit_psd`, it holds the fit from the datas ource, otherwise the newly computed one.
+        :meth:`tweezers.Data.fit_psd`, it holds the fit from the data source, otherwise the newly computed one.
         """
 
         log.info('Reading PSD fit from data source.')
-        return self.dataSource.getPsdFit()
+        return self.source.getPsdFit()
 
     def fitPsd(self, **kwargs):
         """

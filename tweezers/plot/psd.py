@@ -4,6 +4,7 @@ from matplotlib.ticker import MaxNLocator
 import seaborn as sns
 import numpy as np
 import math
+sns.set_context('poster')
 
 
 class PsdPlotBase():
@@ -44,7 +45,7 @@ class PsdPlotBase():
         """
 
         for title in container.psd.columns:
-            if title is not 'f' and not title.lower().endswith('std'):
+            if title is not 'f' and not title.lower().endswith('std') and not title.lower().endswith('fit'):
                 self.psdAxes.append(title)
 
     def plotPsd(self, ax, f, psd, units=None, *args, **kwargs):
@@ -58,7 +59,7 @@ class PsdPlotBase():
             units (str): units of the PSD
         """
 
-        ax.set_ylim([10e-14, 10e-8])
+        ax.set_ylim([10e-13, 10e-8])
         labelX = 'f [Hz]'
         labelY = 'PSD'
         if units:
@@ -141,8 +142,12 @@ class PsdPlotBase():
             :class:`tweezers.plot.psd.PsdPlotBase`
         """
 
-        for ax in self.ax:
-            m = getattr(ax, method)
+        try:
+            for ax in self.ax:
+                m = getattr(ax, method)
+                m(*args, **kwargs)
+        except TypeError:
+            m = getattr(self.ax, method)
             m(*args, **kwargs)
 
         return self
@@ -201,7 +206,7 @@ class PsdFitPlot(PsdPlotBase):
 
         # set up the figure
         self.fig = plt.figure(figsize=figureSize)
-        self.fig.suptitle(self.title, fontsize=16)
+        self.fig.suptitle(self.title, fontsize=22)
         # create grid for all the PSDs
         grid = gridspec.GridSpec(nrows, 2)
         grid.update(hspace=0.25, wspace=0.22)
@@ -272,6 +277,7 @@ class PsdFitPlot(PsdPlotBase):
                 residualAxes.yaxis.set_major_locator(MaxNLocator(nbins=nbins, prune='lower'))
 
         self.fig.subplots_adjust(top=0.94)
+        self.ax = psdAxes
 
 
 class PsdPlot(PsdPlotBase):
@@ -294,7 +300,7 @@ class PsdPlot(PsdPlotBase):
         self.fig, self.ax = plt.subplots()
         self.fig.set_figheight(6)
         self.fig.set_figwidth(8)
-        self.fig.suptitle(self.title, fontsize=16)
+        self.fig.suptitle(self.title, fontsize=22)
 
         # get general info
         f = self.c.psd['f']
