@@ -18,8 +18,6 @@ DEPENDENCIES = [# documentation stuff
                 'pandas>=0.15',
                 'numpy>=1.8',
                 'matplotlib>=1.2.1',
-                'ixo',
-                'physics',
                 'scipy',
                 'seaborn'
 ]

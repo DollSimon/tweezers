@@ -20,3 +20,5 @@ tweezer/legacy/templates/pytex/*
 docs/build
 build
 dist
+docs_legacy
+docs/build
