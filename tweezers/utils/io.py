@@ -1,44 +1,59 @@
-from pathlib import Path
-
 from tweezers.io import TxtBiotecSource
 from tweezers import TweezersData
 
 
-def loadDirectories(directories, cls=TxtBiotecSource):
+def loadIds(path, ids, cls=TxtBiotecSource):
     """
-    Load all directories given in the input list.
+    Load all data names (IDs) given in the input list.
     Args:
-        dirs (:class:`list`): list of directories
+        path (:pathlib:`Path`): path to the data root folder
+        ids (:class:`list`): list of names
 
     Returns:
         :class:`list` of :class:`tweezers.TweezersData`
     """
 
     data = []
-    for directory in directories:
+    for idStr in ids:
         try:
-            td = TweezersData(cls.fromDirectory(directory))
+            td = TweezersData(cls.fromId(path, idStr))
             data.append(td)
         except ValueError:
-            pass
+            # we might want to put a more descriptive message here
+            print('Error loading data set: "' + idStr + '"')
 
     return data
 
 
-def getDirsById(path, id):
+def getAllIds(path, cls=TxtBiotecSource):
     """
-    Get all directories in the given path whose name end on the given ID string.
+    Get a list of all IDs from the static method of the given DataSource class.
+
     Args:
-        path (:pathlib:`Path`): path to check for subdirectories
-        id (str): id to search for
+        path (:class:`pathlib.Path`): root path of the data structure
+        cls: class that implements the `getAllIds` method
 
     Returns:
-        :class:`list` of :pathlib:`Path`
+        :class:`list` of :class:`str`
     """
 
-    # get all subdirectories
-    dirs = [x for x in Path(path).iterdir() if x.is_dir()]
+    return cls.getAllIds(path)
 
-    # filter by ID
-    resDirs = [x for x in dirs if x.name.endswith(id)]
-    return resDirs
+
+def getIdsByName(path, name, cls=TxtBiotecSource):
+    """
+    Get all IDs from the data structure in the given path whose ID end on the given name string.
+    Args:
+        path (:class:`pathlib.Path`): root path to the data structure
+        name (str): name of the experiment, last section of the ID
+
+    Returns:
+        :class:`list` of :class:`str`
+    """
+
+    # get all IDs
+    ids = getAllIds(path, cls=cls)
+
+    # filter by given name
+    resIds = [x for x in ids if x.endswith(name)]
+    return resIds

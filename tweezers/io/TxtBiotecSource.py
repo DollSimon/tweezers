@@ -7,6 +7,7 @@ import re
 
 from .BaseSource import BaseSource
 import tweezers as t
+from tweezers.ixo.io import getSubdirs
 
 
 class TxtBiotecSource(BaseSource):
@@ -50,12 +51,14 @@ class TxtBiotecSource(BaseSource):
         self.path = self.header.parent
 
     @classmethod
-    def fromDirectory(cls, path):
+    def fromId(cls, path, idStr):
         """
-        Creates a data source from a given folder that should contain the data files (PSD, TS, data).
+        Creates a data source from a given experiment ID by searching all required files in the data structure
+        at the given position.
 
         Args:
-            path (:class:`pathlib.Path`): path to the data folder
+            path: root path to the data structure
+            idStr: ID of the experiment to load, this is the part before the file type ('PS.txt' etc.).
 
         Returns:
             :class:`tweezers.io.TxtBiotecSource`
@@ -65,10 +68,12 @@ class TxtBiotecSource(BaseSource):
         if not pPath.exists() and pPath.is_dir():
             raise ValueError('Invalid path given')
 
-        files = {'psd': ' PSD.txt', 'ts': ' TS.txt', 'data': '.txt'}
+        files = {'psd': ['thermal calibration', ' PSD.txt'],
+                 'ts':  ['thermal calibration', ' TS.txt'],
+                 'data': ['data', ' DATA.txt']}
         kwargs = {}
         for key, value in files.items():
-            file = pPath / Path(pPath.name + value)
+            file = pPath / Path(value[0]) / Path(idStr) / Path(idStr + value[1])
             if file.exists() and cls.isDataFile(file):
                 kwargs[key] = file
 
@@ -83,7 +88,7 @@ class TxtBiotecSource(BaseSource):
         Checks if a given file is a valid data file.
 
         Args:
-            path:
+            path (:class:`pathlib.Path`): file to check
 
         Returns:
             bool
@@ -94,6 +99,32 @@ class TxtBiotecSource(BaseSource):
             return True
         else:
             return False
+
+    @staticmethod
+    def getAllIds(path):
+        """
+        Get a list of all IDs that are available in the data structure that is expected at the location of the
+        input path.
+
+        Args:
+            path (:class:`pathlib.Path`): root path of the data structure
+
+        Returns:
+            :class:`list` of :class:`str`
+        """
+
+        pPath = Path(path)
+        dirs = getSubdirs(pPath)
+
+        allIds = []
+        for dir in dirs:
+            ids = getSubdirs(dir)
+            for idPath in ids:
+                idStr = idPath.name
+                if idStr not in allIds:
+                    allIds.append(idStr)
+
+        return allIds
 
     def getMetadata(self):
         """
