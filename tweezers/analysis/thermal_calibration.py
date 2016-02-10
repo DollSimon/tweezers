@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from physics.tweezers import distanceCalibration, trapStiffness
+from tweezers.physics.tweezers import distanceCalibration, trapStiffness
 
 
 def thermalCalibration(diffCoeff, cornerFreq, viscosity, beadRadius, temperature=25):

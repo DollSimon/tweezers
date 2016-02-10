@@ -143,7 +143,7 @@ class MetaBaseDict(OrderedDict):
         return facets
 
     def update(self, E=None, **F):
-        # we assume E to be a dictonary type (have a .keys() method), F is one anyway
+        # we assume E to be a dictionary type (have a .keys() method), F is one anyway
         todo = [E, F]
         # loop through the two dicts
         for el in todo:

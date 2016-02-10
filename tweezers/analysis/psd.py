@@ -1,4 +1,4 @@
-import ixo.fit
+import tweezers.ixo.fit
 from scipy.signal import welch
 import pandas as pd
 import numpy as np
@@ -124,7 +124,7 @@ class PsdComputation():
         return f, psdAv, psdStd, psdList
 
 
-class PsdFitMle(ixo.fit.Fit):
+class PsdFitMle(tweezers.ixo.fit.Fit):
     """
     Perform a maximum likelihood fit as described in the Norrelyke paper.
     """
@@ -248,7 +248,7 @@ class PsdFit():
     Fit the PSD.
     """
 
-    def __init__(self, psd, fitCls=ixo.fit.LeastSquaresFit, minF=5, maxF=7*10**3, residuals=True, **fitargs):
+    def __init__(self, psd, fitCls=tweezers.ixo.fit.LeastSquaresFit, minF=5, maxF=7*10**3, residuals=True, **fitargs):
         """
         Constructor for PsdFit
 
@@ -257,7 +257,7 @@ class PsdFit():
                                              standard deviation of the data with the otherwise same column name and
                                              used for weighted fits, a column `f` must be present with the frequency
                                              values
-            fitCls (:class:`ixo.fit.Fit`): class to use for fitting, must implement the methods given in the
+            fitCls (:class:`tweezers.ixo.fit.Fit`): class to use for fitting, must implement the methods given in the
                                             reference class
             minF (float): only data points with frequencies above this limit are fitted
             maxF (float): only data points with frequencies below this limit are fitted

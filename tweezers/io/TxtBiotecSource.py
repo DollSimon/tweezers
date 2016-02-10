@@ -90,7 +90,7 @@ class TxtBiotecSource(BaseSource):
         """
 
         pPath = Path(path)
-        if re.search('\d{4}(?:_\d{2}){4}.*\.txt', pPath.name):
+        if re.search('\d{4}(?:_\d{2}){5}.*\.txt', pPath.name):
             return True
         else:
             return False
@@ -165,6 +165,17 @@ class TxtBiotecSource(BaseSource):
 
         ts = self.readToDataframe(self.ts)
         return ts
+
+    def getData(self):
+        """
+        Return the experiment data.
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        data = self.readToDataframe(self.data)
+        return data
 
     def findHeaderLine(self, file):
         """

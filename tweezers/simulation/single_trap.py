@@ -1,5 +1,5 @@
-from physics.geometry import mass_sphere
-from physics.hydrodynamics import drag_sphere, diffusion_coefficient
+from tweezers.physics.geometry import massSphere
+from tweezers.physics.hydrodynamics import dragSphere, diffusionCoefficient
 import numpy as np
 import pandas as pd
 
@@ -25,26 +25,26 @@ class Sphere():
         self.viscosity = viscosity
         self.temperature = temperature
 
-    def drag_coefficient(self):
+    def dragCoefficient(self):
         """
         Computes the Stokes drag coefficient in [pN/nm s].
         """
 
-        return drag_sphere(self.radius, dynamicViscosity=self.viscosity)
+        return dragSphere(self.radius, dynamicViscosity=self.viscosity)
 
     def mass(self):
         """
         Computes the mass of the sphere in [g].
         """
 
-        return mass_sphere(self.radius, self.density)
+        return massSphere(self.radius, self.density)
 
-    def diffusion_coefficient(self):
+    def diffusionCoefficient(self):
         """
         Computes the diffusion coefficient in [nm^2 / s].
         """
 
-        return diffusion_coefficient(radius=self.radius, temperature=self.temperature, dynamicViscosity=self.viscosity)
+        return diffusionCoefficient(radius=self.radius, temperature=self.temperature, dynamicViscosity=self.viscosity)
 
 
 
@@ -80,7 +80,7 @@ class SingleTrap():
         Calculates eigenvalues of the Langevin equation in the simulation of OTs according to Norrelykke et al.
         """
 
-        g = self.obj.drag_coefficient()
+        g = self.obj.dragCoefficient()
         m = self.obj.mass()
         k = self.stiffness
 
@@ -112,7 +112,7 @@ class SingleTrap():
 
         l = self.ev
         c = self.c
-        D = self.obj.diffusion_coefficient()
+        D = self.obj.diffusionCoefficient()
 
         factorA = (l['plus'] + l['minus']) / (l['plus'] - l['minus'])
         factorB = np.sqrt((1 - c['plus']**2) * D / (2 * l['plus']))

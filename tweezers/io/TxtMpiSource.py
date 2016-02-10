@@ -10,7 +10,7 @@ import os
 from .TxtFileMpi import TxtFileMpi
 from .BaseSource import BaseSource
 import tweezers as t
-import ixo.utils as ixo
+import tweezers.ixo.utils as ixo
 
 
 class TxtMpiSource(BaseSource):
