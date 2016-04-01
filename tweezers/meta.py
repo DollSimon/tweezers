@@ -1,6 +1,5 @@
 from collections import OrderedDict, Mapping
 import pprint
-import re
 import pandas as pd
 import logging as log
 
@@ -172,6 +171,7 @@ class MetaBaseDict(OrderedDict):
 
         keys = [key for key, value in self.items() if isinstance(value, MetaBaseDict)]
         return keys
+
 
 class MetaDict(MetaBaseDict):
     """

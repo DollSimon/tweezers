@@ -2,7 +2,7 @@ import logging as log
 import copy
 import pandas as pd
 
-from ixo.decorators import lazy
+from tweezers.ixo.decorators import lazy
 from tweezers.analysis.psd import PsdComputation, PsdFit
 from tweezers.analysis.thermal_calibration import thermalCalibration
 from tweezers.meta import MetaDict, UnitDict

@@ -7,7 +7,6 @@ import re
 
 from .BaseSource import BaseSource
 import tweezers as t
-from tweezers.ixo.io import getSubdirs
 
 
 class TxtBiotecSource(BaseSource):
@@ -51,80 +50,75 @@ class TxtBiotecSource(BaseSource):
         self.path = self.header.parent
 
     @classmethod
-    def fromId(cls, path, idStr):
+    def fromIdDict(cls, idDict):
         """
-        Creates a data source from a given experiment ID by searching all required files in the data structure
-        at the given position.
+        Creates a data source from a given experiment ID and the associated files.
 
         Args:
-            path: root path to the data structure
-            idStr: ID of the experiment to load, this is the part before the file type ('PS.txt' etc.).
+            idDict (dir): :class:`dict` with keys `data`, `ts`, `psd` etc. whose values are the
+                            full paths to the corresponding files.
 
         Returns:
             :class:`tweezers.io.TxtBiotecSource`
         """
 
-        pPath = Path(path)
-        if not pPath.exists() and pPath.is_dir():
-            raise ValueError('Invalid path given')
-
-        files = {'psd': ['thermal calibration', ' PSD.txt'],
-                 'ts':  ['thermal calibration', ' TS.txt'],
-                 'data': ['data', ' DATA.txt']}
-        kwargs = {}
-        for key, value in files.items():
-            file = pPath / Path(value[0]) / Path(idStr) / Path(idStr + value[1])
-            if file.exists() and cls.isDataFile(file):
-                kwargs[key] = file
-
-        if not kwargs:
-            raise ValueError('No files found at given path')
-
-        return cls(**kwargs)
+        return cls(**idDict)
 
     @staticmethod
     def isDataFile(path):
         """
-        Checks if a given file is a valid data file.
+        Checks if a given file is a valid data file and returns its ID and type
 
         Args:
             path (:class:`pathlib.Path`): file to check
 
         Returns:
-            bool
+            :class:`dict` with `id` and `type`
         """
 
         pPath = Path(path)
-        if re.search('\d{4}(?:_\d{2}){5}.*\.txt', pPath.name):
-            return True
+        m = re.match('^(?P<id>\d{4}(?:_\d{2}){5}.*)\s(?P<type>\w+)\.txt$', pPath.name)
+        if m:
+            res = {'id': m.group('id'), 'type': m.group('type').lower()}
+            return res
         else:
-            return False
+            return {}
 
     @staticmethod
     def getAllIds(path):
         """
-        Get a list of all IDs that are available in the data structure that is expected at the location of the
-        input path.
+        Get a list of all IDs and their files that are at the given path and its subfolders.
 
         Args:
-            path (:class:`pathlib.Path`): root path of the data structure
+            path (:class:`pathlib.Path`): root path for searching
 
         Returns:
-            :class:`list` of :class:`str`
+            :class:`dir`
         """
 
         pPath = Path(path)
-        dirs = getSubdirs(pPath)
 
-        allIds = []
-        for dir in dirs:
-            ids = getSubdirs(dir)
-            for idPath in ids:
-                idStr = idPath.name
-                if idStr not in allIds:
-                    allIds.append(idStr)
+        ids = {}
+        for obj in pPath.iterdir():
+            if obj.is_dir():
+                # if obj is a directory enter it recursively
+                m = TxtBiotecSource.getAllIds(obj)
+                # merge result to ID list
+                for idStr, info in m.items():
+                    if idStr not in ids.keys():
+                        ids[idStr] = {}
+                    for typeStr, filePath in info.items():
+                        ids[idStr][typeStr] = filePath
+            else:
+                # if it is a file, check if it is a data file
+                m = TxtBiotecSource.isDataFile(obj)
+                # append result to ID list
+                if m:
+                    if m['id'] not in ids.keys():
+                        ids[m['id']] = {}
+                    ids[m['id']][m['type']] = obj
 
-        return allIds
+        return ids
 
     def getMetadata(self):
         """
@@ -152,6 +146,10 @@ class TxtBiotecSource(BaseSource):
         # add column header units
         colHeaders, colUnits = self.readColumnTitles(self.header)
         units.update(colUnits)
+
+        # add id from header file name
+        idDict = self.isDataFile(self.header)
+        meta['id'] = idDict['id']
 
         return meta, units
 

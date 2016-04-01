@@ -265,7 +265,6 @@ class TxtMpiSource(BaseSource):
         else:
             meta = t.MetaDict()
             units = t.UnitDict()
-            # TODO write test for it
             # regular expression explained:
             # - optionally start with '# '
             # - string that can contain everything except ':' and '(' -> meta identifier
