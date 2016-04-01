@@ -527,7 +527,7 @@ class TxtMpiSource(BaseSource):
 
             # axis variables
             'cornerFrequency': float,
-            'detectorOffset': float,
+            'zeroOffset': float,
             'stiffness': float,
             'displacementSensitivity': float,
 
@@ -635,8 +635,8 @@ class TxtMpiSource(BaseSource):
             # aod variables
             'AOD horizontal corner frequency': ['aodX', 'cornerFrequency'],
             'AOD vertical corner frequency': ['aodY', 'cornerFrequency'],
-            'AOD detector horizontal offset': ['aodX', 'detectorOffset'],
-            'AOD detector vertical offset': ['aodY', 'detectorOffset'],
+            'AOD detector horizontal offset': ['aodX', 'zeroOffset'],
+            'AOD detector vertical offset': ['aodY', 'zeroOffset'],
             'AOD horizontal trap stiffness': ['aodX', 'stiffness'],
             'AOD vertical trap stiffness': ['aodY', 'stiffness'],
             'AOD horizontal OLS': ['aodX', 'displacementSensitivity'],
@@ -645,16 +645,16 @@ class TxtMpiSource(BaseSource):
             # pm variables
             'PM horizontal corner frequency': ['pmX', 'cornerFrequency'],
             'PM vertical corner frequency': ['pmY', 'cornerFrequency'],
-            'PM detector horizontal offset': ['pmX', 'detectorOffset'],
-            'PM detector vertical offset': ['pmY', 'detectorOffset'],
+            'PM detector horizontal offset': ['pmX', 'zeroOffset'],
+            'PM detector vertical offset': ['pmY', 'zeroOffset'],
             'PM horizontal trap stiffness': ['pmX', 'stiffness'],
             'PM vertical trap stiffness': ['pmY', 'stiffness'],
             'PM horizontal OLS': ['pmX', 'displacementSensitivity'],
             'PM vertical OLS': ['pmY', 'displacementSensitivity'],
 
             # aod tweebot variables
-            'AOD detector x offset': ['aodX', 'detectorOffset'],
-            'AOD detector y offset': ['aodY', 'detectorOffset'],
+            'AOD detector x offset': ['aodX', 'zeroOffset'],
+            'AOD detector y offset': ['aodY', 'zeroOffset'],
             'AOD trap stiffness x': ['aodX', 'stiffness'],
             'AOD trap stiffness y': ['aodY', 'stiffness'],
 
@@ -672,13 +672,13 @@ class TxtMpiSource(BaseSource):
             'yCornerFreqT2.Hz': ['aodY', 'cornerFrequency'],
             'yCornerFreqT2': ['aodY', 'cornerFrequency'],
 
-            'xOffsetT2.V': ['aodX', 'detectorOffset'],
-            'yOffsetT2.V': ['aodY', 'detectorOffset'],
-            'zOffsetT2.V': ['aodZ', 'detectorOffset'],
+            'xOffsetT2.V': ['aodX', 'zeroOffset'],
+            'yOffsetT2.V': ['aodY', 'zeroOffset'],
+            'zOffsetT2.V': ['aodZ', 'zeroOffset'],
 
             # pm tweebot variables
-            'PM detector x offset': ['pmX', 'detectorOffset'],
-            'PM detector y offset': ['pmY', 'detectorOffset'],
+            'PM detector x offset': ['pmX', 'zeroOffset'],
+            'PM detector y offset': ['pmY', 'zeroOffset'],
 
             'PM trap stiffness x': ['pmX', 'stiffness'],
             'PM trap stiffness y': ['pmY', 'stiffness'],
@@ -697,11 +697,11 @@ class TxtMpiSource(BaseSource):
             'yCornerFreqT1.Hz': ['pmY', 'cornerFrequency'],
             'yCornerFreqT1': ['pmY', 'cornerFrequency'],
 
-            'xOffsetT1.V': ['pmX', 'detectorOffset'],
-            'xOffsetT1': ['pmX', 'detectorOffset'],
-            'yOffsetT1.V': ['pmY', 'detectorOffset'],
-            'yOffsetT1': ['pmY', 'detectorOffset'],
-            'zOffsetT1.V': ['pmZ', 'detectorOffset'],
+            'xOffsetT1.V': ['pmX', 'zeroOffset'],
+            'xOffsetT1': ['pmX', 'zeroOffset'],
+            'yOffsetT1.V': ['pmY', 'zeroOffset'],
+            'yOffsetT1': ['pmY', 'zeroOffset'],
+            'zOffsetT1.V': ['pmZ', 'zeroOffset'],
 
             # aod tweebot camera variables
             'AOD ANDOR center x': ['aodX', 'andorCenter'],
