@@ -26,11 +26,18 @@ class Fit():
         self.fcn = fcn
         self.std = std
         self.kwargs = kwargs
-        self.fitResult = []
         self.fitError = []
 
     @lazy
-    def yFit(self):
+    def fitResult(self):
+        """
+        Attribute to hold the computed fitting parameters.
+        """
+
+        return self.fit()
+
+    @lazy
+    def fitY(self):
         """
         Attribute to hold the y values of the fitted curve. Evaluated lazily.
 
@@ -63,8 +70,8 @@ class Fit():
             :numpy:`np.array` and :class:`float`
         """
 
-        residuals = (self.y - self.yFit) / self.yFit
-        meanResidual = np.sum(residuals) / len(self.yFit)
+        residuals = (self.y - self.fitY) / self.fitY
+        meanResidual = np.sum(residuals) / len(self.fitY)
         return residuals, meanResidual
 
     def chisquared(self):
@@ -78,7 +85,7 @@ class Fit():
         if self.std is None or not any(self.std):
             raise AttributeError('No standard deviation data given for χ² computation.')
 
-        chi2 = np.sum((self.y - self.yFit)**2 / self.std**2) / len(self.x)
+        chi2 = np.sum((self.y - self.fitY)**2 / self.std**2) / len(self.x)
         return chi2
 
 
@@ -117,12 +124,12 @@ class LeastSquaresFit(Fit):
             std = None
 
         # perform fit
-        self.fitResult, cov = curve_fit(self.fcn, self.x, self.y,
-                                        p0=[1, 20],
-                                        sigma=std,
-                                        absolute_sigma=True,
-                                        **self.kwargs)
+        res, cov = curve_fit(self.fcn, self.x, self.y,
+                                p0=[1, 20],
+                                sigma=std,
+                                absolute_sigma=True,
+                                **self.kwargs)
         # one standard deviation errors of the fitting parameters, only makes sense with weighted data points
         self.fitError = np.sqrt(np.diag(cov))
 
-        return self.fitResult
+        return res

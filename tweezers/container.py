@@ -108,7 +108,9 @@ class TweezersData():
         """
 
         log.info('Reading data from data source.')
-        return self.source.getData()
+        data = self.source.getData()
+        self.meta, self.units, data = self.source.postprocessData(self.meta, self.units, data)
+        return data
 
     @lazy
     def ts(self):
@@ -152,7 +154,6 @@ class TweezersData():
 
         # create copy
         td = copy.deepcopy(self)
-
 
         # store PSD in 'psd' attribute of this object
         td.psd = psd
@@ -228,6 +229,10 @@ class TweezersData():
 
             self.meta.update({ax: res})
             self.units.update({ax: units})
+
+        # recompute forces
+        self.meta, self.units, self.data = self.source.computeForces(self.meta, self.units, self.data)
+
         return self
 
     def getFacets(self, data, colName='Value', meta=[]):

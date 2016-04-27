@@ -59,3 +59,33 @@ class BaseSource():
         """
 
         raise NotImplementedError()
+
+    def postprocessData(self, meta, units, data):
+        """
+        This method is run after importing the data and can be used to modify the data and metadata or units.
+
+        Args:
+            meta: :class:`tweezers.MetaDict`
+            units: :class:`tweezers.UnitDict`
+            data: :class:`pandas.DataFrame`
+
+        Returns:
+            meta, units, data
+        """
+
+        return meta, units, data
+
+    def computeForces(self, meta, units, data):
+        """
+        How to calculate proper forces from the metadata and units. Might depend on the data source.
+
+        Args:
+            meta: :class:`tweezers.MetaDict`
+            units: :class:`tweezers.UnitDict`
+            data: :class:`pandas.DataFrame`
+
+        Returns:
+            meta, units, data
+        """
+
+        raise NotImplementedError()

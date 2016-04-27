@@ -5,7 +5,7 @@ import numpy as np
 from collections import OrderedDict
 
 
-class PsdComputation():
+class PsdComputation:
     """
     Object to compute a PSD using Welch's method (:func:`scipy.signal.welch`).
     """
@@ -60,6 +60,10 @@ class PsdComputation():
 
         psd = pd.DataFrame()
         for title, column in self.timeSeries.items():
+            # ignore time column if present
+            if title in ['t']:
+                continue
+
             psdRaw = self.computePsd(column,
                                      samplingFreq=self.samplingRate,
                                      blockLength=self.blockLength,
@@ -243,7 +247,7 @@ class PsdFitMle(tweezers.ixo.fit.Fit):
         return errorsMle
 
 
-class PsdFit():
+class PsdFit:
     """
     Fit the PSD.
     """
@@ -288,8 +292,10 @@ class PsdFit():
         returned meta data can describe different things depending on the fitting class used.
 
         Returns:
-            fitParams (dict): fit parameters and metadata as dictionary
-            psdFit (:class:`pandas.DataFrame`): data of the fitted curve
+             2-element tuple containing
+
+                - **fitParams** (:class:`dict`): fit parameters and metadata as dictionary
+                - **psdFit** (:class:`pandas.DataFrame`): data of the fitted curve
         """
 
         # check for frequency column

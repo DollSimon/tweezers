@@ -24,7 +24,7 @@ def trapStiffness(fc=500, radius=1000, viscosity=8.93e-10):
 
 def distanceCalibration(D=0.46, radius=1000, viscosity=8.93e-10, T=25):
     """
-    Distance calibration factor (beta) in units of [V/nm]
+    Distance calibration factor (beta) in units of [nm/V]
 
     Args:
         D (float): diffusion constant in units of [V]
@@ -36,7 +36,7 @@ def distanceCalibration(D=0.46, radius=1000, viscosity=8.93e-10, T=25):
         :class:`float`
     """
 
-    beta = 1/np.sqrt(thermalEnergy(asKelvin(T))/(dragSphere(radius, viscosity)*D))
+    beta = np.sqrt(thermalEnergy(asKelvin(T))/(dragSphere(radius, viscosity)*D))
 
     return beta
     

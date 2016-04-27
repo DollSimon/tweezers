@@ -1,5 +1,6 @@
 from tweezers.io import TxtBiotecSource
 from tweezers import TweezersData
+from tweezers import TweezersCollection
 
 
 def loadIds(ids, cls=TxtBiotecSource):
@@ -21,11 +22,11 @@ def loadIds(ids, cls=TxtBiotecSource):
     idKeys.sort()
 
     # create data objects
-    data = []
+    data = TweezersCollection()
     for idStr in idKeys:
         try:
             td = TweezersData(cls.fromIdDict(ids[idStr]))
-            data.append(td)
+            data[idStr] = td
         except ValueError:
             # we might want to put a more descriptive message here
             print('Error loading data set: "' + idStr + '"')
@@ -48,35 +49,16 @@ def getAllIds(path, cls=TxtBiotecSource):
     return cls.getAllIds(path)
 
 
-def getIdsByName(name, path, cls=TxtBiotecSource):
+def getIds(names, path, cls=TxtBiotecSource):
     """
     Get all IDs from the data structure in the given path whose ID end on the given name string.
+
     Args:
         name (str or list): name of the experiment, last section of the ID
         path (:class:`pathlib.Path`): root path to the data structure
 
     Returns:
         :class:`dir`
-    """
-
-    # get all IDs
-    ids = getAllIds(path, cls=cls)
-
-    # filter by given name
-    resIds = {key: value for key, value in ids.items() if key.endswith(name)}
-    return resIds
-
-
-def getIds(names, path, cls=TxtBiotecSource):
-    """
-
-    Args:
-        names:
-        path:
-        cls:
-
-    Returns:
-
     """
 
     # check if names is a string and convert to list

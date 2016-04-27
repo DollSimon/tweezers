@@ -23,14 +23,14 @@ def thermalCalibration(diffCoeff, cornerFreq, viscosity, beadRadius, temperature
 
     stiffness = trapStiffness(fc=cornerFreq, radius=beadRadius, viscosity=viscosity)
     dispSens = distanceCalibration(D=diffCoeff, radius=beadRadius, viscosity=viscosity, T=temperature)
-    forceSens = dispSens / stiffness
+    forceSens = dispSens * stiffness
 
     res = OrderedDict([('stiffness', stiffness),
                        ('displacementSensitivity', dispSens),
                        ('forceSensitivity', forceSens)])
     units = OrderedDict([('stiffness', 'pN/nm'),
-                         ('displacementSensitivity', 'V/nm'),
-                         ('forceSensitivity', 'V/pN')])
+                         ('displacementSensitivity', 'nm/V'),
+                         ('forceSensitivity', 'pN/V')])
 
     return res, units
 

@@ -56,6 +56,7 @@ class MetaBaseDict(OrderedDict):
                 self[key] = self.__class__(value)
 
     def __str__(self):
+        #ToDo: consider switching to pprint++: https://github.com/wolever/pprintpp
         return pprint.pformat(self)
 
     def __getitem__(self, item):
@@ -98,16 +99,23 @@ class MetaBaseDict(OrderedDict):
             key (str): one or mulitple keys to (recursively) delete from the dictionary
         """
 
-        keys = args
+        delKeys = args
+        keys = self.keys()
+        for key in delKeys:
+            if key in keys:
+                self.pop(key)
 
-        # loop through dict and check for element
-        for key, value in self.items():
-            if isinstance(value, MetaBaseDict):
-                value.deleteKey(*keys)
-            else:
-                if key in keys:
-                    self.pop(key)
+        for key in self.subDictKeys():
+            self[key].deleteKey(*delKeys)
 
+        #
+        # # loop through dict and check for element
+        # for key, value in self.items():
+        #     if isinstance(value, MetaBaseDict):
+        #         value.deleteKey(*keys)
+        #     else:
+        #         if key in keys:
+        #             self.pop(key)
 
     def getFacets(self):
         """
@@ -198,7 +206,8 @@ class UnitDict(MetaBaseDict):
                 'aodYDiff': 'V',
                 'temperature': '˚C',
                 'psdSamplingRate': 'Hz',
-                'psd': 'V²/Hz'
+                'psd': 'V²/Hz',
+                'timeseries': 'V',
     }
 
     warningString = 'Units: '

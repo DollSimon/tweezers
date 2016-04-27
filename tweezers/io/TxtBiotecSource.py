@@ -55,7 +55,7 @@ class TxtBiotecSource(BaseSource):
         Creates a data source from a given experiment ID and the associated files.
 
         Args:
-            idDict (dir): :class:`dict` with keys `data`, `ts`, `psd` etc. whose values are the
+            idDict (dict): with keys `data`, `ts`, `psd` etc. whose values are the
                             full paths to the corresponding files.
 
         Returns:
@@ -77,7 +77,7 @@ class TxtBiotecSource(BaseSource):
         """
 
         pPath = Path(path)
-        m = re.match('^(?P<id>\d{4}(?:_\d{2}){5}.*)\s(?P<type>\w+)\.txt$', pPath.name)
+        m = re.match('^(?P<id>[0-9\-_]{19}.*)\s(?P<type>[a-zA-Z]+)\.txt$', pPath.name)
         if m:
             res = {'id': m.group('id'), 'type': m.group('type').lower()}
             return res
@@ -151,6 +151,9 @@ class TxtBiotecSource(BaseSource):
         idDict = self.isDataFile(self.header)
         meta['id'] = idDict['id']
 
+        # add trap names
+        meta['traps'] = meta.subDictKeys()
+
         return meta, units
 
     def getPsd(self):
@@ -193,6 +196,8 @@ class TxtBiotecSource(BaseSource):
         """
 
         ts = self.readToDataframe(self.ts)
+        ts.rename(columns={'pmXDiff': 'pmX', 'pmYDiff': 'pmY', 'aodXDiff': 'aodX', 'aodYDiff': 'aodY'},
+                  inplace=True)
         return ts
 
     def getData(self):
@@ -204,7 +209,52 @@ class TxtBiotecSource(BaseSource):
         """
 
         data = self.readToDataframe(self.data)
+        data['timeAbs'] = data['time'].copy()
+        data['time'] -= data['time'][0]
         return data
+
+    def postprocessData(self, meta, units, data):
+        """
+        Modify the time array to use relative times (but keep the absolute time) and calculate forces.
+
+        Args:
+            meta: :class:`tweezers.MetaDict`
+            units: :class:`tweezers.UnitDict`
+            data: :class:`pandas.DataFrame`
+
+        Returns:
+            meta, units, data
+        """
+
+        # create relative time column but keep absolute time
+        data['timeAbs'] = data['time'].copy()
+        data['time'] -= data['time'][0]
+        units['timeAbs'] = 's'
+
+        meta, units, data = self.computeForces(meta, units, data)
+
+        return meta, units, data
+
+    def computeForces(self, meta, units, data):
+        """
+        How to calculate proper forces from the metadata and units
+
+        Args:
+            meta: :class:`tweezers.MetaDict`
+            units: :class:`tweezers.UnitDict`
+            data: :class:`pandas.DataFrame`
+
+        Returns:
+            meta, units, data
+        """
+
+        # calculate force
+        for trap in meta['traps']:
+            m = meta[trap]
+            data[trap + 'Force'] = (data[trap + 'Diff'] - m['zeroOffset']) * m['forceSensitivity']
+            units[trap + 'Force'] = 'pN'
+
+        return meta, units, data
 
     def findHeaderLine(self, file):
         """
