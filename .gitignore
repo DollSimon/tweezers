@@ -22,3 +22,5 @@ build
 dist
 docs_legacy
 docs/build
+docs/source/modules.rst
+docs/source/tweezers*.rst
