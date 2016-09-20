@@ -174,6 +174,54 @@ class PsdPlotBase():
         self.fig.savefig(path, **kwargs)
 
 
+class PsdPlot(PsdPlotBase):
+    """
+    Plot all PSDs in a :class:`tweezers.TweezersData` object.
+    """
+
+    def __init__(self, container, title=None, **kwargs):
+        super().__init__(container, title=title)
+        self.plot(**kwargs)
+
+    def plot(self, **kwargs):
+        """
+        Plot the PSDs. All arguments are forwarded to the plotting functions of ``matplotlib``.
+
+        Returns:
+            :class:`tweezers.plot.psd.PsdPlot`
+        """
+
+        self.fig, self.ax = plt.subplots()
+        self.fig.set_figheight(6)
+        self.fig.set_figwidth(8)
+        self.fig.suptitle(self.title, fontsize=22)
+
+        # get general info
+        f = self.c.psd['f']
+        unit = self.c.units['psd']
+        # plot all PSDs
+        for psd in self.psdAxes:
+            psdLine = self.plotPsd(self.ax,
+                                    f,
+                                    self.c.psd[psd],
+                                    label=psd,
+                                    units=unit,
+                                    **kwargs)
+            # check if error column exists
+            if psd + 'Std' in self.c.psd.columns:
+                # calculate standard error
+                errors = self.c.psd[psd + 'Std'] / np.sqrt(self.c.meta['psdNBlocks'])
+                self.plotPsdErrors(self.ax,
+                                     f,
+                                     self.c.psd[psd],
+                                     errors,
+                                     color=self.getColor(psdLine),
+                                     **kwargs)
+
+        # add legend
+        self.legend(self.ax)
+
+
 class PsdFitPlot(PsdPlotBase):
     """
     Plot a PSD and the corresponding fit with residuals.
@@ -278,51 +326,3 @@ class PsdFitPlot(PsdPlotBase):
 
         self.fig.subplots_adjust(top=0.94)
         self.ax = psdAxes
-
-
-class PsdPlot(PsdPlotBase):
-    """
-    Plot all PSDs in a :class:`tweezers.TweezersData` object.
-    """
-
-    def __init__(self, container, title=None, **kwargs):
-        super().__init__(container, title=title)
-        self.plot(**kwargs)
-
-    def plot(self, **kwargs):
-        """
-        Plot the PSDs. All arguments are forwarded to the plotting functions of ``matplotlib``.
-
-        Returns:
-            :class:`tweezers.plot.psd.PsdPlot`
-        """
-
-        self.fig, self.ax = plt.subplots()
-        self.fig.set_figheight(6)
-        self.fig.set_figwidth(8)
-        self.fig.suptitle(self.title, fontsize=22)
-
-        # get general info
-        f = self.c.psd['f']
-        unit = self.c.units['psd']
-        # plot all PSDs
-        for psd in self.psdAxes:
-            psdLine = self.plotPsd(self.ax,
-                                    f,
-                                    self.c.psd[psd],
-                                    label=psd,
-                                    units=unit,
-                                    **kwargs)
-            # check if error column exists
-            if psd + 'Std' in self.c.psd.columns:
-                # calculate standard error
-                errors = self.c.psd[psd + 'Std'] / np.sqrt(self.c.meta['psdNBlocks'])
-                self.plotPsdErrors(self.ax,
-                                     f,
-                                     self.c.psd[psd],
-                                     errors,
-                                     color=self.getColor(psdLine),
-                                     **kwargs)
-
-        # add legend
-        self.legend(self.ax)

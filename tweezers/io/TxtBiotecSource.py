@@ -7,22 +7,26 @@ import re
 
 from .BaseSource import BaseSource
 import tweezers as t
+from tweezers.ixo.collections import IndexedOrderedDict
+from tweezers.ixo.io import DataFrameJsonDecoder, DataFrameJsonEncoder
 
 
 class TxtBiotecSource(BaseSource):
     """
     Data source for *.txt files from the Biotec tweezers.
     """
+    # todo: get segment method to only read segment data
 
     # hold paths to respective files
     header = None
     psd = None
     data = None
+    analysis = None
     ts = None
     # path to data, not correct if files sit in different folders
     path = None
 
-    def __init__(self, data=None, psd=None, ts=None):
+    def __init__(self, data=None, analysis=None, psd=None, ts=None, **kwargs):
         """
         Constructor for TxtBiotecSource
 
@@ -32,7 +36,7 @@ class TxtBiotecSource(BaseSource):
             psd (:class:`pathlib.Path`): path to psd file to read, similar to `data` input
         """
 
-        super().__init__()
+        super().__init__(**kwargs)
 
         # order is important here for the header file
         if ts:
@@ -46,6 +50,9 @@ class TxtBiotecSource(BaseSource):
         if data:
             self.data = Path(data)
             self.header = self.data
+
+        if analysis:
+            self.analysis = Path(analysis)
 
         self.path = self.header.parent
 
@@ -209,9 +216,31 @@ class TxtBiotecSource(BaseSource):
         """
 
         data = self.readToDataframe(self.data)
-        data['timeAbs'] = data['time'].copy()
-        data['time'] -= data['time'][0]
         return data
+
+    def getDataSegment(self, tmin, tmax, chunkN=10000):
+        # todo docstring
+        # todo fix reading endinge in read_csv to 'c' when switching to pandas 0.19
+
+        # read required information about file and create the chunked iterator
+        colHeaders, colUnits = self.readColumnTitles(self.data)
+        nHeaderLine = self.findHeaderLine(self.data)
+        # consider adding dtype=np.float64, when switching to engine='c'
+        iterCsv = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine+1, header=None,
+                              names=colHeaders, iterator=True, chunksize=chunkN, engine='python')
+
+        # read the chunks into memory if they are within the requested limits
+        df = []
+        for chunk in iterCsv:
+            if chunk['time'].iloc[0] > tmax:
+                # stop reading if the upper time limit was reached
+                iterCsv.close()
+                break
+            selection = chunk[(chunk['time'] >= tmin) & (chunk['time'] <= tmax)]
+            df.append(selection)
+
+        # return concatenated dataframe with all the requested data
+        return pd.concat(df, ignore_index=True)
 
     def postprocessData(self, meta, units, data):
         """
@@ -228,25 +257,8 @@ class TxtBiotecSource(BaseSource):
 
         # create relative time column but keep absolute time
         data['timeAbs'] = data['time'].copy()
-        data['time'] -= data['time'][0]
+        data.loc[:, 'time'] -= data.loc[0, 'time']
         units['timeAbs'] = 's'
-
-        meta, units, data = self.computeForces(meta, units, data)
-
-        return meta, units, data
-
-    def computeForces(self, meta, units, data):
-        """
-        How to calculate proper forces from the metadata and units
-
-        Args:
-            meta: :class:`tweezers.MetaDict`
-            units: :class:`tweezers.UnitDict`
-            data: :class:`pandas.DataFrame`
-
-        Returns:
-            meta, units, data
-        """
 
         # calculate force
         for trap in meta['traps']:
@@ -254,7 +266,47 @@ class TxtBiotecSource(BaseSource):
             data[trap + 'Force'] = (data[trap + 'Diff'] - m['zeroOffset']) * m['forceSensitivity']
             units[trap + 'Force'] = 'pN'
 
+        # calculate distance ?!
+
         return meta, units, data
+
+    def getAnalysis(self):
+        """
+        Return the analysis data.
+
+        Returns:
+            :class:`collections.OrderedDict`
+        """
+
+        if not self.analysis:
+            return IndexedOrderedDict()
+
+        with self.analysis.open(mode='r', encoding='utf-8') as f:
+            analysis = json.load(f, object_pairs_hook=IndexedOrderedDict, cls=DataFrameJsonDecoder)
+        return analysis
+
+    def writeAnalysis(self, analysis, segment=None):
+        # todo: docstring
+
+        # build filename if it does not exist
+        if not self.analysis:
+            self.analysis = self.data.parent.joinpath(self.data.name.replace('DATA', 'ANALYSIS'))
+
+        # should we only update the segment?
+        if segment:
+            analysisNew = self.getAnalysis()
+            analysisNew['segments'][segment] = analysis
+        else:
+            analysisNew = analysis
+
+        # sort analysis keys
+        # we only want to sort the top-level of the dict so we don't use "sort_keys" from json.dump
+        analysisNew = OrderedDict(sorted(analysisNew.items()))
+        # write analysis data
+        # not using json.dump because the DataFrame reformatting in DataFrameJsonEncoder is not working then
+        jsonStr = json.dumps(analysisNew, indent=4, cls=DataFrameJsonEncoder)
+        with self.analysis.open(mode='w', encoding='utf-8') as f:
+            f.write(jsonStr)
 
     def findHeaderLine(self, file):
         """
@@ -322,6 +374,6 @@ class TxtBiotecSource(BaseSource):
 
         colHeaders, colUnits = self.readColumnTitles(file)
         nHeaderLine = self.findHeaderLine(file)
-        df = pd.read_csv(str(file), sep='\t', dtype=np.float64,
-                         skiprows=nHeaderLine+1, header=None, names=colHeaders)
+        df = pd.read_csv(str(file), sep='\t', dtype=np.float64, skiprows=nHeaderLine+1, header=None,
+                         names=colHeaders, engine='c')
         return df

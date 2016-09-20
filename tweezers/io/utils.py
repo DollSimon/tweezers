@@ -3,6 +3,11 @@ from tweezers import TweezersData
 from tweezers import TweezersCollection
 
 
+def loadId(idStr, cls=TxtBiotecSource):
+    #ToDo: docstring
+
+    return TweezersData(cls.fromIdDict(idStr))
+
 def loadIds(ids, cls=TxtBiotecSource):
     """
     Load all data names (IDs) given in the input list.

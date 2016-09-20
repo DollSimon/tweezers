@@ -1,4 +1,4 @@
-class BaseSource():
+class BaseSource:
     """
     Base class for data sources. Inherit from this class when creating a new data source. Keep in mind that not all
     methods described here must be implemented since they are only called when the associated property of the
@@ -8,6 +8,9 @@ class BaseSource():
     the data from wherever it is. This allows the :class:`tweezers.TweezersData` to lazily load the data only when
     required.
     """
+
+    def __init__(self, **kwargs):
+        pass
 
     def getMetadata(self):
         """
@@ -26,6 +29,11 @@ class BaseSource():
         Returns:
             :class:`pandas.DataFrame`
         """
+
+        raise NotImplementedError()
+
+    def getDataSegment(self, tmin, tmax, chunkN=10000):
+        # todo docstring
 
         raise NotImplementedError()
 
@@ -86,6 +94,26 @@ class BaseSource():
 
         Returns:
             meta, units, data
+        """
+
+        raise NotImplementedError()
+
+    def getAnalysis(self):
+        """
+        Returns the analysis data.
+
+        Returns:
+            :class:`collections.OrderedDict`
+
+        """
+        raise NotImplementedError()
+
+    def writeAnalysis(self, analysis):
+        """
+        Write the analysis data back.
+
+        Args:
+            analysis (:class:`collections.OrderedDict`): the analysis data to store
         """
 
         raise NotImplementedError()

@@ -125,10 +125,9 @@ class LeastSquaresFit(Fit):
 
         # perform fit
         res, cov = curve_fit(self.fcn, self.x, self.y,
-                                p0=[1, 20],
-                                sigma=std,
-                                absolute_sigma=True,
-                                **self.kwargs)
+                             sigma=std,
+                             absolute_sigma=True,
+                             **self.kwargs)
         # one standard deviation errors of the fitting parameters, only makes sense with weighted data points
         self.fitError = np.sqrt(np.diag(cov))
 

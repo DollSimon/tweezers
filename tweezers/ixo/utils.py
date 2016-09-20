@@ -1,3 +1,6 @@
+import logging as log
+
+
 def strToBool(value):
     """
     Convert a string representation of a boolean value to a :class:`bool`.
@@ -20,3 +23,15 @@ def strToBool(value):
     else:
         raise ValueError
 
+
+def configLogger(verbose=True):
+    #ToDo: docstring
+
+    # ToDo: check if this still applies
+    # the basicConfig is not working in iPython notebooks :(
+    # log.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
+    logger = log.getLogger()
+    if verbose:
+        logger.setLevel(log.INFO)
+    else:
+        logger.setLevel(log.WARNING)

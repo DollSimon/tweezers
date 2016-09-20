@@ -1,72 +1,20 @@
 import logging as log
 import copy
 import pandas as pd
+from collections import OrderedDict
 
 from tweezers.ixo.decorators import lazy
 from tweezers.analysis.psd import PsdComputation, PsdFit
 from tweezers.analysis.thermal_calibration import thermalCalibration
 from tweezers.meta import MetaDict, UnitDict
+from tweezers.plot.utils import peekPlot
+from tweezers.plot.psd import PsdFitPlot
+from tweezers.ixo.collections import IndexedOrderedDict
 
 
-class TweezersData():
-    """
-    TweezersData structure for tweezers experiment data and metadata. It requires a data source object that provides certain
-    methods That populate the properties of this class. Note that not all of these methods must be implemented,
-    depending of your usage of the class. However, if your data source does not implement a certain method, the code
-    will fail only when the according property is called since all of them are evaluated lazily.
-
-    Currently supported properties that require a specific method in the data source:
-
-        ============ ================================== ===================================
-        property     required method in data source     data type
-        ============ ================================== ===================================
-        meta         getMetadata                       :class:`tweezers.MetaDict`
-        units        getMetadata                       :class:`tweezers.UnitDict`
-        data         getData                           :class:`pandas.DataFrame`
-        psdSource    getPsd                            :class:`pandas.DataFrame`
-        ts           getTs                             :class:`pandas.DataFrame`
-        ============ ================================== ===================================
-
-    The properties require standardized keys for some fields. Additional fields can be present but the ones listed
-    here must have the specified names (really? rethink!).
-
-        =============== =============================================================================================
-        property        standardized keys
-        =============== =============================================================================================
-        meta / units    TODO
-        data            ``PMxdiff``, ``PMydiff``, ``AODxdiff``, ``AODydiff``
-        psdSource / psd ``f``, ``PMx``, ``PMy``, ``AODx``, ``AODy``, ``fitPMx``, ``fitPMy``, ``fitAODx``, ``fitAODy``
-        ts              ``PMxdiff``, ``PMydiff``, ``AODxdiff``, ``AODydiff``
-        =============== =============================================================================================
-    """
-
-    # this variable should be set to false when the object was copied due to data-changing actions (computePsd...)
-    original = True
-
-    def __init__(self, source=None, verbose=True):
-        """
-        Constructor for Data
-
-        Args:
-            dataSource: a data source object like e.g. :class:`tweezers.io.source.TxtMpiSource`
-            verbose (bool): set the level of verbosity
-        """
-
-        # store dataSource object
-        if source:
-            self.source = source
-        else:
-            self.source = None
-            self.meta = MetaDict()
-            self.units = UnitDict()
-
-        # the basicConfig is not working in iPython notebooks :(
-        # log.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
-        logger = log.getLogger()
-        if verbose:
-            logger.setLevel(log.INFO)
-        else:
-            logger.setLevel(log.WARNING)
+class TweezersDataBase:
+    # todo: docstring
+    # base class for TweezersData and TweezersDataSegment, implement stuff that both should be able to do here
 
     @lazy
     def meta(self):
@@ -97,21 +45,6 @@ class TweezersData():
         self.meta = meta
         return units
 
-
-    @lazy
-    def data(self):
-        """
-        Attribute that holds the experiment data. It is evaluated lazily thus the data is read only when required.
-
-        Returns:
-            :class:`pandas.DataFrame`
-        """
-
-        log.info('Reading data from data source.')
-        data = self.source.getData()
-        self.meta, self.units, data = self.source.postprocessData(self.meta, self.units, data)
-        return data
-
     @lazy
     def ts(self):
         """
@@ -133,6 +66,32 @@ class TweezersData():
 
         log.info('Reading PSD from data source.')
         return self.source.getPsd()
+
+    @property
+    def avData(self):
+        """
+        Attribute to return the default downsampled and averaged data. Evaluated each time the
+        attribute is called.
+        """
+
+        return self.averageData(nsamples=10)
+
+    def averageData(self, nsamples=10):
+        """
+        Downsample the data by averaging ``nsamples``.
+        Args:
+            nsamples (int): number of samples to average
+
+        Returns:
+            :class:`tweezers.TweezersData`
+        """
+
+        group = self.data.groupby(self.data.index // nsamples)
+        avData = group.mean()
+        avData['time'] = group.first()['time']
+        avData['timeAbs'] = group.first()['timeAbs']
+
+        return avData
 
     def computePsd(self, **kwargs):
         """
@@ -276,3 +235,193 @@ class TweezersData():
                 resDf.loc[:, m] = self.meta[m]
 
         return resDf
+
+    def peek(self, *cols):
+        # ToDo: docstring
+        peekPlot(self, *cols)
+        return self
+
+    def peekPsd(self):
+        # ToDo: docstring
+        PsdFitPlot(self, residuals=False)
+        return self
+
+
+class TweezersData(TweezersDataBase):
+    """
+    TweezersData structure for tweezers experiment data and metadata. It requires a data source object that provides certain
+    methods That populate the properties of this class. Note that not all of these methods must be implemented,
+    depending of your usage of the class. However, if your data source does not implement a certain method, the code
+    will fail only when the according property is called since all of them are evaluated lazily.
+
+    Currently supported properties that require a specific method in the data source:
+
+        ============ ================================== ===================================
+        property     required method in data source     data type
+        ============ ================================== ===================================
+        meta         getMetadata                       :class:`tweezers.MetaDict`
+        units        getMetadata                       :class:`tweezers.UnitDict`
+        data         getData                           :class:`pandas.DataFrame`
+        psdSource    getPsd                            :class:`pandas.DataFrame`
+        ts           getTs                             :class:`pandas.DataFrame`
+        ============ ================================== ===================================
+
+    The properties require standardized keys for some fields. Additional fields can be present but the ones listed
+    here must have the specified names (really? rethink!).
+
+        =============== =============================================================================================
+        property        standardized keys
+        =============== =============================================================================================
+        meta / units    TODO
+        data            ``PMxdiff``, ``PMydiff``, ``AODxdiff``, ``AODydiff``
+        psdSource / psd ``f``, ``PMx``, ``PMy``, ``AODx``, ``AODy``, ``fitPMx``, ``fitPMy``, ``fitAODx``, ``fitAODy``
+        ts              ``PMxdiff``, ``PMydiff``, ``AODxdiff``, ``AODydiff``
+        =============== =============================================================================================
+    """
+    # todo rework docstring
+
+    def __init__(self, source=None):
+        """
+        Constructor for Data
+
+        Args:
+            source: a data source object like e.g. :class:`tweezers.io.source.TxtMpiSource`
+        """
+
+        super().__init__()
+        # store dataSource object
+        if source:
+            self.source = source
+        else:
+            self.source = None
+            self.meta = MetaDict()
+            self.units = UnitDict()
+            self.analysis = OrderedDict()
+
+    @lazy
+    def data(self):
+        """
+        Attribute that holds the experiment data. It is evaluated lazily thus the data is read only when required.
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        log.info('Reading data from data source.')
+        data = self.source.getData()
+        self.meta, self.units, data = self.source.postprocessData(self.meta, self.units, data)
+        return data
+
+    @lazy
+    def analysis(self):
+        """
+        Attribute that holds the analysis data, evaluated lazily.
+
+        Returns:
+            :class:`collections.OrderedDict`
+        """
+
+        log.info('Reading analysis from data source.')
+        return self.source.getAnalysis()
+
+    def saveAnalysis(self):
+        """
+        Save the analysis data back to disk.
+
+        Returns:
+            :class:`tweezers.TweezersData`
+        """
+
+        self.source.writeAnalysis(self.analysis)
+        return self
+
+    def addSegment(self, tmin, tmax, name=None, time='absolute'):
+        # ToDo: docstring
+
+        # ensure 'segments' in analysis container
+        if 'segments' not in self.analysis.keys():
+            self.analysis['segments'] = IndexedOrderedDict()
+
+        # convert from relative to absolute time for storage
+        if time == 'relative':
+            t0 = self.data['timeAbs'][0]
+            tmin += t0
+            tmax += t0
+
+        # create a standard name if none is given
+        if not name:
+            # converting to integer seconds might cause clashes, better option?
+            name = '{:.0f}'.format(tmin)
+            if name in self.analysis['segments'].keys():
+                log.warning('Segment key "{}" is being overridden'.format(name))
+
+        # insert segment
+        self.analysis['segments'][name] = IndexedOrderedDict([('tmin', tmin), ('tmax', tmax)])
+        # sort segments by tmin
+        self.analysis['segments'] = self.analysis['segments'].sorted(key=lambda t: t[1]['tmin'])
+
+        return self
+
+    def deleteSegment(self, segId):
+        # todo: docstring
+
+        self.analysis['segments'].pop(segId)
+        return self
+
+    def getSegment(self, segId):
+        # todo: docstring
+
+        # check if segments are available
+        if 'segments' not in self.analysis or not self.analysis['segments']:
+            raise KeyError('No segments defined')
+
+        return TweezersDataSegment(self, segId)
+
+
+class TweezersDataSegment(TweezersDataBase):
+    # todo docstring
+
+    def __init__(self, tdInstance, segmentId):
+        # todo: docstring
+        super().__init__()
+        self.__dict__ = copy.deepcopy(tdInstance.__dict__)
+        self.analysis = self.analysis['segments'][segmentId]
+        self.meta['segment'] = segmentId
+
+        # check if data is already read into memory and use that if available
+        if 'data' in self.__dict__:
+            # adjust data
+            queryStr = '{} <= timeAbs <= {}'.format(self.analysis['tmin'], self.analysis['tmax'])
+            self.data = self.data.query(queryStr)
+            self.data = self.data.reset_index(drop=True)
+            self.data.loc[:, 'time'] -= self.data.loc[0, 'time']
+            # delete avData if available
+            try:
+                self.__dict__.pop('avData')
+            except KeyError:
+                pass
+
+    @lazy
+    def data(self):
+        """
+        Attribute that holds the experiment data. It is evaluated lazily thus the data is read only when required.
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        log.info('Reading data from data source.')
+        data = self.source.getDataSegment(self.analysis['tmin'], self.analysis['tmax'])
+        self.meta, self.units, data = self.source.postprocessData(self.meta, self.units, data)
+        return data
+
+    def saveAnalysis(self):
+        """
+        Save the analysis data back to disk.
+
+        Returns:
+            :class:`tweezers.TweezersData`
+        """
+
+        self.source.writeAnalysis(self.analysis, segment=self.meta['segment'])
+        return self
