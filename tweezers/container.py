@@ -213,18 +213,18 @@ class TweezersData():
         axes = self.meta.subDictKeys()
 
         for ax in axes:
-            # convert radius to nm (likely given in µm)
-            if self.units[ax]['beadRadius'] == 'nm':
-                radius = self.meta[ax]['beadRadius']
-            elif self.units[ax]['beadRadius'] in ['um', 'µm']:
-                radius = self.meta[ax]['beadRadius'] * 1000
+            # convert diameter to nm (likely given in µm)
+            if self.units[ax]['beadDiameter'] == 'nm':
+                diam = self.meta[ax]['beadDiameter']
+            elif self.units[ax]['beadDiameter'] in ['um', 'µm']:
+                diam = self.meta[ax]['beadDiameter'] * 1000
             else:
                 raise ValueError('Unknown bead radius unit encountered.')
 
             res, units = thermalCalibration(diffCoeff=self.meta[ax]['diffusionCoefficient'],
                                             cornerFreq=self.meta[ax]['cornerFrequency'],
                                             viscosity=self.meta['viscosity'],
-                                            beadRadius=radius,
+                                            beadDiameter=diam,
                                             temperature=self.meta['temperature'])
 
             self.meta.update({ax: res})

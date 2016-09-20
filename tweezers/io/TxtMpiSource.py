@@ -316,14 +316,6 @@ class TxtMpiSource(BaseSource):
                 if unit:
                     self.setMeta(units, key, unit)
 
-                # ensure bead radius, some have only diameter
-                if key[-1] == 'beadDiameter':
-                    key[-1] = 'beadRadius'
-                    value /= 2
-                    self.setMeta(meta, key, value)
-                    if unit:
-                        self.setMeta(units, key, unit)
-
         return meta, units
 
     def convertColumns(self, struct):
