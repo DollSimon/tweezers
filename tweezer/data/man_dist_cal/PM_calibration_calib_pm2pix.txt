@@ -1,9 +1,0 @@
-# Date: 2/22/2013 2:44 PM
-
-# PM2Pixel X (V/px): -22.604210
-# Intercept X PM2P: 406.729423
-# STD X PM2P: 0.012702
-
-# PM2Pixel Y (V/px): -18.865301
-# Intercept Y PM2P: 316.626721
-# STD Y PM2P: 0.021269                                                              

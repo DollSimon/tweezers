@@ -1,59 +1,11 @@
-*.pyc
-*/*/*.pyc
-examples/
-
-*.py[cod]
-
-# C extensions
-*.so
-
-# Packages
-*.egg
 *.egg-info
-dist
-build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
-.installed.cfg
-lib
-lib64
 __pycache__
 
-# Installer logs
-pip-log.txt
-
-# Unit test / coverage reports
-.coverage
-.tox
-nosetests.xml
-
-.cache/
-
-build/
-dist/
-sandbox/
-
-convert.log
-tox.ini
-
-tweezer.egg-info/
-
 # certain ipython notebook files
-Sandbox.ipynb
-*.ipynb
-
-# sublime project files
-*.sublime-project
-*.sublime-workspace
+notebooks/.ipynb_checkpoints
 
 # PyCharm project files
-*.xml
 .idea
-*.iml
 
 # files related to python testing system
 .coverage
@@ -61,21 +13,14 @@ setup.cfg
 bento.info
 
 # ignore all files related to pythontex except the template itself
-tweezer/templates/pytex/*
-!tweezer/templates/pytex/*.tex
+tweezer/legacy/templates/pytex/*
+!tweezer/legacy/templates/pytex/*.tex
 
-# all TODO files
-*.TODO
-
-# Latex extra files
-*.aux
-*.out
-*.log
-*template.pdf
-
-# profile files
-*.profile
-
-# files from nose testing
-setup.json
-tests.json
+.DS_Store
+docs/build
+build
+dist
+docs_legacy
+docs/build
+docs/source/modules.rst
+docs/source/tweezers*.rst
