@@ -24,14 +24,14 @@ def strToBool(value):
         raise ValueError
 
 
-def configLogger(verbose=True):
+def configLogger(debug=False):
     #ToDo: docstring
 
     # ToDo: check if this still applies
     # the basicConfig is not working in iPython notebooks :(
     # log.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
     logger = log.getLogger()
-    if verbose:
-        logger.setLevel(log.INFO)
+    if debug:
+        logger.setLevel(log.DEBUG)
     else:
-        logger.setLevel(log.WARNING)
+        logger.setLevel(log.INFO)

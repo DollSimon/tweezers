@@ -3,50 +3,22 @@ import pprint
 import pandas as pd
 import logging as log
 
+from tweezers.ixo.collections import AttrDictMixin
 
-class MetaBaseDict(OrderedDict):
+
+class MetaBaseDict(OrderedDict, AttrDictMixin):
     """
     An ordered dictionary (:class:`collections.OrderedDict`) that returns a default value if a key does not exist and
     prints a warning.
     The convention for key style is "camelCase" (start lower case, new words begin upper case).
-    Please check the `knownKeyTypes` dictionary for keys, that are used by some methods of
-    :class:`tweezers.TweezersData`. If you don't call these methods, you don't need these keys. Even then,
-    if you import data, try to use these standard keys as much as possible and please extend the list when your
-    modifications of the code rely on a key's existence.
+
+    Note that if you read data from a new data source, it is recommended to stick to the reference key naming in the
+    meta data. The reference is the header of the Biotec txt files.
     """
-    # TODO should this dictionary be ordered alphabetically?
 
     defaults = {}
 
     warningString = ''
-
-    knownKeyTypes = OrderedDict([
-        # general stuff
-        ('title', str),
-        ('date', str),
-        ('time', str),
-        ('samplingRate', int),
-
-        ('psdSamplingRate', int),
-        ('psdNBlocks', lambda x: int(float(x))),
-        ('psdBlockLength', int),
-        ('psdOverlap', int),
-        ('psdSamplingRate', int),
-
-        # experiment conditions
-        ('viscosity', float),
-
-        # axis variables
-        ('cornerFrequency', float),
-        ('stiffness', float),
-        ('displacementSensitivity', float),
-        ('forceSensitivity', float),
-        ('beadDiameter', float),
-
-        # mostly for units
-        ('timeseries', 'timeseries'),
-        ('psd', 'psd'),
-    ])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -107,15 +79,6 @@ class MetaBaseDict(OrderedDict):
 
         for key in self.subDictKeys():
             self[key].deleteKey(*delKeys)
-
-        #
-        # # loop through dict and check for element
-        # for key, value in self.items():
-        #     if isinstance(value, MetaBaseDict):
-        #         value.deleteKey(*keys)
-        #     else:
-        #         if key in keys:
-        #             self.pop(key)
 
     def getFacets(self):
         """
@@ -185,7 +148,6 @@ class MetaDict(MetaBaseDict):
     """
     An class to hold metadata.
     """
-    # TODO order keys by alphabet
 
     defaults = {'title': 'no title',
                 'temperature': 25,

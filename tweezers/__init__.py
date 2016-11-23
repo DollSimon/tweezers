@@ -8,4 +8,4 @@ from .collections import TweezersCollection
 from .ixo.utils import configLogger
 
 
-configLogger(verbose=True)
+configLogger(debug=False)

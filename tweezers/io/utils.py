@@ -1,3 +1,5 @@
+import logging as log
+
 from tweezers.io import TxtBiotecSource
 from tweezers import TweezersData
 from tweezers import TweezersCollection
@@ -79,3 +81,15 @@ def getIds(names, path, cls=TxtBiotecSource):
         resIds.update(tmpIds)
 
     return resIds
+
+
+def loadSegments(td):
+    # todo docstring
+    data = TweezersCollection()
+    for t in td.values():
+        if not t.segments:
+            log.warning('No segments defined in dataset "{}"'.format(t.meta['id']))
+        for segmentId in t.segments:
+            ts = t.getSegment(segmentId)
+            data[ts.meta['id']] = ts
+    return data

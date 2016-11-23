@@ -256,19 +256,49 @@ class TxtBiotecSource(BaseSource):
         """
 
         # create relative time column but keep absolute time
-        data['timeAbs'] = data['time'].copy()
+        data['absTime'] = data.time.copy()
         data.loc[:, 'time'] -= data.loc[0, 'time']
-        units['timeAbs'] = 's'
+        units['absTime'] = 's'
 
-        # calculate force
+        # calculate force per trap and axis
         for trap in meta['traps']:
             m = meta[trap]
             data[trap + 'Force'] = (data[trap + 'Diff'] - m['zeroOffset']) * m['forceSensitivity']
             units[trap + 'Force'] = 'pN'
 
-        # calculate distance ?!
+        # invert PM force, is not as expected in the raw data
+        data.pmYForce = -data.pmYForce
+
+        # calculate mean force per axis, only meaningful for two traps
+        data['xForce'] = (data.pmXForce + data.aodXForce) / 2
+        data['yForce'] = (data.pmYForce - data.aodYForce) / 2
+
+        # calculate bead distance centre to centre, only meaningful for two trapped beads
+        data['distance'] = np.sqrt((data.pmYBead - data.aodYBead)**2 + (data.pmXBead - data.aodXBead)**2)
 
         return meta, units, data
+
+    def getAnalysisDict(self):
+        #Todo docstring
+
+        if not self.analysis:
+            return IndexedOrderedDict()
+
+        with self.analysis.open(mode='r', encoding='utf-8') as f:
+            analysisDict = json.load(f, object_pairs_hook=IndexedOrderedDict, cls=DataFrameJsonDecoder)
+        return analysisDict
+
+    def writeAnalysisDict(self, analysisDict):
+        # todo docstring
+
+        # build filename if it does not exist
+        if not self.analysis:
+            self.analysis = self.data.parent.joinpath(self.data.name.replace('DATA', 'ANALYSIS'))
+
+        # write data to file
+        jsonStr = json.dumps(analysisDict, indent=4, cls=DataFrameJsonEncoder)
+        with self.analysis.open(mode='w', encoding='utf-8') as f:
+            f.write(jsonStr)
 
     def getAnalysis(self):
         """
@@ -278,35 +308,36 @@ class TxtBiotecSource(BaseSource):
             :class:`collections.OrderedDict`
         """
 
-        if not self.analysis:
-            return IndexedOrderedDict()
-
-        with self.analysis.open(mode='r', encoding='utf-8') as f:
-            analysis = json.load(f, object_pairs_hook=IndexedOrderedDict, cls=DataFrameJsonDecoder)
-        return analysis
+        return self.getAnalysisDict().get('analysis', OrderedDict())
 
     def writeAnalysis(self, analysis, segment=None):
         # todo: docstring
 
-        # build filename if it does not exist
-        if not self.analysis:
-            self.analysis = self.data.parent.joinpath(self.data.name.replace('DATA', 'ANALYSIS'))
+        analysisDict = self.getAnalysisDict()
 
         # should we only update the segment?
-        if segment:
-            analysisNew = self.getAnalysis()
-            analysisNew['segments'][segment] = analysis
+        if segment is not None:
+            analysisDict['segments'][segment] = analysis
+            # remove the general analysis keys
+            for key in analysisDict['analysis'].keys():
+                analysisDict['segments'][segment].pop(key, None)
         else:
-            analysisNew = analysis
+            # sort analysis keys and store in the proper dictionary
+            analysisDict['analysis'] = OrderedDict(sorted(analysis.items()))
 
-        # sort analysis keys
-        # we only want to sort the top-level of the dict so we don't use "sort_keys" from json.dump
-        analysisNew = OrderedDict(sorted(analysisNew.items()))
-        # write analysis data
-        # not using json.dump because the DataFrame reformatting in DataFrameJsonEncoder is not working then
-        jsonStr = json.dumps(analysisNew, indent=4, cls=DataFrameJsonEncoder)
-        with self.analysis.open(mode='w', encoding='utf-8') as f:
-            f.write(jsonStr)
+        self.writeAnalysisDict(analysisDict)
+
+    def getSegments(self):
+        # todo docstring
+        return self.getAnalysisDict().get('segments', IndexedOrderedDict())
+
+    def writeSegments(self, segments):
+        #todo docstring
+
+        analysisDict = self.getAnalysisDict()
+        analysisDict['segments'] = segments
+        self.writeAnalysisDict(analysisDict)
+
 
     def findHeaderLine(self, file):
         """

@@ -24,12 +24,8 @@ def peekPlot(td, *cols):
     for col in cols:
         ax.plot(avd['time'], avd[col], '.', label=col)
     # plot segments
-    try:
-        segments = td.analysis['segments']
-    except KeyError:
-        segments = {}
-    t0 = avd.timeAbs[0]
-    for seg in segments.values():
+    t0 = avd.absTime[0]
+    for seg in td.segments.values():
         plotSegment(ax, seg['tmin'] - t0, seg['tmax'] - t0)
     # labels
     ax.set_ylabel(td.units[cols[0]])
@@ -53,10 +49,6 @@ class SegmentSelector:
     def __init__(self, td, *cols, fig=None, ax=None, autosave=False):
         self.td = td
         self.autosave = autosave
-        try:
-            self.segments = td.analysis['segments']
-        except KeyError:
-            td.analysis['segments'] = IndexedOrderedDict()
 
         # create plot
         if not fig or not ax:
@@ -99,12 +91,8 @@ class SegmentSelector:
         for col in cols:
             self.ax.plot(avd['time'], avd[col], '.', label=col)
         # plot segments
-        try:
-            segments = self.td.analysis['segments']
-        except KeyError:
-            segments = {}
-        t0 = avd.timeAbs[0]
-        for seg in segments.values():
+        t0 = avd.absTime[0]
+        for seg in self.td.segments.values():
             plotSegment(self.ax, seg['tmin'] - t0, seg['tmax'] - t0, facecolor=self.color, alpha=self.alpha)
         # labels
         self.ax.set_ylabel(self.td.units[cols[0]])
@@ -167,14 +155,28 @@ class CollectionSegmentSelector:
         self.statusMsg.value = 'Loading dataset...'
         self.progressBar.value = (self.current + 1) / len(self.td)
         self.progressCounter.value = str(self.current + 1) + ' / ' + str(len(self.td))
-        self.currentDatasetDropdown.value = self.tdKeys[self.current]
         self.selector = SegmentSelector(self.td[self.current], *self.cols,
                                         fig=self.fig, ax=self.ax, autosave=self.autosaveCheck.value)
-        self.statusMsg.value = 'Dataset loaded'
+        self.statusMsg.value = 'Dataset loaded "{}"'.format(self.td[self.current].meta['id'])
 
     def currentDatasetChanged(self, change):
         self.current = self.tdKeys.index(change['new'])
         self.plotCurrent()
+
+    def previousButtonClick(self, b):
+        self.current -= 1
+        if self.current >= 0:
+            self.currentDatasetDropdown.value = self.tdKeys[self.current]
+        else:
+            self.current = 0
+
+    def nextButtonClick(self, b):
+        self.current += 1
+        lentd = len(self.td)
+        if self.current < lentd:
+            self.currentDatasetDropdown.value = self.tdKeys[self.current]
+        else:
+            self.current = lentd - 1
 
     def saveButtonClick(self, b):
         self.td[self.current].saveAnalysis()
@@ -186,19 +188,3 @@ class CollectionSegmentSelector:
             self.td[self.current].saveAnalysis()
         self.statusMsg.value = 'Segments reset'
         self.plotCurrent()
-
-    def previousButtonClick(self, b):
-        self.current -= 1
-        if self.current >= 0:
-            self.plotCurrent()
-        else:
-            self.current = 0
-
-    def nextButtonClick(self, b):
-        self.current += 1
-        lentd = len(self.td)
-        if self.current < lentd:
-            self.plotCurrent()
-        else:
-            self.current = lentd - 1
-

@@ -291,10 +291,7 @@ class TxtMpiSource(BaseSource):
                 # check for value type in MetaDict
                 value = res.group('value').strip()
                 valueKey = key[-1]
-                if valueKey in t.MetaDict.knownKeyTypes.keys():
-                    value = t.MetaDict.knownKeyTypes[valueKey](value)
-                else:
-                    value = self.getValueType(valueKey, value)
+                value = self.getValueType(valueKey, value)
 
                 # get date and time properly, different for all files
                 if key[0] == 'date':
@@ -492,6 +489,14 @@ class TxtMpiSource(BaseSource):
         """
 
         keyMapper = {
+
+            # general stuff
+            'title': str,
+            'time': str,
+
+            # axis variables
+            'forceSensitivity': float,
+
             # general stuff
             'date': lambda x: x.replace('\t', ' '),
             'isDataAveraged': ixo.strToBool,
@@ -505,6 +510,8 @@ class TxtMpiSource(BaseSource):
             'measurementDuration': float,
             'timeStep': float,
             'dt': float,
+            'psdBlockLength': int,
+            'psdOverlap': int,
             'psdNBlocks': lambda x: int(float(x)),
             'viscosity': float,
 

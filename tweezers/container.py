@@ -26,7 +26,7 @@ class TweezersDataBase:
             :class:`tweezers.MetaDict`
         """
 
-        log.info('Reading metadata from data source.')
+        log.debug('Reading metadata from data source.')
         meta, units = self.source.getMetadata()
         self.units = units
         return meta
@@ -54,7 +54,7 @@ class TweezersDataBase:
             :class:`pandas.DataFrame`
         """
 
-        log.info('Reading timeseries from data source.')
+        log.debug('Reading timeseries from data source.')
         return self.source.getTs()
 
     @lazy
@@ -64,7 +64,7 @@ class TweezersDataBase:
         it holds the PSD from the data source, otherwise the newly computed one.
         """
 
-        log.info('Reading PSD from data source.')
+        log.debug('Reading PSD from data source.')
         return self.source.getPsd()
 
     @property
@@ -89,7 +89,7 @@ class TweezersDataBase:
         group = self.data.groupby(self.data.index // nsamples)
         avData = group.mean()
         avData['time'] = group.first()['time']
-        avData['timeAbs'] = group.first()['timeAbs']
+        avData['absTime'] = group.first()['absTime']
 
         return avData
 
@@ -137,7 +137,7 @@ class TweezersDataBase:
         :meth:`tweezers.Data.fit_psd`, it holds the fit from the data source, otherwise the newly computed one.
         """
 
-        log.info('Reading PSD fit from data source.')
+        log.debug('Reading PSD fit from data source.')
         return self.source.getPsdFit()
 
     def fitPsd(self, **kwargs):
@@ -297,6 +297,7 @@ class TweezersData(TweezersDataBase):
             self.meta = MetaDict()
             self.units = UnitDict()
             self.analysis = OrderedDict()
+            self.segments = IndexedOrderedDict()
 
     @lazy
     def data(self):
@@ -307,7 +308,7 @@ class TweezersData(TweezersDataBase):
             :class:`pandas.DataFrame`
         """
 
-        log.info('Reading data from data source.')
+        log.debug('Reading data from data source')
         data = self.source.getData()
         self.meta, self.units, data = self.source.postprocessData(self.meta, self.units, data)
         return data
@@ -321,18 +322,27 @@ class TweezersData(TweezersDataBase):
             :class:`collections.OrderedDict`
         """
 
-        log.info('Reading analysis from data source.')
+        log.debug('Reading analysis from data source')
         return self.source.getAnalysis()
 
-    def saveAnalysis(self):
+    @lazy
+    def segments(self):
+        # todo docstring
+
+        log.debug('Reading segments from data source')
+        return self.source.getSegments()
+
+    def save(self):
         """
         Save the analysis data back to disk.
 
         Returns:
             :class:`tweezers.TweezersData`
         """
+        # todo docstring update
 
         self.source.writeAnalysis(self.analysis)
+        self.source.writeSegments(self.segments)
         return self
 
     def addSegment(self, tmin, tmax, name=None, time='absolute'):
@@ -344,7 +354,7 @@ class TweezersData(TweezersDataBase):
 
         # convert from relative to absolute time for storage
         if time == 'relative':
-            t0 = self.data['timeAbs'][0]
+            t0 = self.data['absTime'][0]
             tmin += t0
             tmax += t0
 
@@ -356,23 +366,23 @@ class TweezersData(TweezersDataBase):
                 log.warning('Segment key "{}" is being overridden'.format(name))
 
         # insert segment
-        self.analysis['segments'][name] = IndexedOrderedDict([('tmin', tmin), ('tmax', tmax)])
+        self.segments[name] = IndexedOrderedDict([('tmin', tmin), ('tmax', tmax)])
         # sort segments by tmin
-        self.analysis['segments'] = self.analysis['segments'].sorted(key=lambda t: t[1]['tmin'])
+        self.segments = self.segments.sorted(key=lambda t: t[1]['tmin'])
 
         return self
 
     def deleteSegment(self, segId):
         # todo: docstring
 
-        self.analysis['segments'].pop(segId)
+        self.segments.pop(segId)
         return self
 
     def getSegment(self, segId):
         # todo: docstring
 
         # check if segments are available
-        if 'segments' not in self.analysis or not self.analysis['segments']:
+        if not self.segments:
             raise KeyError('No segments defined')
 
         return TweezersDataSegment(self, segId)
@@ -385,13 +395,20 @@ class TweezersDataSegment(TweezersDataBase):
         # todo: docstring
         super().__init__()
         self.__dict__ = copy.deepcopy(tdInstance.__dict__)
-        self.analysis = self.analysis['segments'][segmentId]
+        # get the proper key in case numeric indexing was used
+        segmentId = self.segments.key(segmentId)
+        self.analysis = self.segments[segmentId]
+        self.analysis.update(tdInstance.analysis)
+        # get rid of the other segments
+        del self.segments
+        # update meta dict
         self.meta['segment'] = segmentId
+        self.meta['id'] = '{} - {}'.format(self.meta['id'], segmentId)
 
         # check if data is already read into memory and use that if available
         if 'data' in self.__dict__:
             # adjust data
-            queryStr = '{} <= timeAbs <= {}'.format(self.analysis['tmin'], self.analysis['tmax'])
+            queryStr = '{} <= absTime <= {}'.format(self.analysis['tmin'], self.analysis['tmax'])
             self.data = self.data.query(queryStr)
             self.data = self.data.reset_index(drop=True)
             self.data.loc[:, 'time'] -= self.data.loc[0, 'time']
@@ -410,12 +427,12 @@ class TweezersDataSegment(TweezersDataBase):
             :class:`pandas.DataFrame`
         """
 
-        log.info('Reading data from data source.')
+        log.debug('Reading data from data source.')
         data = self.source.getDataSegment(self.analysis['tmin'], self.analysis['tmax'])
         self.meta, self.units, data = self.source.postprocessData(self.meta, self.units, data)
         return data
 
-    def saveAnalysis(self):
+    def save(self):
         """
         Save the analysis data back to disk.
 

@@ -108,12 +108,22 @@ class BaseSource:
         """
         raise NotImplementedError()
 
-    def writeAnalysis(self, analysis):
+    def writeAnalysis(self, analysis, segment=None):
         """
         Write the analysis data back.
 
         Args:
             analysis (:class:`collections.OrderedDict`): the analysis data to store
         """
+
+        raise NotImplementedError()
+
+    def getSegments(self):
+        # todo docstring
+
+        raise NotImplementedError()
+
+    def writeSegments(self, segments):
+        # todo docstring
 
         raise NotImplementedError()
