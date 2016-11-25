@@ -83,21 +83,6 @@ class BaseSource:
 
         return meta, units, data
 
-    def computeForces(self, meta, units, data):
-        """
-        How to calculate proper forces from the metadata and units. Might depend on the data source.
-
-        Args:
-            meta: :class:`tweezers.MetaDict`
-            units: :class:`tweezers.UnitDict`
-            data: :class:`pandas.DataFrame`
-
-        Returns:
-            meta, units, data
-        """
-
-        raise NotImplementedError()
-
     def getAnalysis(self):
         """
         Returns the analysis data.

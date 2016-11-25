@@ -24,9 +24,8 @@ def peekPlot(td, *cols):
     for col in cols:
         ax.plot(avd['time'], avd[col], '.', label=col)
     # plot segments
-    t0 = avd.absTime[0]
     for seg in td.segments.values():
-        plotSegment(ax, seg['tmin'] - t0, seg['tmax'] - t0)
+        plotSegment(ax, seg['tmin'], seg['tmax'])
     # labels
     ax.set_ylabel(td.units[cols[0]])
     ax.set_xlabel(td.units['time'])
@@ -62,7 +61,7 @@ class SegmentSelector:
 
     def onselect(self, xmin, xmax):
         # store new segment
-        self.td.addSegment(xmin, xmax, time='relative')
+        self.td.addSegment(xmin, xmax)
 
         # plot segment
         plotSegment(self.ax, xmin, xmax, facecolor=self.color, alpha=self.alpha)

@@ -89,7 +89,8 @@ class TweezersDataBase:
         group = self.data.groupby(self.data.index // nsamples)
         avData = group.mean()
         avData['time'] = group.first()['time']
-        avData['absTime'] = group.first()['absTime']
+        if 'absTime' in self.data.columns:
+            avData['absTime'] = group.first()['absTime']
 
         return avData
 
@@ -345,18 +346,9 @@ class TweezersData(TweezersDataBase):
         self.source.writeSegments(self.segments)
         return self
 
-    def addSegment(self, tmin, tmax, name=None, time='absolute'):
+    def addSegment(self, tmin, tmax, name=None):
         # ToDo: docstring
-
-        # ensure 'segments' in analysis container
-        if 'segments' not in self.analysis.keys():
-            self.analysis['segments'] = IndexedOrderedDict()
-
-        # convert from relative to absolute time for storage
-        if time == 'relative':
-            t0 = self.data['absTime'][0]
-            tmin += t0
-            tmax += t0
+        # tmin and tmax are relative times
 
         # create a standard name if none is given
         if not name:
