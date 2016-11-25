@@ -225,6 +225,10 @@ class TxtBiotecSource(BaseSource):
         # read required information about file and create the chunked iterator
         colHeaders, colUnits = self.readColumnTitles(self.data)
         nHeaderLine = self.findHeaderLine(self.data)
+        # read the first data line to allow conversion between absolute and relative time
+        firstLine = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine + 1, header=None,
+                                names=colHeaders, nrows=1)
+        t0 = firstLine.time.iloc[0]
         # consider adding dtype=np.float64, when switching to engine='c'
         iterCsv = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine+1, header=None,
                               names=colHeaders, iterator=True, chunksize=chunkN, engine='python')
@@ -232,11 +236,11 @@ class TxtBiotecSource(BaseSource):
         # read the chunks into memory if they are within the requested limits
         df = []
         for chunk in iterCsv:
-            if chunk['time'].iloc[0] > tmax:
+            if chunk['time'].iloc[0] - t0 > tmax:
                 # stop reading if the upper time limit was reached
                 iterCsv.close()
                 break
-            selection = chunk[(chunk['time'] >= tmin) & (chunk['time'] <= tmax)]
+            selection = chunk[(chunk['time'] - t0 >= tmin) & (chunk['time'] - t0 <= tmax)]
             df.append(selection)
 
         # return concatenated dataframe with all the requested data
@@ -273,8 +277,12 @@ class TxtBiotecSource(BaseSource):
         data['xForce'] = (data.pmXForce + data.aodXForce) / 2
         data['yForce'] = (data.pmYForce - data.aodYForce) / 2
 
+        units['xForce'] = 'pN'
+        units['yForce'] = 'pN'
+
         # calculate bead distance centre to centre, only meaningful for two trapped beads
         data['distance'] = np.sqrt((data.pmYBead - data.aodYBead)**2 + (data.pmXBead - data.aodXBead)**2)
+        units['distance'] = 'nm'
 
         return meta, units, data
 
