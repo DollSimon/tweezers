@@ -232,7 +232,7 @@ class PsdFitPlot(PsdPlotBase):
         Constructor for PsdFitPlot. Additional arguments are passed on to :meth:`tweezers.plot.psd.PsdFitPlot.plot`.
 
         Args:
-            container (:class:`tweezers.TweezersData`): container that holds PSD data to plot
+            container (:class:`tweezers.TweezersDataBase`): container that holds PSD data to plot
             title (str): title for the plot, optional to override default value used
         """
 

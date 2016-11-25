@@ -1,8 +1,10 @@
 import logging as log
+import collections
 
 from tweezers.io import TxtBiotecSource
 from tweezers import TweezersData
 from tweezers import TweezersCollection
+from tweezers.ixo.collections import isNestedDict
 
 
 def loadId(idStr, cls=TxtBiotecSource):
@@ -15,7 +17,7 @@ def loadIds(ids, cls=TxtBiotecSource):
     Load all data names (IDs) given in the input list.
     Args:
         ids (dict): :class:`dict` with ID strings as keys and :class:`dict` as values. The value is passed on to the
-        `fromId` method of the data source class provided in `cls`.
+        `fromId` method of the data source class provided in `cls`. Also works for nested dictionaries.
 
         cls (class): Type of the data source to use. By default this is
         :class:`tweezers.io.TxtBiotecSource.TxtBiotecSource`.
@@ -31,12 +33,15 @@ def loadIds(ids, cls=TxtBiotecSource):
     # create data objects
     data = TweezersCollection()
     for idStr in idKeys:
-        try:
-            td = TweezersData(cls.fromIdDict(ids[idStr]))
-            data[idStr] = td
-        except ValueError:
-            # we might want to put a more descriptive message here
-            print('Error loading data set: "' + idStr + '"')
+        if isNestedDict(ids[idStr]):
+            data[idStr] = loadIds(ids[idStr])
+        else:
+            try:
+                td = TweezersData(cls.fromIdDict(ids[idStr]))
+                data[idStr] = td
+            except ValueError:
+                # we might want to put a more descriptive message here
+                print('Error loading data set: "' + idStr + '"')
 
     return data
 

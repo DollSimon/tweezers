@@ -26,7 +26,7 @@ class TxtBiotecSource(BaseSource):
     # path to data, not correct if files sit in different folders
     path = None
 
-    def __init__(self, data=None, analysis=None, psd=None, ts=None, **kwargs):
+    def __init__(self, data=None, analysis=None, psd=None, ts=None, screenshot=None, **kwargs):
         """
         Constructor for TxtBiotecSource
 
@@ -35,6 +35,7 @@ class TxtBiotecSource(BaseSource):
                                            :class:`pathlib.Path` to try to create an instance
             psd (:class:`pathlib.Path`): path to psd file to read, similar to `data` input
         """
+        #todo fix docstring
 
         super().__init__(**kwargs)
 
@@ -53,6 +54,8 @@ class TxtBiotecSource(BaseSource):
 
         if analysis:
             self.analysis = Path(analysis)
+        if screenshot:
+            self.screenshot = Path(screenshot)
 
         self.path = self.header.parent
 
@@ -84,12 +87,35 @@ class TxtBiotecSource(BaseSource):
         """
 
         pPath = Path(path)
-        m = re.match('^(?P<id>[0-9\-_]{19}.*)\s(?P<type>[a-zA-Z]+)\.txt$', pPath.name)
+        m = re.match('^(?P<id>[0-9\-_]{19}.*#\d{3})(?P<trial>-\d{3})?\s(?P<type>[a-zA-Z]+)\.txt$', pPath.name)
         if m:
-            res = {'id': m.group('id'), 'type': m.group('type').lower()}
+            trial = None
+            if m.group('trial'):
+                trial = '{}{}'.format(m.group('id'), m.group('trial'))
+            res = {'id': m.group('id'),
+                   'trial': trial,
+                   'type': m.group('type').lower(),
+                   'path': pPath}
             return res
         else:
-            return {}
+            return False
+
+    @staticmethod
+    def getAllFiles(path):
+        # todo docstring
+
+        pPath = Path(path)
+        files = []
+
+        for obj in pPath.iterdir():
+            if obj.is_dir():
+                subFiles = TxtBiotecSource.getAllFiles(obj)
+                files += subFiles
+            else:
+                m = TxtBiotecSource.isDataFile(obj)
+                if m:
+                    files.append(m)
+        return files
 
     @staticmethod
     def getAllIds(path):
@@ -105,25 +131,29 @@ class TxtBiotecSource(BaseSource):
 
         pPath = Path(path)
 
+        # get a list of all files and their properties
+        files = TxtBiotecSource.getAllFiles(pPath)
         ids = {}
-        for obj in pPath.iterdir():
-            if obj.is_dir():
-                # if obj is a directory enter it recursively
-                m = TxtBiotecSource.getAllIds(obj)
-                # merge result to ID list
-                for idStr, info in m.items():
-                    if idStr not in ids.keys():
-                        ids[idStr] = {}
-                    for typeStr, filePath in info.items():
-                        ids[idStr][typeStr] = filePath
+        sharedFiles = {}
+
+        # sort files in sharedFiles and actual data files that belong to an individual trial
+        for el in files:
+            if el['trial']:
+                if el['id'] not in ids.keys():
+                    ids[el['id']] = {}
+                if el['trial'] not in ids[el['id']].keys():
+                    ids[el['id']][el['trial']] = {}
+                ids[el['id']][el['trial']][el['type']] = el['path']
             else:
-                # if it is a file, check if it is a data file
-                m = TxtBiotecSource.isDataFile(obj)
-                # append result to ID list
-                if m:
-                    if m['id'] not in ids.keys():
-                        ids[m['id']] = {}
-                    ids[m['id']][m['type']] = obj
+                if el['id'] not in sharedFiles.keys():
+                    sharedFiles[el['id']] = {}
+                sharedFiles[el['id']][el['type']] = el['path']
+
+        # append a reference to the shared file to each trial
+        for idStr, el in ids.items():
+            if idStr in sharedFiles.keys():
+                for trial in el.values():
+                    trial.update(sharedFiles[idStr])
 
         return ids
 

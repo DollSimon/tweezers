@@ -1,4 +1,5 @@
-from collections import OrderedDict
+from collections import OrderedDict, Iterable
+import pprint
 
 
 class AttrDictMixin(object):
@@ -85,3 +86,21 @@ class IndexedOrderedDict(OrderedDict, AttrDictMixin):
         else:
             key = item
         return super().pop(key, *args)
+
+    def __str__(self):
+        # pretty-print output of the dict
+        return pprint.pformat(super().__str__())
+
+
+def isNestedDict(dictionary):
+    #todo: docstring
+    # checks if a dictionary contains subdictionaries
+
+    if not isinstance(dictionary, dict):
+        raise ValueError('isNestedDict: No dict given')
+
+    for key in dictionary.keys():
+        if isinstance(dictionary[key], Iterable):
+            return True
+
+    return False

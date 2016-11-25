@@ -107,12 +107,12 @@ class CollectionSegmentSelector:
         if not isinstance(td, TweezersCollection):
             raise TypeError('TweezersCollection object expected but not given.')
 
-        self.td = td
+        self.td = td.flatten()
         self.current = 0
         self.cols = cols
         self.selector = None
         # get all dataset names
-        self.tdKeys = list(td.keys())
+        self.tdKeys = list(self.td.keys())
 
         # create user interface
         self.progressBar = widgets.FloatProgress(value=0, min=0, max=1, description='Progress: ')

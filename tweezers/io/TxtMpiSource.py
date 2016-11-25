@@ -120,11 +120,14 @@ class TxtMpiSource(BaseSource):
         # add title string to metadata, used for plots
         self.setTitle(meta)
 
-        # make sure all axes have the beadRadius
-        meta['pmY']['beadRadius'] = meta['pmX']['beadRadius']
-        units['pmY']['beadRadius'] = units['pmX']['beadRadius']
-        meta['aodY']['beadRadius'] = meta['aodX']['beadRadius']
-        units['aodY']['beadRadius'] = units['aodX']['beadRadius']
+        # make sure all axes have the beadDiameter
+        meta['pmY']['beadDiameter'] = meta['pmX']['beadDiameter']
+        units['pmY']['beadDiameter'] = units['pmX']['beadDiameter']
+        meta['aodY']['beadDiameter'] = meta['aodX']['beadDiameter']
+        units['aodY']['beadDiameter'] = units['aodX']['beadDiameter']
+
+        # add trap names
+        meta['traps'] = meta.subDictKeys()
 
         return meta, units
 
@@ -146,6 +149,32 @@ class TxtMpiSource(BaseSource):
         # convert the data to a standardized format
         data = self.convertData(columnHeader, data)
         return data
+
+    def postprocessData(self, meta, units, data):
+        # todo docstring
+
+        data['time'] = np.arange(0, meta['dt'] * len(data), meta['dt'])
+        units['time'] = 's'
+
+        # calculate force per trap and axis
+        for trap in meta['traps']:
+            m = meta[trap]
+            data[trap + 'Force'] = (data[trap + 'Diff'] - m['zeroOffset']) \
+                                    / m['displacementSensitivity'] \
+                                    * m['stiffness']
+            units[trap + 'Force'] = 'pN'
+
+        # invert PM force, is not as expected in the raw data
+        # data.pmYForce = -data.pmYForce
+
+        # calculate mean force per axis, only meaningful for two traps
+        data['xForce'] = (data.pmXForce + data.aodXForce) / 2
+        data['yForce'] = (data.pmYForce - data.aodYForce) / 2
+
+        units['xForce'] = 'pN'
+        units['yForce'] = 'pN'
+
+        return meta, units, data
 
     def getPsd(self):
         """
@@ -528,7 +557,7 @@ class TxtMpiSource(BaseSource):
             'cornerFrequency': float,
             'zeroOffset': float,
             'stiffness': float,
-            'displacementSensitivity': float,
+            'displacementSensitivity': lambda x: 1/float(x),
 
             # bead
             'beadDiameter': float,
