@@ -21,3 +21,14 @@ class TweezersCollection(IndexedOrderedDict):
                 self.update(value)
 
         return self.sorted()
+
+    def filter(self, filterStr):
+        # todo docstring
+        # string based filter for keys
+        res = self.__class__()
+        for key in self.keys():
+            if filterStr in key:
+                res[key] = self[key]
+
+        return res
+

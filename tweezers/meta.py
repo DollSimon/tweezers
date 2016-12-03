@@ -85,30 +85,28 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
         Create a :class:`pandas.DataFrame` facet view of the metadata. Useful for facet plotting using
         :class:`seaborn.FacetGrid`.
 
-        Args:
-            beams (list): list of strings describing the available beams (e.g. `['pm', 'aod']`)
-            axes (list): list of strings describing the available measured axes per beam (e.g. `['x', 'y']`)
-
         Returns:
             :class:`pandas.DataFrame`
         """
 
-        facets = {}
+        facets = []
 
         # each axis will be a row in the final dataframe so each of them needs to have all the metadata
         generalMeta = {}
         for key, value in self.items():
             if isinstance(value, self.__class__):
-                facets[key] = value
-                facets[key]['axis'] = key
+                facets.append(value.copy())
+                facets[-1]['axis'] = key
             else:
                 generalMeta[key] = value
 
-        for key, value in facets.items():
-            value.update(generalMeta)
+        # remove not needed keys
+        generalMeta.pop('traps', None)
 
-        # convert to pandas DataFrame
-        facets = pd.DataFrame(list(facets.values()))
+        # turn into a DataFrame
+        facets = pd.DataFrame(facets)
+        # add general data to each row
+        facets = facets.assign(**generalMeta)
 
         return facets
 

@@ -61,33 +61,6 @@ def getAllIds(path, cls=TxtBiotecSource):
     return cls.getAllIds(path)
 
 
-def getIds(names, path, cls=TxtBiotecSource):
-    """
-    Get all IDs from the data structure in the given path whose ID end on the given name string.
-
-    Args:
-        name (str or list): name of the experiment, last section of the ID
-        path (:class:`pathlib.Path`): root path to the data structure
-
-    Returns:
-        :class:`dir`
-    """
-
-    # check if names is a string and convert to list
-    if isinstance(names, str):
-        names = [names]
-
-    ids = getAllIds(path, cls=cls)
-
-    # filter by names
-    resIds = {}
-    for name in names:
-        tmpIds = {key: value for key, value in ids.items() if (key.endswith(name) or key.startswith(name))}
-        resIds.update(tmpIds)
-
-    return resIds
-
-
 def loadSegments(td):
     # todo docstring
     data = TweezersCollection()

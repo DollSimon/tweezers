@@ -9,6 +9,7 @@ from .BaseSource import BaseSource
 import tweezers as t
 from tweezers.ixo.collections import IndexedOrderedDict
 from tweezers.ixo.io import DataFrameJsonDecoder, DataFrameJsonEncoder
+from tweezers.collections import TweezersCollection
 
 
 class TxtBiotecSource(BaseSource):
@@ -87,7 +88,7 @@ class TxtBiotecSource(BaseSource):
         """
 
         pPath = Path(path)
-        m = re.match('^(?P<id>[0-9\-_]{19}.*#\d{3})(?P<trial>-\d{3})?\s(?P<type>[a-zA-Z]+)\.txt$', pPath.name)
+        m = re.match('^(?P<id>[0-9\-_]{19}.*#\d{3})(?P<trial>-\d{3})?\s(?P<type>[a-zA-Z]+)\.[a-zA-Z]{3}$', pPath.name)
         if m:
             trial = None
             if m.group('trial'):
@@ -133,7 +134,7 @@ class TxtBiotecSource(BaseSource):
 
         # get a list of all files and their properties
         files = TxtBiotecSource.getAllFiles(pPath)
-        ids = {}
+        ids = TweezersCollection()
         sharedFiles = {}
 
         # sort files in sharedFiles and actual data files that belong to an individual trial
