@@ -29,7 +29,7 @@ class Fit():
         self.fitError = []
 
     @lazy
-    def fitResult(self):
+    def result(self):
         """
         Attribute to hold the computed fitting parameters.
         """
@@ -37,7 +37,7 @@ class Fit():
         return self.fit()
 
     @lazy
-    def fitY(self):
+    def yFit(self):
         """
         Attribute to hold the y values of the fitted curve. Evaluated lazily.
 
@@ -46,7 +46,7 @@ class Fit():
 
         """
 
-        fit = self.fcn(self.x, *self.fitResult)
+        fit = self.fcn(self.x, *self.result)
         return fit
         
     def rsquared(self):
@@ -58,7 +58,7 @@ class Fit():
             :class:`float`
         """
 
-        ssRes = np.sum((self.y - self.fcn(self.x, *self.fitResult))**2)
+        ssRes = np.sum((self.y - self.fcn(self.x, *self.result))**2)
         ssTot = np.sum((self.y - np.mean(self.y))**2)
         return 1 - ssRes / ssTot
 
@@ -70,8 +70,8 @@ class Fit():
             :numpy:`np.array` and :class:`float`
         """
 
-        residuals = (self.y - self.fitY) / self.fitY
-        meanResidual = np.sum(residuals) / len(self.fitY)
+        residuals = (self.y - self.yFit) / self.yFit
+        meanResidual = np.sum(residuals) / len(self.yFit)
         return residuals, meanResidual
 
     def chisquared(self):
@@ -85,7 +85,7 @@ class Fit():
         if self.std is None or not any(self.std):
             raise AttributeError('No standard deviation data given for χ² computation.')
 
-        chi2 = np.sum((self.y - self.fitY)**2 / self.std**2) / len(self.x)
+        chi2 = np.sum((self.y - self.yFit)**2 / self.std**2) / len(self.x)
         return chi2
 
 
