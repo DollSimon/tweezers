@@ -354,7 +354,7 @@ class TweezersData(TweezersDataBase):
         if not name:
             # converting to integer seconds might cause clashes, better option?
             name = '{:.0f}'.format(tmin)
-            if name in self.analysis['segments'].keys():
+            if name in self.segments.keys():
                 log.warning('Segment key "{}" is being overridden'.format(name))
 
         # insert segment

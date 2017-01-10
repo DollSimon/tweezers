@@ -14,11 +14,12 @@ class TweezersCollection(IndexedOrderedDict):
         # todo docstring
         # flatten a data collection (remove nested collections)
 
-        for key, value in self.items():
-            if isinstance(value, TweezersCollection):
+        keys = list(self.keys())
+
+        for key in keys:
+            if isinstance(self[key], TweezersCollection):
+                self.update(self[key].flatten())
                 self.pop(key)
-                value.flatten()
-                self.update(value)
 
         return self.sorted()
 
