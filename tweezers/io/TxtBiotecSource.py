@@ -88,13 +88,14 @@ class TxtBiotecSource(BaseSource):
         """
 
         pPath = Path(path)
-        m = re.match('^(?P<id>[0-9\-_]{19}.*#\d{3})(?P<trial>-\d{3})?\s(?P<type>[a-zA-Z]+)\.[a-zA-Z]{3}$', pPath.name)
+        m = re.match('^(?P<beadId>[0-9\-_]{19}.*#\d{3})(?P<trial>-\d{3})?\s(?P<type>[a-zA-Z]+)\.[a-zA-Z]{3}$',
+                     pPath.name)
         if m:
-            trial = None
+            ide = None
             if m.group('trial'):
-                trial = '{}{}'.format(m.group('id'), m.group('trial'))
-            res = {'id': m.group('id'),
-                   'trial': trial,
+                ide = '{}{}'.format(m.group('beadId'), m.group('trial'))
+            res = {'beadId': m.group('beadId'),
+                   'id': ide,
                    'type': m.group('type').lower(),
                    'path': pPath}
             return res
@@ -139,16 +140,16 @@ class TxtBiotecSource(BaseSource):
 
         # sort files in sharedFiles and actual data files that belong to an individual trial
         for el in files:
-            if el['trial']:
-                if el['id'] not in ids.keys():
-                    ids[el['id']] = {}
-                if el['trial'] not in ids[el['id']].keys():
-                    ids[el['id']][el['trial']] = {}
-                ids[el['id']][el['trial']][el['type']] = el['path']
+            if el['id']:
+                if el['beadId'] not in ids.keys():
+                    ids[el['beadId']] = {}
+                if el['id'] not in ids[el['beadId']].keys():
+                    ids[el['beadId']][el['id']] = {}
+                ids[el['beadId']][el['id']][el['type']] = el['path']
             else:
-                if el['id'] not in sharedFiles.keys():
-                    sharedFiles[el['id']] = {}
-                sharedFiles[el['id']][el['type']] = el['path']
+                if el['beadId'] not in sharedFiles.keys():
+                    sharedFiles[el['beadId']] = {}
+                sharedFiles[el['beadId']][el['type']] = el['path']
 
         # append a reference to the shared file to each trial
         for idStr, el in ids.items():
@@ -187,7 +188,10 @@ class TxtBiotecSource(BaseSource):
 
         # add id from header file name
         idDict = self.isDataFile(self.header)
-        meta['id'] = idDict['id']
+        if idDict['id']:
+            meta['id'] = idDict['id']
+        else:
+            meta['id'] = idDict['beadId']
 
         # add trap names
         meta['traps'] = meta.subDictKeys()
@@ -251,7 +255,6 @@ class TxtBiotecSource(BaseSource):
 
     def getDataSegment(self, tmin, tmax, chunkN=10000):
         # todo docstring
-        # todo fix reading endinge in read_csv to 'c' when switching to pandas 0.19
 
         # read required information about file and create the chunked iterator
         colHeaders, colUnits = self.readColumnTitles(self.data)
@@ -260,9 +263,9 @@ class TxtBiotecSource(BaseSource):
         firstLine = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine + 1, header=None,
                                 names=colHeaders, nrows=1)
         t0 = firstLine.time.iloc[0]
-        # consider adding dtype=np.float64, when switching to engine='c'
-        iterCsv = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine+1, header=None,
-                              names=colHeaders, iterator=True, chunksize=chunkN, engine='python')
+        iterCsv = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine+2, header=None,
+                              names=colHeaders, iterator=True, chunksize=chunkN, engine='c',
+                              dtype=np.float64)
 
         # read the chunks into memory if they are within the requested limits
         df = []

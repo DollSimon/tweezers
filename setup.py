@@ -14,8 +14,7 @@ LONG_DESCRIPTION = """
 DEPENDENCIES = [# documentation stuff
                 'sphinx',
                 'sphinx_rtd_theme>=0.1',
-                'pytest',
-                'pandas>=0.15',
+                'pandas>=0.19',
                 'numpy>=1.8',
                 'matplotlib>=1.2.1',
                 'scipy',
