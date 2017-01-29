@@ -114,6 +114,7 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
     def update(self, *dicts, **kwargs):
         """
         Update content with key/value pairs from
+        
             * one or more other dictionaries
             * or given key / value pairs
 
