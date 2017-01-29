@@ -111,22 +111,25 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
 
         return facets
 
-    def update(self, E=None, **F):
+    def update(self, *dicts, **kwargs):
         """
-        Update content with key/value pairs from another dictionary.
+        Update content with key/value pairs from
+            * one or more other dictionaries
+            * or given key / value pairs
 
         Args:
-            E:
-            **F:
+            *dicts: one or multiple dictionaries to use for updating
+            **kwargs: key/value pairs (e.g. ``msg='hello world'``) to update
 
         Returns:
-            :class:`tweezers.meta.MetaBaseDict`
+            :class:`.MetaBaseDict`
         """
-        # todo: fix docstring, what is E for
-        # todo make nicer with *E and **F for dictionary or key / value input
-        # we assume E to be a dictionary type (have a .keys() method), F is one anyway
-        todo = [E, F]
-        # loop through the two dicts
+
+        # we assume 'dicts' to be a list of dictionary type objects (have a .keys() method), 'kwargs' is one anyway
+        todo = list(dicts)
+        if kwargs:
+            todo.append(kwargs)
+        # loop through all the dicts in 'todo'
         for el in todo:
             # if an element was given...
             if el:
