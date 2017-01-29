@@ -11,8 +11,6 @@ class TxtFileMpi():
 
     def __init__(self, path):
         """
-        Constructor for TxtFileMpi
-
         Args:
             path (:class:`patlhlib.Path`): path to file to read, if the input is of a different type, it is given to
                                            :class:`pathlibh.Path` to try to create an instance
@@ -79,11 +77,11 @@ class TxtFileMpi():
         Read a data file with a JSON styled header.
 
         Args:
-            get (str): either 'data' or 'header', determines what to return
+            get (`str`): either ``data`` or ``header``, determines what to return
 
         Returns:
-            if 'get' is 'data: columnHeader (:class:`list` of :class:`str`), dataLines (:class:`str`)
-            if 'get' is 'header': headerLines (:class:`list` of :class:`str`)
+            * if ``get`` is ``data`` -- columnHeader (`list` of `str`), dataLines (`str`)
+            * if ``get`` is ``header`` -- headerLines (`list` of `str`)
         """
 
         with self.path.open(encoding='utf-8') as f:

@@ -15,14 +15,14 @@ class PsdComputation:
         Constructor for PsdAnalysis
 
         Args:
-            timeSeries (:class:`pandas.DataFrame`): data frame, PSD will be computed for each column
-            blockLength (float): number of data points per block (default: 2**13)
-            samplingRate (float): sampling frequency of the time series data in [Hz] (default: 80000)
-            overlap (int): The number of datapoints that should overlap. If not ``None``, this will take precedence
+            timeSeries (:class:`pandas.DataFrame`): dataframe, PSD will be computed for each column
+            blockLength (`float`): number of data points per block
+            samplingRate (`float`): sampling frequency of the time series data in [Hz]
+            overlap (`int`): The number of datapoints that should overlap. If not ``None``, this will take precedence
                            over ``nBlocks``. If nothing is given, the overlap is 0.
-            nBlocks (int): The number of blocks determines the overlap between them. If set to ``None``, the number
+            nBlocks (`int`): The number of blocks determines the overlap between them. If set to ``None``, the number
                            is computed such that the overlap is 0.
-            blockData (bool): Should the PSD for each block also be returned?
+            blockData (`bool`): Should the PSD for each block also be returned?
         """
 
         self.timeSeries = timeSeries
@@ -37,8 +37,8 @@ class PsdComputation:
 
     def psd(self):
         """
-        Compute the PSDs for all axes in the data object. The units of the PSD are `<time series units>² /
-        <samplingFreq units>`.
+        Compute the PSDs for all axes in the data object. The units of the PSD are ``<time series units>² /
+        <samplingFreq units>``.
 
         Returns:
             :class:`pandas.DataFrame`
@@ -97,18 +97,21 @@ class PsdComputation:
     @staticmethod
     def computePsd(data, samplingFreq=80000, blockLength=2**13, overlap=0):
         """
-        Compute the PSD using :fcn:`scipy.signal.welch` for each block but do the averaging of the blocks in this
+        Compute the PSD using :func:`scipy.signal.welch` for each block but do the averaging of the blocks in this
         function. This allows to also return the standard deviation of the data for each frequency and the individual
         values as well.
         
         Args:
             data (array-like): 1-D data array
-            samplingFreq (int): sampling frequency of the data
-            blockLength (int): number of data points per block
-            overlap (int): number of overlapping data points of consecutive blocks
+            samplingFreq (`int`): sampling frequency of the data
+            blockLength (`int`): number of data points per block
+            overlap (`int`): number of overlapping data points of consecutive blocks
            
         Returns:
-            frequency, PSD values, PSD standard deviation, PSD values for each block; all as :class:`numpy.ndarray`
+            * frequency (:class:`numpy.ndarray`)
+            * PSD values (:class:`numpy.ndarray`)
+            * PSD standard deviation (:class:`numpy.ndarray`)
+            * PSD values for each block
         """
 
         # the size of each step
@@ -138,8 +141,8 @@ class PsdFitMle(tweezers.ixo.fit.Fit):
         Constructor for PsdFitMle
 
         Args:
-            container (:class:`tweezers.TweezersData`): data container
-            nBlocks (int): number of blocks in the PSD
+            container (:class:`tweezers.container.TweezersData`): data container
+            nBlocks (`int`): number of blocks in the PSD
         """
 
         super().__init__(*args, **kwargs)
@@ -150,8 +153,8 @@ class PsdFitMle(tweezers.ixo.fit.Fit):
         Do the fit following the linear approximation of Norrelyke paper
 
         Returns:
-            D (float): diffusion constant
-            fc (float): corner frequency
+            D (`float`): diffusion constant
+            fc (`float`): corner frequency
         """
 
 
@@ -169,10 +172,10 @@ class PsdFitMle(tweezers.ixo.fit.Fit):
         Calculation of the S coefficients related to the MLE, according to the paper of Norrelyke
 
         Args:
-            P (np.array): Experimental PSD function in [V^2]
+            P (:class:`numpy.array`): Experimental PSD function in [V^2]
 
         Returns:
-            s (list of float): matrix with the S coefficients
+            s (`list` of `float`) -- matrix with the S coefficients
         """
 
         nFreq = len(self.x)
@@ -190,11 +193,11 @@ class PsdFitMle(tweezers.ixo.fit.Fit):
         Calculation of the pre-parameters a and b, according to the paper of Norrelyke
 
         Args:
-            s (list of float): matrix with the S coefficients
-            n (float): number of averaged power spectra (total data points divided by the block length)
+            s (`list` of `float`): matrix with the S coefficients
+            n (`float`): number of averaged power spectra (total data points divided by the block length)
 
         Returns:
-            a, b (float): pre-parameters for the calculation of D and fc
+            a, b (`float`) -- pre-parameters for the calculation of D and fc
         """
 
         a = ((1+1/n)/(s[0][2]*s[2][2]-s[1][2]*s[1][2])) * (s[0][1]*s[2][2]-s[1][1]*s[1][2])
@@ -205,12 +208,13 @@ class PsdFitMle(tweezers.ixo.fit.Fit):
         """Calculate parameters from the factors of the MLE
 
         Args:
-            a, b (float): pre-parameters for the calculation of D and fc
-            n (float): number of averaged power spectra (total data points divided by the block length)
+            a (`float`): pre-parameter for the calculation of D and fc
+            b (`float`): pre-parameter for the calculation of D and fc
+            n (`float`): number of averaged power spectra (total data points divided by the block length)
 
         Returns:
-            D (float): diffusion constant in units of [V]
-            fc (float): corner frequency in units of [Hz]
+            * D (float) -- diffusion constant in units of [V]
+            * fc (float) -- corner frequency in units of [Hz]
 
         """
 
@@ -223,17 +227,18 @@ class PsdFitMle(tweezers.ixo.fit.Fit):
         return D, fc
 
     def mleErrors(self, D, fc, a, b, n):
-        """Function to get the standard deviation of the parameters according to the paper of Norrelyke
+        """
+        Function to get the standard deviation of the parameters according to the paper of Norrelyke
 
         Args:
-            f (np.array): array of the frequencies in units of [Hz]
-            D (float): diffusion constant in units of [V]
-            fc (float): corner frequency in units of [Hz]
-            a, b (float): pre-parameters for the calculation of D and fc
-            n (float): number of averaged power spectra (total data points divided by the block length)
+            f (:class:`numpy.array`): array of the frequencies in units of [Hz]
+            D (`float`): diffusion constant in units of [V]
+            fc (`float`): corner frequency in units of [Hz]
+            a, b (`float`): pre-parameters for the calculation of D and fc
+            n (`float`): number of averaged power spectra (total data points divided by the block length)
 
         Returns:
-            errosMle (np.array): with sigma(D) and sigma(fc)
+            errosMle (:class:`numpy.array`) -- with sigma(D) and sigma(fc)
         """
 
         s = self.mleFactors(self.yFit)
@@ -257,16 +262,16 @@ class PsdFit:
         Constructor for PsdFit
 
         Args:
-            psd (:class:`pandas.DataFrame`): data container, data columns ending with `Std` are interpreted as
+            psd (:class:`pandas.DataFrame`): data container, data columns ending with ``Std`` are interpreted as
                                              standard deviation of the data with the otherwise same column name and
-                                             used for weighted fits, a column `f` must be present with the frequency
+                                             used for weighted fits, a column ``f`` must be present with the frequency
                                              values
             fitCls (:class:`tweezers.ixo.fit.Fit`): class to use for fitting, must implement the methods given in the
                                             reference class
-            minF (float): only data points with frequencies above this limit are fitted
-            maxF (float): only data points with frequencies below this limit are fitted
-            residuals (bool): compute the residuals for the fit, they are added as columns to the PSD fit data
-            others: additional arguments are passed on to the constructor of `fitCls`
+            minF (`float`): only data points with frequencies above this limit are fitted
+            maxF (`float`): only data points with frequencies below this limit are fitted
+            residuals (`bool`): compute the residuals for the fit, they are added as columns to the PSD fit data
+            others: additional arguments are passed on to the constructor of ``fitCls``
         """
 
         self.psd = psd
@@ -292,10 +297,8 @@ class PsdFit:
         returned meta data can describe different things depending on the fitting class used.
 
         Returns:
-             2-element tuple containing
-
-                - **fitParams** (:class:`dict`): fit parameters and metadata as dictionary
-                - **psdFit** (:class:`pandas.DataFrame`): data of the fitted curve
+             * fitParams (:class:`dict`) -- fit parameters and metadata as dictionary
+             * psdFit (:class:`pandas.DataFrame`) -- data of the fitted curve
         """
 
         # check for frequency column
@@ -362,8 +365,8 @@ class PsdFit:
 
         Args:
             f (:class:`numpy.array`): frequency in units of [Hz]
-            D (float): diffusion constant in units of [V]
-            fc (float): corner frequency in units of [Hz]
+            D (`float`): diffusion constant in units of [V]
+            fc (`float`): corner frequency in units of [Hz]
 
         Returns:
             :class:`numpy.array`

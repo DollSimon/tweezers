@@ -7,23 +7,32 @@ from tweezers import TweezersCollection
 from tweezers.ixo.collections import isNestedDict
 
 
-def loadId(idStr, cls=TxtBiotecSource):
-    #ToDo: docstring
+def loadId(idDict, cls=TxtBiotecSource):
+    """
+    Create :class:`tweezers.TweezersData` instance from given ID-`dict` using the specified data source.
 
-    return TweezersData(cls.fromIdDict(idStr))
+    Args:
+        idDict (`dict`): ID dictionary
+        cls (:class:`tweezers.io.BaseSource`): data source class
+
+    Returns:
+        Child of :class:`tweezers.io.BaseSource`
+    """
+
+    return TweezersData(cls.fromIdDict(idDict))
 
 def loadIds(ids, cls=TxtBiotecSource):
     """
-    Load all data names (IDs) given in the input list.
-    Args:
-        ids (dict): :class:`dict` with ID strings as keys and :class:`dict` as values. The value is passed on to the
-        `fromId` method of the data source class provided in `cls`. Also works for nested dictionaries.
+    Load all IDs given in the input list.
 
-        cls (class): Type of the data source to use. By default this is
-        :class:`tweezers.io.TxtBiotecSource.TxtBiotecSource`.
+    Args:
+        ids (`dict`): `dict` with ID strings as keys and `dict` as values. The value is passed on to the
+            ``fromId`` method of the data source class provided in ``cls``. Also works for nested dictionaries.
+
+        cls: Type of the data source to use. By default this is :class:`tweezers.io.TxtBiotecSource`.
 
     Returns:
-        :class:`list` of :class:`tweezers.TweezersData`
+        `list` of :class:`tweezers.TweezersData`
     """
 
     # get sorted list of ids
@@ -52,17 +61,25 @@ def getAllIds(path, cls=TxtBiotecSource):
 
     Args:
         path (:class:`pathlib.Path`): root path of the data structure
-        cls: class that implements the `getAllIds` method
+        cls: class that implements the ``getAllIds`` method
 
     Returns:
-        :class:`dir`
+        `dir`
     """
 
     return cls.getAllIds(path)
 
 
 def loadSegments(td):
-    # todo docstring
+    """
+    Load all segments from the given :class:`tweezers.TweezersCollection`.
+    Args:
+        td (:class:`tweezers.TweezersCollection`): collection to read segements from
+
+    Returns:
+        :class:`tweezers.TweezersCollection`
+    """
+
     data = TweezersCollection()
     for t in td.values():
         if not t.segments:

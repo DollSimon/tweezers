@@ -2,17 +2,18 @@ from tweezers.ixo.collections import IndexedOrderedDict
 
 
 class TweezersCollection(IndexedOrderedDict):
-    # ToDo: Docstring
-
-    @property
-    def length(self):
-        #todo docstring
-
-        return len(self)
+    """
+    Collection of :class:`.TweezersData`. Inherits from
+    :class:`.IndexedOrderedDict` with keys being ID names.
+    """
 
     def flatten(self):
-        # todo docstring
-        # flatten a data collection (remove nested collections)
+        """
+        Flatten a data collection, i.e. remove nested collections.
+
+        Returns:
+            :class:`.TweezersCollection`
+        """
 
         keys = list(self.keys())
 
@@ -24,7 +25,15 @@ class TweezersCollection(IndexedOrderedDict):
         return self.sorted()
 
     def filter(self, filterStr):
-        # todo docstring
+        """
+        Filter keys based on whether they contain a substring or not.
+
+        Args:
+            filterStr (`str`): substring to filter keys for
+
+        Returns:
+            :class:`.TweezersCollection`
+        """
         # string based filter for keys
         res = self.__class__()
         for key in self.keys():

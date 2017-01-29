@@ -33,7 +33,17 @@ class BaseSource:
         raise NotImplementedError()
 
     def getDataSegment(self, tmin, tmax, chunkN=10000):
-        # todo docstring
+        """
+        Returns the data between ``tmin`` and ``tmax``.
+
+        Args:
+            tmin (float): minimum data timestamp
+            tmax (float): maximum data timestamp
+            chunkN (int): number of rows to read per chunk
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
 
         raise NotImplementedError()
 
@@ -73,7 +83,7 @@ class BaseSource:
         This method is run after importing the data and can be used to modify the data and metadata or units.
 
         Args:
-            meta: :class:`tweezers.MetaDict`
+            meta (:class:`tweezers.MetaDict`): :class:`tweezers.MetaDict`
             units: :class:`tweezers.UnitDict`
             data: :class:`pandas.DataFrame`
 
@@ -104,11 +114,21 @@ class BaseSource:
         raise NotImplementedError()
 
     def getSegments(self):
-        # todo docstring
+        """
+        Return a list of all segments.
+
+        Returns:
+            :class:`tweezers.ixo.collections.IndexedOrderedDict`
+        """
 
         raise NotImplementedError()
 
     def writeSegments(self, segments):
-        # todo docstring
+        """
+        Write segment information to data structure.
+
+        Args:
+            segments (:class:`tweezers.ixo.collections.IndexedOrderedDict`): segment dictionary
+        """
 
         raise NotImplementedError()

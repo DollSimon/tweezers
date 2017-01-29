@@ -7,7 +7,10 @@ from tweezers.plot.utils import plotSegment
 
 
 class CollectionPlot:
-    #ToDo docstring
+    """
+    Interactive plot for looking at all datasets in a :class:`tweezers.TweezersCollection` for use in a Jupyter
+    notebook.
+    """
     
     def __init__(self, data, fcn, **kwargs):
         self.tc = data.flatten()
@@ -68,7 +71,10 @@ class CollectionPlot:
 
 
 class SegmentSelector(CollectionPlot):
-    #ToDo docstring
+    """
+    Interactive plotting of all the datasets in a :class:`tweezers.TweezersCollection` which allows to select
+    segments graphically. To be used in a Jupyter notebook.
+    """
 
     color = 'red'
     selector = None

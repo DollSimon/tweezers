@@ -8,7 +8,8 @@ from tweezers.ixo.collections import AttrDictMixin
 
 class MetaBaseDict(OrderedDict, AttrDictMixin):
     """
-    An ordered dictionary (:class:`collections.OrderedDict`) that returns a default value if a key does not exist and
+    An ordered dictionary (:class:`collections.OrderedDict`) with attribute styled element access (
+    :class:`tweezers.ixo.collections.AttrDictMixin`) that returns a default value if a key does not exist and
     prints a warning.
     The convention for key style is "camelCase" (start lower case, new words begin upper case).
 
@@ -56,8 +57,8 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
         at the end.
 
         Args:
-            oldKey (str): old key name
-            newKey (str): new key name
+            oldKey (`str`): old key name
+            newKey (`str`): new key name
         """
 
         if oldKey in self:
@@ -68,7 +69,7 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
         Delete one or multiple keys from the dictionary.
 
         Args:
-            key (str): one or mulitple keys to (recursively) delete from the dictionary
+            key (`str`): one or mulitple keys to (recursively) delete from the dictionary
         """
 
         delKeys = args
@@ -111,6 +112,18 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
         return facets
 
     def update(self, E=None, **F):
+        """
+        Update content with key/value pairs from another dictionary.
+
+        Args:
+            E:
+            **F:
+
+        Returns:
+            :class:`tweezers.meta.MetaBaseDict`
+        """
+        # todo: fix docstring, what is E for
+        # todo make nicer with *E and **F for dictionary or key / value input
         # we assume E to be a dictionary type (have a .keys() method), F is one anyway
         todo = [E, F]
         # loop through the two dicts
@@ -135,7 +148,7 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
         Returns the keys of elements which are :class:`tweezers.meta.MetaBaseDict` or inherited from it.
 
         Returns:
-            list of strings
+            `list` of `str`
         """
 
         keys = [key for key, value in self.items() if isinstance(value, MetaBaseDict)]
@@ -144,7 +157,7 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
 
 class MetaDict(MetaBaseDict):
     """
-    An class to hold metadata.
+    A class to hold metadata.
     """
 
     defaults = {'title': 'no title',

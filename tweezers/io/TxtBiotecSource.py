@@ -14,9 +14,8 @@ from tweezers.collections import TweezersCollection
 
 class TxtBiotecSource(BaseSource):
     """
-    Data source for *.txt files from the Biotec tweezers.
+    Data source for \*.txt files from the Biotec tweezers.
     """
-    # todo: get segment method to only read segment data
 
     # hold paths to respective files
     header = None
@@ -34,9 +33,12 @@ class TxtBiotecSource(BaseSource):
         Args:
             data (:class:`pathlib.Path`): path to data file to read, if the input is of a different type, it is given to
                                            :class:`pathlib.Path` to try to create an instance
-            psd (:class:`pathlib.Path`): path to psd file to read, similar to `data` input
+            analysis (:class:`pathlib.Path`): path to analysis file
+            psd (:class:`pathlib.Path`): path to psd file
+            ts (:class:`pathlib.Path`): path to ts file
+            screenshot (:class:`pathlib.Path`): path to screenshot file
+            kwargs: forwared to super class
         """
-        #todo fix docstring
 
         super().__init__(**kwargs)
 
@@ -104,7 +106,14 @@ class TxtBiotecSource(BaseSource):
 
     @staticmethod
     def getAllFiles(path):
-        # todo docstring
+        """
+        Return a recursive list of all valid data files within a given path.
+        Args:
+            path (:class:`pathlib.Path`): root path to search for valid data files
+
+        Returns:
+            :obj:`list` of :obj:`str`
+        """
 
         pPath = Path(path)
         files = []
@@ -198,6 +207,54 @@ class TxtBiotecSource(BaseSource):
 
         return meta, units
 
+    def getData(self):
+        """
+        Return the experiment data.
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        data = self.readToDataframe(self.data)
+        return data
+
+    def getDataSegment(self, tmin, tmax, chunkN=10000):
+        """
+        Returns the data between ``tmin`` and ``tmax`` by reading the datafile chunkwise until ``tmax`` is reached.
+
+        Args:
+            tmin (float): minimum data timestamp
+            tmax (float): maximum data timestamp
+            chunkN (int): number of rows to read per chunk
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        # read required information about file and create the chunked iterator
+        colHeaders, colUnits = self.readColumnTitles(self.data)
+        nHeaderLine = self.findHeaderLine(self.data)
+        # read the first data line to allow conversion between absolute and relative time
+        firstLine = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine + 1, header=None,
+                                names=colHeaders, nrows=1)
+        t0 = firstLine.time.iloc[0]
+        iterCsv = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine+2, header=None,
+                              names=colHeaders, iterator=True, chunksize=chunkN, engine='c',
+                              dtype=np.float64)
+
+        # read the chunks into memory if they are within the requested limits
+        df = []
+        for chunk in iterCsv:
+            if chunk['time'].iloc[0] - t0 > tmax:
+                # stop reading if the upper time limit was reached
+                iterCsv.close()
+                break
+            selection = chunk[(chunk['time'] - t0 >= tmin) & (chunk['time'] - t0 <= tmax)]
+            df.append(selection)
+
+        # return concatenated dataframe with all the requested data
+        return pd.concat(df, ignore_index=True)
+
     def getPsd(self):
         """
         Returns the power spectral density (PSD) used for the calibration of the experiment by the data source.
@@ -242,44 +299,6 @@ class TxtBiotecSource(BaseSource):
                   inplace=True)
         return ts
 
-    def getData(self):
-        """
-        Return the experiment data.
-
-        Returns:
-            :class:`pandas.DataFrame`
-        """
-
-        data = self.readToDataframe(self.data)
-        return data
-
-    def getDataSegment(self, tmin, tmax, chunkN=10000):
-        # todo docstring
-
-        # read required information about file and create the chunked iterator
-        colHeaders, colUnits = self.readColumnTitles(self.data)
-        nHeaderLine = self.findHeaderLine(self.data)
-        # read the first data line to allow conversion between absolute and relative time
-        firstLine = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine + 1, header=None,
-                                names=colHeaders, nrows=1)
-        t0 = firstLine.time.iloc[0]
-        iterCsv = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine+2, header=None,
-                              names=colHeaders, iterator=True, chunksize=chunkN, engine='c',
-                              dtype=np.float64)
-
-        # read the chunks into memory if they are within the requested limits
-        df = []
-        for chunk in iterCsv:
-            if chunk['time'].iloc[0] - t0 > tmax:
-                # stop reading if the upper time limit was reached
-                iterCsv.close()
-                break
-            selection = chunk[(chunk['time'] - t0 >= tmin) & (chunk['time'] - t0 <= tmax)]
-            df.append(selection)
-
-        # return concatenated dataframe with all the requested data
-        return pd.concat(df, ignore_index=True)
-
     def postprocessData(self, meta, units, data):
         """
         Modify the time array to use relative times (but keep the absolute time) and calculate forces.
@@ -320,8 +339,13 @@ class TxtBiotecSource(BaseSource):
 
         return meta, units, data
 
-    def getAnalysisDict(self):
-        #Todo docstring
+    def readAnalysisFile(self):
+        """
+        Read the content of the analysis file from disk.
+
+        Returns:
+            :class:`tweezers.ixo.utils.IndexedOrderedDict`
+        """
 
         if not self.analysis:
             return IndexedOrderedDict()
@@ -330,8 +354,13 @@ class TxtBiotecSource(BaseSource):
             analysisDict = json.load(f, object_pairs_hook=IndexedOrderedDict, cls=DataFrameJsonDecoder)
         return analysisDict
 
-    def writeAnalysisDict(self, analysisDict):
-        # todo docstring
+    def writeAnalysisFile(self, analysisDict):
+        """
+        Write the analysis file to disk.
+
+        Args:
+            analysisDict (:class:`tweezers.ixo.utils.IndexedOrderedDict`): analysis dictionary
+        """
 
         # build filename if it does not exist
         if not self.analysis:
@@ -350,12 +379,17 @@ class TxtBiotecSource(BaseSource):
             :class:`collections.OrderedDict`
         """
 
-        return self.getAnalysisDict().get('analysis', OrderedDict())
+        return self.readAnalysisFile().get('analysis', OrderedDict())
 
     def writeAnalysis(self, analysis, segment=None):
-        # todo: docstring
+        """
+        Write the analysis data back to disk.
 
-        analysisDict = self.getAnalysisDict()
+        Args:
+            analysis (:class:`collections.OrderedDict`): the analysis data to store
+        """
+
+        analysisDict = self.readAnalysisFile()
 
         # should we only update the segment?
         if segment is not None:
@@ -367,23 +401,34 @@ class TxtBiotecSource(BaseSource):
             # sort analysis keys and store in the proper dictionary
             analysisDict['analysis'] = OrderedDict(sorted(analysis.items()))
 
-        self.writeAnalysisDict(analysisDict)
+        self.writeAnalysisFile(analysisDict)
 
     def getSegments(self):
-        # todo docstring
-        return self.getAnalysisDict().get('segments', IndexedOrderedDict())
+        """
+        Return a list of all segments.
+
+        Returns:
+            :class:`tweezers.ixo.collections.IndexedOrderedDict`
+        """
+
+        return self.readAnalysisFile().get('segments', IndexedOrderedDict())
 
     def writeSegments(self, segments):
-        #todo docstring
+        """
+        Write segment information back to disk.
 
-        analysisDict = self.getAnalysisDict()
+        Args:
+            segments (:class:`tweezers.ixo.collections.IndexedOrderedDict`): segment dictionary
+        """
+
+        analysisDict = self.readAnalysisFile()
         analysisDict['segments'] = segments
-        self.writeAnalysisDict(analysisDict)
+        self.writeAnalysisFile(analysisDict)
 
 
     def findHeaderLine(self, file):
         """
-        Find the line number of the first header line, searches for '### DATA ###'
+        Find the line number of the first header line, searches for ``### DATA ###``
 
         Args:
             file (:class:`pathlib.Path`): path to file

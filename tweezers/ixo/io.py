@@ -19,7 +19,10 @@ def getSubdirs(path):
 
 
 class DataFrameJsonEncoder(json.JSONEncoder):
-    # todo docstring
+    """
+    JSON encoder that allows writing a :class:`pandas.DataFrame` to a JSON file.
+    """
+
     def default(self, obj):
         if isinstance(obj, pd.DataFrame):
             return {
@@ -45,7 +48,9 @@ class DataFrameJsonEncoder(json.JSONEncoder):
 
 
 class DataFrameJsonDecoder(json.JSONDecoder):
-    # todo docstring
+    """
+    JSON decoder that allows reading a :class:`pandas.DataFrame` from a JSON file.
+    """
     def __init__(self, *args, **kwargs):
         json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
 

@@ -3,7 +3,17 @@ from matplotlib.patches import Rectangle
 
 
 def peekPlot(td, *cols):
-    # ToDo: docstring
+    """
+    Quickly plot content of a dataset :class:`tweezers.container.TweezersData`. Best used within a Jupyter notebook.
+
+    Args:
+        td (:class:`tweezers.container.TweezersData`): dataset to peek into
+        *cols (`str` or `list` of `str`): data column(s) to plot
+
+    Returns:
+        * fig (:class:`matplotlib.figure.Figure`) -- figure in which data is plotted
+        * ax (:class:`matplotlib.axes.Axes`) -- axes in which data is plotted
+    """
 
     if not cols:
         # if no columns were given, plot all force columns
@@ -30,6 +40,16 @@ def peekPlot(td, *cols):
 
 
 def plotSegment(ax, xmin, xmax, facecolor='red', alpha=0.2):
-    # todo: docstring
+    """
+    Highleight segment in plotted data.
+
+    Args:
+        ax (:class:`matplotlib.axis.Axis`): axes to plot to
+        xmin (`float`): starting x value of segment
+        xmax (`float`): ending x value of segment
+        facecolor: highlighting color, see :class:`matplotlib.patches.Rectangle`
+        alpha: highlighting alpha, see :class:`matplotlib.patches.Rectangle`
+    """
+
     (ymin, ymax) = ax.get_ylim()
     ax.add_patch(Rectangle((xmin, ymin), xmax - xmin, ymax - ymin, facecolor=facecolor, alpha=alpha))

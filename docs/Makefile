@@ -50,7 +50,7 @@ help:
 	@echo "  coverage   to run coverage check of the documentation (if enabled)"
 
 apidoc:
-	sphinx-apidoc -o source/ -f ../tweezers/
+	sphinx-apidoc -e -o source/ -f ../tweezers/
 
 clean:
 	rm -rf $(BUILDDIR)/*

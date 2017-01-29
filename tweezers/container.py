@@ -13,8 +13,10 @@ from tweezers.ixo.collections import IndexedOrderedDict
 
 
 class TweezersDataBase:
-    # todo: docstring
-    # base class for TweezersData and TweezersDataSegment, implement stuff that both should be able to do here
+    """
+    Base class for storing tweezers data. This class should implement methods and attributes that both,
+    the :class:`.TweezersData` and the :class:`.TweezersDataSegment` require.
+    """
 
     @lazy
     def meta(self):
@@ -23,7 +25,7 @@ class TweezersDataBase:
         when required.
 
         Returns:
-            :class:`tweezers.MetaDict`
+            :class:`.MetaDict`
         """
 
         log.debug('Reading metadata from data source.')
@@ -38,7 +40,7 @@ class TweezersDataBase:
         ``getMetadata`` method as well. Evaluated lazily.
 
         Returns:
-            :class:`tweezers.UnitDict`
+            :class:`.UnitDict`
         """
 
         meta, units = self.source.getMetadata()
@@ -60,7 +62,7 @@ class TweezersDataBase:
     @lazy
     def psd(self):
         """
-        Attribute to hold the power spectrum density. If called before :meth:`tweezers.Data.computePsd`,
+        Attribute to hold the power spectrum density. If called before :meth:`.computePsd`,
         it holds the PSD from the data source, otherwise the newly computed one.
         """
 
@@ -79,11 +81,12 @@ class TweezersDataBase:
     def averageData(self, nsamples=10):
         """
         Downsample the data by averaging ``nsamples``.
+
         Args:
-            nsamples (int): number of samples to average
+            nsamples (`int`): number of samples to average
 
         Returns:
-            :class:`tweezers.TweezersData`
+            :class:`.TweezersData`
         """
 
         group = self.data.groupby(self.data.index // nsamples)
@@ -97,12 +100,12 @@ class TweezersDataBase:
     def computePsd(self, **kwargs):
         """
         Compute the power spectrum density from the experiments time series which is stored in the ``ts`` attribute.
-        All arguments are forwarded to :class:`tweezers.psd.PsdComputation`.
-        This method returns a copy of the initial :class:`tweezers.TweezersData` object to prevent e.g. overwriting of
+        All arguments are forwarded to :class:`.PsdComputation`.
+        This method returns a copy of the initial :class:`.TweezersData` object to prevent e.g. overwriting of
         data that was read from files.
 
         Returns:
-            :class:`tweezers.TweezersData`
+            :class:`.TweezersData`
         """
 
         # use the timeseries sampling rate as default if none is given as user input (in kwargs)
@@ -135,7 +138,7 @@ class TweezersDataBase:
     def psdFit(self):
         """
         Attribute to hold the Lorentzian fit to the power spectrum density. If called before
-        :meth:`tweezers.Data.fit_psd`, it holds the fit from the data source, otherwise the newly computed one.
+        :meth:`.fit_psd`, it holds the fit from the data source, otherwise the newly computed one.
         """
 
         log.debug('Reading PSD fit from data source.')
@@ -143,12 +146,12 @@ class TweezersDataBase:
 
     def fitPsd(self, **kwargs):
         """
-        Fits the PSD. All input is forwarded to the :class:`tweezers.analysis.psd.PsdFit` object.
-        This method returns a copy of the initial :class:`tweezers.TweezersData` object to prevent e.g. overwriting of
+        Fits the PSD. All input is forwarded to the :class:`.PsdFit` object.
+        This method returns a copy of the initial :class:`.TweezersData` object to prevent e.g. overwriting of
         data that was read from files.
 
         Returns:
-            :class:`tweezers.TweezersData`
+            :class:`.TweezersData`
         """
 
         # create copy that will be returned
@@ -162,11 +165,11 @@ class TweezersDataBase:
 
     def thermalCalibration(self):
         """
-        Perform a thermal calibration. Requires :meth:`tweezers.TweezersData.psd` and
-        :meth:`tweezers.TweezersData.psdFit`.
+        Perform a thermal calibration. Requires :meth:`.psd` and
+        :meth:`.psdFit`.
 
         Returns:
-            :class:`tweezers.TweezersData`
+            :class:`.TweezersData`
         """
 
         # get axes
@@ -202,9 +205,9 @@ class TweezersDataBase:
 
         Args:
             data (:class:`pandas.DataFrame`): input data
-            colName (str): column name of the "value" column
-            meta (list): list of strings, the metadata is searched for these keys and they are added as additional
-                         columns if available
+            colName (`str`): column name of the "value" column
+            meta (`list` of `str`): list of strings, the metadata is searched for these keys and they are added as
+                additional columns if available
 
         Returns:
             :class:`pandas.DataFrame`
@@ -238,55 +241,44 @@ class TweezersDataBase:
         return resDf
 
     def peek(self, *cols):
-        # ToDo: docstring
+        """
+        Show a :func:`.peekPlot` of the current data.
+
+        Args:
+            *cols: see :func:`.peekPlot`
+
+        Returns:
+            :class:`.TweezersData`
+        """
+
         peekPlot(self, *cols)
         return self
 
     def peekPsd(self):
-        # ToDo: docstring
+        """
+        Plots the PSD, see :class:`.PsdFitPlot`
+
+        Returns:
+            :class:`.TweezersData`
+        """
+
         PsdFitPlot(self, residuals=False)
         return self
 
 
 class TweezersData(TweezersDataBase):
     """
-    TweezersData structure for tweezers experiment data and metadata. It requires a data source object that provides certain
-    methods That populate the properties of this class. Note that not all of these methods must be implemented,
-    depending of your usage of the class. However, if your data source does not implement a certain method, the code
+    TweezersData structure for tweezers experiment data and metadata. It requires a data source object that
+    implements the methods of :class:`.BaseSource` to populate its properties.
+    Note that not all of these methods must be implemented, depending of your usage of the class. However, if
+    your data source does not implement a certain method, the code
     will fail only when the according property is called since all of them are evaluated lazily.
-
-    Currently supported properties that require a specific method in the data source:
-
-        ============ ================================== ===================================
-        property     required method in data source     data type
-        ============ ================================== ===================================
-        meta         getMetadata                       :class:`tweezers.MetaDict`
-        units        getMetadata                       :class:`tweezers.UnitDict`
-        data         getData                           :class:`pandas.DataFrame`
-        psdSource    getPsd                            :class:`pandas.DataFrame`
-        ts           getTs                             :class:`pandas.DataFrame`
-        ============ ================================== ===================================
-
-    The properties require standardized keys for some fields. Additional fields can be present but the ones listed
-    here must have the specified names (really? rethink!).
-
-        =============== =============================================================================================
-        property        standardized keys
-        =============== =============================================================================================
-        meta / units    TODO
-        data            ``PMxdiff``, ``PMydiff``, ``AODxdiff``, ``AODydiff``
-        psdSource / psd ``f``, ``PMx``, ``PMy``, ``AODx``, ``AODy``, ``fitPMx``, ``fitPMy``, ``fitAODx``, ``fitAODy``
-        ts              ``PMxdiff``, ``PMydiff``, ``AODxdiff``, ``AODydiff``
-        =============== =============================================================================================
     """
-    # todo rework docstring
 
     def __init__(self, source=None):
         """
-        Constructor for Data
-
         Args:
-            source: a data source object like e.g. :class:`tweezers.io.source.TxtMpiSource`
+            source (:class:`.BaseSource`): a data source object like e.g. :class:`.TxtBiotecSource`
         """
 
         super().__init__()
@@ -328,7 +320,12 @@ class TweezersData(TweezersDataBase):
 
     @lazy
     def segments(self):
-        # todo docstring
+        """
+        Attribute that holds the segment information, evaluated lazily.
+
+        Returns:
+            :class:`.IndexedOrderedDict`
+        """
 
         log.debug('Reading segments from data source')
         return self.source.getSegments()
@@ -338,17 +335,25 @@ class TweezersData(TweezersDataBase):
         Save the analysis data back to disk.
 
         Returns:
-            :class:`tweezers.TweezersData`
+            :class:`.TweezersData`
         """
-        # todo docstring update
 
         self.source.writeAnalysis(self.analysis)
         self.source.writeSegments(self.segments)
         return self
 
     def addSegment(self, tmin, tmax, name=None):
-        # ToDo: docstring
-        # tmin and tmax are relative times
+        """
+        Add a segment with the given limits.
+
+        Args:
+            tmin (`float`): relative starting time of the segment
+            tmax (`float`): relative end time of the segment
+            name (`str`, optional): name (ID) of the segment, defaults to ``int(tmin)``
+
+        Returns:
+            :class:`.TweezersData`
+        """
 
         # create a standard name if none is given
         if not name:
@@ -365,13 +370,29 @@ class TweezersData(TweezersDataBase):
         return self
 
     def deleteSegment(self, segId):
-        # todo: docstring
+        """
+        Delete the segment with the given name or numeric index.
+
+        Args:
+            segId (`int` or `str`): name or numeric index of the segment to delete
+
+        Returns:
+            :class:`.TweezersData`
+        """
 
         self.segments.pop(segId)
         return self
 
     def getSegment(self, segId):
-        # todo: docstring
+        """
+        Returns the segment with the given name or numeric index.
+
+        Args:
+            segId (`int` or `str`): name or numeric index of the segment to return
+
+        Returns:
+            :class:`.TweezersDataSegment`
+        """
 
         # check if segments are available
         if not self.segments:
@@ -381,10 +402,17 @@ class TweezersData(TweezersDataBase):
 
 
 class TweezersDataSegment(TweezersDataBase):
-    # todo docstring
+    """
+    Class to hold the data of a data segment. Can be used in the same way as :class:`.TweezersData`.
+    """
 
     def __init__(self, tdInstance, segmentId):
-        # todo: docstring
+        """
+        Args:
+            tdInstance (:class:`.TweezersData`): instance to get the segment from
+            segmentId (`int` or `str`): name or numeric index of the segment to return
+        """
+
         super().__init__()
         self.__dict__ = copy.deepcopy(tdInstance.__dict__)
         # get the proper key in case numeric indexing was used
@@ -429,7 +457,7 @@ class TweezersDataSegment(TweezersDataBase):
         Save the analysis data back to disk.
 
         Returns:
-            :class:`tweezers.TweezersData`
+            :class:`.TweezersData`
         """
 
         self.source.writeAnalysis(self.analysis, segment=self.meta['segment'])

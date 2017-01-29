@@ -20,8 +20,6 @@ class TxtMpiSource(BaseSource):
 
     def __init__(self, data=None, psd=None, ts=None):
         """
-        Constructor for TxtMpiSource
-
         Args:
             path (:class:`patlhlib.Path`): path to file to read, if the input is of a different type, it is given to
                                            :class:`pathlibh.Path` to try to create an instance
@@ -151,7 +149,17 @@ class TxtMpiSource(BaseSource):
         return data
 
     def postprocessData(self, meta, units, data):
-        # todo docstring
+        """
+        Create time array, calculate forces etc.
+
+        Args:
+            meta (:class:`tweezers.MetaDict`): meta dictionary
+            units (:class:`tweezers.UnitDict`): units dictionary
+            data (:class:`pandas.DataFrame`): data
+
+        Returns:
+            meta, units, data
+        """
 
         data['time'] = np.arange(0, meta['dt'] * len(data), meta['dt'])
         units['time'] = 's'
