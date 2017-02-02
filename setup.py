@@ -11,6 +11,7 @@ LONG_DESCRIPTION = """
  of dual-trap optical tweezers experiments.
 """
 
+# todo: fix requirements, check which ones are actually required and in which version
 DEPENDENCIES = [# documentation stuff
                 'sphinx',
                 'sphinx_rtd_theme>=0.1',
