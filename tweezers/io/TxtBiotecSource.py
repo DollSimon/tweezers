@@ -28,8 +28,6 @@ class TxtBiotecSource(BaseSource):
 
     def __init__(self, data=None, analysis=None, psd=None, ts=None, screenshot=None, **kwargs):
         """
-        Constructor for TxtBiotecSource
-
         Args:
             data (:class:`pathlib.Path`): path to data file to read, if the input is of a different type, it is given to
                                            :class:`pathlib.Path` to try to create an instance
@@ -86,7 +84,7 @@ class TxtBiotecSource(BaseSource):
             path (:class:`pathlib.Path`): file to check
 
         Returns:
-            :class:`dict` with `id` and `type`
+            `dict` with ``id`` and ``type``
         """
 
         pPath = Path(path)
@@ -108,11 +106,12 @@ class TxtBiotecSource(BaseSource):
     def getAllFiles(path):
         """
         Return a recursive list of all valid data files within a given path.
+
         Args:
             path (:class:`pathlib.Path`): root path to search for valid data files
 
         Returns:
-            :obj:`list` of :obj:`str`
+            `list` of `dict`
         """
 
         pPath = Path(path)
@@ -137,7 +136,7 @@ class TxtBiotecSource(BaseSource):
             path (:class:`pathlib.Path`): root path for searching
 
         Returns:
-            :class:`dir`
+            `dict`
         """
 
         pPath = Path(path)
@@ -223,9 +222,9 @@ class TxtBiotecSource(BaseSource):
         Returns the data between ``tmin`` and ``tmax`` by reading the datafile chunkwise until ``tmax`` is reached.
 
         Args:
-            tmin (float): minimum data timestamp
-            tmax (float): maximum data timestamp
-            chunkN (int): number of rows to read per chunk
+            tmin (`float`): minimum data timestamp
+            tmax (`float`): maximum data timestamp
+            chunkN (`int`): number of rows to read per chunk
 
         Returns:
             :class:`pandas.DataFrame`
@@ -299,23 +298,24 @@ class TxtBiotecSource(BaseSource):
                   inplace=True)
         return ts
 
-    def postprocessData(self, meta, units, data):
+    @staticmethod
+    def calculateForce(meta, units, data):
         """
-        Modify the time array to use relative times (but keep the absolute time) and calculate forces.
+        Calculate forces from Diff signal and calibration values.
 
         Args:
-            meta: :class:`tweezers.MetaDict`
-            units: :class:`tweezers.UnitDict`
-            data: :class:`pandas.DataFrame`
+            meta (:class:`.MetaDict`): metadata
+            units (:class:`.UnitDict`): unit metadata
+            data (:class:`pandas.DataFrame`): data
 
         Returns:
-            meta, units, data
-        """
 
-        # create relative time column but keep absolute time
-        data['absTime'] = data.time.copy()
-        data.loc[:, 'time'] -= data.loc[0, 'time']
-        units['absTime'] = 's'
+            Updated versions of the input parameters
+
+            * meta (:class:`.MetaDict`)
+            * units (:class:`.UnitDict`)
+            * data (:class:`pandas.DataFrame`)
+        """
 
         # calculate force per trap and axis
         for trap in meta['traps']:
@@ -333,8 +333,39 @@ class TxtBiotecSource(BaseSource):
         units['xForce'] = 'pN'
         units['yForce'] = 'pN'
 
+        return meta, units, data
+
+    def postprocessData(self, meta, units, data):
+        """
+        Modify the time array to use relative times (but keep the absolute time) and calculate forces.
+
+        Args:
+            meta: :class:`tweezers.MetaDict`
+            units: :class:`tweezers.UnitDict`
+            data: :class:`pandas.DataFrame`
+
+        Returns:
+            Updated versions of the input parameters
+
+            * meta (:class:`.MetaDict`)
+            * units (:class:`.UnitDict`)
+            * data (:class:`pandas.DataFrame`)
+        """
+
+        # create relative time column but keep absolute time
+        data['absTime'] = data.time.copy()
+        data.loc[:, 'time'] -= data.loc[0, 'time']
+        units['absTime'] = 's'
+
+        # calculate forces
+        meta, units, data = self.calculateForce(meta, units, data)
+
         # calculate bead distance centre to centre, only meaningful for two trapped beads
+        data['xDist'] = data.pmXBead - data.aodXBead
+        data['yDist'] = data.pmYBead - data.aodYBead
         data['distance'] = np.sqrt((data.pmYBead - data.aodYBead)**2 + (data.pmXBead - data.aodXBead)**2)
+        units['xDist'] = 'nm'
+        units['yDist'] = 'nm'
         units['distance'] = 'nm'
 
         return meta, units, data
@@ -424,7 +455,6 @@ class TxtBiotecSource(BaseSource):
         analysisDict = self.readAnalysisFile()
         analysisDict['segments'] = segments
         self.writeAnalysisFile(analysisDict)
-
 
     def findHeaderLine(self, file):
         """
