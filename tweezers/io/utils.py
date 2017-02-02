@@ -70,21 +70,24 @@ def getAllIds(path, cls=TxtBiotecSource):
     return cls.getAllIds(path)
 
 
-def loadSegments(td):
+def loadSegments(tc):
     """
     Load all segments from the given :class:`tweezers.TweezersCollection`.
     Args:
-        td (:class:`tweezers.TweezersCollection`): collection to read segements from
+        tc (:class:`tweezers.TweezersCollection`): collection to read segements from
 
     Returns:
         :class:`tweezers.TweezersCollection`
     """
 
     data = TweezersCollection()
-    for t in td.values():
-        if not t.segments:
-            log.warning('No segments defined in dataset "{}"'.format(t.meta['id']))
-        for segmentId in t.segments:
-            ts = t.getSegment(segmentId)
-            data[ts.meta['id']] = ts
+    for id, t in tc.items():
+        if isinstance(t, TweezersCollection):
+            data[id] = loadSegments(t)
+        else:
+            if not t.segments:
+                log.warning('No segments defined in dataset "{}"'.format(t.meta['id']))
+            for segmentId in t.segments:
+                ts = t.getSegment(segmentId)
+                data[ts.meta['id']] = ts
     return data
