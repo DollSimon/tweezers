@@ -194,7 +194,7 @@ class TweezersDataBase:
             self.units.update({ax: units})
 
         # recompute forces
-        self.meta, self.units, self.data = self.source.computeForces(self.meta, self.units, self.data)
+        self.meta, self.units, self.data = self.source.calculateForce(self.meta, self.units, self.data)
 
         return self
 
