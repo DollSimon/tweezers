@@ -11,11 +11,12 @@ from .TxtFileMpi import TxtFileMpi
 from .BaseSource import BaseSource
 import tweezers as t
 import tweezers.ixo.utils as ixo
+from tweezers.collections import TweezersCollection
 
 
 class TxtMpiSource(BaseSource):
     """
-    Data source for *.txt files from the MPI with the old style header or the new JSON format.
+    Data source for \*.txt files from the MPI with the old style header or the new JSON format.
     """
 
     def __init__(self, data=None, psd=None, ts=None):
@@ -43,6 +44,99 @@ class TxtMpiSource(BaseSource):
         else:
             self.ts = None
 
+    @classmethod
+    def fromIdDict(cls, idDict):
+        """
+        Creates a data source from a given experiment ID and the associated files.
+
+        Args:
+            idDict (dict): with keys `data`, `ts`, `psd` etc. whose values are the
+                            full paths to the corresponding files.
+
+        Returns:
+            :class:`tweezers.io.TxtMpiSource`
+        """
+
+        return cls(**idDict)
+
+    @staticmethod
+    def isDataFile(path):
+        """
+        Checks if a given file is a valid data file and returns its ID and type.
+
+        Args:
+            path (:class:`pathlib.Path`): file to check
+
+        Returns:
+            :class:`dict` with `id` and `type`
+        """
+
+        pPath = Path(path)
+        m = re.match('^((?P<type>[A-Z]{2,3})_)?(?P<id>(?P<trial>[0-9]{1,3})_Date_[0-9_]{19})\.txt$',
+                     pPath.name)
+        if m:
+            tipe = 'data'
+            if m.group('type'):
+                tipe = m.group('type').lower()
+            res = {'id': m.group('id'),
+                   'trial': m.group('trial'),
+                   'type': tipe,
+                   'path': pPath}
+            return res
+        else:
+            return False
+
+    @staticmethod
+    def getAllFiles(path):
+        """
+        Return a recursive list of all valid data files within a given path.
+
+        Args:
+            path (:class:`pathlib.Path`): root path to search for valid data files
+
+        Returns:
+            `list` of `str`
+        """
+
+        pPath = Path(path)
+        files = []
+
+        for obj in pPath.iterdir():
+            if obj.is_dir():
+                subFiles = TxtMpiSource.getAllFiles(obj)
+                files += subFiles
+            else:
+                m = TxtMpiSource.isDataFile(obj)
+                if m:
+                    files.append(m)
+        return files
+
+    @staticmethod
+    def getAllIds(path):
+        """
+        Get a list of all IDs and their files that are at the given path and its subfolders.
+
+        Args:
+            path (:class:`pathlib.Path`): root path for searching
+
+        Returns:
+            `dir`
+        """
+
+        pPath = Path(path)
+
+        # get a list of all files and their properties
+        files = TxtMpiSource.getAllFiles(pPath)
+        ids = TweezersCollection()
+
+        # sort files that belong to the same id
+        for el in files:
+            if el['id'] not in ids.keys():
+                ids[el['id']] = {}
+            ids[el['id']][el['type']] = el['path']
+
+        return ids
+
     def getMetadata(self):
         """
         Return the metadata of the experiment.
@@ -62,7 +156,7 @@ class TxtMpiSource(BaseSource):
             metaLines, unitsTmp = self.ts.getHeader()
             # if we got units for the column names, update them
             if unitsTmp:
-                units.update(unitsTmp)
+                units.update(self.convertColumns(unitsTmp))
             # convert header to corresponding dict format
             metaTmp, unitsTmp = self.convertHeader(metaLines)
 
@@ -80,7 +174,7 @@ class TxtMpiSource(BaseSource):
         if self.psd:
             metaTmp, unitsTmp = self.psd.getHeader()
             if unitsTmp:
-                units.update(unitsTmp)
+                units.update(self.convertColumns(unitsTmp))
             metaTmp, unitsTmp = self.convertHeader(metaTmp)
 
             # make sure we don't override important stuff that by accident has the same name
@@ -97,7 +191,7 @@ class TxtMpiSource(BaseSource):
         if self.data:
             metaTmp, unitsTmp = self.data.getHeader()
             if unitsTmp:
-                units.update(unitsTmp)
+                units.update(self.convertColumns(unitsTmp))
             metaTmp, unitsTmp = self.convertHeader(metaTmp)
 
             # rename variables for the sake of consistency and compatibility with Matlab and because the naming is
@@ -148,28 +242,30 @@ class TxtMpiSource(BaseSource):
         data = self.convertData(columnHeader, data)
         return data
 
-    def postprocessData(self, meta, units, data):
+    @staticmethod
+    def calculateForce(meta, units, data):
         """
-        Create time array, calculate forces etc.
+        Calculate forces from Diff signal and calibration values.
 
         Args:
-            meta (:class:`tweezers.MetaDict`): meta dictionary
-            units (:class:`tweezers.UnitDict`): units dictionary
+            meta (:class:`.MetaDict`): metadata
+            units (:class:`.UnitDict`): unit metadata
             data (:class:`pandas.DataFrame`): data
 
         Returns:
-            meta, units, data
-        """
+            Updated versions of the input parameters
 
-        data['time'] = np.arange(0, meta['dt'] * len(data), meta['dt'])
-        units['time'] = 's'
+            * meta (:class:`.MetaDict`)
+            * units (:class:`.UnitDict`)
+            * data (:class:`pandas.DataFrame`)
+        """
 
         # calculate force per trap and axis
         for trap in meta['traps']:
             m = meta[trap]
             data[trap + 'Force'] = (data[trap + 'Diff'] - m['zeroOffset']) \
-                                    / m['displacementSensitivity'] \
-                                    * m['stiffness']
+                                   / m['displacementSensitivity'] \
+                                   * m['stiffness']
             units[trap + 'Force'] = 'pN'
 
         # invert PM force, is not as expected in the raw data
@@ -181,6 +277,33 @@ class TxtMpiSource(BaseSource):
 
         units['xForce'] = 'pN'
         units['yForce'] = 'pN'
+
+        return meta, units, data
+
+    def postprocessData(self, meta, units, data):
+        """
+        Create time array, calculate forces etc.
+
+        Args:
+            meta (:class:`tweezers.MetaDict`): meta dictionary
+            units (:class:`tweezers.UnitDict`): units dictionary
+            data (:class:`pandas.DataFrame`): data
+
+        Returns:
+            Updated versions of the input parameters
+
+            * meta (:class:`.MetaDict`)
+            * units (:class:`.UnitDict`)
+            * data (:class:`pandas.DataFrame`)
+        """
+
+        data['time'] = np.arange(0, meta['dt'] * len(data), meta['dt'])
+        units['time'] = 's'
+
+        meta, units, data = self.calculateForce(meta, units, data)
+
+        data['distance'] = np.sqrt(data.xDist**2 + data.yDist**2)
+        units['distance'] = 'nm'
 
         return meta, units, data
 
