@@ -1,0 +1,10 @@
+{
+    "analysis": {},
+    "segments": {
+        "3": {
+            "tmin": 2.5857190223226265,
+            "tmax": 18.705717241564958,
+            "result": "new science"
+        }
+    }
+}
