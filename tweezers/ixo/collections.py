@@ -168,7 +168,7 @@ def isNestedDict(dictionary):
         raise ValueError('isNestedDict: No dict given')
 
     for key in dictionary.keys():
-        if isinstance(dictionary[key], Iterable):
+        if isinstance(dictionary[key], dict):
             return True
 
     return False
