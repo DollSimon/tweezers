@@ -19,7 +19,11 @@ class TxtMpiSource(BaseSource):
     Data source for \*.txt files from the MPI with the old style header or the new JSON format.
     """
 
-    def __init__(self, data=None, psd=None, ts=None):
+    data = None
+    psd = None
+    ts = None
+
+    def __init__(self, data=None, psd=None, ts=None, analysis=None):
         """
         Args:
             path (:class:`patlhlib.Path`): path to file to read, if the input is of a different type, it is given to
@@ -31,18 +35,12 @@ class TxtMpiSource(BaseSource):
         # go through input
         if data:
             self.data = TxtFileMpi(data)
-        else:
-            self.data = None
-
         if psd:
             self.psd = TxtFileMpi(psd)
-        else:
-            self.psd = None
-
         if ts:
             self.ts = TxtFileMpi(ts)
-        else:
-            self.ts = None
+        if analysis:
+            self.analysis = Path(analysis)
 
     @classmethod
     def fromIdDict(cls, idDict):
@@ -72,7 +70,7 @@ class TxtMpiSource(BaseSource):
         """
 
         pPath = Path(path)
-        m = re.match('^((?P<type>[A-Z]{2,3})_)?(?P<id>(?P<trial>[0-9]{1,3})_Date_[0-9_]{19})\.txt$',
+        m = re.match('^((?P<type>[A-Z]+)_)?(?P<id>(?P<trial>[0-9]{1,3})_Date_[0-9_]{19})\.txt$',
                      pPath.name)
         if m:
             tipe = 'data'
@@ -241,6 +239,21 @@ class TxtMpiSource(BaseSource):
         # convert the data to a standardized format
         data = self.convertData(columnHeader, data)
         return data
+
+    def getDataSegment(self, tmin, tmax, chunkN=10000):
+        """
+        Returns the data between ``tmin`` and ``tmax``.
+
+        Args:
+            tmin (float): minimum data timestamp
+            tmax (float): maximum data timestamp
+            chunkN (int): number of rows to read per chunk
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        raise NotImplementedError()
 
     @staticmethod
     def calculateForce(meta, units, data):
@@ -934,3 +947,12 @@ class TxtMpiSource(BaseSource):
             return True
         else:
             return False
+
+    def getAnalysisFile(self):
+        """
+        Create the analysis file name.
+
+        Returns:
+            :class:`pathlib.Path`
+        """
+

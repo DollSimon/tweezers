@@ -1,3 +1,9 @@
+import json
+
+from tweezers.ixo.collections import IndexedOrderedDict
+from tweezers.ixo.io import DataFrameJsonDecoder, DataFrameJsonEncoder
+
+
 class BaseSource:
     """
     Base class for data sources. Inherit from this class when creating a new data source. Keep in mind that not all
@@ -8,6 +14,8 @@ class BaseSource:
     the data from wherever it is. This allows the :class:`tweezers.TweezersData` to lazily load the data only when
     required.
     """
+
+    analysis = None
 
     def __init__(self, **kwargs):
         pass
@@ -93,25 +101,79 @@ class BaseSource:
 
         return meta, units, data
 
+    def getAnalysisFile(self):
+        """
+        Create the analysis file name.
+
+        Returns:
+            :class:`pathlib.Path`
+        """
+
+        raise NotImplementedError()
+
+    def readAnalysisFile(self):
+        """
+        Read the content of the analysis file from disk.
+
+        Returns:
+            :class:`tweezers.ixo.utils.IndexedOrderedDict`
+        """
+
+        if not self.analysis:
+            return IndexedOrderedDict()
+
+        with self.analysis.open(mode='r', encoding='utf-8') as f:
+            analysisDict = json.load(f, object_pairs_hook=IndexedOrderedDict, cls=DataFrameJsonDecoder)
+        return analysisDict
+
+    def writeAnalysisFile(self, analysisDict):
+        """
+        Write the analysis file to disk.
+
+        Args:
+            analysisDict (:class:`tweezers.ixo.utils.IndexedOrderedDict`): analysis dictionary
+        """
+
+        # build filename if it does not exist
+        if not self.analysis:
+            self.analysis = self.getAnalysisFile()
+
+        # write data to file
+        jsonStr = json.dumps(analysisDict, indent=4, cls=DataFrameJsonEncoder)
+        with self.analysis.open(mode='w', encoding='utf-8') as f:
+            f.write(jsonStr)
+
     def getAnalysis(self):
         """
-        Returns the analysis data.
+        Return the analysis data.
 
         Returns:
             :class:`collections.OrderedDict`
-
         """
-        raise NotImplementedError()
+
+        return self.readAnalysisFile().get('analysis', IndexedOrderedDict())
 
     def writeAnalysis(self, analysis, segment=None):
         """
-        Write the analysis data back.
+        Write the analysis data back to disk.
 
         Args:
             analysis (:class:`collections.OrderedDict`): the analysis data to store
         """
 
-        raise NotImplementedError()
+        analysisDict = self.readAnalysisFile()
+
+        # should we only update the segment?
+        if segment is not None:
+            analysisDict['segments'][segment] = analysis
+            # remove the general analysis keys
+            for key in analysisDict['analysis'].keys():
+                analysisDict['segments'][segment].pop(key, None)
+        else:
+            # sort analysis keys and store in the proper dictionary
+            analysisDict['analysis'] = IndexedOrderedDict(sorted(analysis.items()))
+
+        self.writeAnalysisFile(analysisDict)
 
     def getSegments(self):
         """
@@ -121,14 +183,16 @@ class BaseSource:
             :class:`tweezers.ixo.collections.IndexedOrderedDict`
         """
 
-        raise NotImplementedError()
+        return self.readAnalysisFile().get('segments', IndexedOrderedDict())
 
     def writeSegments(self, segments):
         """
-        Write segment information to data structure.
+        Write segment information back to disk.
 
         Args:
             segments (:class:`tweezers.ixo.collections.IndexedOrderedDict`): segment dictionary
         """
 
-        raise NotImplementedError()
+        analysisDict = self.readAnalysisFile()
+        analysisDict['segments'] = segments
+        self.writeAnalysisFile(analysisDict)

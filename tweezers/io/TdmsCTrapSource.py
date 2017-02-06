@@ -4,6 +4,7 @@ import pandas as pd
 from pathlib import Path
 
 from .BaseSource import BaseSource
+import tweezers as t
 from tweezers.ixo.decorators import lazy
 from tweezers import TweezersCollection
 
@@ -16,7 +17,7 @@ class TdmsCTrapSource(BaseSource):
     # path to tdms file
     tdmsFile = None
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, analysis=None):
         """
         Args:
             data (`str` or :class:`pathlib.Path`): path to TDMS file
@@ -27,6 +28,8 @@ class TdmsCTrapSource(BaseSource):
 
         super().__init__()
         self.tdmsFile = Path(data)
+        if analysis:
+            self.analysis = Path(analysis)
 
     @lazy
     def tdms(self):
@@ -66,14 +69,18 @@ class TdmsCTrapSource(BaseSource):
         """
 
         pPath = Path(path)
-        m = re.match('^(?P<beadId>[0-9\-]{15}.*#\d{3})(?P<trial>-\d{3})\.tdms$',
+        m = re.match('^(?P<beadId>[0-9\-]{15}.*#\d{3})(?P<trial>-\d{3})( (?P<type>[A-Z]+))?\.[a-zA-Z]{3,4}$',
                      pPath.name)
         if m:
             ide = None
             if m.group('trial'):
                 ide = '{}{}'.format(m.group('beadId'), m.group('trial'))
+            tipe = m.group('type').lower()
+            if not tipe:
+                tipe = 'data'
             res = {'beadId': m.group('beadId'),
                    'id': ide,
+                   'type': tipe,
                    'path': pPath}
             return res
         else:
@@ -166,10 +173,10 @@ class TdmsCTrapSource(BaseSource):
 
     def getData(self):
         """
-                Return the experiment data.
+        Return the experiment data.
 
-                Returns:
-                    :class:`pandas.DataFrame`
+        Returns:
+            :class:`pandas.DataFrame`
         """
 
         # create emtpy DataFrame
@@ -181,6 +188,24 @@ class TdmsCTrapSource(BaseSource):
             name = self.getKeyAndUnit(channel.channel)
             name = self.getStandardPropertyId(name['key'])
             data[name] = channel.data
+        return data
+
+    def getDataSegment(self, tmin, tmax, chunkN=10000):
+        """
+        Returns the data between ``tmin`` and ``tmax``. Unfortunately, the ``nptdms`` always reads in all the data
+        when opening the file. So this basically just returns a subset of the already read data and does not speed up things.
+
+        Args:
+            tmin (float): minimum data timestamp
+            tmax (float): maximum data timestamp
+            chunkN (int): number of rows to read per chunk
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        data = self.getData()
+        data = data.query('@tmin <= time <= @tmax').copy()
         return data
 
     def postprocessData(self, meta, units, data):
@@ -378,3 +403,14 @@ class TdmsCTrapSource(BaseSource):
         string = ''.join(x for x in string.title() if not x.isspace())
         string = string[0].lower() + string[1:]
         return string
+
+    def getAnalysisFile(self):
+        """
+        Create the analysis file name.
+
+        Returns:
+            :class:`pathlib.Path`
+        """
+
+        filename = self.data.with_name('{} ANALYSIS{}'.format(self.data.stem, self.data.suffix))
+        return filename

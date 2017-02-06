@@ -7,8 +7,6 @@ import re
 
 from .BaseSource import BaseSource
 import tweezers as t
-from tweezers.ixo.collections import IndexedOrderedDict
-from tweezers.ixo.io import DataFrameJsonDecoder, DataFrameJsonEncoder
 from tweezers.collections import TweezersCollection
 
 
@@ -21,7 +19,6 @@ class TxtBiotecSource(BaseSource):
     header = None
     psd = None
     data = None
-    analysis = None
     ts = None
     # path to data, not correct if files sit in different folders
     path = None
@@ -370,92 +367,6 @@ class TxtBiotecSource(BaseSource):
 
         return meta, units, data
 
-    def readAnalysisFile(self):
-        """
-        Read the content of the analysis file from disk.
-
-        Returns:
-            :class:`tweezers.ixo.utils.IndexedOrderedDict`
-        """
-
-        if not self.analysis:
-            return IndexedOrderedDict()
-
-        with self.analysis.open(mode='r', encoding='utf-8') as f:
-            analysisDict = json.load(f, object_pairs_hook=IndexedOrderedDict, cls=DataFrameJsonDecoder)
-        return analysisDict
-
-    def writeAnalysisFile(self, analysisDict):
-        """
-        Write the analysis file to disk.
-
-        Args:
-            analysisDict (:class:`tweezers.ixo.utils.IndexedOrderedDict`): analysis dictionary
-        """
-
-        # build filename if it does not exist
-        if not self.analysis:
-            self.analysis = self.data.parent.joinpath(self.data.name.replace('DATA', 'ANALYSIS'))
-
-        # write data to file
-        jsonStr = json.dumps(analysisDict, indent=4, cls=DataFrameJsonEncoder)
-        with self.analysis.open(mode='w', encoding='utf-8') as f:
-            f.write(jsonStr)
-
-    def getAnalysis(self):
-        """
-        Return the analysis data.
-
-        Returns:
-            :class:`collections.OrderedDict`
-        """
-
-        return self.readAnalysisFile().get('analysis', OrderedDict())
-
-    def writeAnalysis(self, analysis, segment=None):
-        """
-        Write the analysis data back to disk.
-
-        Args:
-            analysis (:class:`collections.OrderedDict`): the analysis data to store
-        """
-
-        analysisDict = self.readAnalysisFile()
-
-        # should we only update the segment?
-        if segment is not None:
-            analysisDict['segments'][segment] = analysis
-            # remove the general analysis keys
-            for key in analysisDict['analysis'].keys():
-                analysisDict['segments'][segment].pop(key, None)
-        else:
-            # sort analysis keys and store in the proper dictionary
-            analysisDict['analysis'] = OrderedDict(sorted(analysis.items()))
-
-        self.writeAnalysisFile(analysisDict)
-
-    def getSegments(self):
-        """
-        Return a list of all segments.
-
-        Returns:
-            :class:`tweezers.ixo.collections.IndexedOrderedDict`
-        """
-
-        return self.readAnalysisFile().get('segments', IndexedOrderedDict())
-
-    def writeSegments(self, segments):
-        """
-        Write segment information back to disk.
-
-        Args:
-            segments (:class:`tweezers.ixo.collections.IndexedOrderedDict`): segment dictionary
-        """
-
-        analysisDict = self.readAnalysisFile()
-        analysisDict['segments'] = segments
-        self.writeAnalysisFile(analysisDict)
-
     def findHeaderLine(self, file):
         """
         Find the line number of the first header line, searches for ``### DATA ###``
@@ -525,3 +436,14 @@ class TxtBiotecSource(BaseSource):
         df = pd.read_csv(str(file), sep='\t', dtype=np.float64, skiprows=nHeaderLine+1, header=None,
                          names=colHeaders, engine='c')
         return df
+
+    def getAnalysisFile(self):
+        """
+        Create the analysis file name.
+
+        Returns:
+            :class:`pathlib.Path`
+        """
+
+        filename = self.data.parent.joinpath(self.data.name.replace('DATA', 'ANALYSIS'))
+        return filename
