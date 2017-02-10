@@ -188,8 +188,8 @@ class TxtBiotecSource(BaseSource):
         meta = t.MetaDict(header)
 
         # add column header units
-        colHeaders, colUnits = self.readColumnTitles(self.header)
-        units.update(colUnits)
+        cols = self.readColumnTitles(self.header)
+        units.update(cols['units'])
 
         # add id from header file name
         idDict = self.isDataFile(self.header)
@@ -228,14 +228,13 @@ class TxtBiotecSource(BaseSource):
         """
 
         # read required information about file and create the chunked iterator
-        colHeaders, colUnits = self.readColumnTitles(self.data)
-        nHeaderLine = self.findHeaderLine(self.data)
+        cols = self.readColumnTitles(self.data)
         # read the first data line to allow conversion between absolute and relative time
-        firstLine = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine + 1, header=None,
-                                names=colHeaders, nrows=1)
+        firstLine = pd.read_csv(self.data, sep='\t', skiprows=cols['n'], header=None,
+                                names=cols['names'], nrows=1)
         t0 = firstLine.time.iloc[0]
-        iterCsv = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine+2, header=None,
-                              names=colHeaders, iterator=True, chunksize=chunkN, engine='c',
+        iterCsv = pd.read_csv(self.data, sep='\t', skiprows=cols['n']+1, header=None,
+                              names=cols['names'], iterator=True, chunksize=chunkN, engine='c',
                               dtype=np.float64)
 
         # read the chunks into memory if they are within the requested limits
@@ -394,16 +393,18 @@ class TxtBiotecSource(BaseSource):
             file: (:class:`pathlib.Path`): path to file
 
         Returns:
-            list: column header names
-            :class:`tweezers.UnitDict`: units dictionary with available column units
+            `dict` with keys `names` (`list`), `units` (:class:`.UnitDict`) and `n`
         """
-
         # read header line
-        nHeaderLine = self.findHeaderLine(file)
+        n = 0
         with file.open(encoding='utf-8') as f:
-            for i, line in enumerate(f):
-                if i == nHeaderLine:
-                    headerLine = line
+            for line in f:
+                n += 1
+                if line.startswith('#'):
+                    # skip empty line
+                    next(f)
+                    headerLine = next(f)
+                    n += 2
                     break
 
         # get column title names with units
@@ -418,7 +419,7 @@ class TxtBiotecSource(BaseSource):
             if unit:
                 colUnits[colHeader] = unit
 
-        return colHeaders, colUnits
+        return {'names': colHeaders, 'units': colUnits, 'n': n}
 
     def readToDataframe(self, file):
         """
@@ -431,10 +432,9 @@ class TxtBiotecSource(BaseSource):
             :class:`pandas.DataFrame`
         """
 
-        colHeaders, colUnits = self.readColumnTitles(file)
-        nHeaderLine = self.findHeaderLine(file)
-        df = pd.read_csv(str(file), sep='\t', dtype=np.float64, skiprows=nHeaderLine+1, header=None,
-                         names=colHeaders, engine='c')
+        cols = self.readColumnTitles(file)
+        df = pd.read_csv(str(file), sep='\t', dtype=np.float64, skiprows=cols['n'], header=None,
+                         names=cols['names'], engine='c')
         return df
 
     def getAnalysisFile(self):
