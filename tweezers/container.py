@@ -121,7 +121,7 @@ class TweezersDataBase:
         # store PSD in 'psd' attribute of this object
         td.psd = psd
         # store PSD units
-        td.units['psd'] = self.units['timeseries'] + '² / Hz'
+        td.units['psd'] = self.units['timeseries'] + '^2/Hz'
         # store psd metadata
         td.meta.update(psdMeta)
 

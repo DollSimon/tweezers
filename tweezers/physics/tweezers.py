@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from .hydrodynamics import dragSphere
-from .thermodynamics import thermalEnergy
+from .thermodynamics import kbt
 from .util import asKelvin
 
 def trapStiffness(fc=500, radius=1000, viscosity=8.93e-10):
@@ -36,7 +36,7 @@ def distanceCalibration(D=0.46, radius=1000, viscosity=8.93e-10, T=25):
         :class:`float`
     """
 
-    beta = np.sqrt(thermalEnergy(asKelvin(T))/(dragSphere(radius, viscosity)*D))
+    beta = np.sqrt(kbt(T)/(dragSphere(radius, viscosity)*D))
 
     return beta
     

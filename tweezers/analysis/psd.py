@@ -10,7 +10,7 @@ class PsdComputation:
     Object to compute a PSD using Welch's method (:func:`scipy.signal.welch`).
     """
 
-    def __init__(self, timeSeries, blockLength=2**13, samplingRate=80000, overlap=None, nBlocks=None, blockData=False):
+    def __init__(self, timeSeries, blockLength=1E4, samplingRate=100000, overlap=None, nBlocks=None, blockData=False):
         """
         Constructor for PsdAnalysis
 
@@ -95,7 +95,7 @@ class PsdComputation:
         return overlap
     
     @staticmethod
-    def computePsd(data, samplingFreq=80000, blockLength=2**13, overlap=0):
+    def computePsd(data, samplingFreq=100000, blockLength=1E4, overlap=0):
         """
         Compute the PSD using :func:`scipy.signal.welch` for each block but do the averaging of the blocks in this
         function. This allows to also return the standard deviation of the data for each frequency and the individual
@@ -120,8 +120,11 @@ class PsdComputation:
         psdList = []
         for n in range(blockLength, len(data) + 1, stepSize):
             # get individual block psd and add it to our list
-            f, psd = welch(data[n - blockLength:n], fs=samplingFreq, nperseg=blockLength, noverlap=overlap)
-            psdList.append(psd)
+            f, psd = welch(data[n - blockLength:n], fs=samplingFreq, nperseg=blockLength, noverlap=overlap,
+                           window='boxcar')
+            # append PSD to list but exclude f = 0
+            psdList.append(psd[1:])
+        f = f[1:]
         psdList = np.array(psdList)
         # averaged psd
         psdAv = psdList.mean(axis=0)
@@ -156,7 +159,6 @@ class PsdFitMle(tweezers.ixo.fit.Fit):
             D (`float`): diffusion constant
             fc (`float`): corner frequency
         """
-
 
         s = self.mleFactors(self.y)
         a, b = self.mleAB(s, self.nBlocks)

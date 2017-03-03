@@ -1,5 +1,5 @@
 import numpy as np
-from .thermodynamics import thermalEnergy
+from .thermodynamics import kbt
 from .util import asKelvin
 
 
@@ -62,7 +62,7 @@ def diffusionCoefficient(radius=1000, temperature=25, dynamicViscosity=1e-9, ver
     assert temperature >= -273.15
     assert dynamicViscosity > 0
 
-    kT = thermalEnergy(asKelvin(temperature))
+    kT = kbt(temperature)
     drag = dragSphere(radius=radius, dynamicViscosity=dynamicViscosity)
 
     diffusionConstant = kT / drag

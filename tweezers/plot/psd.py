@@ -59,7 +59,6 @@ class PsdPlotBase():
             units (str): units of the PSD
         """
 
-        ax.set_ylim([10e-13, 10e-8])
         labelX = 'f [Hz]'
         labelY = 'PSD'
         if units:

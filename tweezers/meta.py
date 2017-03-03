@@ -183,7 +183,7 @@ class UnitDict(MetaBaseDict):
                 'aodYDiff': 'V',
                 'temperature': '˚C',
                 'psdSamplingRate': 'Hz',
-                'psd': 'V²/Hz',
+                'psd': 'V^2/Hz',
                 'timeseries': 'V',
     }
 
