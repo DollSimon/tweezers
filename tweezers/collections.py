@@ -1,3 +1,5 @@
+import re
+
 from tweezers.ixo.collections import IndexedOrderedDict
 
 
@@ -24,20 +26,27 @@ class TweezersCollection(IndexedOrderedDict):
 
         return self.sorted()
 
-    def filter(self, filterStr):
+    def filter(self, filterExp):
         """
-        Filter keys based on whether they contain a substring or not.
+        Filter keys based on whether they match a regular filter expression or not.
 
         Args:
-            filterStr (`str`): substring to filter keys for
+            filterExp (`str`): regular expression to filter keys
 
         Returns:
             :class:`.TweezersCollection`
+
+        Example:
+            ::
+
+                 path = '/Volumes/grill/Tweezers/Data/Raw/data'
+                 ids = getAllIds(path)
+                 fids = ids.filter('2017-03.*Hyd')
         """
         # string based filter for keys
         res = self.__class__()
         for key in self.keys():
-            if filterStr in key:
+            if re.match(filterExp, key):
                 res[key] = self[key]
 
         return res
