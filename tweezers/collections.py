@@ -46,7 +46,7 @@ class TweezersCollection(IndexedOrderedDict):
         # string based filter for keys
         res = self.__class__()
         for key in self.keys():
-            if re.match(filterExp, key):
+            if re.search(filterExp, key):
                 res[key] = self[key]
 
         return res
