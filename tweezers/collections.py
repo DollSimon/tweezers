@@ -1,4 +1,5 @@
 import re
+import pandas as pd
 
 from tweezers.ixo.collections import IndexedOrderedDict
 
@@ -51,3 +52,20 @@ class TweezersCollection(IndexedOrderedDict):
 
         return res
 
+    def getMetaFacets(self):
+        """
+        Create a :class:`pandas.DataFrame` facet view of the metadata of all datasets. This calls
+        :meth:`tweezers.meta.MetaBaseDict.getFacets`.
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        res = []
+        for item in self.values():
+            if isinstance(item, TweezersCollection):
+                res.append(item.getMetaFacets())
+            else:
+                res.append(item.meta.getFacets())
+
+        return pd.concat(res, ignore_index=True)
