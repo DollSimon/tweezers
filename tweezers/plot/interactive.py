@@ -13,7 +13,7 @@ class CollectionPlot:
     """
     
     def __init__(self, data, fcn, **kwargs):
-        self.tc = data.flatten()
+        self.tc = data.copy().flatten()
         self.fcn = fcn
         self.i = 0
         self.n = len(self.tc)

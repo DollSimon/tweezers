@@ -30,7 +30,7 @@ class Sphere():
         Computes the Stokes drag coefficient in [pN/nm s].
         """
 
-        return dragSphere(self.radius, dynamicViscosity=self.viscosity)
+        return dragSphere(self.radius, viscosity=self.viscosity)
 
     def mass(self):
         """
@@ -44,7 +44,7 @@ class Sphere():
         Computes the diffusion coefficient in [nm^2 / s].
         """
 
-        return diffusionCoefficient(radius=self.radius, temperature=self.temperature, dynamicViscosity=self.viscosity)
+        return diffusionCoefficient(radius=self.radius, temperature=self.temperature, viscosity=self.viscosity)
 
 
 

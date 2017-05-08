@@ -428,7 +428,7 @@ class TweezersDataSegment(TweezersDataBase):
         # check if data is already read into memory and use that if available
         if 'data' in self.__dict__:
             # adjust data
-            queryStr = '{} <= absTime <= {}'.format(self.analysis['tmin'], self.analysis['tmax'])
+            queryStr = '{} <= time <= {}'.format(self.analysis['tmin'], self.analysis['tmax'])
             self.data = self.data.query(queryStr)
             self.data = self.data.reset_index(drop=True)
             self.data.loc[:, 'time'] -= self.data.loc[0, 'time']

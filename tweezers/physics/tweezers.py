@@ -2,7 +2,7 @@ import math
 import numpy as np
 from .hydrodynamics import dragSphere
 from .thermodynamics import kbt
-from .util import asKelvin
+from .utils import asKelvin
 
 def trapStiffness(fc=500, radius=1000, viscosity=8.93e-10):
     """

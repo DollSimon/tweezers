@@ -21,6 +21,7 @@ def loadId(idDict, cls=TxtBiotecSource):
 
     return TweezersData(cls.fromIdDict(idDict))
 
+
 def loadIds(ids, cls=TxtBiotecSource):
     """
     Load all IDs given in the input list.
@@ -81,9 +82,9 @@ def loadSegments(tc):
     """
 
     data = TweezersCollection()
-    for id, t in tc.items():
+    for tid, t in tc.items():
         if isinstance(t, TweezersCollection):
-            data[id] = loadSegments(t)
+            data[tid] = loadSegments(t)
         else:
             if not t.segments:
                 log.warning('No segments defined in dataset "{}"'.format(t.meta['id']))
