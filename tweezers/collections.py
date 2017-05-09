@@ -12,20 +12,24 @@ class TweezersCollection(IndexedOrderedDict):
 
     def flatten(self):
         """
-        Flatten a data collection, i.e. remove nested collections.
+        Flatten a data collection, i.e. remove nested collections. Returns a copy of the collection.
 
         Returns:
             :class:`.TweezersCollection`
         """
 
+        res = self.__class__()
         keys = list(self.keys())
 
         for key in keys:
             if isinstance(self[key], TweezersCollection):
-                self.update(self[key].flatten())
-                self.pop(key)
+                # if the item is a collection itself, append its flattened result
+                res.update(self[key].flatten())
+            else:
+                # append the item directly
+                res[key] = self[key]
 
-        return self.sorted()
+        return res.sorted()
 
     def filter(self, filterExp):
         """
