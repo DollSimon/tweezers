@@ -1,4 +1,4 @@
-# Tweezer - Data Analysis Tools for Single Molecule Experiments
+# Tweezers - Data Analysis Tools for Single Molecule Experiments
 
 A python package containing all the relevant files for tweezer data analysis.
 
