@@ -6,11 +6,15 @@ import numpy as np
 class Fit():
     """
     Basic class for fitting.
+
+    Attributes:
+        coef:   computed fitting parameters
+        yFit:   y values of fitted curve
     """
     
     def __init__(self, x, y, fcn=None, std=None, **kwargs):
         """
-        Constructor for Fit
+        Constructor for Fit, also performs the fit
         
         Args:
             x (:class:`list` of :class:`float`): x values
@@ -29,7 +33,7 @@ class Fit():
         self.fitError = []
 
     @lazy
-    def result(self):
+    def coef(self):
         """
         Attribute to hold the computed fitting parameters.
         """
@@ -43,10 +47,9 @@ class Fit():
 
         Returns:
             :class:`list` of :class:`float`, depending on the input
-
         """
 
-        fit = self.fcn(self.x, *self.result)
+        fit = self.fcn(self.x, *self.coef)
         return fit
         
     def rsquared(self):
@@ -58,7 +61,7 @@ class Fit():
             :class:`float`
         """
 
-        ssRes = np.sum((self.y - self.fcn(self.x, *self.result))**2)
+        ssRes = np.sum((self.y - self.yFit)**2)
         ssTot = np.sum((self.y - np.mean(self.y))**2)
         return 1 - ssRes / ssTot
 
@@ -67,8 +70,9 @@ class Fit():
         Compute the residuals of the fit.
 
         Returns:
-            :numpy:`np.array` and :class:`float`
+            :class:`numpy.ndarray` and :class:`float`
         """
+        #TODO: check if OK
 
         residuals = (self.y - self.yFit) / self.yFit
         meanResidual = np.sum(residuals) / len(self.yFit)
@@ -81,6 +85,7 @@ class Fit():
         Returns:
             :class:`float`
         """
+        # TODO: check if OK
 
         if self.std is None or not any(self.std):
             raise AttributeError('No standard deviation data given for χ² computation.')
@@ -132,3 +137,97 @@ class LeastSquaresFit(Fit):
         self.fitError = np.sqrt(np.diag(cov))
 
         return res
+
+
+class PolyFit(Fit):
+    """
+    Perform a least squares fit of a polynoimal.
+
+    Attributes:
+        poly (:class:`numpy.polynomial.polynomial.Polynomial`): polynomial instance
+        coef (:class:`numpy.ndarray`):  polynomial coefficients
+        yFit (:class:`numpy.ndarray`):  y values of fitted curve
+    """
+
+    def __init__(self, x, y, order, **kwargs):
+        """
+        Constructor for PolyFit
+
+        Args:
+            x, y, order, kwargs
+        """
+
+        super().__init__(x, y, **kwargs)
+        self.order = order
+
+    def __call__(self, arg):
+        """
+        Evaluate the polynomial at the given position.
+        """
+
+        return self.poly(arg)
+
+    def fit(self):
+        """
+        Do the fit. Returns only the fitted parameters, everything else is stored in class attributes. The standard
+        deviation of the datapoints ist used for the weighting.
+
+        Returns:
+            :class:`numpy.ndarray` of parameters as determined by the fit.
+        """
+
+        mi = min(self.x)
+        ma = max(self.x)
+        #TODO: check for fitError
+        poly = np.polynomial.Polynomial.fit(self.x, self.y, deg=self.order, w=self.std,
+                                            domain=[mi, ma], window=[mi, ma])
+
+        return poly
+
+    @lazy
+    def poly(self):
+        """
+        Get the `Polynomial` instance.
+
+        Returns:
+            :class:`numpy.polynomial.polynomial.Polynomial`
+        """
+
+        return self.fit()
+
+    @lazy
+    def coef(self):
+        """
+        Get the polynomial coefficients, see :attr:`numpy.polynomial.polynomial.Polynomial.coef`.
+
+        Returns:
+            :class:`numpy.ndarray`
+        """
+
+        return self.poly.coef
+
+    @lazy
+    def yFit(self):
+        """
+        Attribute to hold the y values of the fitted curve. Evaluated lazily.
+
+        Returns:
+            :class:`numpy.ndarray`
+        """
+
+        return self.poly(self.x)
+
+    def linspace(self):
+        """
+        Return x, y values at equally spaced points in domain
+        (see :meth:`numpy.polynomial.polynomial.Polynomial.linspace`).
+
+        Returns:
+            :class:`numpy.ndarray` with x, y
+        """
+
+        return self.poly.linspace()
+
+
+
+
