@@ -292,6 +292,10 @@ class TxtBiotecSource(BaseSource):
         ts = self.readToDataframe(self.ts)
         ts.rename(columns={'pmXDiff': 'pmX', 'pmYDiff': 'pmY', 'aodXDiff': 'aodX', 'aodYDiff': 'aodY'},
                   inplace=True)
+        # get relative time
+        ts['absTime'] = ts.t.copy()
+        ts.loc[:, 't'] -= ts.loc[0, 't']
+
         return ts
 
     @staticmethod
