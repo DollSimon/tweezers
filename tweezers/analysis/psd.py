@@ -10,7 +10,8 @@ class PsdComputation:
     Object to compute a PSD using Welch's method (:func:`scipy.signal.welch`).
     """
 
-    def __init__(self, timeSeries, blockLength=1E4, samplingRate=100000, overlap=None, nBlocks=None, blockData=False):
+    def __init__(self, timeSeries, blockLength=1E4, samplingRate=100000, overlap=None, nBlocks=None,
+                 blockData=False, axes=None):
         """
         Constructor for PsdAnalysis
 
@@ -23,6 +24,7 @@ class PsdComputation:
             nBlocks (`int`): The number of blocks determines the overlap between them. If set to ``None``, the number
                            is computed such that the overlap is 0.
             blockData (`bool`): Should the PSD for each block also be returned?
+            axes (`list`): for which axes in the timeSeries to calculate the PSD, do it for all if ``None``
         """
 
         self.timeSeries = timeSeries
@@ -34,6 +36,7 @@ class PsdComputation:
             self.overlap = overlap
         self.nBlocks = nBlocks
         self.blockData = blockData
+        self.axes = axes
 
     def psd(self):
         """
@@ -58,10 +61,14 @@ class PsdComputation:
             self.overlap = 0
             self.nBlocks = lenData // self.blockLength
 
+        # list of columns to go through
+        cols = self.axes if self.axes else list(self.timeSeries.columns)
+        cols = [x for x in cols if x not in ['t', 'time', 'absTime', 'mz']]
+
         psd = pd.DataFrame()
         for title, column in self.timeSeries.items():
-            # ignore time column if present
-            if title in ['t']:
+            # ignore columns if present
+            if title not in cols:
                 continue
 
             psdRaw = self.computePsd(column,
@@ -332,11 +339,10 @@ class PsdFit:
                                  fcn=self.lorentzian,
                                  std=psdStd,
                                  **self.fitargs)
-            res = fitObj.fit()
 
             # get results
-            D = res[0]
-            fc = res[1]
+            D = fitObj.coef[0]
+            fc = fitObj.coef[1]
 
             # append fitted Lorentzian x and y data to to fit-dataframe
             psdFit.loc[:, axis + 'Fit'] = self.lorentzian(psdFit['f'], D, fc)

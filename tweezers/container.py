@@ -16,6 +16,15 @@ class TweezersDataBase:
     """
     Base class for storing tweezers data. This class should implement methods and attributes that both,
     the :class:`.TweezersData` and the :class:`.TweezersDataSegment` require.
+
+    The following attributes are populated lazily on the first call.
+
+    Attributes:
+        meta (:class:`.MetaDict`):          metadata of the experiment
+        units (:class:`.UnitDict`):         units of the metadata
+        psd (:class:`pandas.DataFrame`):    power spectrum data
+        psdFit (:class:`pandas.DataFrame`): power spectrum fit data
+        ts (:class:`pandas.DataFrame`):     time series for thermal calibration
     """
 
     @lazy
@@ -112,7 +121,7 @@ class TweezersDataBase:
         args = {'samplingRate': self.meta['psdSamplingRate']}
         args.update(kwargs)
 
-        psdObj = PsdComputation(self.ts, **args)
+        psdObj = PsdComputation(self.ts)
         psdMeta, psd = psdObj.psd()
 
         # create copy
@@ -198,6 +207,20 @@ class TweezersDataBase:
 
         return self
 
+    def copy(self):
+        """
+        Returns a deep copy of the object
+
+        Args:
+
+
+        Returns:
+            :class:`tweezers.container.TweezersDataBase`
+        """
+
+        return copy.deepcopy(self)
+
+
     def getFacets(self, data, colName='Value', meta=[]):
         """
         Returns a :class:`pandas.DataFrame` suitable for a :class:`seaborn.FacetGrid`, i.e. the axis of a value is
@@ -273,6 +296,12 @@ class TweezersData(TweezersDataBase):
     Note that not all of these methods must be implemented, depending of your usage of the class. However, if
     your data source does not implement a certain method, the code
     will fail only when the according property is called since all of them are evaluated lazily.
+
+
+    Attributes:
+        data (:class:`pandas.DataFrame`):               experimental data
+        analysis (:class:`collections.OrderedDict`):    storage for analysis results
+        segments (:class:`.IndexedOrderedDict`):        segment data
     """
 
     def __init__(self, source=None):
@@ -404,6 +433,10 @@ class TweezersData(TweezersDataBase):
 class TweezersDataSegment(TweezersDataBase):
     """
     Class to hold the data of a data segment. Can be used in the same way as :class:`.TweezersData`.
+
+    Attributes:
+        data (:class:`pandas.DataFrame`):               experimental data
+        analysis (:class:`collections.OrderedDict`):    storage for analysis results
     """
 
     def __init__(self, tdInstance, segmentId):
