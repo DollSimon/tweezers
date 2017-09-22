@@ -39,5 +39,19 @@ def distanceCalibration(D=0.46, radius=1000, viscosity=8.93e-10, T=25):
     beta = np.sqrt(kbt(T)/(dragSphere(radius, viscosity)*D))
 
     return beta
-    
 
+
+def lorentzian(f, D, fc):
+    """
+    Lorentzian function
+
+    Args:
+        f (:class:`numpy.array`): frequency in units of [Hz]
+        D (`float`): diffusion constant in units of [V]
+        fc (`float`): corner frequency in units of [Hz]
+
+    Returns:
+        :class:`numpy.array`
+    """
+
+    return D / (np.pi ** 2 * (f ** 2 + fc ** 2))
