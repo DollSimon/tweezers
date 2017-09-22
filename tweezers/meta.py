@@ -6,7 +6,7 @@ import logging as log
 from tweezers.ixo.collections import AttrDictMixin
 
 
-class MetaBaseDict(OrderedDict, AttrDictMixin):
+class MetaBaseDict(AttrDictMixin, OrderedDict):
     """
     An ordered dictionary (:class:`collections.OrderedDict`) with attribute styled element access (
     :class:`tweezers.ixo.collections.AttrDictMixin`) that returns a default value if a key does not exist and

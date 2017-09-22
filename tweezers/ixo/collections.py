@@ -8,32 +8,41 @@ class AttrDictMixin(object):
 
         dict['key'] = 'hello world'
         print(dict.key)
+
+    It also implements the `__dir__` method to allow autocompletion for attributes and keys in Jupyter notebooks.
     """
 
-    def __getattr__(self, item):
-        if item in self.__dir__():
-            return getattr(self, item)
-        elif item in self.keys():
-            return self[item]
+    def __getattribute__(self, name):
+        # we have to use __getattribute__ instead of __getattr__ here since the latter relies on __dir__ which is
+        # reimplemented below
+        try:
+            return super().__getattribute__(name)
+        except AttributeError:
+            pass
+        if name in self.keys():
+            return self[name]
         else:
-            raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, item))
+            raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, name))
 
     def __setattr__(self, name, value):
-        if name in self.__dir__():
-            return setattr(self, name, value)
+        if name in super().__dir__():
+            return super().__setattr__(name, value)
         else:
             self[name] = value
 
-    def __delattr__(self, item):
-        if item in self.__dir__():
-            return delattr(self, item)
-        elif item in self.keys():
-            del self[item]
+    def __delattr__(self, name):
+        if name in super().__dir__():
+            return super().__delattr__(name)
+        elif name in self.keys():
+            del self[name]
         else:
-            raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, item))
+            raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, name))
+
+    def __dir__(self):
+        return super().__dir__() + list(self.keys())
 
 
-class IndexedOrderedDict(OrderedDict, AttrDictMixin):
+class IndexedOrderedDict(AttrDictMixin, OrderedDict):
     """
     An ordered dictionary whose elements can be accessed
         * in the classic dict ``dict['key']``
