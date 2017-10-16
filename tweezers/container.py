@@ -4,6 +4,7 @@ import pandas as pd
 from collections import OrderedDict
 
 from tweezers.ixo.decorators import lazy
+from tweezers.io.AnalysisFile import AnalysisFile
 from tweezers.analysis.psd import PsdComputation, PsdFit
 from tweezers.analysis.thermal_calibration import thermalCalibration
 from tweezers.meta import MetaDict, UnitDict

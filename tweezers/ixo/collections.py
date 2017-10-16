@@ -1,4 +1,4 @@
-from collections import OrderedDict, Iterable
+from collections import OrderedDict
 import pprint
 
 
@@ -25,6 +25,7 @@ class AttrDictMixin(object):
             raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, name))
 
     def __setattr__(self, name, value):
+        # calling super-method here since we reimplemented __dir__ below
         if name in super().__dir__():
             return super().__setattr__(name, value)
         else:

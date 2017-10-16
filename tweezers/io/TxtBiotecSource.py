@@ -6,7 +6,7 @@ import numpy as np
 import re
 
 from .BaseSource import BaseSource
-import tweezers as t
+from tweezers.meta import MetaDict, UnitDict
 from tweezers.collections import TweezersCollection
 
 
@@ -184,8 +184,8 @@ class TxtBiotecSource(BaseSource):
                     headerStr += line
 
         header = json.loads(headerStr, object_pairs_hook=OrderedDict)
-        units = t.UnitDict(header.pop('units'))
-        meta = t.MetaDict(header)
+        units = UnitDict(header.pop('units'))
+        meta = MetaDict(header)
 
         # add column header units
         cols = self.readColumnTitles(self.header)
@@ -417,7 +417,7 @@ class TxtBiotecSource(BaseSource):
 
         # store them in a UnitDict
         colHeaders = []
-        colUnits = t.UnitDict()
+        colUnits = UnitDict()
         for (colHeader, unit) in header:
             colHeaders.append(colHeader)
             if unit:

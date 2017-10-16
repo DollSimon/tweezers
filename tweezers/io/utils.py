@@ -1,9 +1,8 @@
 import logging as log
-import collections
 
 from tweezers.io import TxtBiotecSource
-from tweezers import TweezersData
-from tweezers import TweezersCollection
+from tweezers.container import TweezersData
+from tweezers.collections import TweezersCollection
 from tweezers.ixo.collections import isNestedDict
 
 

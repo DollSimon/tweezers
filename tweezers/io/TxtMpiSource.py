@@ -6,7 +6,7 @@ import os
 
 from .TxtMpiFile import TxtMpiFile
 from .BaseSource import BaseSource
-import tweezers as t
+from tweezers.meta import MetaDict, UnitDict
 from tweezers.collections import TweezersCollection
 
 
@@ -451,8 +451,8 @@ class TxtMpiSource(BaseSource):
             :class:`tweezers.MetaDict` and :class:`tweezers.UnitDict`
         """
 
-        meta = t.MetaDict()
-        units = t.UnitDict()
+        meta = MetaDict()
+        units = UnitDict()
 
         # meta[self.getStandardIdentifier('tsSamplingRate')] = 80000
         #

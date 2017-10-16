@@ -5,11 +5,11 @@ import json
 import pandas as pd
 import numpy as np
 
-from tweezers import MetaDict, UnitDict
+from tweezers.meta import MetaDict, UnitDict
 import tweezers.ixo.utils as ixo
 
 
-class TxtMpiFile():
+class TxtMpiFile:
     """
     A helper object to extract data from MPI-styled txt-files. Especially to get all header lines and all data lines.
     Note that this reads the files with `UTF-8` encoding.
