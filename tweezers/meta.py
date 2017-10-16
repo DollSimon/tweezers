@@ -98,6 +98,8 @@ class MetaBaseDict(AttrDictMixin, OrderedDict):
             if isinstance(value, self.__class__):
                 facets.append(value.copy())
                 facets[-1]['axis'] = key
+            elif isinstance(value, list):
+                pass
             else:
                 generalMeta[key] = value
 
