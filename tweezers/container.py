@@ -288,6 +288,26 @@ class TweezersDataBase:
         PsdFitPlot(self, residuals=False)
         return self
 
+    def getAnalysis(self, path, name=None):
+        """
+
+        Args:
+
+
+        Returns:
+
+        """
+
+        if not name:
+            name = self.meta.id + '.h5'
+        elif name[-3:] != '.h5':
+            name += '.h5'
+
+        analysis = AnalysisFile(path=path, file=name)
+        analysis.meta = copy.deepcopy(self.meta)
+        analysis.data = copy.deepcopy(self.data)
+        return analysis
+
 
 class TweezersData(TweezersDataBase):
     """
@@ -318,8 +338,9 @@ class TweezersData(TweezersDataBase):
             self.source = None
             self.meta = MetaDict()
             self.units = UnitDict()
+        # ToDo: check:
             self.analysis = OrderedDict()
-            self.segments = IndexedOrderedDict()
+        self.segments = IndexedOrderedDict()
 
     @lazy
     def data(self):
@@ -334,42 +355,6 @@ class TweezersData(TweezersDataBase):
         data = self.source.getData()
         self.meta, self.units, data = self.source.postprocessData(self.meta, self.units, data)
         return data
-
-    @lazy
-    def analysis(self):
-        """
-        Attribute that holds the analysis data, evaluated lazily.
-
-        Returns:
-            :class:`collections.OrderedDict`
-        """
-
-        log.debug('Reading analysis from data source')
-        return self.source.getAnalysis()
-
-    @lazy
-    def segments(self):
-        """
-        Attribute that holds the segment information, evaluated lazily.
-
-        Returns:
-            :class:`.IndexedOrderedDict`
-        """
-
-        log.debug('Reading segments from data source')
-        return self.source.getSegments()
-
-    def save(self):
-        """
-        Save the analysis data back to disk.
-
-        Returns:
-            :class:`.TweezersData`
-        """
-
-        self.source.writeAnalysis(self.analysis)
-        self.source.writeSegments(self.segments)
-        return self
 
     def addSegment(self, tmin, tmax, name=None):
         """
@@ -450,8 +435,7 @@ class TweezersDataSegment(TweezersDataBase):
         self.__dict__ = copy.deepcopy(tdInstance.__dict__)
         # get the proper key in case numeric indexing was used
         segmentId = self.segments.key(segmentId)
-        self.analysis = self.segments[segmentId]
-        self.analysis.update(tdInstance.analysis)
+        self.segment = self.segments[segmentId]
         # get rid of the other segments
         del self.segments
         # update meta dict
@@ -461,7 +445,7 @@ class TweezersDataSegment(TweezersDataBase):
         # check if data is already read into memory and use that if available
         if 'data' in self.__dict__:
             # adjust data
-            queryStr = '{} <= time <= {}'.format(self.analysis['tmin'], self.analysis['tmax'])
+            queryStr = '{} <= time <= {}'.format(self.segment['tmin'], self.segment['tmax'])
             self.data = self.data.query(queryStr)
             self.data = self.data.reset_index(drop=True)
             self.data.loc[:, 'time'] -= self.data.loc[0, 'time']
@@ -481,17 +465,6 @@ class TweezersDataSegment(TweezersDataBase):
         """
 
         log.debug('Reading data from data source.')
-        data = self.source.getDataSegment(self.analysis['tmin'], self.analysis['tmax'])
+        data = self.source.getDataSegment(self.segment['tmin'], self.segment['tmax'])
         self.meta, self.units, data = self.source.postprocessData(self.meta, self.units, data)
         return data
-
-    def save(self):
-        """
-        Save the analysis data back to disk.
-
-        Returns:
-            :class:`.TweezersData`
-        """
-
-        self.source.writeAnalysis(self.analysis, segment=self.meta['segment'])
-        return self

@@ -23,12 +23,11 @@ class TxtBiotecSource(BaseSource):
     # path to data, not correct if files sit in different folders
     path = None
 
-    def __init__(self, data=None, analysis=None, psd=None, ts=None, screenshot=None, **kwargs):
+    def __init__(self, data=None, psd=None, ts=None, screenshot=None, **kwargs):
         """
         Args:
             data (:class:`pathlib.Path`): path to data file to read, if the input is of a different type, it is given to
                                            :class:`pathlib.Path` to try to create an instance
-            analysis (:class:`pathlib.Path`): path to analysis file
             psd (:class:`pathlib.Path`): path to psd file
             ts (:class:`pathlib.Path`): path to ts file
             screenshot (:class:`pathlib.Path`): path to screenshot file
@@ -50,8 +49,6 @@ class TxtBiotecSource(BaseSource):
             self.data = Path(data)
             self.header = self.data
 
-        if analysis:
-            self.analysis = Path(analysis)
         if screenshot:
             self.screenshot = Path(screenshot)
 
@@ -357,6 +354,13 @@ class TxtBiotecSource(BaseSource):
         data.loc[:, 'time'] -= data.loc[0, 'time']
         units['absTime'] = 's'
 
+        # ensure values, set them to 0 if they come as None from the file
+        for trap in meta['traps']:
+            if not meta[trap].displacementSensitivity:
+                meta[trap].displacementSensitivity = 0
+            if not meta[trap].forceSensitivity:
+                meta[trap].forceSensitivity = 0
+
         # calculate forces
         meta, units, data = self.calculateForce(meta, units, data)
 
@@ -440,14 +444,3 @@ class TxtBiotecSource(BaseSource):
         df = pd.read_csv(str(file), sep='\t', dtype=np.float64, skiprows=cols['n'], header=None,
                          names=cols['names'], engine='c')
         return df
-
-    def getAnalysisFile(self):
-        """
-        Create the analysis file name.
-
-        Returns:
-            :class:`pathlib.Path`
-        """
-
-        filename = self.data.parent.joinpath(self.data.name.replace('DATA', 'ANALYSIS'))
-        return filename

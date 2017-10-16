@@ -15,8 +15,6 @@ class BaseSource:
     required.
     """
 
-    analysis = None
-
     def __init__(self, **kwargs):
         pass
 
@@ -100,99 +98,3 @@ class BaseSource:
         """
 
         return meta, units, data
-
-    def getAnalysisFile(self):
-        """
-        Create the analysis file name.
-
-        Returns:
-            :class:`pathlib.Path`
-        """
-
-        raise NotImplementedError()
-
-    def readAnalysisFile(self):
-        """
-        Read the content of the analysis file from disk.
-
-        Returns:
-            :class:`tweezers.ixo.utils.IndexedOrderedDict`
-        """
-
-        if not self.analysis:
-            return IndexedOrderedDict()
-
-        with self.analysis.open(mode='r', encoding='utf-8') as f:
-            analysisDict = json.load(f, object_pairs_hook=IndexedOrderedDict, cls=DataFrameJsonDecoder)
-        return analysisDict
-
-    def writeAnalysisFile(self, analysisDict):
-        """
-        Write the analysis file to disk.
-
-        Args:
-            analysisDict (:class:`tweezers.ixo.utils.IndexedOrderedDict`): analysis dictionary
-        """
-
-        # build filename if it does not exist
-        if not self.analysis:
-            self.analysis = self.getAnalysisFile()
-
-        # write data to file
-        jsonStr = json.dumps(analysisDict, indent=4, cls=DataFrameJsonEncoder)
-        with self.analysis.open(mode='w', encoding='utf-8') as f:
-            f.write(jsonStr)
-
-    def getAnalysis(self):
-        """
-        Return the analysis data.
-
-        Returns:
-            :class:`collections.OrderedDict`
-        """
-
-        return self.readAnalysisFile().get('analysis', IndexedOrderedDict())
-
-    def writeAnalysis(self, analysis, segment=None):
-        """
-        Write the analysis data back to disk.
-
-        Args:
-            analysis (:class:`collections.OrderedDict`): the analysis data to store
-        """
-
-        analysisDict = self.readAnalysisFile()
-
-        # should we only update the segment?
-        if segment is not None:
-            analysisDict['segments'][segment] = analysis
-            # remove the general analysis keys
-            for key in analysisDict['analysis'].keys():
-                analysisDict['segments'][segment].pop(key, None)
-        else:
-            # sort analysis keys and store in the proper dictionary
-            analysisDict['analysis'] = IndexedOrderedDict(sorted(analysis.items()))
-
-        self.writeAnalysisFile(analysisDict)
-
-    def getSegments(self):
-        """
-        Return a list of all segments.
-
-        Returns:
-            :class:`tweezers.ixo.collections.IndexedOrderedDict`
-        """
-
-        return self.readAnalysisFile().get('segments', IndexedOrderedDict())
-
-    def writeSegments(self, segments):
-        """
-        Write segment information back to disk.
-
-        Args:
-            segments (:class:`tweezers.ixo.collections.IndexedOrderedDict`): segment dictionary
-        """
-
-        analysisDict = self.readAnalysisFile()
-        analysisDict['segments'] = segments
-        self.writeAnalysisFile(analysisDict)

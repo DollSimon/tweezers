@@ -19,7 +19,7 @@ class TxtMpiSource(BaseSource):
     psd = None
     ts = None
 
-    def __init__(self, data=None, psd=None, ts=None, analysis=None):
+    def __init__(self, data=None, psd=None, ts=None):
         """
         Args:
             path (:class:`patlhlib.Path`): path to file to read, if the input is of a different type, it is given to
@@ -35,8 +35,6 @@ class TxtMpiSource(BaseSource):
             self.psd = TxtMpiFile(psd)
         if ts:
             self.ts = TxtMpiFile(ts)
-        if analysis:
-            self.analysis = Path(analysis)
 
     @classmethod
     def fromIdDict(cls, idDict):
@@ -479,14 +477,3 @@ class TxtMpiSource(BaseSource):
             if oldKey not in units:
                 return
             units.replaceKey(oldKey, newKey)
-
-    def getAnalysisFile(self):
-        """
-        Create the analysis file name.
-
-        Returns:
-            :class:`pathlib.Path`
-        """
-
-        dataPath = self.data.path
-        return dataPath.with_name('ANALAYSIS_' + dataPath.name)
