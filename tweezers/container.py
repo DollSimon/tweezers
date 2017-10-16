@@ -122,11 +122,11 @@ class TweezersDataBase:
         args = {'samplingRate': self.meta['psdSamplingRate']}
         args.update(kwargs)
 
-        psdObj = PsdComputation(self.ts)
+        psdObj = PsdComputation(self.ts, **kwargs)
         psdMeta, psd = psdObj.psd()
 
         # create copy
-        td = copy.deepcopy(self)
+        td = self.copy()
 
         # store PSD in 'psd' attribute of this object
         td.psd = psd
@@ -177,36 +177,36 @@ class TweezersDataBase:
         """
         Perform a thermal calibration. Requires :meth:`.psd` and
         :meth:`.psdFit`.
+        Returns a copy of the initial object.
 
         Returns:
             :class:`.TweezersData`
         """
 
-        # get axes
-        axes = self.meta.subDictKeys()
+        t = self.copy()
 
-        for ax in axes:
+        for ax in t.meta.traps:
             # convert diameter to nm (likely given in µm)
-            if self.units[ax]['beadDiameter'] == 'nm':
-                diam = self.meta[ax]['beadDiameter']
-            elif self.units[ax]['beadDiameter'] in ['um', 'µm']:
-                diam = self.meta[ax]['beadDiameter'] * 1000
+            if t.units[ax]['beadDiameter'] == 'nm':
+                diam = t.meta[ax]['beadDiameter']
+            elif t.units[ax]['beadDiameter'] in ['um', 'µm']:
+                diam = t.meta[ax]['beadDiameter'] * 1000
             else:
                 raise ValueError('Unknown bead radius unit encountered.')
 
-            res, units = thermalCalibration(diffCoeff=self.meta[ax]['diffusionCoefficient'],
-                                            cornerFreq=self.meta[ax]['cornerFrequency'],
-                                            viscosity=self.meta['viscosity'],
+            res, units = thermalCalibration(diffCoeff=t.meta[ax]['diffusionCoefficient'],
+                                            cornerFreq=t.meta[ax]['cornerFrequency'],
+                                            viscosity=t.meta['viscosity'],
                                             beadDiameter=diam,
-                                            temperature=self.meta['temperature'])
+                                            temperature=t.meta['temperature'])
 
-            self.meta.update({ax: res})
-            self.units.update({ax: units})
+            t.meta.update({ax: res})
+            t.units.update({ax: units})
 
         # recompute forces
-        self.meta, self.units, self.data = self.source.calculateForce(self.meta, self.units, self.data)
+        t.meta, t.units, t.data = t.source.calculateForce(t.meta, t.units, t.data)
 
-        return self
+        return t
 
     def copy(self):
         """
@@ -220,7 +220,6 @@ class TweezersDataBase:
         """
 
         return copy.deepcopy(self)
-
 
     def getFacets(self, data, colName='Value', meta=[]):
         """
