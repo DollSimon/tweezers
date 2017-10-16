@@ -30,11 +30,11 @@ class CollectionPlot:
         self.nextButton.on_click(self.next)
 
         self.datasetDropdown = widgets.Dropdown(options=self.ids, value=self.ids[0])
-        self.datasetDropdown.layout.width = '500px'
         self.datasetDropdown.observe(self.datasetDropdownChanged, names='value')
 
         statusMsgLabel = widgets.Label(value='Status:')
         self.statusMsg = widgets.Label(value='-')
+        self.statusMsg.layout.width = '100px'
 
         display(widgets.VBox([
             widgets.HBox([currentLabelDescription, self.currentLabel]),
