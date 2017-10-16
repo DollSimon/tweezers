@@ -80,30 +80,21 @@ class SegmentSelector(CollectionPlot):
     selector = None
     alpha = 0.2
 
-    def __init__(self, td, cols=['yForce'], **kwargs):
+    def __init__(self, tc, cols=['yForce'], **kwargs):
         if isinstance(cols, str):
             self.cols = [cols]
         else:
             self.cols = cols
 
-        super().__init__(td, self.plot, **kwargs)
+        super().__init__(tc, self.plot, **kwargs)
 
-        # autosave checkbox
-        self.autosaveCheck = widgets.Checkbox(value=True)
-        autsaveCheckLabel = widgets.Label('Autosave segments:')
-        autosaveBox = widgets.HBox([autsaveCheckLabel, self.autosaveCheck])
-        autosaveBox.layout.align_items = 'center'
-
-        # save and reset buttons
-        self.saveButton = widgets.Button(description='Save segments')
-        self.saveButton.on_click(self.saveButtonClick)
+        # reset button
         self.resetButton = widgets.Button(description='Reset current dataset')
         self.resetButton.on_click(self.resetButtonClick)
 
         # display widgets
         gui = widgets.VBox([
-            autosaveBox,
-            widgets.HBox([self.saveButton, self.resetButton])
+            widgets.HBox([self.resetButton])
         ])
         display(gui)
 
@@ -130,27 +121,15 @@ class SegmentSelector(CollectionPlot):
 
     def segmentSelect(self, xmin, xmax):
         # add segment
-        self.statusMsg.value = '{} - {}'.format(xmin, xmax)
+        self.statusMsg.value = '{:.2} s - {:.2} s'.format(xmin, xmax)
         self.tc[self.i].addSegment(xmin, xmax)
 
         # plot segment
         plotSegment(self.ax, xmin, xmax, facecolor=self.color, alpha=self.alpha)
 
-        # save segments?
-        if self.autosaveCheck.value:
-            self.tc[self.i].save()
-
-    def saveButtonClick(self, b):
-        self.tc[self.i].save()
-        self.statusMsg.value = 'Segments saved'
-
     def resetButtonClick(self, b):
         # delete all segments using the higher level API
-        for segId in self.tc[self.i].segments.keys():
-            self.tc[self.i].deleteSegment(segId)
-        # autosave?
-        if self.autosaveCheck.value:
-            self.tc[self.i].save()
+        self.tc[self.i].segments.clear()
         # update GUI
         self.statusMsg.value = 'Segments reset'
         self.update()
