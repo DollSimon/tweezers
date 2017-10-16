@@ -19,7 +19,9 @@ DEPENDENCIES = [# documentation stuff
                 'numpy>=1.8',
                 'matplotlib>=1.2.1',
                 'scipy',
-                'seaborn'
+                'hdf5storage>=0.2',
+                'ipywidgets',
+                'jupyter'
 ]
 
 CLASSIFIERS = [

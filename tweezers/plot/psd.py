@@ -1,10 +1,8 @@
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MaxNLocator
-import seaborn as sns
 import numpy as np
 import math
-sns.set_context('poster')
 
 
 class PsdPlotBase():
