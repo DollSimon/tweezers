@@ -1,5 +1,6 @@
 import re
 import pandas as pd
+import datetime
 
 from tweezers.ixo.collections import IndexedOrderedDict
 
@@ -54,6 +55,42 @@ class TweezersCollection(IndexedOrderedDict):
             if re.search(filterExp, key):
                 res[key] = self[key]
 
+        return res
+
+    def filterByDate(self, date, method='newer', endDate=None):
+        """
+        Filter the `TweezersCollection` by date. Available methods are `newer`, `older` and `between`.
+        For `between`, dates between `date` and `endDate` will be filtered.
+
+        Args:
+            date (`datetime.datetime`): reference date
+            method (`str`): one of `newer`, `older`, `between`
+            endDate(`datetime.datetime): required if `type = 'between'`
+
+        Returns:
+            `tweezers.TweezersCollection`
+        """
+
+        if not isinstance(date, datetime.datetime):
+            raise ValueError('filterByDate: `date` is not a `datetime.datetime` object')
+        if method is 'between' and not isinstance(endDate, datetime.datetime):
+            raise ValueError('filterByDate: `endDate` is not a `datetime.datetime` object')
+
+        res = self.__class__()
+        for key, item in self.items():
+            # start recursion
+            if isinstance(item, TweezersCollection):
+                res[key] = item.filterByDate(date, method=method, endDate=endDate)
+                continue
+
+            # or work on current item
+            time = item.source.getTime()
+            if method is 'newer' and time >= date:
+                res[key] = item
+            elif method is 'older' and time <= date:
+                res[key] = item
+            elif method is 'between' and date <= time <= endDate:
+                res[key] = item
         return res
 
     def getMetaFacets(self):
