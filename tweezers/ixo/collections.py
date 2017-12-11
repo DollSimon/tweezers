@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import pprint
+import copy
 
 
 class AttrDictMixin(object):
@@ -162,6 +163,16 @@ class IndexedOrderedDict(AttrDictMixin, OrderedDict):
 
         return len(self)
 
+    def copy(self):
+        """
+        Returns a deep copy of the object
+
+        Returns:
+            same type as object
+        """
+
+        return copy.deepcopy(self)
+
 
 def isNestedDict(dictionary):
     """
@@ -182,3 +193,32 @@ def isNestedDict(dictionary):
             return True
 
     return False
+
+
+def dictStructure(dictionary, indent=4, level=0):
+    """
+    Get the structure of a dictionary. Returns an ``OrderedDict`` with the same keys
+    as the one passed as input but the values replaced with its type.
+
+    Args:
+        dictionary (`dict`): dictionary to traverse
+        indent (`int`): number of spaces to indent a level
+        level (`int`): current level of indentation
+
+    Returns:
+        `str`
+    """
+
+    if not isinstance(dictionary, dict):
+        raise AttributeError('dictStructure: No dict given')
+
+    indentString = ' ' * indent * level
+    content = ''
+    for key, item in dictionary.items():
+        if isinstance(item, dict):
+            content += '{}{}:\n'.format(indentString, key)
+            content += dictStructure(item, indent=indent, level=level+1)
+        else:
+            content += '{}{}: {}\n'.format(indentString, key, type(item))
+
+    return content
