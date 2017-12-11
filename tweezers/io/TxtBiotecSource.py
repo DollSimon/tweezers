@@ -17,7 +17,6 @@ class TxtBiotecSource(BaseSource):
     """
 
     # hold paths to respective files
-    header = None
     psd = None
     data = None
     ts = None
@@ -37,23 +36,14 @@ class TxtBiotecSource(BaseSource):
 
         super().__init__(**kwargs)
 
-        # order is important here for the header file
         if ts:
             self.ts = Path(ts)
-            self.header = self.ts
-
         if psd:
             self.psd = Path(psd)
-            self.header = self.psd
-
         if data:
             self.data = Path(data)
-            self.header = self.data
-
         if screenshot:
             self.screenshot = Path(screenshot)
-
-        self.path = self.header.parent
 
     @classmethod
     def fromIdDict(cls, idDict):
@@ -162,6 +152,28 @@ class TxtBiotecSource(BaseSource):
 
         return ids
 
+    @property
+    def header(self):
+        """
+        Return which file is used for reading the metadata.
+
+        Returns:
+            `pathlib.Path`
+        """
+        header = None
+        # order is important here for the header file
+        if self.ts:
+            header = self.ts
+        if self.psd:
+            header = self.psd
+        if self.data:
+            header = self.data
+
+        if not header:
+            raise ValueError('No header file given (probably no file given at all).')
+
+        return header
+
     def getMetadata(self):
         """
         Return the metadata of the experiment.
@@ -169,9 +181,6 @@ class TxtBiotecSource(BaseSource):
         Returns:
             :class:`tweezers.MetaDict` and :class:`tweezers.UnitDict`
         """
-
-        if not self.header:
-            raise ValueError('No header file given (probably no file given at all).')
 
         headerStr = ''
         with self.header.open(encoding='utf-8') as f:
