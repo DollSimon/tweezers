@@ -4,6 +4,7 @@ from collections import OrderedDict
 import pandas as pd
 import numpy as np
 import re
+import datetime
 
 from .BaseSource import BaseSource
 from tweezers.meta import MetaDict, UnitDict
@@ -444,3 +445,15 @@ class TxtBiotecSource(BaseSource):
         df = pd.read_csv(str(file), sep='\t', dtype=np.float64, skiprows=cols['n'], header=None,
                          names=cols['names'], engine='c')
         return df
+
+    def getTime(self):
+        """
+        Return the time of the source.
+
+        Returns:
+            `datetime.datetime`
+        """
+
+        timeStr = self.header.name[:19]
+        time = datetime.datetime.strptime(timeStr, '%Y-%m-%d_%H-%M-%S')
+        return time

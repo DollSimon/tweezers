@@ -1,9 +1,3 @@
-import json
-
-from tweezers.ixo.collections import IndexedOrderedDict
-from tweezers.ixo.io import DataFrameJsonDecoder, DataFrameJsonEncoder
-
-
 class BaseSource:
     """
     Base class for data sources. Inherit from this class when creating a new data source. Keep in mind that not all
@@ -98,3 +92,13 @@ class BaseSource:
         """
 
         return meta, units, data
+
+    def getTime(self):
+        """
+        Return the time of the source.
+
+        Returns:
+            `datetime.datetime`
+        """
+
+        raise NotImplementedError()
