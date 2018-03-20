@@ -1,3 +1,4 @@
-from .TxtMpiSource import TxtMpiSource
+from .BaseSource import BaseSource
 from .TxtBiotecSource import TxtBiotecSource
-from .AnalysisFile import AnalysisFile
+from .TxtMpiSource import TxtMpiSource
+from .TdmsCTrapSource import TdmsCTrapSource

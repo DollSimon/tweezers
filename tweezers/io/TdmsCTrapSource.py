@@ -2,11 +2,11 @@ from nptdms import TdmsFile
 import re
 import pandas as pd
 from pathlib import Path
+from collections import OrderedDict
 
 from .BaseSource import BaseSource
 import tweezers as t
 from tweezers.ixo.decorators import lazy
-from tweezers import TweezersCollection
 
 
 class TdmsCTrapSource(BaseSource):
@@ -42,20 +42,6 @@ class TdmsCTrapSource(BaseSource):
 
         return TdmsFile(str(self.tdmsFile))
 
-    @classmethod
-    def fromIdDict(cls, idDict):
-        """
-        Creates a data source from a given experiment ID and the associated files.
-
-        Args:
-            idDict (`str` or :class:`pathlib.Path`): path to the data file
-
-        Returns:
-            :class:`tweezers.io.TdmsCTrapSource`
-        """
-
-        return cls(idDict)
-
     @staticmethod
     def isDataFile(path):
         """
@@ -68,9 +54,9 @@ class TdmsCTrapSource(BaseSource):
             `dict` with ``id`` and ``type``
         """
 
-        pPath = Path(path)
+        _path = Path(path)
         m = re.match('^(?P<beadId>[0-9\-]{15}.*#\d{3})(?P<trial>-\d{3})( (?P<type>[A-Z]+))?\.[a-zA-Z]{3,4}$',
-                     pPath.name)
+                     _path.name)
         if m:
             ide = None
             if m.group('trial'):
@@ -81,38 +67,13 @@ class TdmsCTrapSource(BaseSource):
             res = {'beadId': m.group('beadId'),
                    'id': ide,
                    'type': tipe,
-                   'path': pPath}
+                   'path': _path}
             return res
         else:
             return False
 
-    @staticmethod
-    def getAllFiles(path):
-        """
-        Return a recursive list of all valid data files within a given path.
-
-        Args:
-            path (:class:`pathlib.Path`): root path to search for valid data files
-
-        Returns:
-            `list` of `dict`
-        """
-
-        pPath = Path(path)
-        files = []
-
-        for obj in pPath.iterdir():
-            if obj.is_dir():
-                subFiles = TdmsCTrapSource.getAllFiles(obj)
-                files += subFiles
-            else:
-                m = TdmsCTrapSource.isDataFile(obj)
-                if m:
-                    files.append(m)
-        return files
-
-    @staticmethod
-    def getAllIds(path):
+    @classmethod
+    def getAllSources(cls, path):
         """
         Get a list of all IDs and their files that are at the given path and its subfolders.
 
@@ -123,21 +84,22 @@ class TdmsCTrapSource(BaseSource):
             `dict`
         """
 
-        pPath = Path(path)
+        _path = Path(path)
 
         # get a list of all files and their properties
-        files = TdmsCTrapSource.getAllFiles(pPath)
-        ids = TweezersCollection()
+        files = TdmsCTrapSource.getAllFiles(_path)
+        sources = OrderedDict()
 
         # sort files
         for el in files:
-            if el['beadId'] not in ids.keys():
-                ids[el['beadId']] = {}
-            if el['id'] not in ids[el['beadId']].keys():
-                ids[el['beadId']][el['id']] = {}
-            ids[el['beadId']][el['id']]['data'] = el['path']
+            if el['beadId'] not in sources.keys():
+                sources[el['beadId']] = OrderedDict()
+            if el['id'] not in sources[el['beadId']].keys():
+                sources[el['beadId']][el['id']] = cls()
+            # ToDo requries testing
+            setattr(sources[el['beadId']][el['id']], el['type'], el['path'])
 
-        return ids
+        return sources
 
     def getMetadata(self):
         """

@@ -3,11 +3,11 @@ import json
 import re
 import numpy as np
 import os
+from collections import OrderedDict
 
 from .TxtMpiFile import TxtMpiFile
 from .BaseSource import BaseSource
 from tweezers.meta import MetaDict, UnitDict
-from tweezers.collections import TweezersCollection
 
 
 class TxtMpiSource(BaseSource):
@@ -36,21 +36,6 @@ class TxtMpiSource(BaseSource):
         if ts:
             self.ts = TxtMpiFile(ts)
 
-    @classmethod
-    def fromIdDict(cls, idDict):
-        """
-        Creates a data source from a given experiment ID and the associated files.
-
-        Args:
-            idDict (dict): with keys `data`, `ts`, `psd` etc. whose values are the
-                            full paths to the corresponding files.
-
-        Returns:
-            :class:`tweezers.io.TxtMpiSource`
-        """
-
-        return cls(**idDict)
-
     @staticmethod
     def isDataFile(path):
         """
@@ -78,33 +63,8 @@ class TxtMpiSource(BaseSource):
         else:
             return False
 
-    @staticmethod
-    def getAllFiles(path):
-        """
-        Return a recursive list of all valid data files within a given path.
-
-        Args:
-            path (:class:`pathlib.Path`): root path to search for valid data files
-
-        Returns:
-            `list` of `str`
-        """
-
-        pPath = Path(path)
-        files = []
-
-        for obj in pPath.iterdir():
-            if obj.is_dir():
-                subFiles = TxtMpiSource.getAllFiles(obj)
-                files += subFiles
-            else:
-                m = TxtMpiSource.isDataFile(obj)
-                if m:
-                    files.append(m)
-        return files
-
-    @staticmethod
-    def getAllIds(path):
+    @classmethod
+    def getAllSources(cls, path):
         """
         Get a list of all IDs and their files that are at the given path and its subfolders.
 
@@ -115,19 +75,19 @@ class TxtMpiSource(BaseSource):
             `dir`
         """
 
-        pPath = Path(path)
+        _path = Path(path)
 
         # get a list of all files and their properties
-        files = TxtMpiSource.getAllFiles(pPath)
-        ids = TweezersCollection()
+        files = cls.getAllFiles(_path)
+        sources = OrderedDict()
 
         # sort files that belong to the same id
         for el in files:
-            if el['id'] not in ids.keys():
-                ids[el['id']] = {}
-            ids[el['id']][el['type']] = el['path']
+            if el['id'] not in sources.keys():
+                sources[el['id']] = cls()
+            setattr(sources[el['id']], el['type'], TxtMpiFile(el['path']))
 
-        return ids
+        return sources
 
     def getMetadata(self):
         """

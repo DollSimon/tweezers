@@ -121,7 +121,7 @@ def save(path, data):
     collect = CustomMarshallerCollection(marshallers=[DataFrameMarshaller(),
                                                       IndexedOrderedDictMarshaller(),
                                                       CustomNumpyMarshaller()])
-    h5.savemat(path, data,
+    h5.savemat(str(path), data,
                marshaller_collection=collect,
                truncate_existing=True,
                format='7.3',
@@ -132,5 +132,5 @@ def load(path, keys=None):
     collect = CustomMarshallerCollection(marshallers=[DataFrameMarshaller(),
                                                       IndexedOrderedDictMarshaller(),
                                                       CustomNumpyMarshaller()])
-    return h5.loadmat(path, marshaller_collection=collect,
+    return h5.loadmat(str(path), marshaller_collection=collect,
                       appendmat=False, variable_names=keys)

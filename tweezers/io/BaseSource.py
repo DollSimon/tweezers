@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 class BaseSource:
     """
     Base class for data sources. Inherit from this class when creating a new data source. Keep in mind that not all
@@ -45,7 +48,9 @@ class BaseSource:
             :class:`pandas.DataFrame`
         """
 
-        raise NotImplementedError()
+        # default expensive implementation....
+        return self.getData().query('{} <= time <= {}'.format(tmin, tmax))
+
 
     def getPsd(self):
         """
@@ -102,3 +107,59 @@ class BaseSource:
         """
 
         raise NotImplementedError()
+
+    @staticmethod
+    def calculateForce(meta, units, data):
+        """
+        Calculate forces from Diff signal and calibration values.
+
+        Args:
+            meta (:class:`.MetaDict`): metadata
+            units (:class:`.UnitDict`): unit metadata
+            data (:class:`pandas.DataFrame`): data
+
+        Returns:
+
+            Updated versions of the input parameters
+
+            * meta (:class:`.MetaDict`)
+            * units (:class:`.UnitDict`)
+            * data (:class:`pandas.DataFrame`)
+        """
+
+        raise NotImplementedError()
+
+    @staticmethod
+    def isDataFile(path):
+
+        raise NotImplementedError()
+
+    @classmethod
+    def getAllSources(cls, path):
+
+        raise NotImplementedError()
+
+    @classmethod
+    def getAllFiles(cls, path):
+        """
+        Return a recursive list of all valid data files within a given path.
+
+        Args:
+            path (:class:`pathlib.Path`): root path to search for valid data files
+
+        Returns:
+            `list` of `dict`
+        """
+
+        _path = Path(path)
+        files = []
+
+        for item in _path.iterdir():
+            if item.is_dir():
+                subFiles = cls.getAllFiles(item)
+                files += subFiles
+            else:
+                m = cls.isDataFile(item)
+                if m:
+                    files.append(m)
+        return files

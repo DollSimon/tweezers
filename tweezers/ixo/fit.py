@@ -80,7 +80,8 @@ class Fit():
 
     def chisquared(self):
         """
-        Compute chi squared of the fit.
+        Compute reduced chi squared of the fit.
+            formula source: https://en.wikipedia.org/wiki/Reduced_chi-squared_statistic
 
         Returns:
             :class:`float`

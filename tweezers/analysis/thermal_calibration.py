@@ -34,4 +34,3 @@ def thermalCalibration(diffCoeff, cornerFreq, viscosity, beadDiameter, temperatu
                          ('forceSensitivity', 'pN/V')])
 
     return res, units
-

@@ -1,16 +1,18 @@
-import logging as log
 import copy
-import pandas as pd
+import logging as log
 from collections import OrderedDict
 
-from tweezers.ixo.decorators import lazy
-from tweezers.io.AnalysisFile import AnalysisFile
+import pandas as pd
+
 from tweezers.analysis.psd import PsdComputation, PsdFit
 from tweezers.analysis.thermal_calibration import thermalCalibration
-from tweezers.meta import MetaDict, UnitDict
-from tweezers.plot.utils import peekPlot
-from tweezers.plot.psd import PsdFitPlot
+from tweezers.container.TweezersAnalysis import TweezersAnalysis
 from tweezers.ixo.collections import IndexedOrderedDict
+from tweezers.ixo.decorators import lazy
+from tweezers.ixo.statistics import averageData
+from tweezers.meta import MetaDict, UnitDict
+from tweezers.plot.psd import PsdFitPlot
+from tweezers.plot.utils import peekPlot
 
 
 class TweezersDataBase:
@@ -96,16 +98,10 @@ class TweezersDataBase:
             nsamples (`int`): number of samples to average
 
         Returns:
-            :class:`.TweezersData`
+            :class:`pandas.DataFrame`
         """
 
-        group = self.data.groupby(self.data.index // nsamples)
-        avData = group.mean()
-        avData['time'] = group.first()['time']
-        if 'absTime' in self.data.columns:
-            avData['absTime'] = group.first()['absTime']
-
-        return avData
+        return averageData(self.data, nsamples=nsamples)
 
     def computePsd(self, **kwargs):
         """
@@ -216,7 +212,7 @@ class TweezersDataBase:
 
 
         Returns:
-            :class:`tweezers.container.TweezersDataBase`
+            :class:`.TweezersDataBase`
         """
 
         return copy.deepcopy(self)
@@ -290,22 +286,29 @@ class TweezersDataBase:
 
     def getAnalysis(self, path, name=None):
         """
+        Convert the current :class:`.TweezersData` to a :class:`.TweezersAnalysis`, the general format to store and
+        exchange analysis results.
 
         Args:
-
+            path (`str`): path to the directory that will hold the :class:`tweezers.TweezersAnalysis` file
+            name (`str`, optional): name for the analysis file, constructed from metadata if not given (using the ID)
 
         Returns:
-
+            :class:`.TweezersAnalysis`
         """
 
         if not name:
-            name = self.meta.id + '.h5'
-        elif name[-3:] != '.h5':
-            name += '.h5'
+            name = self.meta.id
+        name = TweezersAnalysis.getFilename(name)
 
-        analysis = AnalysisFile(path=path, file=name)
+        analysis = TweezersAnalysis(path=path, name=name)
         analysis.meta = copy.deepcopy(self.meta)
-        analysis.data = copy.deepcopy(self.data)
+        # if segments are defined, put them here, otherwise put the data
+        if self.segments:
+            for key in self.segments.keys():
+                analysis[key] = IndexedOrderedDict(data=self.getSegment(key).data)
+        else:
+            analysis.data = copy.deepcopy(self.data)
         return analysis
 
 
@@ -378,8 +381,8 @@ class TweezersData(TweezersDataBase):
 
         # insert segment
         self.segments[name] = IndexedOrderedDict([('tmin', tmin), ('tmax', tmax)])
-        # sort segments by tmin
-        self.segments = self.segments.sorted(key=lambda t: t[1]['tmin'])
+        # sort segments by name
+        self.segments = self.segments.sorted()
 
         return self
 

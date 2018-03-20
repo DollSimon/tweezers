@@ -8,7 +8,6 @@ import datetime
 
 from .BaseSource import BaseSource
 from tweezers.meta import MetaDict, UnitDict
-from tweezers.collections import TweezersCollection
 
 
 class TxtBiotecSource(BaseSource):
@@ -16,14 +15,12 @@ class TxtBiotecSource(BaseSource):
     Data source for \*.txt files from the Biotec tweezers.
     """
 
-    # hold paths to respective files
+    ts = None
     psd = None
     data = None
-    ts = None
-    # path to data, not correct if files sit in different folders
-    path = None
+    image = None
 
-    def __init__(self, data=None, psd=None, ts=None, screenshot=None, **kwargs):
+    def __init__(self, data=None, psd=None, ts=None, image=None, **kwargs):
         """
         Args:
             data (:class:`pathlib.Path`): path to data file to read, if the input is of a different type, it is given to
@@ -42,23 +39,8 @@ class TxtBiotecSource(BaseSource):
             self.psd = Path(psd)
         if data:
             self.data = Path(data)
-        if screenshot:
-            self.screenshot = Path(screenshot)
-
-    @classmethod
-    def fromIdDict(cls, idDict):
-        """
-        Creates a data source from a given experiment ID and the associated files.
-
-        Args:
-            idDict (dict): with keys `data`, `ts`, `psd` etc. whose values are the
-                            full paths to the corresponding files.
-
-        Returns:
-            :class:`tweezers.io.TxtBiotecSource`
-        """
-
-        return cls(**idDict)
+        if image:
+            self.image = Path(image)
 
     @staticmethod
     def isDataFile(path):
@@ -72,9 +54,9 @@ class TxtBiotecSource(BaseSource):
             `dict` with ``id`` and ``type``
         """
 
-        pPath = Path(path)
+        _path = Path(path)
         m = re.match('^(?P<beadId>[0-9\-_]{19}.*#\d{3})(?P<trial>-\d{3})?\s(?P<type>[a-zA-Z]+)\.[a-zA-Z]{3}$',
-                     pPath.name)
+                     _path.name)
         if m:
             ide = None
             if m.group('trial'):
@@ -82,40 +64,15 @@ class TxtBiotecSource(BaseSource):
             res = {'beadId': m.group('beadId'),
                    'id': ide,
                    'type': m.group('type').lower(),
-                   'path': pPath}
+                   'path': _path}
             return res
         else:
             return False
 
-    @staticmethod
-    def getAllFiles(path):
+    @classmethod
+    def getAllSources(cls, path):
         """
-        Return a recursive list of all valid data files within a given path.
-
-        Args:
-            path (:class:`pathlib.Path`): root path to search for valid data files
-
-        Returns:
-            `list` of `dict`
-        """
-
-        pPath = Path(path)
-        files = []
-
-        for obj in pPath.iterdir():
-            if obj.is_dir():
-                subFiles = TxtBiotecSource.getAllFiles(obj)
-                files += subFiles
-            else:
-                m = TxtBiotecSource.isDataFile(obj)
-                if m:
-                    files.append(m)
-        return files
-
-    @staticmethod
-    def getAllIds(path):
-        """
-        Get a list of all IDs and their files that are at the given path and its subfolders.
+        Get a list of all IDs and their data soruces that are at the given path and its subfolders.
 
         Args:
             path (:class:`pathlib.Path`): root path for searching
@@ -124,33 +81,36 @@ class TxtBiotecSource(BaseSource):
             `dict`
         """
 
-        pPath = Path(path)
+        _path = Path(path)
 
         # get a list of all files and their properties
-        files = TxtBiotecSource.getAllFiles(pPath)
-        ids = TweezersCollection()
+        files = cls.getAllFiles(_path)
+        sources = OrderedDict()
         sharedFiles = {}
 
         # sort files in sharedFiles and actual data files that belong to an individual trial
         for el in files:
             if el['id']:
-                if el['beadId'] not in ids.keys():
-                    ids[el['beadId']] = {}
-                if el['id'] not in ids[el['beadId']].keys():
-                    ids[el['beadId']][el['id']] = {}
-                ids[el['beadId']][el['id']][el['type']] = el['path']
+                if el['beadId'] not in sources.keys():
+                    sources[el['beadId']] = OrderedDict()
+                if el['id'] not in sources[el['beadId']].keys():
+                    sources[el['beadId']][el['id']] = cls()
+                setattr(sources[el['beadId']][el['id']], el['type'], el['path'])
             else:
                 if el['beadId'] not in sharedFiles.keys():
                     sharedFiles[el['beadId']] = {}
                 sharedFiles[el['beadId']][el['type']] = el['path']
 
         # append a reference to the shared file to each trial
-        for idStr, el in ids.items():
-            if idStr in sharedFiles.keys():
-                for trial in el.values():
-                    trial.update(sharedFiles[idStr])
+        for beadId, beadData in sources.items():
+            if beadId in sharedFiles.keys():
+                # for each trial
+                for trial in beadData.values():
+                    # append each shared file
+                    for fileType, file in sharedFiles[beadId].items():
+                        setattr(trial, fileType, file)
 
-        return ids
+        return sources
 
     @property
     def header(self):
@@ -335,7 +295,7 @@ class TxtBiotecSource(BaseSource):
 
         # calculate mean force per axis, only meaningful for two traps
         data['xForce'] = (data.pmXForce + data.aodXForce) / 2
-        data['yForce'] = (data.pmYForce - data.aodYForce) / 2
+        data['yForce'] = (data.pmYForce + data.aodYForce) / 2
 
         units['xForce'] = 'pN'
         units['yForce'] = 'pN'

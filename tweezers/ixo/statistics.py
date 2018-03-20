@@ -1,6 +1,27 @@
 import numpy as np
 
 
+def averageData(data, nsamples=10):
+    """
+    Downsample the data by averaging ``nsamples``.
+
+    Args:
+        data (`pandas.DataFrame`): data to average
+        nsamples (`int`): number of samples to average
+
+    Returns:
+        :class:`pandas.DataFrame`
+    """
+
+    group = data.groupby(data.index // nsamples)
+    avData = group.mean()
+    avData['time'] = group.first()['time']
+    if 'absTime' in data.columns:
+        avData['absTime'] = group.first()['absTime']
+
+    return avData
+
+
 def correlate(x, y, length=20):
     """
     Calculate the normalized correlation coefficients of two 1-D arrays for a given maximum lag starting at 0.
