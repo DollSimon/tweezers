@@ -69,7 +69,7 @@ class TweezersDataCollection(TweezersCollection):
     """
 
     @classmethod
-    def load(cls, path, sourceType=TxtBiotecSource):
+    def load(cls, path, source=TxtBiotecSource):
         """
         Load data from disk. This will recursively find all files in the provied `path` that can be used with the
         provided tweezers data source, construct a :class:`.TweezersData` from it and populate a
@@ -80,7 +80,7 @@ class TweezersDataCollection(TweezersCollection):
         Args:
             path (`str` or :class:`pathlib.Path`): path to recursively search for data files that will be loaded as
             :class:`.TweezersData` objects
-            sourceType (:class:`tweezers.io.BaseSource.BaseSource`, optional): a tweezers data source used to
+            source (:class:`tweezers.io.BaseSource.BaseSource`, optional): a tweezers data source used to
             identify valid data files and build the :class:`.TweezersData` object, defaults to
             :class:`tweezers.io.TxtBiotecSource`
 
@@ -89,7 +89,7 @@ class TweezersDataCollection(TweezersCollection):
         """
 
         # get all data sources
-        sources = sourceType.getAllSources(path)
+        sources = source.getAllSources(path)
 
         # convert data sources to TweezersData
         res = cls._sourcesToData(sources)

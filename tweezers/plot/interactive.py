@@ -290,7 +290,7 @@ class DataManager:
         """
 
         sourceType = cls.getSourceTypes()[sourceType]
-        tc = TweezersDataCollection.load(path, sourceType=sourceType)
+        tc = TweezersDataCollection.load(path, source=sourceType)
         return cls(tc)
 
     def _setSegmentCounter(self):
