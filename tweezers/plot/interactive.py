@@ -344,7 +344,8 @@ class DataManager:
 
     def getDistColumns(self):
         res = [item for item in self.t.data.columns if (item.lower().endswith('dist')
-                                                        or item.lower().endswith('ext'))]
+                                                        or item.lower().endswith('ext')
+                                                        or item in ['dist1', 'dist2'])]     # c-trap compatibility
         return res
 
     def getAxesLabel(self, name):

@@ -15,7 +15,8 @@ class TdmsCTrapSource(BaseSource):
     """
 
     # path to tdms file
-    tdmsFile = None
+    data = None
+    analysis = None
 
     def __init__(self, data=None, analysis=None):
         """
@@ -27,7 +28,8 @@ class TdmsCTrapSource(BaseSource):
         """
 
         super().__init__()
-        self.tdmsFile = Path(data)
+        if data:
+            self.data = Path(data)
         if analysis:
             self.analysis = Path(analysis)
 
@@ -40,7 +42,7 @@ class TdmsCTrapSource(BaseSource):
             :class:`nptdms.TdmsFile`
         """
 
-        return TdmsFile(str(self.tdmsFile))
+        return TdmsFile(str(self.data))
 
     @staticmethod
     def isDataFile(path):
@@ -61,8 +63,10 @@ class TdmsCTrapSource(BaseSource):
             ide = None
             if m.group('trial'):
                 ide = '{}{}'.format(m.group('beadId'), m.group('trial'))
-            tipe = m.group('type').lower()
-            if not tipe:
+            tipe = m.group('type')
+            if tipe:
+                tipe = tipe.lower
+            else:
                 tipe = 'data'
             res = {'beadId': m.group('beadId'),
                    'id': ide,
@@ -119,6 +123,11 @@ class TdmsCTrapSource(BaseSource):
             metaTmp, unitsTmp = self.convertProperties(group.properties)
             meta.update(metaTmp)
             units.update(unitsTmp)
+
+        # postprocess metadata
+        meta.uniqueId = meta.id
+        meta.id = meta.name
+        meta.beadId = meta.name[:-4]
 
         # get metadata from channels
         for channel in self.tdms.group_channels('FD Data'):
