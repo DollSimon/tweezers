@@ -835,7 +835,8 @@ class SegmentSelector(QtWidgets.QMainWindow):
         """
         Event handler for the "Quit" button. Use in general to quit the application
         """
-        QtWidgets.QApplication.instance().quit()
+
+        self.close()
 
     def closeEvent(self, event):
         """
