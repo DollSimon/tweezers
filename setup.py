@@ -22,7 +22,8 @@ DEPENDENCIES = [# documentation stuff
                 'hdf5storage>=0.2',
                 'ipywidgets',
                 'jupyter',
-                'npTDMS>=0.11.4'
+                'npTDMS>=0.11.4',
+                'PyQt5'
 ]
 
 CLASSIFIERS = [
