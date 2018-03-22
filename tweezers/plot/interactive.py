@@ -291,6 +291,9 @@ class DataManager:
 
         sourceType = cls.getSourceTypes()[sourceType]
         tc = TweezersDataCollection.load(path, source=sourceType)
+        # empty dirctory given
+        if not tc:
+            raise ValueError('No data files found in the given path.')
         return cls(tc)
 
     def _setSegmentCounter(self):
@@ -510,7 +513,10 @@ class SegmentSelector(QtWidgets.QMainWindow):
 
         # source type combo box
         self.sourceTypeCmb = CustomComboBox()
-        self.sourceTypeCmb.addItems(DataManager.getSourceTypes().keys())
+        sourceTypes = list(DataManager.getSourceTypes().keys())
+        self.sourceTypeCmb.addItems(sourceTypes)
+        self.sourceTypeCmb.setCurrentItem(self.settings.value('dataSourceType', sourceTypes[0]))
+        self.sourceTypeCmb.currentIndexChanged[int].connect(self.onSelectSourceType)
         # load data button
         loadDataBtn = QtWidgets.QPushButton('Load Directory')
         loadDataBtn.clicked.connect(self.onLoadDirectory)
@@ -632,12 +638,17 @@ class SegmentSelector(QtWidgets.QMainWindow):
 
         lastImportDir = self.settings.value('importDir', '')
         path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory", lastImportDir)
+        sourceType = self.sourceTypeCmb.currentText()
+        self.settings.setValue('dataSourceType', sourceType)
         if path:
             self.settings.setValue('importDir', path)
             self.setStatus('Loading files ...')
             self.disableGui(True)
-            self.data = DataManager.load(path, sourceType=self.sourceTypeCmb.currentText())
-            self.loadData()
+            try:
+                self.data = DataManager.load(path, sourceType=sourceType)
+                self.loadData()
+            except ValueError as err:
+                self.displayError('Error loading data', err)
             self.setStatus('Ready')
 
     def setStatus(self, message):
@@ -824,13 +835,22 @@ class SegmentSelector(QtWidgets.QMainWindow):
         path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory", lastExportDir)
         if path:
             self.settings.setValue('exportDir', path)
+            groupExport = self.groupExportByIdChkbx.isChecked()
+            self.settings.setValue('groupExport', groupExport)
             self.setStatus('Saving analysis files...')
             try:
-                group = self.settings.value('groupExport')
-                self.data.export(path, groupExport=group)
+                self.data.export(path, groupExport=groupExport)
             except KeyError as err:
                 self.displayError('Could not save all analysis files', err)
             self.setStatus('Ready')
+
+    def onSelectSourceType(self, index):
+        """
+        Event handler for the data source selection combo box. Updates the value stored in the settings.
+        """
+
+        sourceTypes = list(DataManager.getSourceTypes())
+        self.settings.setValue('dataSourceType', sourceTypes[index])
 
     def onExit(self):
         """
@@ -858,7 +878,8 @@ class SegmentSelector(QtWidgets.QMainWindow):
         msg = QtWidgets.QMessageBox()
         msg.setWindowTitle('Error')
         msg.setText(message)
-        msg.setInformativeText('{0}'.format(error))
+        if error:
+            msg.setInformativeText('{0}'.format(error))
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
 
