@@ -23,7 +23,8 @@ DEPENDENCIES = [# documentation stuff
                 'ipywidgets',
                 'jupyter',
                 'npTDMS>=0.11.4',
-                'PyQt5'
+                'PyQt5',
+                'pyinstaller'
 ]
 
 CLASSIFIERS = [
