@@ -2,6 +2,7 @@ import re
 import pandas as pd
 import datetime
 from pathlib import Path
+from datetime import datetime
 
 from tweezers.ixo.collections import IndexedOrderedDict
 from tweezers.container.TweezersAnalysis import TweezersAnalysis
@@ -181,7 +182,7 @@ class TweezersDataCollection(TweezersCollection):
         For `between`, dates between `date` and `endDate` will be filtered.
 
         Args:
-            date (`datetime.datetime`): reference date
+            date (`datetime.datetime` or str): reference date, if `str`, it should be in format "YYYY-MM-DD"
             method (`str`): one of `newer`, `older`, `between`
             endDate(`datetime.datetime): required if `type = 'between'`
 
@@ -189,10 +190,23 @@ class TweezersDataCollection(TweezersCollection):
             `tweezers.TweezersCollection`
         """
 
-        if not isinstance(date, datetime.datetime):
+        if isinstance(date, str):
+            try:
+                date = datetime.strptime(date, '%Y-%m-%d')
+            except ValueError:
+                raise ValueError('filterByDate: `date` could not be converted to a `datetime.datetime object. Use '
+                                 '"YYYY-MM-DD" notation')
+        if not isinstance(date, datetime):
             raise ValueError('filterByDate: `date` is not a `datetime.datetime` object')
-        if method is 'between' and not isinstance(endDate, datetime.datetime):
-            raise ValueError('filterByDate: `endDate` is not a `datetime.datetime` object')
+        if method is 'between':
+            if isinstance(endDate, str):
+                try:
+                    endDate = datetime.strptime(endDate, '%Y-%m-%d')
+                except ValueError:
+                    raise ValueError('filterByDate: `endDate` could not be converted to a `datetime.datetime object. '
+                                     'Use "YYYY-MM-DD" notation')
+                if not isinstance(endDate, datetime):
+                    raise ValueError('filterByDate: `endDate` is not a `datetime.datetime` object')
 
         res = self.__class__()
         for key, item in self.items():

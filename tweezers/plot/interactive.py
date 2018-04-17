@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.backends.backend_qt5agg import (
             FigureCanvasQTAgg as FigureCanvas,
-            NavigationToolbar2QT as NavigationToolbar,
-            QtWidgets, QtCore, QtGui)
+            NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.widgets import RectangleSelector
+from PyQt5 import QtWidgets, QtCore
 from collections import OrderedDict
 
 from tweezers import TweezersData, TweezersDataCollection
@@ -267,9 +267,10 @@ class DataManager:
     decouple the GUI and the application logic.
     """
 
+    segCounter = dict()
+
     def __init__(self, tc):
         self.tc = tc.flatten()
-        self.segCounter = self._setSegmentCounter()
         self.n = 0
         self.setT(0)
         self.timeYAxis = self.getForceColumns()[0]
@@ -316,6 +317,8 @@ class DataManager:
         tmin, tmax = self.tLim[:2]
         if not name:
             ide = self._getBeadId(self.t)
+            if ide not in self.segCounter.keys():
+                self.segCounter[ide] = 0
             name = '{}'.format(self.segCounter[ide])
             self.segCounter[ide] += 1
         # check if segment already exists
@@ -420,6 +423,8 @@ class SegmentSelector(QtWidgets.QMainWindow):
         self.setWindowTitle('Segment Selector')
         # status bar
         self.statusBar().showMessage('Starting...')
+
+
 
         # mpl options
         mpl.pyplot.style.use('fivethirtyeight')

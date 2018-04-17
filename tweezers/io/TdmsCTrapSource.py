@@ -57,12 +57,12 @@ class TdmsCTrapSource(BaseSource):
         """
 
         _path = Path(path)
-        m = re.match('^(?P<beadId>[0-9\-]{15}.*#\d{3})(?P<trial>-\d{3})( (?P<type>[A-Z]+))?\.[a-zA-Z]{3,4}$',
+        m = re.match('^(?P<beadId>[0-9\-]{15}.*#\d{3})-(?P<trial>\d{3})( (?P<type>[A-Z]+))?\.tdms$',
                      _path.name)
         if m:
             ide = None
             if m.group('trial'):
-                ide = '{}{}'.format(m.group('beadId'), m.group('trial'))
+                ide = '{}-{}'.format(m.group('beadId'), m.group('trial'))
             tipe = m.group('type')
             if tipe:
                 tipe = tipe.lower

@@ -55,7 +55,7 @@ class TxtBiotecSource(BaseSource):
         """
 
         _path = Path(path)
-        m = re.match('^(?P<beadId>[0-9\-_]{19}.*#\d{3})(?P<trial>-\d{3})?\s(?P<type>[a-zA-Z]+)\.[a-zA-Z]{3}$',
+        m = re.match('^(?P<beadId>[0-9\-_]{19}.*#\d{3})(?P<trial>-\d{3})?\s(?P<type>[a-zA-Z]+)\.txt$',
                      _path.name)
         if m:
             ide = None
