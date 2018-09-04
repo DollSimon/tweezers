@@ -106,21 +106,11 @@ class DataFrameMarshaller(IndexedOrderedDictMarshaller):
         return data
 
 
-class CustomMarshallerCollection(h5.MarshallerCollection):
-    def __init__(self, lazy_loading=True, marshallers=[]):
-        super().__init__(lazy_loading=True, marshallers=[])
-
-        if not isinstance(marshallers, Iterable):
-            marshallers = [marshallers]
-        # prepend custom marshallers to builtin list
-        self._builtin_marshallers = marshallers + self._builtin_marshallers
-        self._update_marshallers()
-
-
 def save(path, data):
-    collect = CustomMarshallerCollection(marshallers=[DataFrameMarshaller(),
-                                                      IndexedOrderedDictMarshaller(),
-                                                      CustomNumpyMarshaller()])
+    collect = h5.MarshallerCollection(marshallers=[DataFrameMarshaller(),
+                                                   IndexedOrderedDictMarshaller(),
+                                                   CustomNumpyMarshaller()],
+                                      priority=('user', 'builtin', 'plugin'))
     h5.savemat(str(path), data,
                marshaller_collection=collect,
                truncate_existing=True,
