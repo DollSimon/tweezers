@@ -1,7 +1,6 @@
 import copy
 import logging as log
 from collections import OrderedDict
-
 import pandas as pd
 
 from tweezers.analysis.psd import PsdComputation, PsdFit
