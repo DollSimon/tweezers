@@ -168,6 +168,10 @@ class TxtBiotecSource(BaseSource):
         # add trap names
         meta['traps'] = meta.subDictKeys()
 
+        # add ID strings safe for printing (e.g. in matplotlib legend)
+        meta['beadIdSafe'] = meta['beadId'].replace('_', ' ').replace('#', '')
+        meta['idSafe'] = meta['id'].replace('_', ' ').replace('#', '')
+
         return meta, units
 
     def getData(self):
