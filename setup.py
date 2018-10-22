@@ -20,7 +20,6 @@ DEPENDENCIES = [# documentation stuff
                 'matplotlib>=1.2.1',
                 'scipy',
                 'hdf5storage>=0.2',
-                'ipywidgets',
                 'jupyter',
                 'npTDMS>=0.11.4',
                 'PyQt5',
