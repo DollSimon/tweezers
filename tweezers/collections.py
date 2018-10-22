@@ -116,7 +116,7 @@ class TweezersDataCollection(TweezersCollection):
                 res[key] = cls._sourcesToData(value)
         return res
 
-    def getAnalysis(self, path, groupByBead=True):
+    def getAnalysis(self, path, groupByBead=True, onlySegments=False):
         """
         Convert all the :class:`.TweezersData` objects, held by this collection, to :class:`.TweezersAnalysis`
         objects.
@@ -132,6 +132,8 @@ class TweezersDataCollection(TweezersCollection):
         Args:
             path (`str` or :class:`pathlib.Path`): export path for the :class:`.TweezersAnalysis` objects
             groupByBead (bool): group data by bead ID
+            onlySegments (bool): if `True` only gets segments and skips files without any defined segments,
+                                 otherwise these contain the whole datafile
 
         Returns:
             :class:`.TweezersAnalysisCollection`
@@ -142,6 +144,9 @@ class TweezersDataCollection(TweezersCollection):
             # create one analysis file per bead, collect all the trial segments
             tcTmp = self.flatten()
             for t in tcTmp.values():
+                # skip if there are not segments and we only export segments
+                if onlySegments and not t.segments:
+                    continue
                 try:
                     beadId = t.meta.beadId
                 except KeyError:
@@ -244,7 +249,7 @@ class TweezersDataCollection(TweezersCollection):
             else:
                 res.append(item.meta.getFacets())
 
-        return pd.concat(res, ignore_index=True)
+        return pd.concat(res, ignore_index=True, sort=False)
 
 
 class TweezersAnalysisCollection(TweezersCollection):
