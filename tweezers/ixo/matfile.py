@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from collections import OrderedDict, Iterable
+from collections import OrderedDict
 import hdf5storage as h5
 
 from tweezers.meta import MetaDict, UnitDict
@@ -119,8 +119,8 @@ def save(path, data):
 
 
 def load(path, keys=None):
-    collect = CustomMarshallerCollection(marshallers=[DataFrameMarshaller(),
-                                                      IndexedOrderedDictMarshaller(),
-                                                      CustomNumpyMarshaller()])
+    collect = h5.MarshallerCollection(marshallers=[DataFrameMarshaller(),
+                                                   IndexedOrderedDictMarshaller(),
+                                                   CustomNumpyMarshaller()])
     return h5.loadmat(str(path), marshaller_collection=collect,
                       appendmat=False, variable_names=keys)
