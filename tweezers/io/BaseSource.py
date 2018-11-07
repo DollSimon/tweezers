@@ -83,7 +83,8 @@ class BaseSource:
 
         raise NotImplementedError()
 
-    def postprocessData(self, meta, units, data):
+    @staticmethod
+    def postprocessData(meta, units, data):
         """
         This method is run after importing the data and can be used to modify the data and metadata or units.
 

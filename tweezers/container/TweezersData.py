@@ -296,18 +296,55 @@ class TweezersDataBase:
             :class:`.TweezersAnalysis`
         """
 
+        analysis = self.getEmptyAnalysis(path, name=name)
+        analysis.data = copy.deepcopy(self.data)
+        return analysis
+
+    def getSegmentAnalysis(self, path, name=None):
+        """
+        Convert all segments of the current :class:`.TweezersData` to a :class:`.TweezersAnalysis`, the general
+        format to store and exchange analysis results.
+
+        Args:
+            path (`str`): path to the directory that will hold the :class:`tweezers.TweezersAnalysis` file
+            name (`str`, optional): name for the analysis file, constructed from metadata if not given (using the ID)
+
+        Returns:
+            :class:`.TweezersAnalysis` or `None` if no segments are defined
+        """
+
+        # if there are no segments, ignore this dataset
+        if not self.segments:
+            return None
+
+        analysis = self.getEmptyAnalysis(path, name=name)
+        analysis.addField('segments')
+        for key in self.segments.keys():
+            seg = self.getSegment(key)
+            analysis.segments[key] = IndexedOrderedDict(data=seg.data, id=seg.meta.id, idSafe=seg.meta.idSafe)
+        return analysis
+
+    def getEmptyAnalysis(self, path, name=None):
+        """
+        Shared code that prepares export of an analysis file, used by :meth:`.getAnalysis` and
+        :meth:`.getSegmentAnalysis`.
+
+        Args:
+            path: see :meth:`.getAnalysis`
+            name: see :meth:`.getAnalysis`
+
+        Returns:
+            :class:`.TweezersAnalysis`
+        """
+
         if not name:
             name = self.meta.id
         name = TweezersAnalysis.getFilename(name)
 
         analysis = TweezersAnalysis(path=path, name=name)
         analysis.meta = copy.deepcopy(self.meta)
-        # if segments are defined, put them here, otherwise put the data
-        if self.segments:
-            for key in self.segments.keys():
-                analysis[key] = IndexedOrderedDict(data=self.getSegment(key).data)
-        else:
-            analysis.data = copy.deepcopy(self.data)
+        analysis.units = copy.deepcopy(self.units)
+        analysis.meta['sourceClass'] = self.source.__class__.__name__
         return analysis
 
 
@@ -443,6 +480,7 @@ class TweezersDataSegment(TweezersDataBase):
         # update meta dict
         self.meta['segment'] = segmentId
         self.meta['id'] = '{} - {}'.format(self.meta['id'], segmentId)
+        self.meta['idSafe'] = self.meta['id'].replace('_', ' ').replace('#', '')
 
         # check if data is already read into memory and use that if available
         if 'data' in self.__dict__:

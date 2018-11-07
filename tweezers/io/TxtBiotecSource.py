@@ -270,6 +270,36 @@ class TxtBiotecSource(BaseSource):
         return ts
 
     @staticmethod
+    def calculateDisplacement(meta, units, data):
+        """
+        Calculate bead displacements from Diff signal and calibration values.
+
+        Args:
+            meta (:class:`.MetaDict`): metadata
+            units (:class:`.UnitDict`): unit metadata
+            data (:class:`pandas.DataFrame`): data
+
+        Returns:
+
+            Updated versions of the input parameters
+
+            * meta (:class:`.MetaDict`)
+            * units (:class:`.UnitDict`)
+            * data (:class:`pandas.DataFrame`)
+        """
+
+        # calculate displacement per trap and axis
+        for trap in meta['traps']:
+            m = meta[trap]
+            data[trap + 'Disp'] = (data[trap + 'Diff'] - m['zeroOffset']) * m['displacementSensitivity']
+            units[trap + 'Disp'] = 'nm'
+
+        # invert PM bead displacement for convenience, disp is positive when pulled towards AOD ("up")
+        data.pmYDisp = -data.pmYDisp
+
+        return meta, units, data
+
+    @staticmethod
     def calculateForce(meta, units, data):
         """
         Calculate forces from Diff signal and calibration values.
@@ -294,7 +324,7 @@ class TxtBiotecSource(BaseSource):
             data[trap + 'Force'] = (data[trap + 'Diff'] - m['zeroOffset']) * m['forceSensitivity']
             units[trap + 'Force'] = 'pN'
 
-        # invert PM force, is not as expected in the raw data
+        # invert PM force for convenience, force is positive when pulled towards AOD ("up")
         data.pmYForce = -data.pmYForce
 
         # calculate mean force per axis, only meaningful for two traps
@@ -306,7 +336,8 @@ class TxtBiotecSource(BaseSource):
 
         return meta, units, data
 
-    def postprocessData(self, meta, units, data):
+    @staticmethod
+    def postprocessData(meta, units, data):
         """
         Modify the time array to use relative times (but keep the absolute time) and calculate forces.
 
@@ -325,7 +356,7 @@ class TxtBiotecSource(BaseSource):
 
         # create relative time column but keep absolute time
         data['absTime'] = data.time.copy()
-        data.loc[:, 'time'] -= data.loc[0, 'time']
+        data.loc[:, 'time'] -= data.time.iloc[0]
         units['absTime'] = 's'
 
         # ensure values, set them to 0 if they come as None from the file
@@ -335,16 +366,30 @@ class TxtBiotecSource(BaseSource):
             if not meta[trap].forceSensitivity:
                 meta[trap].forceSensitivity = 0
 
-        # calculate forces
-        meta, units, data = self.calculateForce(meta, units, data)
+        # calculate displacement and forces
+        meta, units, data = TxtBiotecSource.calculateDisplacement(meta, units, data)
+        meta, units, data = TxtBiotecSource.calculateForce(meta, units, data)
 
-        # calculate bead distance centre to centre, only meaningful for two trapped beads
-        data['xDist'] = data.pmXBead - data.aodXBead
-        data['yDist'] = data.pmYBead - data.aodYBead
-        data['distance'] = np.sqrt((data.pmYBead - data.aodYBead)**2 + (data.pmXBead - data.aodXBead)**2)
-        units['xDist'] = 'nm'
-        units['yDist'] = 'nm'
-        units['distance'] = 'nm'
+        data['xTrapDist'] = data.pmXTrap - data.aodXTrap
+        data['yTrapDist'] = data.pmYTrap - data.aodYTrap
+        units['xTrapDist'] = 'nm'
+        units['yTrapDist'] = 'nm'
+
+        # calculate bead distance center to center from trap signal
+        data['xDistVolt'] = data.xTrapDist - data.pmXDisp - data.aodXDisp
+        data['yDistVolt'] = data.yTrapDist - data.pmYDisp - data.aodYDisp
+        data['distVolt'] = np.sqrt(data.xDistVolt**2 + data.yDistVolt**2)
+        units['xDistVolt'] = 'nm'
+        units['yDistVolt'] = 'nm'
+        units['distVolt'] = 'nm'
+
+        # calculate bead distance center to center from video signal, only meaningful for two trapped beads
+        data['xDistVid'] = data.pmXBead - data.aodXBead
+        data['yDistVid'] = data.pmYBead - data.aodYBead
+        data['distVid'] = np.sqrt((data.pmYBead - data.aodYBead)**2 + (data.pmXBead - data.aodXBead)**2)
+        units['xDistVid'] = 'nm'
+        units['yDistVid'] = 'nm'
+        units['distVid'] = 'nm'
 
         return meta, units, data
 

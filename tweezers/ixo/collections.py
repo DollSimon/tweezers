@@ -85,6 +85,22 @@ class IndexedOrderedDict(AttrDictMixin, OrderedDict):
             # classical key based indexing
             return super().__getitem__(item)
 
+    def _repr_pretty_(self, p, cycle):
+        name = self.__class__.__name__
+        if cycle:
+            p.text(name + '(...)')
+        else:
+            with p.group(len(name) + 2, name + '([', '])'):
+                for idx, (key, value) in enumerate(self.items()):
+                    if idx:
+                        p.text(',')
+                        p.breakable()
+                    if isinstance(value, dict):
+                        p.text("'{}': ".format(key))
+                        p.pretty(value)
+                    else:
+                        p.pretty(key)
+
     def index(self, key):
         """
         Get numeric index of given key.
@@ -172,6 +188,20 @@ class IndexedOrderedDict(AttrDictMixin, OrderedDict):
         """
 
         return copy.deepcopy(self)
+
+    def addField(self, name):
+        """
+        Adds a key with the given name and creates a :class:`tweezers.ixo.collections.IndexedOrderedDict` as value.
+
+        Args:
+            name (str): name for the new field
+
+        Returns:
+            :class:`tweezers.ixo.collections.IndexedOrderedDict`
+        """
+
+        self[name] = IndexedOrderedDict()
+        return self
 
 
 def isNestedDict(dictionary):

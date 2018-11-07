@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import (
             FigureCanvasQTAgg as FigureCanvas,
             NavigationToolbar2QT as NavigationToolbar)
-from matplotlib.patches import Rectangle
 from matplotlib.widgets import RectangleSelector
 from collections import OrderedDict
 
@@ -118,11 +117,8 @@ class DataManager:
         ax.set_ylabel(self.getAxesLabel(yAxis), fontsize=12)
 
         # plot segments
-        (ymin, ymax) = ax.get_ylim()
         for seg in self.t.segments.values():
-            rect = Rectangle((seg['tmin'], ymin), seg['tmax'] - seg['tmin'], ymax - ymin,
-                             facecolor='red', alpha=0.2)
-            ax.add_patch(rect)
+            ax.axvspan(seg['tmin'], seg['tmax'], facecolor='red', alpha=0.2)
 
     def plotDistance(self, ax, xAxis, yAxis):
         ax.clear()

@@ -1,6 +1,11 @@
 from pathlib import Path
+import scipy as sp
+
 from tweezers.ixo.collections import IndexedOrderedDict, dictStructure
 from tweezers.ixo import matfile
+from tweezers.ixo.fit import PolyFit
+from tweezers.ixo.statistics import averageData
+import tweezers.io as tio
 
 
 class TweezersAnalysis(IndexedOrderedDict):
@@ -10,6 +15,8 @@ class TweezersAnalysis(IndexedOrderedDict):
 
     _path = None
     name = None
+    # columns to ignore on baseline correction
+    baselineIgnoreColumns = ['BSL', 'bslFlat', 'bslBeads']
 
     def __init__(self, path=None, name=None):
         """
@@ -61,11 +68,6 @@ class TweezersAnalysis(IndexedOrderedDict):
             raise ValueError('Given path is not a directory: {}'.format(path))
         self._path = ppath
 
-    def addField(self, name):
-        # ToDo docstring
-        self[name] = IndexedOrderedDict()
-        return self
-
     def save(self, keys=None):
         """
         Save analysis file to the path and name it was created with.
@@ -98,7 +100,13 @@ class TweezersAnalysis(IndexedOrderedDict):
         return self.name
 
     def _repr_pretty_(self, p, cycle):
-        p.text(self.__repr__())
+        """
+        Pretty printer used by IPython (and Jupyter notebook).
+        """
+
+        p.text(self.name)
+        p.break_()
+        super()._repr_pretty_(p, cycle)
 
     @staticmethod
     def isAnalysisFile(file):

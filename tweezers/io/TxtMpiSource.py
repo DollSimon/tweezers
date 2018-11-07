@@ -284,7 +284,8 @@ class TxtMpiSource(BaseSource):
 
         return meta, units, data
 
-    def postprocessData(self, meta, units, data):
+    @staticmethod
+    def postprocessData(meta, units, data):
         """
         Create time array, calculate forces etc.
 

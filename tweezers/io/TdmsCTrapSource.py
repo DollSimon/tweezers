@@ -179,7 +179,8 @@ class TdmsCTrapSource(BaseSource):
         data = data.query('@tmin <= time <= @tmax').copy()
         return data
 
-    def postprocessData(self, meta, units, data):
+    @staticmethod
+    def postprocessData(meta, units, data):
         """
         Convert time column in data from [ms] to [s].
 

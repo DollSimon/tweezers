@@ -1,13 +1,13 @@
-from collections import OrderedDict, Mapping
+from collections import Mapping
 import pprint
 import pandas as pd
 import logging as log
 from datetime import datetime
 
-from tweezers.ixo.collections import AttrDictMixin
+from tweezers.ixo.collections import IndexedOrderedDict
 
 
-class MetaBaseDict(AttrDictMixin, OrderedDict):
+class MetaBaseDict(IndexedOrderedDict):
     """
     An ordered dictionary (:class:`collections.OrderedDict`) with attribute styled element access (
     :class:`tweezers.ixo.collections.AttrDictMixin`) that returns a default value if a key does not exist and

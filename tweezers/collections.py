@@ -28,7 +28,7 @@ class TweezersCollection(IndexedOrderedDict):
         res = self.__class__()
 
         for key in self.keys():
-            if isinstance(self[key], TweezersCollection):
+            if isinstance(self[key], self.__class__):
                 # if the item is a collection itself, append its flattened result
                 res.update(self[key].flatten())
             else:
@@ -116,7 +116,7 @@ class TweezersDataCollection(TweezersCollection):
                 res[key] = cls._sourcesToData(value)
         return res
 
-    def getAnalysis(self, path, groupByBead=True, onlySegments=False):
+    def getAnalysis(self, path, groupByBead=True, onlySegments=True):
         """
         Convert all the :class:`.TweezersData` objects, held by this collection, to :class:`.TweezersAnalysis`
         objects.
@@ -126,25 +126,26 @@ class TweezersDataCollection(TweezersCollection):
         collected in that one analysis object.
         If no `beadID` key is present in the metadata, an exception is raised.
 
-        If the contained :class:`.TweezersData` object has segments, only the segments will be exported. Otherwise,
-        the whole dataset is appended to the analysis object.
+        If `onlySegments` is `True`, only segments get exported from the data. Otherwise, the complete dataset get's
+        exported.
 
         Args:
             path (`str` or :class:`pathlib.Path`): export path for the :class:`.TweezersAnalysis` objects
             groupByBead (bool): group data by bead ID
             onlySegments (bool): if `True` only gets segments and skips files without any defined segments,
-                                 otherwise these contain the whole datafile
+                                 if `False` the whole dataset is exported
 
         Returns:
             :class:`.TweezersAnalysisCollection`
         """
+
         res = TweezersAnalysisCollection()
 
         if groupByBead:
-            # create one analysis file per bead, collect all the trial segments
+            # create one analysis file per bead, collect all the trials
             tcTmp = self.flatten()
             for t in tcTmp.values():
-                # skip if there are not segments and we only export segments
+                # skip if there are no segments and we only export segments
                 if onlySegments and not t.segments:
                     continue
                 try:
@@ -153,31 +154,35 @@ class TweezersDataCollection(TweezersCollection):
                     raise ValueError('TweezersDataCollection:getAnalysis: Grouping by bead not possible, no "beadId" present')
                 if beadId not in res.keys():
                     # create new bead in collection
-                    res[beadId] = TweezersAnalysis(path=path, name=beadId)
-                    res[beadId].meta = t.meta
-                    res[beadId].units = t.units
+                    res[beadId] = t.getEmptyAnalysis(path, name=beadId)
                     res[beadId].addField('segments')
 
-                a = t.getAnalysis(path)
-                for key, value in a.items():
-                    if key in ['meta', 'units']:
-                        # meta and units are added for all trials in the beginning so skip these fields
-                        continue
-                    if key in res[beadId].segments.keys():
-                        # if the segment name already exists, throw an exception
-                        # since we don't have a good way to create a unique segment id for all data sources,
-                        # this is a reasonable fix, could be improved in the future
-                        raise KeyError('TweezersDataCollection:getAnalysis: Bead ID "{}" already has a segment "{}"'.format(beadId, key))
-                    res[beadId].segments[key] = value
+                if onlySegments:
+                    a = t.getSegmentAnalysis(path)
+                    for key, value in a.segments.items():
+                        if key in res[beadId].segments.keys():
+                            # if the segment name already exists, throw an exception
+                            # since we don't have a good way to create a unique segment id for all data sources,
+                            # this is a reasonable behavior, could be improved in the future
+                            raise KeyError('TweezersDataCollection:getAnalysis: Bead ID "{}" already has a segment "{}"'.format(beadId, key))
+                        res[beadId].segments[key] = value
+                else:
+                    a = t.getAnalysis(path)
+                    res[beadId].segments[str(t.meta.trial)] = a.data
         else:
             # just go through the structure recursively
             for key in self.keys():
                 if isinstance(self[key], TweezersData):
                     # self[key] is a TwezersData object
-                    res[key] = self[key].getAnalysis(path=path)
+                    if onlySegments:
+                        a = self[key].getSegmentAnalysis(path=path)
+                    else:
+                        a = self[key].getAnalysis(path=path)
+                    if a:
+                        res[key] = a
                 else:
                     # self[key] is a nested TweezersDataCollection
-                    res[key] = self[key].getAnalysis(path=path, groupByBead=groupByBead)
+                    res[key] = self[key].getAnalysis(path=path, groupByBead=groupByBead, onlySegments=onlySegments)
 
         return res.sorted()
 
@@ -216,7 +221,7 @@ class TweezersDataCollection(TweezersCollection):
         res = self.__class__()
         for key, item in self.items():
             # start recursion
-            if isinstance(item, TweezersCollection):
+            if isinstance(item, self.__class__):
                 tmp = item.filterByDate(date, method=method, endDate=endDate)
                 # only add if there is a filtering result
                 if tmp:
