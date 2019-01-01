@@ -1,11 +1,7 @@
 from pathlib import Path
-import scipy as sp
 
 from tweezers.ixo.collections import IndexedOrderedDict, dictStructure
 from tweezers.ixo import matfile
-from tweezers.ixo.fit import PolyFit
-from tweezers.ixo.statistics import averageData
-import tweezers.io as tio
 
 
 class TweezersAnalysis(IndexedOrderedDict):

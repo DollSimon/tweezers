@@ -1,8 +1,9 @@
-import tweezers.ixo.fit
 from scipy.signal import welch
 import pandas as pd
 import numpy as np
 from collections import OrderedDict
+
+import tweezers.ixo.fit
 
 
 class PsdComputation:
