@@ -12,6 +12,14 @@ import tweezers
 from tweezers.plot.SegmentSelectorUi import Ui_MainWindow
 
 
+"""
+- start QtDesigner on Mac: open -a Designer
+- compile *.ui file (run from "plot" directory): pyuic5 -o SegmentSelectorUi.py SegmentSelectorUi.ui
+"""
+
+BSL_SEGMENTS = ['bslFlat', 'bslBeads']
+
+
 class SpanSelector(RectangleSelector):
     """
     Customized :class:`RectangleSelector` to allow span selection that is adjustable with handles.
@@ -139,6 +147,9 @@ class DataManager:
             return t.meta.id
 
     def saveSegment(self, name=None):
+        if not self.tLim:
+            raise ValueError('No segment selected')
+
         tmin, tmax = self.tLim[:2]
         if not name:
             idx = self._getBeadId(self.t)
@@ -146,6 +157,14 @@ class DataManager:
                 self.segCounter[idx] = 0
             name = '{}'.format(self.segCounter[idx])
             self.segCounter[idx] += 1
+        self._saveSegment(name, tmin, tmax)
+
+        # special treatment for bsl segments
+        if name in BSL_SEGMENTS:
+            self._checkBslSegments()
+        return name
+
+    def _saveSegment(self, name, tmin, tmax):
         # check if segment already exists
         if name in self.t.segments.keys():
             # update existing segment
@@ -154,7 +173,21 @@ class DataManager:
         else:
             # create new segment
             self.t.addSegment(tmin=tmin, tmax=tmax, name=name)
-        return name
+
+    def _checkBslSegments(self):
+        # check if all special baseline segements exists
+        if not all(elem in self.t.segments.keys() for elem in BSL_SEGMENTS):
+            # if not, return
+            return
+
+        # if so, create "bsl" segment
+        times = []
+        for sid in BSL_SEGMENTS:
+            times += [self.t.segments[sid].tmin, self.t.segments[sid].tmax]
+
+        tmin = min(times)
+        tmax = max(times)
+        self._saveSegment('bsl', tmin, tmax)
 
     def clearSegments(self):
         self.t.segments.clear()
@@ -336,6 +369,8 @@ class SegmentSelector(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.clearSegmentBtn.clicked.connect(self.onClearSegments)
         self.saveSegmentBtn.clicked.connect(self.onSaveSegment)
+        self.saveBslBeadsBtn.clicked.connect(self.onSaveBslBeads)
+        self.saveBslFlatBtn.clicked.connect(self.onSaveBslFlat)
         self.exportSegmentBtn.clicked.connect(self.onExport)
         self.segmentLst.selectionModel().selectionChanged.connect(self.onSegmentSelect)
         self.removeSegmentBtn.clicked.connect(self.onRemoveSegment)
@@ -354,6 +389,7 @@ class SegmentSelector(QtWidgets.QMainWindow, Ui_MainWindow):
         self.clearSegmentBtn.setDisabled(disabled)
         self.segmentIdTxt.setDisabled(disabled)
         self.saveSegmentBtn.setDisabled(disabled)
+        self.specialSegmentsGrp.setDisabled(disabled)
         self.segmentLst.setDisabled(disabled)
         self.exportSegmentBtn.setDisabled(disabled)
 
@@ -519,10 +555,30 @@ class SegmentSelector(QtWidgets.QMainWindow, Ui_MainWindow):
         segId = "".join(c for c in segId if c.isalnum() or c in keepcharacters)
         self.segmentIdTxt.setText('')
         # save segment
-        segId = self.data.saveSegment(name=segId)
-        # update the GUI
-        self.showData()
-        self.statusbar.showMessage('Segment "{}" added'.format(segId))
+        try:
+            segId = self.data.saveSegment(name=segId)
+        except ValueError as e:
+            self.statusbar.showMessage('Error: {}'.format(e))
+        else:
+            # update the GUI
+            self.showData()
+            self.statusbar.showMessage('Segment "{}" added'.format(segId))
+
+    def onSaveBslBeads(self):
+        """
+        Event handler for save as "bslBeads" button. Adds the current segment with name "bslBeads".
+        """
+
+        self.segmentIdTxt.setText('bslBeads')
+        self.onSaveSegment()
+
+    def onSaveBslFlat(self):
+        """
+        Event handler for save as "bslFlat" button. Adds the current segment with name "bslFlat".
+        """
+
+        self.segmentIdTxt.setText('bslFlat')
+        self.onSaveSegment()
 
     def onSegmentSelect(self, selected, deselected):
         """
@@ -605,12 +661,17 @@ class SegmentSelector(QtWidgets.QMainWindow, Ui_MainWindow):
         Event handler for the "Export" button. Triggers exporting / saving of the analysis files.
         """
 
+        # get export path
         lastExportDir = self.settings.value('exportDir', '')
         path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory", lastExportDir)
         if path:
+            # disable gui
+            self.setDataLoaded(False)
+            # store export settings
             self.settings.setValue('exportDir', path)
             groupExport = self.groupExportBeadCbx.isChecked()
             self.settings.setValue('groupExport', groupExport)
+            # run export
             self.statusbar.showMessage('Saving analysis files...')
             self.data.export(self.onExported, path, groupExport=groupExport)
 
@@ -619,6 +680,7 @@ class SegmentSelector(QtWidgets.QMainWindow, Ui_MainWindow):
         Event handler for when data was exported.
         """
 
+        self.setDataLoaded(True)
         if error:
             self.displayError('Could not save analysis files!', error)
         self.statusbar.showMessage('Segments exported')
