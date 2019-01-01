@@ -200,6 +200,10 @@ class IndexedOrderedDict(AttrDictMixin, OrderedDict):
             :class:`tweezers.ixo.collections.IndexedOrderedDict`
         """
 
+        # don't overwrite existing keys
+        if name in self.keys():
+            return self
+
         self[name] = IndexedOrderedDict()
         return self
 
