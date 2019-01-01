@@ -1,3 +1,4 @@
+import numpy as np
 import scipy as sp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -7,10 +8,54 @@ from tweezers import TweezersAnalysis, TweezersAnalysisCollection
 import tweezers.io as tio
 from tweezers.ixo.statistics import averageData
 from tweezers.ixo.fit import PolyFit
+from tweezers.physics.tweezers import tcOsciHydroCorrect
 
 
 # columns to ignore on baseline correction
-BASELINE_IGNORE_COLUMNS = ['BSL', 'bslFlat', 'bslBeads']
+BASELINE_IGNORE_COLUMNS = ['bsl', 'bslFlat', 'bslBeads']
+
+
+def osciHydrodynamicCorr(analysis):
+    """
+    Correct results of thermal calibration performed with oscillation technique.
+
+    Args:
+        analysis (:class:`.TweezersAnalysis`): analysis object
+
+    Returns:
+        :class:`.TweezersAnalysis`
+    """
+
+    # store original segments
+    analysis['segmentsOrig'] = analysis.segments.copy()
+
+    m = analysis.meta
+    # radii in nm
+    rPm = m.pmY.beadDiameter / 2 * 1000
+    rAod = m.aodY.beadDiameter / 2 * 1000
+
+    # get y distance
+    dy = np.abs(m.pmY.trapPosition - m.aodY.trapPosition)
+
+    # go through y-traps
+    for trap in m.traps:
+        if not trap.lower().endswith('y'):
+            continue
+        # the radius in the equation is that of the other bead (that causes the flow field)
+        [rTrap, rOther] = [rPm, rAod] if trap.lower().startswith('pm') else [rAod, rPm]
+        # get correction factor
+        c = tcOsciHydroCorrect(dy, rTrap=rTrap, rOther=rOther, method='oseen')
+        # store and correct data
+        m[trap]['hydroCorr'] = c
+        m[trap].displacementSensitivity *= c
+        m[trap].stiffness /= c**2
+        m[trap].forceSensitivity /= c
+
+    # correct all segments
+    for seg in analysis.segments.values():
+        m, u, d = tio.TxtBiotecSource.postprocessData(m, analysis.units, seg.data)
+
+    return analysis
 
 
 def createBslCorrField(analysis, force=False):
@@ -46,8 +91,10 @@ def splitBaseline(analysis, windowSize=500, stdThrs=0.3, stdAxis='pmYForce', lin
 
     The standard deviation is calculated in a rolling window (moving window) of the given size.
 
+    This is currently not reliable and should be used with caution and supervision.
+
     Args:
-        analysis (:class:`.TweezersAnalysis`): analysis object that holds the baseline, requires a segment named `BSL`
+        analysis (:class:`.TweezersAnalysis`): analysis object that holds the baseline, requires a segment named `bsl`
         windowSize (int): size of the rolling window to compute standard deviation (default: 500)
         stdThrs (float): threshold for standard deviation, below this value, beads are considered to touch (default:
             0.3)
@@ -60,18 +107,23 @@ def splitBaseline(analysis, windowSize=500, stdThrs=0.3, stdAxis='pmYForce', lin
     """
 
     # get baseline data
-    bslData = analysis.segments['BSL'].data
+    bslData = analysis.segments['bsl'].data
     # average data using with a rolling (moving) window
     avd = bslData.rolling(windowSize, center=True).mean()
     # calculate standard deviation for rolling window after subtracting mean from data
     std = (bslData - avd).rolling(windowSize, center=True).std()
+    # select data
+    # stdStd = std.rolling(windowSize, center=True).std()
+    # stdThrs = std[stdAxis].min() + 4 * stdStd[stdAxis].mean()
     # select data where std is below threshold
     ds = bslData[std[stdAxis] < stdThrs]
+    if ds.empty:
+        raise ValueError('No data found with std below threshold in "splitBaseline".')
 
     # split data where beads are stuck from rest of baseline
     # fit a line to the detected stuck bead segments
     fit = PolyFit(ds.yTrapDist, ds[stdAxis], 1)
-    # # calculate line values (slightly shifted to ignore noise) for all trap distances
+    # calculate line values (slightly shifted to ignore noise) for all trap distances
     lineThrs = fit(bslData.yTrapDist - lineShift)
     # select data where the signal is below the line
     bslFlat = bslData[bslData[stdAxis] < lineThrs]
@@ -86,7 +138,7 @@ def splitBaseline(analysis, windowSize=500, stdThrs=0.3, stdAxis='pmYForce', lin
 
 def baselineSubtraction(analysis, axis='y', averageBsl=None):
     """
-    Remove baseline from signal. Input :class:`.TweezersAnalysis` must have a segment "BSL" which will be
+    Remove baseline from signal. Input :class:`.TweezersAnalysis` must have a segment "bsl" which will be
     used as baseline. For all other segments, the baseline is subtracted. Baseline-corrected data is stored in
     `bslCorr`. The independent signal used as baseline "x" is trap distance.
     Data is cropped to the available trap distance.
@@ -121,7 +173,7 @@ def baselineSubtraction(analysis, axis='y', averageBsl=None):
     meta = analysis.meta.copy()
     for trap in traps:
         # get interpolation function
-        bslInterp[trap] = sp.interpolate.interp1d(bslData[trapDist], bslData[trap + 'Diff'])
+        bslInterp[trap] = sp.interpolate.interp1d(bslData[trapDist], bslData[trap + 'Diff'], kind='cubic')
         # reset zeroOffset: since we subtract the baseline in raw Diff signal, we should not subract this again when calculating distances and forces
         meta[trap].zeroOffset = 0
 
@@ -133,7 +185,8 @@ def baselineSubtraction(analysis, axis='y', averageBsl=None):
             seg.data[trap + 'Diff'] = seg.data[trap + 'Diff'] - bslInterp[trap](seg.data[trapDist])
 
         m, u, bslCorr = sourceClass.postprocessData(meta, analysis.units, seg.data)
-        seg['bslSubAverage'] = averageBsl
+        seg.addField('bslCorr')
+        seg.bslCorr['bslSubAverage'] = averageBsl
 
     return analysis
 
@@ -187,62 +240,127 @@ def zeroDistance(analysis, axis='y', useTrap='pm'):
     offset = analysis.meta[useTrap.lower() + axis.upper()].bslCorr.zeroExt
     # offset data
     for segId, seg in analysis.bslCorr.items():
+        seg.addField('bslCorr')
         for ax in axesToCorrect[axis]:
             seg.data[ax] = seg.data[ax] - offset
-            seg['zeroExt'] = offset
-            seg['zerExtTrap'] = useTrap.lower() + axis.upper()
+            seg.bslCorr['zeroExt'] = offset
+            seg.bslCorr['zeroExtTrap'] = useTrap.lower() + axis.upper()
 
     return analysis
 
 
-def videoCorrection(analysis, axis='y', lowForceLimit=5):
+def displacementCorrection(analysis, axis='y', lowForceLimit=5):
     """
-    Fit a line to the video displacement vs trap displacement signal and correct the offset in the video signal. This
-    combines offsets in trapping template from actual bead center and trap calibration offsets.
+    Correct the displacement data (displacement of bead from trap center).
+
+    The procedure is to fit a line to the video displacement vs trap displacement signal. The intercept of the line
+    is used as an offset for the video signal (zero displacement is well determined from PSD signal). The slope of
+    the line is used to correct the displacement from the trap signal which is not reliable for larger displacements
+    (depending on trap stiffness).
 
     Args:
         analysis (:class:`.TweezersAnalysis`): analysis object
-        axis:`x` or `y`, axis to do the video correction (default: `y`)
+        axis: `x` or `y`, axis to do the displacement correction (default: `y`)
         lowForceLimit (float): ignore signal where force is below this limit (default: 5)
 
     Returns:
         :class:`.TweezersAnalysis`
     """
 
+    createBslCorrField(analysis)
     traps = [trap for trap in analysis.meta.traps if trap.lower().endswith(axis.lower())]
 
-    createBslCorrField(analysis)
-
     for segId, seg in analysis.bslCorr.items():
+        seg.addField('bslCorr')
         d = seg.data
-        for trap in traps:
-            d[trap + 'DispVid'] = d[trap + 'Bead'] - d[trap + 'Trap']
-            if trap == 'pmY':
-                # invert PM bead displacement for convenience, disp is positive when pulled towards AOD ("up")
-                d['pmYDispVid'] = -d['pmYDispVid']
 
+        for trap in traps:
             # get only data above a specific force, should we use trap separation instead?
             queryStr = '{}Force > {}'.format(trap, lowForceLimit)
             dq = d.query(queryStr)
             if dq.empty:
-                raise ValueError('No data found for "videoCorrection" of axis "{}"'.format(trap))
+                raise ValueError('No data found for "videoCorrection" of axis "{}" in "{}"'.format(trap, seg.id))
 
+            # fit Video vs Trap data with line
             fit = PolyFit(dq[trap + 'Disp'], dq[trap + 'DispVid'], 1)
+            intercept = fit.coef[0]
+            slope = fit.coef[1]
 
-            d[trap + 'DispVid'] = d[trap + 'DispVid'] - fit.coef[0]
-            seg[trap + 'ZeroVid'] = fit.coef[0]
-            seg[trap + 'ZeroVidSlope'] = fit.coef[1]
-            seg[trap + 'ZeroVidR2'] = fit.rsquared()
-
+            # store parameters
+            seg.bslCorr[trap + 'ZeroVid'] = intercept
+            seg.bslCorr[trap + 'ZeroVidSlope'] = slope
+            seg.bslCorr[trap + 'ZeroVidR2'] = fit.rsquared()
             # store units
             analysis.units[trap + 'ZeroVid'] = analysis.units[trap + 'Disp']
-            
-        seg['zeroVidFitForceLow'] = lowForceLimit
 
-        # correct distance from video signal
+            # shift video displacement by offset
+            d[trap + 'DispVid'] = d[trap + 'DispVid'] - intercept
+            # change slope of data by multiplying the trp data
+            d[trap + 'Disp'] *= slope
+
+        seg.bslCorr['zeroVidFitForceLow'] = lowForceLimit
+
         a = axis.upper()
-        d[axis + 'DistVid'] = d['pm' + a + 'Trap'] - d['aod' + a + 'Trap'] \
-                              - seg.zeroExt - d['pm' + a + 'DispVid'] - d['aod' + a + 'DispVid']
+        try:
+            # the 'zeroDistance' function should not be required to run this one
+            offset = seg.bslCorr.zeroExt
+        except KeyError:
+            offset = 0
+        trapDist = d['pm' + a + 'Trap'] - d['aod' + a + 'Trap'] - offset
+        # correct extension from video signal
+        d[axis + 'DistVid'] = trapDist - d['pm' + a + 'DispVid'] - d['aod' + a + 'DispVid']
+
+        # correct extension from trap signal
+        d[axis + 'DistVolt'] = trapDist - d['pm' + a + 'Disp'] - d['aod' + a + 'Disp']
+
+    return analysis
+
+
+def detectRip(analysis, axis='y'):
+    """
+    Detect rip in each segment in 'bslCorr' by finding analyzing the force vs trap distance signal. Stores
+    `ripTrapDist` and `ripPmYForce` in the segment.
+    Also adds the `dist20` key that is the mean force @ 20 pN.
+
+    Args:
+        analysis (:class:`.TweezersAnalysis`): analysis object
+        axis: axis: `x` or `y`, axis to check of force step (default: `y`)
+
+    Returns:
+        :class:`.TweezersAnalysis`
+    """
+
+    dist = axis.lower() + 'TrapDist'
+    force = axis.lower() + 'Force'
+
+    for seg in analysis.bslCorr.values():
+        seg.addField('bslCorr')
+
+        # get and sort data
+        d = seg.data.sort_values(dist)
+        # get preliminary ripping trap distance by force threshold
+        ripDist = d.query(force + ' > 5').iloc[-1][dist]
+        # refine ripping distance if available
+        ds = d.query(dist + ' < @ripDist').iloc[-100:]
+        limForce = ds[force].max() * 2 / 3
+        sel = ds.query(force + ' < @limForce')
+        if not sel.empty:
+            ripDist = sel.iloc[0][dist]
+        # get ripping force
+        d = d.query(dist + ' < @ripDist')
+        ripF = d.iloc[-10:].pmYForce.max()
+        # store as rip distance
+        seg['ripTrapDist'] = ripDist
+        # store ripping force
+        seg['ripPmYForce'] = ripF
+
+        # dist @ 20 pN
+        d = seg.data.query('19.5 < pmYForce < 20.5')
+        if d.empty:
+            d20 = np.nan
+        else:
+            d20 = d.yDistVolt.mean()
+        seg['dist20'] = d20
 
     return analysis
 
@@ -295,20 +413,19 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
     ### force - extension plot ###
     plotArgs = {'markersize': 1, 'rasterized': True}
 
-    # hack to find rip and plot only until there
-    d = s.data.sort_values('yDistVolt', ascending=False)
-    dist = d[d.pmYForce > 10].iloc[0].yDistVolt
-    queryStr = 'yDistVolt < @dist'
+    # plot until rip
+    dist = s.ripTrapDist
+    queryStr = 'yTrapDist < @dist'
 
     ax = axExt
     d = s.data.query(queryStr)
     ax.plot(d.yDistVid, d.pmYForce, '.', label='Video', **plotArgs)
     d = a.segments[segId].data.copy()
-    d.yDistVolt = d.yDistVolt - a.bslCorr[0].zeroExt
+    d.yDistVolt = d.yDistVolt - a.bslCorr[0].bslCorr.zeroExt
     d = d.query(queryStr)
     ax.plot(d.yDistVolt, d.pmYForce, '.', label='Trap', **plotArgs)
     d = s.data.query(queryStr)
-    ax.plot(d.yDistVolt, d.pmYForce, '.', label='Trap - BSL', **plotArgs)
+    ax.plot(d.yDistVolt, d.pmYForce, '.', label='Trap - corr', **plotArgs)
     # legend with fixed marker size
     ax.legend(markerscale=10, fontsize=8)
     ax.set_xlabel('Extension [nm]', fontsize=12)
@@ -332,7 +449,7 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
     # for determining categorical or continuous colorbar by mpl
     p = ax.scatter(d.pmYDisp, d.pmYDispVid, c=d.pmYForce.values, **scatterArgs)
     # fit limit line
-    idx = (d.pmYForce - s.zeroVidFitForceLow).abs().idxmin()
+    idx = (d.pmYForce - s.bslCorr.zeroVidFitForceLow).abs().idxmin()
     ax.axvline(d.loc[idx].pmYDisp, color='0.7', linestyle='--')
     # slope 1 line
     lim = [d.pmYDisp.min(), d.pmYDisp.max()]
@@ -343,7 +460,7 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
     ax = axsDisp[1]
     ax.scatter(d.aodYDisp, d.aodYDispVid, c=d.aodYForce.values, **scatterArgs)
     # fit limit line
-    idx = (d.aodYForce - s.zeroVidFitForceLow).abs().idxmin()
+    idx = (d.aodYForce - s.bslCorr.zeroVidFitForceLow).abs().idxmin()
     ax.axvline(d.loc[idx].aodYDisp, color='0.7', linestyle='--')
     # slope 1 line
     lim = [d.aodYDisp.min(), d.aodYDisp.max()]
@@ -366,33 +483,50 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
         ax.tick_params(**tickPrms)
 
     ### bsl plot ###
-    plotArgs = {'rasterized': True}
+    plotArgs = {'rasterized': True, 'markersize': 1}
     # bsl pm
     ax = axsBsl[0]
-    d = a.segments.BSL.data
-    ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL', **plotArgs)
-    d = a.segments.bslBeads.data
-    ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL Beads', **plotArgs)
-    d = a.segments.bslFlat.data
-    ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL Flat', **plotArgs)
-    if s.bslSubAverage:
-        d = averageData(a.segments.bslFlat.data, s.bslSubAverage)
-        ax.plot(d.yTrapDist, d.pmYForce, '.', **plotArgs)
+    if 'bsl' in a.segments.keys():
+        d = a.segments.bsl.data
+        ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL', color='gray', **plotArgs)
 
+    # plot bslBeads
+    d = a.segments.bslBeads.data
+    ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL Beads', zorder=5, **plotArgs)
+    # plot fit to determine zeroExt
+    x = np.arange(d.yTrapDist.min(), d.yTrapDist.max())
+    y = a.meta.pmY.bslCorr.keffExp * x + a.meta.pmY.bslCorr.zeroExtIntercept
+    ax.plot(x, y, '.', label='_', zorder=6, **plotArgs)
+    # plot bslFlat
+    d = a.segments.bslFlat.data
+    ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL Flat', zorder=3, **plotArgs)
+    if s.bslCorr.bslSubAverage:
+        d = averageData(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
+        ax.plot(d.yTrapDist, d.pmYForce, '.', zorder=4, **plotArgs)
+
+    # general
     ax.set_title('PM Y', **axsTtl)
     ax.set_ylabel('Force [pN]', **axsLbl)
 
     # bsl aod
     ax = axsBsl[1]
-    d = a.segments.BSL.data
-    ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL', **plotArgs)
+    if 'bsl' in a.segments.keys():
+        d = a.segments.bsl.data
+        ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL', color='gray', **plotArgs)
+
+    # plot bslBeads
     d = a.segments.bslBeads.data
-    ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL Beads', **plotArgs)
+    ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL Beads', zorder=5, **plotArgs)
+    x = np.arange(d.yTrapDist.min(), d.yTrapDist.max())
+    y = a.meta.aodY.bslCorr.keffExp * x + a.meta.aodY.bslCorr.zeroExtIntercept
+    ax.plot(x, y, '.', label='_', zorder=6, **plotArgs)
+    # plot bslFlat
     d = a.segments.bslFlat.data
-    ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL Flat', **plotArgs)
-    if s.bslSubAverage:
-        d = averageData(a.segments.bslFlat.data, s.bslSubAverage)
-        ax.plot(d.yTrapDist, d.aodYForce, '.', label='_', **plotArgs)
+    ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL Flat', zorder=3, **plotArgs)
+    if s.bslCorr.bslSubAverage:
+        d = averageData(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
+        ax.plot(d.yTrapDist, d.aodYForce, '.', label='_', zorder=4, **plotArgs)
+    # general
     ax.set_title('AOD Y', **axsTtl)
     ax.legend(fontsize=6)
 
@@ -421,6 +555,23 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
         trapPm = 'pmX'
         trapAod = 'aodX'
 
+    # more general info
+    d20 = s.dist20 if 'dist20' in s.keys() else np.nan
+    ripF = s.ripPmYForce if 'ripPmYForce' in s.keys() else np.nan
+
+    txt = r'\textbf{{General:}}\\\\' + \
+          r'\begin{tabular}{l r l}' + \
+          r'd(\SI{{20}}{{pN}}): & {:.0f} & {}\\'.format(d20, u.yDistVolt) + \
+          r'$F_\mathrm{{rip}}$: & {:.1f} & pN\\'.format(ripF)
+
+    if 'hydroCorr' in m.pmY.keys():
+        txt += r'$c^\mathrm{{PM}}_\mathrm{{hydro}}$: & {:.2f} & \\'.format(m.pmY.hydroCorr) + \
+               r'$c^\mathrm{{AOD}}_\mathrm{{hydro}}$: & {:.2f} & \\'.format(m.aodY.hydroCorr)
+
+    txt += r'\end{tabular}'
+
+    axTxt.text(0.34, 1 , txt, **txtArgs)
+
     # extension zero
     txt = r'\textbf{{Extension zero:}} {}\\\\' + \
           r'\begin{tabular}{l r r l}' + \
@@ -435,18 +586,18 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
           r'$r^2$: & {:.2f} & {:.2f} & \\'.format(m[trapPm].bslCorr.zeroExtR2, m[trapAod].bslCorr.zeroExtR2) + \
           r'\end{tabular}'
 
-    axTxt.text(0.35, 1, txt, **txtArgs)
+    axTxt.text(0.5, 1, txt, **txtArgs)
 
     # video correction
     txt = r'\textbf{{Video correction:}} {}\\\\' + \
           r'\begin{tabular}{l r r l}' + \
           r'& PM & AOD & \\' + \
-          r'$\Delta x$: & {:.1f} & {:.1f} & {}\\'.format(s.pmYZeroVid, s.aodYZeroVid, a.units.pmYZeroVid) + \
-          r'Slope: & {:.3f} & {:.3f} & \\'.format(s.pmYZeroVidSlope, s.aodYZeroVidSlope) + \
-          r'$r^2$: & {:.2f} & {:.2f} & \\'.format(s.pmYZeroVidR2, s.aodYZeroVidR2) + \
+          r'$\Delta x$: & {:.1f} & {:.1f} & {}\\'.format(s.bslCorr.pmYZeroVid, s.bslCorr.aodYZeroVid, a.units.pmYZeroVid) + \
+          r'Slope: & {:.3f} & {:.3f} & \\'.format(s.bslCorr.pmYZeroVidSlope, s.bslCorr.aodYZeroVidSlope) + \
+          r'$r^2$: & {:.2f} & {:.2f} & \\'.format(s.bslCorr.pmYZeroVidR2, s.bslCorr.aodYZeroVidR2) + \
           r'\end{tabular}'
 
-    axTxt.text(0.6, 1, txt, **txtArgs)
+    axTxt.text(0.75, 1, txt, **txtArgs)
 
     saveArgs = {'facecolor': 'white', 'dpi': 300}
 
@@ -489,7 +640,7 @@ def analysisSummaryFig(analysis, saveDir):
             segmentSummaryFig(a, segId, saveDir=saveDir, display=False)
 
 
-def bslCorrectAndSummarize(pathIn, pathOut=False, save=False, averageBsl=100, debug=False):
+def bslCorrectAndSummarize(pathIn, pathOut=False, save=False, averageBsl=100, lowForceLimit=5, debug=False):
     """
     Load all :class:`.TweezersAnalysis` files from the given path, run the baseline
     and video corrections and export the summary figure for each segment.
@@ -498,7 +649,8 @@ def bslCorrectAndSummarize(pathIn, pathOut=False, save=False, averageBsl=100, de
         pathIn (str): path to load the data from
         pathOut (str): path to export the summary figues, if `None`, exports to `pathIn` (default: None)
         save (bool): if `True`, the results are saved back to the analysis files that were loaded
-        averageBsl (int): passed to :meth:`.baselineSubtraction`
+        averageBsl (int): passed to :func:`baselineSubtraction`
+        lowForceLimit (float): passed to :func:`displacementCorrection`
         debug (bool): if `True`, print additional information (e.g. progress)
 
     Returns:
@@ -512,13 +664,15 @@ def bslCorrectAndSummarize(pathIn, pathOut=False, save=False, averageBsl=100, de
         if debug:
             print(a.name)
         # check if baseline is available
-        if 'BSL' not in a.segments.keys():
+        if 'bslBeads' not in a.segments.keys():
             continue
         # baseline and video corrections
-        splitBaseline(a)
+        if a.meta.psdType == 'oscillation':
+            osciHydrodynamicCorr(a)
         baselineSubtraction(a, averageBsl=averageBsl)
         zeroDistance(a)
-        videoCorrection(a)
+        displacementCorrection(a, lowForceLimit=lowForceLimit)
+        detectRip(a)
 
         # save summary figures
         for segId in a.bslCorr.keys():
