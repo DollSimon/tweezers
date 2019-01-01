@@ -291,11 +291,15 @@ class TxtBiotecSource(BaseSource):
         # calculate displacement per trap and axis
         for trap in meta['traps']:
             m = meta[trap]
+            # displacement from trap signal
             data[trap + 'Disp'] = (data[trap + 'Diff'] - m['zeroOffset']) * m['displacementSensitivity']
             units[trap + 'Disp'] = 'nm'
+            # displacement from video signal
+            data[trap + 'DispVid'] = data[trap + 'Bead'] - data[trap + 'Trap']
 
         # invert PM bead displacement for convenience, disp is positive when pulled towards AOD ("up")
         data.pmYDisp = -data.pmYDisp
+        data.pmYDispVid = -data.pmYDispVid
 
         return meta, units, data
 
@@ -355,9 +359,10 @@ class TxtBiotecSource(BaseSource):
         """
 
         # create relative time column but keep absolute time
-        data['absTime'] = data.time.copy()
+        if 'absTime' not in data.columns:
+            data['absTime'] = data.time.copy()
+            units['absTime'] = 's'
         data.loc[:, 'time'] -= data.time.iloc[0]
-        units['absTime'] = 's'
 
         # ensure values, set them to 0 if they come as None from the file
         for trap in meta['traps']:
