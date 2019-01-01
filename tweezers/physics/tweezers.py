@@ -55,3 +55,36 @@ def lorentzian(f, D, fc):
     """
 
     return D / (np.pi ** 2 * (f ** 2 + fc ** 2))
+
+
+def tcOsciHydroCorrect(dist, rTrap=np.nan, rOther=np.nan, method='oseen'):
+    """
+    When using the oscillating calibration method with two beads, hydrodynamic interactions have to be taken into
+    account. This function allows to calculate the correction factor using different methods.
+
+
+    `oseen`: requires `dist` and `rOther`
+
+    `rp` (Rotne Prager): requires `dist` and `rOther`
+
+    `rpUneven` (Rotne Prager with spheres of different size): requires `dist`, `rTrap`, `rOther`
+
+    Args:
+        dist (float): distance between the traps (in nm)
+        rTrap (float): radius of the bead in the trap for which to calculate the correction factor (in nm)
+        rOther: radius of the bead in the other trap (in nm)
+        method (str): currently only `oseen` is suppoted
+
+    Returns:
+
+    """
+
+    if method == 'oseen':
+        c = 1 - 1.5 * rOther / dist
+    elif method == 'rp':
+        c = 1 - 1.5 * rOther / dist + (rOther / dist)**3
+    elif method == 'rpUneven':
+        c = 1 - 1.5 * rOther / dist + 0.5 * rOther * (rTrap**2 + rOther**2) / dist**3
+    else:
+        raise ValueError('tcOsciHydroCorrect: "{}" moethod is not supported'.format(method))
+    return c
