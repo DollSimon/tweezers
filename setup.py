@@ -14,14 +14,16 @@ LONG_DESCRIPTION = """
 # todo: fix requirements, check which ones are actually required and in which version
 DEPENDENCIES = [# documentation stuff
                 'sphinx',
-                'sphinx_rtd_theme>=0.1',
-                'pandas>=0.19',
-                'numpy>=1.8',
-                'matplotlib>=1.2.1',
+                'sphinx_rtd_theme >= 0.1',
+                'pandas >= 0.19',
+                'numpy >= 1.8',
+                'matplotlib >= 1.2.1',
                 'scipy',
-                'hdf5storage>=0.2',
+                # when hdf5storage 0.2 is released on PyPi, this can be changed
+                # 'hdf5storage >= 0.2',
+                'hdf5storage @ https://github.com/frejanordsiek/hdf5storage/archive/master.zip',
                 'jupyter',
-                'npTDMS>=0.11.4',
+                'npTDMS >= 0.11.4',
                 'PyQt5',
                 'pyinstaller'
 ]
