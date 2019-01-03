@@ -37,6 +37,25 @@ class TweezersCollection(IndexedOrderedDict):
 
         return res.sorted()
 
+    def select(self, keys):
+        """
+        Select all items with a key that is in the provided iterable `keys`.
+
+        Args:
+            keys (iterable): list of keys to select from the collection
+
+        Returns:
+            :class:`.TweezersCollection`
+        """
+
+        res = self.__class__()
+
+        for key in keys:
+            if key in self.keys():
+                res[key] = self[key]
+
+        return res
+
     def filter(self, filterExp):
         """
         Filter keys based on whether they match a regular filter expression or not.
