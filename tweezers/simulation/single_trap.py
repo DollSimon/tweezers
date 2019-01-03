@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-class Sphere():
+class Sphere:
     """
     Represents a sphere and gives an interface to compute its properties.
     """
@@ -47,12 +47,7 @@ class Sphere():
         return diffusionCoefficient(radius=self.radius, temperature=self.temperature, viscosity=self.viscosity)
 
 
-
-class SingleTrap():
-    """
-
-    """
-
+class SingleTrap:
     def __init__(self, stiffness=0.1, obj=Sphere(radius=1000), timeStep=0.001):
         """
         Constructor for SingleTrap
@@ -60,7 +55,7 @@ class SingleTrap():
         Args:
             stiffness (float): Stiffness of the trap in [pN/nm] (Default: 0.1 pN/nm)
             obj: an object that provides methods to calculate mass, drag coefficient and diffusion coefficent (e.g.
-            :class:`tweezers.simulation.single_trap.Sphere`.
+                :class:`tweezers.simulation.single_trap.Sphere`.
             timeStep (float): Difference between two time points in [s]; delta time (Default: 0.001 s)
 
         """

@@ -80,10 +80,10 @@ class TweezersDataCollection(TweezersCollection):
 
         Args:
             path (`str` or :class:`pathlib.Path`): path to recursively search for data files that will be loaded as
-            :class:`.TweezersData` objects
+                :class:`.TweezersData` objects
             source (:class:`tweezers.io.BaseSource.BaseSource`, optional): a tweezers data source used to
-            identify valid data files and build the :class:`.TweezersData` object, defaults to
-            :class:`tweezers.io.TxtBiotecSource`
+                identify valid data files and build the :class:`.TweezersData` object, defaults to
+                :class:`tweezers.io.TxtBiotecSource`
 
         Returns:
             :class:`.TweezersDataCollection`
@@ -101,6 +101,7 @@ class TweezersDataCollection(TweezersCollection):
     def _sourcesToData(cls, sources):
         """
         Convert the found data sources to :class:`.TweezersData` objects
+
         Args:
             sources (dict): dictionary of datasources
 
@@ -194,10 +195,10 @@ class TweezersDataCollection(TweezersCollection):
         Args:
             date (`datetime.datetime` or str): reference date, if `str`, it should be in format "YYYY-MM-DD"
             method (`str`): one of `newer`, `older`, `between`
-            endDate(`datetime.datetime): required if `type = 'between'`
+            endDate(`datetime.datetime`): required if `type = 'between'`
 
         Returns:
-            `tweezers.TweezersCollection`
+            `tweezers.TweezersDataCollection`
         """
 
         if isinstance(date, str):
