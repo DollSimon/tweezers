@@ -4,7 +4,6 @@ block_cipher = None
 
 
 a = Analysis(['SegmentSelector.py'],
-             pathex=['/Users/christophehrlich/Documents/Python/tweezers/SegmentSelector'],
              binaries=[],
              datas=[],
              # bugfix, https://github.com/pyinstaller/pyinstaller/issues/2999
