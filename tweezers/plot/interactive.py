@@ -57,37 +57,42 @@ class DataManager:
     tc = None
     t = None
     segCounter = dict()
-
-    def __init__(self, path, sourceType=tweezers.io.TxtBiotecSource):
-        self.path = path
-        self.sourceType = sourceType
+    loaded = False
+    error = None
 
     @staticmethod
     def getSourceTypes():
-        return OrderedDict([
-            ('TxtBiotecSource', tweezers.io.TxtBiotecSource),
-            ('TdmsCTrapSource', tweezers.io.TdmsCTrapSource),
-            ('TxtMpiSource', tweezers.io.TxtMpiSource)
-        ])
+        sources = tweezers.io.SOURCE_CLASSES
+        sources['TweezersAnalysis'] = tweezers.TweezersAnalysis
+        return sources
 
-    def loadCollection(self, callback):
+    def loadCollection(self, callback, path, sourceType, tcPath=None):
+        self.loaded = False
         self.callback = callback
 
         # create thread
         self.thread = QtCore.QThread()
-        self.dataLoader = DataLoader(path=self.path, sourceType=self.sourceType)
+        self.dataLoader = DataLoader(path=path, sourceType=sourceType, tcPath=tcPath)
 
         # connect signal
         self.dataLoader.completed.connect(self.onCollectionLoaded)
         # move data loader to thread
         self.dataLoader.moveToThread(self.thread)
         self.dataLoader.finished.connect(self.thread.quit)
-        self.thread.started.connect(self.dataLoader.loadCollection)
+        # do we load from analysis files?
+        if tcPath:
+            self.thread.started.connect(self.dataLoader.loadAnalysisCollection)
+        else:
+            self.thread.started.connect(self.dataLoader.loadCollection)
         self.thread.start()
 
     def onCollectionLoaded(self, tc):
-        self.tc = tc.flatten()
-        self.setT(0)
+        if isinstance(tc, tweezers.TweezersDataCollection):
+            self.tc = tc.flatten()
+            self.setT(0)
+            self.loaded = True
+        else:
+            self.error = tc
         self.callback()
 
     def setT(self, idx):
@@ -218,19 +223,69 @@ class DataManager:
 
 
 class DataLoader(QtCore.QObject):
+    """
+    This class is used to asynchroneously interact with data (loading, exporting etc.).
+    """
+
     finished = QtCore.pyqtSignal()
     completed = QtCore.pyqtSignal(object)
 
-    def __init__(self, path=None, sourceType=tweezers.io.TxtBiotecSource, tc=None, groupExport=True):
+    def __init__(self, path=None, sourceType=tweezers.io.TxtBiotecSource, tc=None, groupExport=True, tcPath=None):
+        """
+        Which parameters are required epends on the method that is called later on.
+        """
+
         super().__init__()
         self.path = path
         self.sourceType = sourceType
         self.groupExport = groupExport
         self.tc = tc
+        self.tcPath = tcPath
 
     @QtCore.pyqtSlot()
     def loadCollection(self):
         tc = tweezers.TweezersDataCollection.load(self.path, source=self.sourceType)
+        self.completed.emit(tc)
+        self.finished.emit()
+
+    @QtCore.pyqtSlot()
+    def loadAnalysisCollection(self):
+        # load analysis collection
+        ac = tweezers.TweezersAnalysisCollection.load(self.path).flatten()
+        # get all bead and trial ids
+        beadIds = set()
+        for a in ac.values():
+            beadIds.add(a.meta.beadId)
+
+        # get new source type
+        try:
+            sourceType = tweezers.io.SOURCE_CLASSES[ac[0].meta.sourceClass]
+        except Exception as e:
+            # if an error occurs, return
+            e.customMsg = 'Invalid "sourceClass" encountered.'
+            self.completed.emit(e)
+            self.finished.emit()
+            return
+
+        # load tweezers data collection
+        tc = tweezers.TweezersDataCollection.load(self.tcPath, sourceType)
+
+        # select only bead ids that were already exported
+        tc = tc.select(beadIds)
+
+        for a in ac.values():
+            # add all the segments to the TweezersDataCollection
+            for segId, seg in a.segments.items():
+                # get start and stop time
+                tStart = seg.data.absTime.iloc[0]
+                tEnd = seg.data.absTime.iloc[-1]
+                # find matching trial
+                for t in tc[a.meta.beadId].values():
+                    if t.data.absTime.iloc[0] <= tStart and tEnd <= t.data.absTime.iloc[-1]:
+                        # addSegment requires relative time
+                        segData = t.data.query('@tStart <= absTime <= @tEnd')
+                        t.addSegment(segData.time.iloc[0], segData.time.iloc[-1], name=segId)
+
         self.completed.emit(tc)
         self.finished.emit()
 
@@ -405,20 +460,30 @@ class SegmentSelector(QtWidgets.QMainWindow, Ui_MainWindow):
         """
 
         lastImportDir = self.settings.value('importDir', '')
-        path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select Directory", lastImportDir)
-        # sourceType = self.sourceTypeCmb.currentText()
-        sourceType = tweezers.io.TxtBiotecSource
+        path = QtWidgets.QFileDialog.getExistingDirectory(self, "Select directory", lastImportDir)
+        sourceType = DataManager.getSourceTypes()[self.sourceTypeCmb.currentText()]
         if path:
             self.settings.setValue('importDir', path)
             self.statusbar.showMessage('Loading directory ...')
             self.setDataLoaded(False)
-            self.data = DataManager(path, sourceType=sourceType)
-            self.data.loadCollection(self.onDirectoryLoaded)
+            self.data = DataManager()
+            tcPath = None
+            # are we loading analysis files?
+            if sourceType is tweezers.TweezersAnalysis:
+                # we need the path to the raw data files
+                tcPath = QtWidgets.QFileDialog.getExistingDirectory(self, "Select directory with raw data",
+                                                                    lastImportDir)
+            self.data.loadCollection(self.onDirectoryLoaded, path, sourceType, tcPath=tcPath)
 
     def onDirectoryLoaded(self):
         """
         Event handler for when new directory was loaded.
         """
+
+        # do nothing if data was not loaded properly
+        if not self.data.loaded:
+            self.displayError('Error loading data', self.data.error)
+            return
 
         # populate settings
         # time y axis selection combo
@@ -709,7 +774,10 @@ class SegmentSelector(QtWidgets.QMainWindow, Ui_MainWindow):
         msg.setWindowTitle('Error')
         msg.setText(message)
         if error:
-            msg.setInformativeText('{0}'.format(error))
+            msgStr = '{}'.format(error)
+            if hasattr(error, 'customMsg'):
+                msgStr += '\n{}'.format(error.customMsg)
+            msg.setInformativeText(msgStr)
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
 
