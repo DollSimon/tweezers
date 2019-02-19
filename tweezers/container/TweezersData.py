@@ -2,6 +2,7 @@ import copy
 import logging as log
 from collections import OrderedDict
 import pandas as pd
+import numpy as np
 
 from tweezers.analysis.psd import PsdComputation, PsdFit
 from tweezers.analysis.thermal_calibration import thermalCalibration
@@ -12,6 +13,7 @@ from tweezers.ixo.statistics import averageData
 from tweezers.meta import MetaDict, UnitDict
 from tweezers.plot.psd import PsdFitPlot
 from tweezers.plot.utils import peekPlot
+from tweezers.physics.tweezers import tcOsciHydroCorrect
 
 
 class TweezersDataBase:
@@ -202,6 +204,46 @@ class TweezersDataBase:
         t.meta, t.units, t.data = t.source.calculateForce(t.meta, t.units, t.data)
 
         return t
+
+    def osciHydroCorr(self):
+        """
+        Correct results of thermal calibration performed with oscillation technique.
+
+        Returns a copy of the initial object.
+
+        Returns:
+            :class:`.TweezersData`
+        """
+
+        t = self.copy()
+        m = t.meta
+        # radii in nm
+        rPm = m.pmY.beadDiameter / 2 * 1000
+        rAod = m.aodY.beadDiameter / 2 * 1000
+
+        # get y distance
+        dy = np.abs(m.pmY.trapPosition - m.aodY.trapPosition)
+
+        # todo correct x-axis parameters?
+        # go through y-traps
+        for trap in m.traps:
+            if not trap.lower().endswith('y'):
+                continue
+            # the radius in the equation is that of the other bead (that causes the flow field)
+            [rTrap, rOther] = [rPm, rAod] if trap.lower().startswith('pm') else [rAod, rPm]
+            # get correction factor
+            c = tcOsciHydroCorrect(dy, rTrap=rTrap, rOther=rOther, method='oseen')
+            # store and correct data
+            m[trap]['hydroCorr'] = c
+            m[trap].displacementSensitivity *= c
+            m[trap].stiffness /= c ** 2
+            m[trap].forceSensitivity /= c
+
+        # recompute data
+        t.meta, t.units, t.data = t.source.postprocessData(m, t.units, t.data)
+
+        return t
+
 
     def copy(self):
         """

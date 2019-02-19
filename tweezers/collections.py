@@ -276,6 +276,24 @@ class TweezersDataCollection(TweezersCollection):
 
         return pd.concat(res, ignore_index=True, sort=False)
 
+    def osciHydroCorr(self):
+        """
+        Correct results of thermal calibration performed with oscillation technique. This calls
+        :meth:`tweezers.TweezersData.osciHydroCorr`
+
+        Returns a copy of the initial object.
+
+        Returns:
+            `tweezers.TweezersDataCollection`
+        """
+
+        res = self.__class__()
+        for key, item in self.items():
+            # this will either call the method on the TweezersData object or start the recursion on the
+            # TweezersDataCollection (works since the method is called the same for both objects)
+            res[key] = item.osciHydroCorr()
+        return res
+
 
 class TweezersAnalysisCollection(TweezersCollection):
     """

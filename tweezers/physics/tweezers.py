@@ -72,7 +72,7 @@ def tcOsciHydroCorrect(dist, rTrap=np.nan, rOther=np.nan, method='oseen'):
     Args:
         dist (float): distance between the traps (in nm)
         rTrap (float): radius of the bead in the trap for which to calculate the correction factor (in nm)
-        rOther: radius of the bead in the other trap (in nm)
+        rOther (float): radius of the bead in the other trap (in nm)
         method (str): currently only `oseen` is suppoted
 
     Returns:

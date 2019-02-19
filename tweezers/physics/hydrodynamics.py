@@ -104,7 +104,7 @@ def viscosityWater(T, absoluteT=False):
     if absoluteT:
         absT = T
     else:
-        absT = 273.15 + T
+        absT = asKelvin(T)
 
     # calculate viscosity and convert units
     n = A * 10**(B / (absT - C)) * 1E-6
