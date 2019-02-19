@@ -37,6 +37,12 @@ So, e.g. in your base-environment, install `jupyter` and `nb_conda_kernels`.
 conda install jupyter nb_conda_kernels
 ```
 
+To install the Jupyter NbExtensions (for table of contents etc.), run the following in the environment, from which you're running the Jupyter Notebook Server.
+
+```
+conda install jupyter_contrib_nbextensions
+```
+
 
 #### Installing the package
 
@@ -73,6 +79,23 @@ If you get an error message like above, change the default backend of `matplotli
 ```bash
 echo "backend: Qt5Agg" > ~/.matplotlib/matplotlibrc
 ```
+
+
+#### Matplotlib, LaTeX and Jupyter
+
+When using LaTeX in a Jupyter Notebook and you get an error message like
+
+```text
+No such file or directory: 'latex': 'latex'
+```
+
+it means that Jupyter does not load all the environment path variables. Manually add the path to the latex executable to the Jupyter path variable. Add the following to your `.bash_profile`:
+
+```bash
+export JUPYTER_PATH="/Library/TeX/texbin/:$JUPYTER_PATH"
+```
+
+and replace the path by the proper one (e.g. run `which latex` and use that path).
 
 
 ## Build the docs
