@@ -192,6 +192,30 @@ def baselineSubtraction(analysis, axis='y', averageBsl=None):
 
 
 def zeroDistance(analysis, axis='y', useTrap='pm'):
+
+    axesToCorrect = {'x': ['xDistVolt'],
+                     'y': ['yDistVolt']}
+
+    d = analysis.segments['bslBeads'].data
+    forceChan = useTrap.lower() + axis.upper() + 'Force'
+    trapDistChan = axis.lower() + 'TrapDist'
+    dZeroForce = d.query('-0.05 <= ' + forceChan + ' <= 0.05')
+    offset = dZeroForce[trapDistChan].mean()
+
+    createBslCorrField(analysis)
+
+    # offset data
+    for segId, seg in analysis.bslCorr.items():
+        seg.addField('bslCorr')
+        for ax in axesToCorrect[axis]:
+            seg.data[ax] = seg.data[ax] - offset
+            seg.bslCorr['zeroExt'] = offset
+            seg.bslCorr['zeroExtTrap'] = useTrap.lower() + axis.upper()
+            seg.bslCorr['zeroExtUnit'] = analysis.units[trapDistChan]
+
+    return analysis
+
+def zeroDistanceByFit(analysis, axis='y', useTrap='pm'):
     """
     Find the trap distance at which the beads touch and use this as an offset to calculate the extension.
 
@@ -493,6 +517,245 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
     # plot bslBeads
     d = a.segments.bslBeads.data
     ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL Beads', zorder=5, **plotArgs)
+    # plot bslFlat
+    d = a.segments.bslFlat.data
+    ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL Flat', zorder=3, **plotArgs)
+    if s.bslCorr.bslSubAverage:
+        d = averageData(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
+        ax.plot(d.yTrapDist, d.pmYForce, '.', zorder=4, **plotArgs)
+
+    # general
+    ax.set_title('PM Y', **axsTtl)
+    ax.set_ylabel('Force [pN]', **axsLbl)
+
+    # bsl aod
+    ax = axsBsl[1]
+    if 'bsl' in a.segments.keys():
+        d = a.segments.bsl.data
+        ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL', color='gray', **plotArgs)
+
+    # plot bslBeads
+    d = a.segments.bslBeads.data
+    ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL Beads', zorder=5, **plotArgs)
+    # plot bslFlat
+    d = a.segments.bslFlat.data
+    ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL Flat', zorder=3, **plotArgs)
+    if s.bslCorr.bslSubAverage:
+        d = averageData(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
+        ax.plot(d.yTrapDist, d.aodYForce, '.', label='_', zorder=4, **plotArgs)
+    # general
+    ax.set_title('AOD Y', **axsTtl)
+    ax.legend(fontsize=6)
+
+    for ax in axsBsl:
+        ax.set_xlabel('Trap Dist [nm]', **axsLbl)
+        ax.tick_params(**tickPrms)
+
+    ### results text ###
+    txtArgs = {'fontsize': 12, 'verticalalignment': 'top'}
+
+    # general info
+    txtId = s.id.translate(str.maketrans({'_': '\_', '#': '\#'}))
+    txt = r'\textbf{{Exp ID:}}\\\\{}\\\\'.format(txtId) + \
+          r'\begin{tabular}{l r l}' + \
+          r'Temperature: & {:.1f} & {}\\'.format(m.temperature, u.temperature) + \
+          r'Laser Power: & {:.1f} & {}\\'.format(m.laserPower, u.laserPower) + \
+          r'Laser Temperature: & {:.1f} & {}'.format(m.laserTemperature, u.laserTemperature) + \
+          r'\end{tabular}'
+
+    axTxt.text(0, 1, txt, **txtArgs)
+
+    # add AOD
+    trapPm = 'pmY'
+    trapAod = 'aodY'
+    if 'bslCorr' in m.pmX.keys():
+        trapPm = 'pmX'
+        trapAod = 'aodX'
+
+    # more general info
+    d20 = s.dist20 if 'dist20' in s.keys() else np.nan
+    ripF = s.ripPmYForce if 'ripPmYForce' in s.keys() else np.nan
+
+    txt = r'\textbf{{General:}}\\\\' + \
+          r'\begin{tabular}{l r l}' + \
+          r'd(\SI{{20}}{{pN}}): & {:.0f} & {}\\'.format(d20, u.yDistVolt) + \
+          r'$F_\mathrm{{rip}}$: & {:.1f} & pN\\'.format(ripF)
+
+    if 'hydroCorr' in m.pmY.keys():
+        txt += r'$c^\mathrm{{PM}}_\mathrm{{hydro}}$: & {:.2f} & \\'.format(m.pmY.hydroCorr) + \
+               r'$c^\mathrm{{AOD}}_\mathrm{{hydro}}$: & {:.2f} & \\'.format(m.aodY.hydroCorr)
+
+    txt += r'\end{tabular}'
+
+    axTxt.text(0.34, 1 , txt, **txtArgs)
+
+    # extension zero
+    txt = r'\textbf{{Extension zero:}} {}\\\\' + \
+          r'\begin{tabular}{l r l}' + \
+          r'& PM &\\' + \
+          r'$\Delta x_0$: & {:.1f} & {}\\'.format(s.bslCorr.zeroExt, s.bslCorr.zeroExtUnit) + \
+          r'\end{tabular}'
+
+    axTxt.text(0.5, 1, txt, **txtArgs)
+
+    # video correction
+    txt = r'\textbf{{Video correction:}} {}\\\\' + \
+          r'\begin{tabular}{l r r l}' + \
+          r'& PM & AOD & \\' + \
+          r'$\Delta x$: & {:.1f} & {:.1f} & {}\\'.format(s.bslCorr.pmYZeroVid, s.bslCorr.aodYZeroVid, a.units.pmYZeroVid) + \
+          r'Slope: & {:.3f} & {:.3f} & \\'.format(s.bslCorr.pmYZeroVidSlope, s.bslCorr.aodYZeroVidSlope) + \
+          r'$r^2$: & {:.2f} & {:.2f} & \\'.format(s.bslCorr.pmYZeroVidR2, s.bslCorr.aodYZeroVidR2) + \
+          r'\end{tabular}'
+
+    axTxt.text(0.75, 1, txt, **txtArgs)
+
+    saveArgs = {'facecolor': 'white', 'dpi': 300}
+
+    if saveDir:
+        p = Path(saveDir)
+        if not p.exists() or not p.is_dir():
+            raise FileExistsError('Directory given to save the figure does not exist.')
+        fig.savefig(str(p / (s.id + '.pdf')), **saveArgs)
+
+    # reset interactive state
+    if not display:
+        # close figure
+        plt.close(fig)
+        if mpl.get_backend() == 'nbAgg':
+            # restore interactive mode
+            plt.ion()
+
+    return fig
+
+
+def segmentSummaryFigByFit(analysis, segId, display=True, saveDir=None):
+    """
+    Creates a summary figure for a data segment from a :class:`.TweezersAnalysis` object after the baseline
+    and video corrections.
+
+    Args:
+        analysis (:class:`.TweezersAnalysis`): analysis object
+        segId (int or str): segment ID for which to create the figure
+        display (bool): should the figure be displayed? a new figure is created if so
+        saveDir (str): path to save the figure to, if set to `None` it will not be saved (default: None)
+
+    Returns:
+        :class:`matplotlib.figure.Figure`
+    """
+
+    a = analysis
+    s = a.bslCorr[segId]
+    m = a.meta
+    u = a.units
+
+    # should we display the figure?
+    if not display:
+        if mpl.get_backend() == 'nbAgg':
+            # if run from a notebook, turn off interactive mode
+            plt.ioff()
+
+    ### create figure ###
+    fig = plt.figure(figsize=(12, 6), constrained_layout=True)
+    gs = fig.add_gridspec(nrows=3, ncols=6, width_ratios=[1, 1, 1, 1, 1, 0.1])
+    # extension axis
+    axExt = fig.add_subplot(gs[:2, :2])
+    # displacement axes
+    ax0 = fig.add_subplot(gs[0, 2])
+    ax1 = fig.add_subplot(gs[0, 3])
+    ax2 = fig.add_subplot(gs[0, 4])
+    ax3 = fig.add_subplot(gs[0, 5])
+    axsDisp = [ax0, ax1, ax2, ax3]
+    # bsl axes
+    ax0 = fig.add_subplot(gs[1, 2])
+    ax1 = fig.add_subplot(gs[1, 3])
+    axsBsl = [ax0, ax1]
+    # text axes
+    axTxt = fig.add_subplot(gs[2, :])
+    axTxt.set_axis_off()
+
+    ### force - extension plot ###
+    plotArgs = {'markersize': 1, 'rasterized': True}
+
+    # plot until rip
+    dist = s.ripTrapDist
+    queryStr = 'yTrapDist < @dist'
+
+    ax = axExt
+    d = s.data.query(queryStr)
+    ax.plot(d.yDistVid, d.pmYForce, '.', label='Video', **plotArgs)
+    d = a.segments[segId].data.copy()
+    d.yDistVolt = d.yDistVolt - a.bslCorr[0].bslCorr.zeroExt
+    d = d.query(queryStr)
+    ax.plot(d.yDistVolt, d.pmYForce, '.', label='Trap', **plotArgs)
+    d = s.data.query(queryStr)
+    ax.plot(d.yDistVolt, d.pmYForce, '.', label='Trap - corr', **plotArgs)
+    # legend with fixed marker size
+    ax.legend(markerscale=10, fontsize=8)
+    ax.set_xlabel('Extension [nm]', fontsize=12)
+    ax.set_ylabel('PM Y Force [pN]', fontsize=12)
+    ax.set_title('Force - Extension', fontsize=14)
+
+    ### config ###
+    axsLbl = {'fontsize': 10}
+    axsTtl = {'fontsize': 12}
+    tickPrms = {'labelsize': 9}
+
+    ### video - trap displacement plot ###
+    d = s.data
+
+    minF = d[['pmYForce', 'aodYForce', 'yForce']].min().min()
+    maxF = d[['pmYForce', 'aodYForce', 'yForce']].max().max()
+    scatterArgs = {'cmap': 'viridis', 'vmin': minF, 'vmax': maxF, 's': 10, 'rasterized': True}
+
+    ax = axsDisp[0]
+    # scatter plot, using "values" for color argument to convert pandas series to numpy array, series cause errors
+    # for determining categorical or continuous colorbar by mpl
+    p = ax.scatter(d.pmYDisp, d.pmYDispVid, c=d.pmYForce.values, **scatterArgs)
+    # fit limit line
+    idx = (d.pmYForce - s.bslCorr.zeroVidFitForceLow).abs().idxmin()
+    ax.axvline(d.loc[idx].pmYDisp, color='0.7', linestyle='--')
+    # slope 1 line
+    lim = [d.pmYDisp.min(), d.pmYDisp.max()]
+    ax.plot([lim[0], lim[1]], [lim[0], lim[1]], 'r', linestyle='--')
+    ax.set_title('PM Y Displacement', **axsTtl)
+    ax.set_ylabel('Video [nm]', **axsLbl)
+
+    ax = axsDisp[1]
+    ax.scatter(d.aodYDisp, d.aodYDispVid, c=d.aodYForce.values, **scatterArgs)
+    # fit limit line
+    idx = (d.aodYForce - s.bslCorr.zeroVidFitForceLow).abs().idxmin()
+    ax.axvline(d.loc[idx].aodYDisp, color='0.7', linestyle='--')
+    # slope 1 line
+    lim = [d.aodYDisp.min(), d.aodYDisp.max()]
+    ax.plot([lim[0], lim[1]], [lim[0], lim[1]], 'r', linestyle='--')
+    ax.set_title('AOD Y Displacement', **axsTtl)
+
+    ax = axsDisp[2]
+    ax.scatter(d.yDistVolt, d.yDistVid, c=d.pmYForce.values, **scatterArgs)
+    # slope 1 line
+    lim = [d.yDistVolt.min(), d.yDistVolt.max()]
+    ax.plot([lim[0], lim[1]], [lim[0], lim[1]], 'r', linestyle='--')
+    ax.set_title('Extension Y', **axsTtl)
+
+    cbar = fig.colorbar(p, cax=axsDisp[-1])
+    cbar.set_label('Force [pN]', **axsLbl)
+
+    for ax in axsDisp[:3]:
+        ax.set_xlabel('Trap [nm]', **axsLbl)
+    for ax in axsDisp:
+        ax.tick_params(**tickPrms)
+
+    ### bsl plot ###
+    plotArgs = {'rasterized': True, 'markersize': 1}
+    # bsl pm
+    ax = axsBsl[0]
+    if 'bsl' in a.segments.keys():
+        d = a.segments.bsl.data
+        ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL', color='gray', **plotArgs)
+
+    # plot bslBeads
+    d = a.segments.bslBeads.data
+    ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL Beads', zorder=5, **plotArgs)
     # plot fit to determine zeroExt
     x = np.arange(d.yTrapDist.min(), d.yTrapDist.max())
     y = a.meta.pmY.bslCorr.keffExp * x + a.meta.pmY.bslCorr.zeroExtIntercept
@@ -635,7 +898,7 @@ def analysisSummaryFig(analysis, saveDir):
     else:
         ac = analysis.copy()
 
-    for a in ac.values:
+    for a in ac.values():
         for segId in a.bslCorr.keys():
             segmentSummaryFig(a, segId, saveDir=saveDir, display=False)
 
