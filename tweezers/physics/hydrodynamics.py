@@ -3,7 +3,7 @@ from .thermodynamics import kbt
 from .utils import asKelvin
 
 
-def dragSphere(radius=1000, viscosity=0.9e-9, verbose=False):
+def dragSphere(radius=1000, viscosity=0.9e-9):
     """
     Calculates the simple Stokes' drag coefficient of a sphere in a Newtonian fluid
     at low Reynolds number. :math:`\\gamma = 6 \\pi \\eta r`
@@ -11,35 +11,12 @@ def dragSphere(radius=1000, viscosity=0.9e-9, verbose=False):
     Args:
         radius (float): radius of solid sphere (default: 1000 nm)
         viscosity (float): dynamic viscosity (default: 0.9e-9 pN s / nm²)
-        verbose (bool): print parameters and results with units (default: False)
 
     Returns:
         :class:`float` Stokes drag coefficient in [pN/nm s]
     """
 
-    if not isinstance(radius, (int, float, np.float)):
-        try:
-            radius = np.float(radius)
-        except ValueError:
-            print('Radius must be a number, not a {}'.format(type(radius)))
-
-    if not isinstance(viscosity, (int, float, np.float)):
-        try:
-            viscosity = np.float(viscosity)
-        except ValueError:
-            print('Viscosity must be a number, not a {}'.format(type(viscosity)))
-
-    assert (radius > 0), 'Radius of sphere must be positive'
-
     dragCoefficient = 6 * np.pi * radius * viscosity
-
-    if verbose:
-        print("In:")
-        print("Radius: r = {} nm".format(radius))
-        print("Viscosity: eta = {} pN/nm^2 s\n".format(viscosity))
-
-        print("Out:")
-        print("Drag coefficient: gamma = {} pN/nm s".format(round(dragCoefficient, 12)))
 
     return dragCoefficient
 
