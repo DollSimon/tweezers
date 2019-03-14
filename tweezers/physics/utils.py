@@ -8,7 +8,6 @@ def asKelvin(temperatureInCelsius=25):
     Returns:
         temperatureInKelvin (float): Temperature in Kelvin [K]
     """
-    assert temperatureInCelsius >= -273.15
 
     temperatureInKelvin = 273.15 + temperatureInCelsius
 
@@ -25,7 +24,6 @@ def asCelsius(temperatureInKelvin=298):
     Returns:
         temperatureInCelsius (float): Temperature in [°C]. (Default: 25 °C)
     """
-    assert temperatureInKelvin >= 0
 
     temperatureInCelsius = temperatureInKelvin - 273.15
 
