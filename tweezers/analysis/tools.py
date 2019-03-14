@@ -45,8 +45,15 @@ def osciHydrodynamicCorr(analysis):
         [rTrap, rOther] = [rPm, rAod] if trap.lower().startswith('pm') else [rAod, rPm]
         # get correction factor
         c = tcOsciHydroCorrect(dy, rTrap=rTrap, rOther=rOther, method='oseen')
-        # store and correct data
+        # store correction factor
         m[trap]['hydroCorr'] = c
+        # also store for x-trap
+        xTrap = trap[:-1] + 'X'
+        m[xTrap]['hydroCorr'] = c
+
+    # correct the calibration parameters
+    for trap in m.traps:
+        c = m[trap].hydroCorr
         m[trap].displacementSensitivity *= c
         m[trap].stiffness /= c**2
         m[trap].forceSensitivity /= c
@@ -319,8 +326,27 @@ def displacementCorrection(analysis, axis='y', lowForceLimit=5):
 
             # shift video displacement by offset
             d[trap + 'DispVid'] = d[trap + 'DispVid'] - intercept
-            # change slope of data by multiplying the trp data
+            # parallel projection
             d[trap + 'Disp'] *= slope
+
+            # # we trust the zero of the trap signal, but not the one of the video signal
+            # queryStr = '-10 < {}Disp < 10'.format(trap)
+            # dq = d.query(queryStr)
+            # zeroVid = dq[trap + 'DispVid'].mean()
+            # d[trap + 'DispVid'] -= zeroVid
+            # seg.bslCorr[trap + 'ZeroVid'] = zeroVid
+            # # store units
+            # analysis.units[trap + 'ZeroVid'] = analysis.units[trap + 'Disp']
+            # # temporary fix
+            # seg.bslCorr[trap + 'ZeroVidSlope'] = np.nan
+            # seg.bslCorr[trap + 'ZeroVidR2'] = np.nan
+            #
+            # # we trust the displacement from the video, but not the one from the trap signal but want the better
+            # # resolution of the trap signal
+            # ds = d.sort_values(by='aodYDisp')
+            # dm = ds.rolling(15, center=True).mean()
+            #
+            # d[trap + 'Disp'] = ds[trap + 'Disp'] + (dm[trap + 'DispVid'] - dm[trap + 'Disp'])
 
         seg.bslCorr['zeroVidFitForceLow'] = lowForceLimit
 
@@ -467,8 +493,13 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
     minF = d[['pmYForce', 'aodYForce', 'yForce']].min().min()
     maxF = d[['pmYForce', 'aodYForce', 'yForce']].max().max()
     scatterArgs = {'cmap': 'viridis', 'vmin': minF, 'vmax': maxF, 's': 10, 'rasterized': True}
+    # original data
+    dorig = a.segments[segId].data
 
     ax = axsDisp[0]
+    # original data
+    ax.scatter(dorig.pmYDisp, dorig.pmYDispVid, c='lightgray', **scatterArgs)
+    # fixed data
     # scatter plot, using "values" for color argument to convert pandas series to numpy array, series cause errors
     # for determining categorical or continuous colorbar by mpl
     p = ax.scatter(d.pmYDisp, d.pmYDispVid, c=d.pmYForce.values, **scatterArgs)
@@ -482,6 +513,9 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
     ax.set_ylabel('Video [nm]', **axsLbl)
 
     ax = axsDisp[1]
+    # original data
+    ax.scatter(dorig.aodYDisp, dorig.aodYDispVid, c='lightgray', **scatterArgs)
+    # fixed data
     ax.scatter(d.aodYDisp, d.aodYDispVid, c=d.aodYForce.values, **scatterArgs)
     # fit limit line
     idx = (d.aodYForce - s.bslCorr.zeroVidFitForceLow).abs().idxmin()
@@ -578,7 +612,9 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
 
     txt = r'\textbf{{General:}}\\\\' + \
           r'\begin{tabular}{l r l}' + \
-          r'd(\SI{{20}}{{pN}}): & {:.0f} & {}\\'.format(d20, u.yDistVolt) + \
+          r'$d_\mathrm{{PM}}$: & {:.2f} & {}\\'.format(m.pmY.beadDiameter, u.pmY.beadDiameter) + \
+          r'$d_\mathrm{{AOD}}$: & {:.2f} & {}\\'.format(m.aodY.beadDiameter, u.aodY.beadDiameter) + \
+          r'$d(\SI{{20}}{{pN}})$: & {:.0f} & {}\\'.format(d20, u.yDistVolt) + \
           r'$F_\mathrm{{rip}}$: & {:.1f} & pN\\'.format(ripF)
 
     if 'hydroCorr' in m.pmY.keys():
@@ -587,7 +623,7 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
 
     txt += r'\end{tabular}'
 
-    axTxt.text(0.34, 1 , txt, **txtArgs)
+    axTxt.text(0.34, 1, txt, **txtArgs)
 
     # extension zero
     txt = r'\textbf{{Extension zero:}} {}\\\\' + \
@@ -596,7 +632,7 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
           r'$\Delta x_0$: & {:.1f} & {}\\'.format(s.bslCorr.zeroExt, s.bslCorr.zeroExtUnit) + \
           r'\end{tabular}'
 
-    axTxt.text(0.5, 1, txt, **txtArgs)
+    axTxt.text(0.55, 1, txt, **txtArgs)
 
     # video correction
     txt = r'\textbf{{Video correction:}} {}\\\\' + \
