@@ -14,7 +14,7 @@ class TweezersAnalysis(IndexedOrderedDict):
     # columns to ignore on baseline correction
     baselineIgnoreColumns = ['BSL', 'bslFlat', 'bslBeads']
 
-    def __init__(self, path=None, name=None):
+    def __init__(self, name=None):
         """
         Constructor for TweezersAnalysis
 
@@ -24,8 +24,6 @@ class TweezersAnalysis(IndexedOrderedDict):
         """
         super().__init__()
 
-        if path:
-            self.path = path
         self.name = name
 
     @classmethod
@@ -42,7 +40,8 @@ class TweezersAnalysis(IndexedOrderedDict):
         """
 
         path = Path(file)
-        obj = TweezersAnalysis(path.parent, path.name)
+        obj = TweezersAnalysis(path.name)
+        obj.path = path.parent
         data = matfile.load(path, keys=keys)
         for key, value in data.items():
             obj[key] = value
@@ -64,13 +63,20 @@ class TweezersAnalysis(IndexedOrderedDict):
             raise ValueError('Given path is not a directory: {}'.format(path))
         self._path = ppath
 
-    def save(self, keys=None):
+    def save(self, path=None, keys=None):
         """
         Save analysis file to the path and name it was created with.
         
         Args:
+            path (`str` or :class:`pathlib.Path`): path to the directory where the file should be stored
             keys(`list` of `str`): list of keys to write to the file, `None` for all
         """
+
+        if path:
+            self.path = path
+
+        if not self.path:
+            raise ValueError('No path given to store the Analysis File.')
 
         toSave = self
         # list of keys to save was given

@@ -136,7 +136,7 @@ class TweezersDataCollection(TweezersCollection):
                 res[key] = cls._sourcesToData(value)
         return res
 
-    def getAnalysis(self, path, groupByBead=True, onlySegments=True):
+    def getAnalysis(self, groupByBead=True, onlySegments=True):
         """
         Convert all the :class:`.TweezersData` objects, held by this collection, to :class:`.TweezersAnalysis`
         objects.
@@ -150,7 +150,6 @@ class TweezersDataCollection(TweezersCollection):
         exported.
 
         Args:
-            path (`str` or :class:`pathlib.Path`): export path for the :class:`.TweezersAnalysis` objects
             groupByBead (bool): group data by bead ID
             onlySegments (bool): if `True` only gets segments and skips files without any defined segments,
                                  if `False` the whole dataset is exported
@@ -174,11 +173,11 @@ class TweezersDataCollection(TweezersCollection):
                     raise ValueError('TweezersDataCollection:getAnalysis: Grouping by bead not possible, no "beadId" present')
                 if beadId not in res.keys():
                     # create new bead in collection
-                    res[beadId] = t.getEmptyAnalysis(path, name=beadId)
+                    res[beadId] = t.getEmptyAnalysis(name=beadId)
                     res[beadId].addField('segments')
 
                 if onlySegments:
-                    a = t.getSegmentAnalysis(path)
+                    a = t.getSegmentAnalysis()
                     for key, value in a.segments.items():
                         if key in res[beadId].segments.keys():
                             # if the segment name already exists, throw an exception
@@ -187,7 +186,7 @@ class TweezersDataCollection(TweezersCollection):
                             raise KeyError('TweezersDataCollection:getAnalysis: Bead ID "{}" already has a segment "{}"'.format(beadId, key))
                         res[beadId].segments[key] = value
                 else:
-                    a = t.getAnalysis(path)
+                    a = t.getAnalysis()
                     res[beadId].segments[str(t.meta.trial)] = a.data
         else:
             # just go through the structure recursively
@@ -195,14 +194,14 @@ class TweezersDataCollection(TweezersCollection):
                 if isinstance(self[key], TweezersData):
                     # self[key] is a TwezersData object
                     if onlySegments:
-                        a = self[key].getSegmentAnalysis(path=path)
+                        a = self[key].getSegmentAnalysis()
                     else:
-                        a = self[key].getAnalysis(path=path)
+                        a = self[key].getAnalysis()
                     if a:
                         res[key] = a
                 else:
                     # self[key] is a nested TweezersDataCollection
-                    res[key] = self[key].getAnalysis(path=path, groupByBead=groupByBead, onlySegments=onlySegments)
+                    res[key] = self[key].getAnalysis(groupByBead=groupByBead, onlySegments=onlySegments)
 
         return res.sorted()
 
@@ -331,11 +330,14 @@ class TweezersAnalysisCollection(TweezersCollection):
 
         return res
 
-    def save(self):
+    def save(self, path=None):
         """
         Saves all the :class:`.TweezersAnalysis` objects in this collection by calling :meth:`.TweezersAnalysis.save`.
+
+        Args:
+            path (`str` or :class:`pathlib.Path`): path to the directory where the file should be stored
         """
 
         # this will work recursively since save is a method in TweezersAnalysis and TweezersAnalysisCollection
         for value in self.values():
-            value.save()
+            value.save(path=path)

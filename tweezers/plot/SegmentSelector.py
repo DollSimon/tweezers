@@ -293,8 +293,8 @@ class DataLoader(QtCore.QObject):
     def export(self):
         error = None
         try:
-            ac = self.tc.getAnalysis(path=self.path, groupByBead=self.groupExport, onlySegments=True)
-            ac.save()
+            ac = self.tc.getAnalysis(groupByBead=self.groupExport, onlySegments=True)
+            ac.save(path=self.path)
         except Exception as err:
             error = err
         self.completed.emit(error)
