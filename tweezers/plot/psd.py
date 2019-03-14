@@ -5,7 +5,28 @@ import numpy as np
 import math
 
 
-class PsdPlotBase():
+def plotPsd(ax, psd, axis, *args, **kwargs):
+    line = ax.loglog(psd.f, psd[axis], *args, **kwargs)
+    ax.set_xlabel('f [Hz]')
+    ax.set_ylabel('PSD ' + axis)
+    return line
+
+
+def plotPsdError(ax, psd, axis, *args, **kwargs):
+    psdData = psd[axis]
+    errors = psd[axis + 'Std']
+    lowerLimit = psdData - errors
+    lowerLimit[lowerLimit <= 0] = 1e-15
+
+    # set alpha
+    kwargs['alpha'] = 0.3
+
+    ax.fill_between(psd.f, psdData + errors, lowerLimit, *args, **kwargs)
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+
+
+class PsdPlotBase:
     """
     Base class for plotting PSDs. It implements some basic functionality and declares required variables.
     """
