@@ -233,8 +233,15 @@ class TweezersDataBase:
             [rTrap, rOther] = [rPm, rAod] if trap.lower().startswith('pm') else [rAod, rPm]
             # get correction factor
             c = tcOsciHydroCorrect(dy, rTrap=rTrap, rOther=rOther, method='oseen')
-            # store and correct data
+            # store correction factor
             m[trap]['hydroCorr'] = c
+            # also store for x-trap
+            xTrap = trap[:-1] + 'X'
+            m[xTrap]['hydroCorr'] = c
+
+            # correct the calibration parameters
+        for trap in m.traps:
+            c = m[trap].hydroCorr
             m[trap].displacementSensitivity *= c
             m[trap].stiffness /= c ** 2
             m[trap].forceSensitivity /= c
@@ -243,7 +250,6 @@ class TweezersDataBase:
         t.meta, t.units, t.data = t.source.postprocessData(m, t.units, t.data)
 
         return t
-
 
     def copy(self):
         """
@@ -325,30 +331,28 @@ class TweezersDataBase:
         PsdFitPlot(self, residuals=False)
         return self
 
-    def getAnalysis(self, path, name=None):
+    def getAnalysis(self, name=None):
         """
         Convert the current :class:`.TweezersData` to a :class:`.TweezersAnalysis`, the general format to store and
         exchange analysis results.
 
         Args:
-            path (`str`): path to the directory that will hold the :class:`tweezers.TweezersAnalysis` file
             name (`str`, optional): name for the analysis file, constructed from metadata if not given (using the ID)
 
         Returns:
             :class:`.TweezersAnalysis`
         """
 
-        analysis = self.getEmptyAnalysis(path, name=name)
+        analysis = self.getEmptyAnalysis(name=name)
         analysis.data = copy.deepcopy(self.data)
         return analysis
 
-    def getSegmentAnalysis(self, path, name=None):
+    def getSegmentAnalysis(self, name=None):
         """
         Convert all segments of the current :class:`.TweezersData` to a :class:`.TweezersAnalysis`, the general
         format to store and exchange analysis results.
 
         Args:
-            path (`str`): path to the directory that will hold the :class:`tweezers.TweezersAnalysis` file
             name (`str`, optional): name for the analysis file, constructed from metadata if not given (using the ID)
 
         Returns:
@@ -359,20 +363,19 @@ class TweezersDataBase:
         if not self.segments:
             return None
 
-        analysis = self.getEmptyAnalysis(path, name=name)
+        analysis = self.getEmptyAnalysis(name=name)
         analysis.addField('segments')
         for key in self.segments.keys():
             seg = self.getSegment(key)
             analysis.segments[key] = IndexedOrderedDict(data=seg.data, id=seg.meta.id, idSafe=seg.meta.idSafe)
         return analysis
 
-    def getEmptyAnalysis(self, path, name=None):
+    def getEmptyAnalysis(self, name=None):
         """
         Shared code that prepares export of an analysis file, used by :meth:`.getAnalysis` and
         :meth:`.getSegmentAnalysis`.
 
         Args:
-            path: see :meth:`.getAnalysis`
             name: see :meth:`.getAnalysis`
 
         Returns:
@@ -383,7 +386,7 @@ class TweezersDataBase:
             name = self.meta.id
         name = TweezersAnalysis.getFilename(name)
 
-        analysis = TweezersAnalysis(path=path, name=name)
+        analysis = TweezersAnalysis(name=name)
         analysis.meta = copy.deepcopy(self.meta)
         analysis.units = copy.deepcopy(self.units)
         analysis.meta['sourceClass'] = self.source.__class__.__name__
