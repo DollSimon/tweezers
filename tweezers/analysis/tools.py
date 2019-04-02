@@ -253,7 +253,7 @@ def zeroDistanceByFit(analysis, axis='y', useTrap='pm'):
         analysis.meta[trap].addField('bslCorr')
         analysis.meta[trap].bslCorr['zeroExt'] = offset
         analysis.meta[trap].bslCorr['zeroExtIntercept'] = fit.coef[0]
-        analysis.meta[trap].bslCorr['zeroExtR2'] = fit.rsquared()
+        analysis.meta[trap].bslCorr['zeroExtR2'] = fit.rsquared
         analysis.meta[trap].bslCorr['keffExp'] = fit.coef[1]
         k1 = analysis.meta['pm' + axis.upper()].stiffness
         k2 = analysis.meta['aod' + axis.upper()].stiffness
@@ -320,7 +320,7 @@ def displacementCorrection(analysis, axis='y', lowForceLimit=5):
             # store parameters
             seg.bslCorr[trap + 'ZeroVid'] = intercept
             seg.bslCorr[trap + 'ZeroVidSlope'] = slope
-            seg.bslCorr[trap + 'ZeroVidR2'] = fit.rsquared()
+            seg.bslCorr[trap + 'ZeroVidR2'] = fit.rsquared
             # store units
             analysis.units[trap + 'ZeroVid'] = analysis.units[trap + 'Disp']
 

@@ -3,7 +3,7 @@ from scipy.optimize import curve_fit
 import numpy as np
 
 
-class Fit():
+class Fit:
     """
     Basic class for fitting.
 
@@ -11,7 +11,9 @@ class Fit():
         coef:   computed fitting parameters
         yFit:   y values of fitted curve
     """
-    
+
+    _coef = None
+
     def __init__(self, x, y, fcn=None, std=None, **kwargs):
         """
         Constructor for Fit, also performs the fit
@@ -32,15 +34,18 @@ class Fit():
         self.kwargs = kwargs
         self.fitError = []
 
-    @lazy
+    @property
     def coef(self):
         """
         Attribute to hold the computed fitting parameters.
         """
 
-        return self.fit()
+        if self._coef is None:
+            self._coef = self.fit()
 
-    @lazy
+        return self._coef
+
+    @property
     def yFit(self):
         """
         Attribute to hold the y values of the fitted curve. Evaluated lazily.
@@ -51,7 +56,8 @@ class Fit():
 
         fit = self.fcn(self.x, *self.coef)
         return fit
-        
+
+    @property
     def rsquared(self):
         """
         R^2 value: :math:`R^2 = ...`
@@ -65,19 +71,29 @@ class Fit():
         ssTot = np.sum((self.y - np.mean(self.y))**2)
         return 1 - ssRes / ssTot
 
+    @property
     def residuals(self):
         """
-        Compute the residuals of the fit.
+        Compute the normalized residuals of the fit.
 
         Returns:
-            :class:`numpy.ndarray` and :class:`float`
+            :class:`numpy.ndarray`
         """
-        #TODO: check if OK
 
-        residuals = (self.y - self.yFit) / self.yFit
-        meanResidual = np.sum(residuals) / len(self.yFit)
-        return residuals, meanResidual
+        return (self.y - self.yFit) / self.yFit
 
+    @property
+    def meanResidual(self):
+        """
+        Compute the mean residual for the fit.
+
+        Returns:
+            :class:`float`
+        """
+
+        return np.sum(self.residuals) / len(self.yFit)
+
+    @property
     def chisquared(self):
         """
         Compute reduced chi squared of the fit.
@@ -86,13 +102,25 @@ class Fit():
         Returns:
             :class:`float`
         """
-        # TODO: check if OK
 
         if self.std is None or not any(self.std):
             raise AttributeError('No standard deviation data given for χ² computation.')
 
-        chi2 = np.sum((self.y - self.yFit)**2 / self.std**2) / len(self.x)
+        chi2 = np.sum((self.y - self.yFit)**2 / self.std**2) / (len(self.x) - len(self.coef))
         return chi2
+
+    def eval(self, x):
+        """
+        Evaluate the fitted function with the parameters resulting from the fit for the given x values.
+
+        Args:
+            x (:class:`list` of :class:`float`): x values
+
+        Returns:
+            :class:`list` of :class:`float`
+        """
+
+        return self.fcn(x, *self.coef)
 
 
 class LeastSquaresFit(Fit):
@@ -132,7 +160,7 @@ class LeastSquaresFit(Fit):
         # perform fit
         res, cov = curve_fit(self.fcn, self.x, self.y,
                              sigma=std,
-                             absolute_sigma=True,
+                             absolute_sigma=False,
                              **self.kwargs)
         # one standard deviation errors of the fitting parameters, only makes sense with weighted data points
         self.fitError = np.sqrt(np.diag(cov))
@@ -150,6 +178,8 @@ class PolyFit(Fit):
         yFit (:class:`numpy.ndarray`):  y values of fitted curve
     """
 
+    _poly = None
+
     def __init__(self, x, y, order, **kwargs):
         """
         Constructor for PolyFit
@@ -160,13 +190,6 @@ class PolyFit(Fit):
 
         super().__init__(x, y, **kwargs)
         self.order = order
-
-    def __call__(self, arg):
-        """
-        Evaluate the polynomial at the given position.
-        """
-
-        return self.poly(arg)
 
     def fit(self):
         """
@@ -185,7 +208,7 @@ class PolyFit(Fit):
 
         return poly
 
-    @lazy
+    @property
     def poly(self):
         """
         Get the `Polynomial` instance.
@@ -194,9 +217,12 @@ class PolyFit(Fit):
             :class:`numpy.polynomial.polynomial.Polynomial`
         """
 
-        return self.fit()
+        if self._poly is None:
+            self._poly = self.fit()
 
-    @lazy
+        return self._poly
+
+    @property
     def coef(self):
         """
         Get the polynomial coefficients, see :attr:`numpy.polynomial.polynomial.Polynomial.coef`.
@@ -207,7 +233,7 @@ class PolyFit(Fit):
 
         return self.poly.coef
 
-    @lazy
+    @property
     def yFit(self):
         """
         Attribute to hold the y values of the fitted curve. Evaluated lazily.
@@ -217,6 +243,19 @@ class PolyFit(Fit):
         """
 
         return self.poly(self.x)
+
+    def eval(self, x):
+        """
+        Evaluate the fitted polynomial for the given x values.
+
+        Args:
+            x (:class:`list` of :class:`float`): x values
+
+        Returns:
+            :class:`list` of :class:`float`
+        """
+
+        return self.poly(x)
 
     def linspace(self):
         """
