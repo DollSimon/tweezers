@@ -4,8 +4,6 @@ from collections import OrderedDict
 import pandas as pd
 import numpy as np
 
-from tweezers.analysis.psd import PsdComputation, PsdFit
-from tweezers.analysis.thermal_calibration import thermalCalibration
 from tweezers.container.TweezersAnalysis import TweezersAnalysis
 from tweezers.ixo.collections import IndexedOrderedDict
 from tweezers.ixo.decorators import lazy
@@ -13,6 +11,8 @@ from tweezers.ixo.statistics import averageData
 from tweezers.meta import MetaDict, UnitDict
 from tweezers.plot.psd import PsdFitPlot
 from tweezers.plot.utils import peekPlot
+import tweezers.calibration.psd as psd
+import tweezers.calibration.thermal as thermal
 from tweezers.physics.tweezers import tcOsciHydroCorrect
 
 
@@ -119,27 +119,37 @@ class TweezersDataBase:
         args = {'samplingRate': self.meta['psdSamplingRate']}
         args.update(kwargs)
 
-        psdObj = PsdComputation(self.ts, **kwargs)
-        psdMeta, psd = psdObj.psd()
-
         # create copy
-        td = self.copy()
+        t = self.copy()
 
-        # store PSD in 'psd' attribute of this object
-        td.psd = psd
+        data = {}
+        cols = ['f']
+        # compute PSD for each trap
+        for trap in t.meta.traps:
+            psdTrap = psd.computePsd(t.ts[trap], **kwargs)[0]
+            data[trap] = psdTrap['psdMean']
+            data[trap + 'Std'] = psdTrap['psdStd']
+            cols += [trap, trap + 'Std']
+        data['f'] = psdTrap['f']
+
+        # store PSD
+        t.psd = pd.DataFrame(data, columns=cols)
+        # store PSD metadata
+        t.meta['psdBlockLength'] = psdTrap['blockLength']
+        t.meta['psdNBlocks'] = psdTrap['nBlocks']
+        t.meta['psdOverlap'] = psdTrap['overlap']
+
         # store PSD units
-        td.units['psd'] = self.units['timeseries'] + '^2/Hz'
-        # store psd metadata
-        td.meta.update(psdMeta)
+        t.units['psd'] = t.units['timeseries'] + '^2/Hz'
 
         # delete PSD fit and thermal calibration data if present to prevent confusion with newly computed PSD and old fits
-        td.psdFit = None
-        td.meta.deleteKey('diffusionCoefficient', 'cornerFrequency', 'psdFitError', 'psdFitR2', 'psdFitChi2',
+        t.psdFit = None
+        t.meta.deleteKey('diffusionCoefficient', 'cornerFrequency', 'psdFitError', 'psdFitR2', 'psdFitChi2',
+                         'displacementSensitivity', 'forceSensitivity', 'stiffness')
+        t.units.deleteKey('diffusionCoefficient', 'cornerFrequency', 'psdFitError', 'psdFitR2', 'psdFitChi2',
                           'displacementSensitivity', 'forceSensitivity', 'stiffness')
-        td.units.deleteKey('diffusionCoefficient', 'cornerFrequency', 'psdFitError', 'psdFitR2', 'psdFitChi2',
-                           'displacementSensitivity', 'forceSensitivity', 'stiffness')
 
-        return td
+        return t
 
     @lazy
     def psdFit(self):
@@ -162,13 +172,31 @@ class TweezersDataBase:
         """
 
         # create copy that will be returned
-        td = copy.deepcopy(self)
+        t = self.copy()
 
-        psdFitObj = PsdFit(td.psd, **kwargs)
-        fitParams, psdFit = psdFitObj.fit()
-        td.meta.update(fitParams)
-        setattr(td, 'psdFit', psdFit)
-        return td
+        data = {}
+        cols = ['f'] + t.meta.traps
+        # fit PSD for each trap
+        for trap in t.meta.traps:
+            # check for oscillation calibration to exclude peak from fitting
+            peakF = 0
+            if t.meta.psdType == 'oscillation':
+                peakF = t.meta.psdOscillateFrequency
+            # fit psd
+            fitTrap = psd.PsdFit(t.psd.f, t.psd[trap], std=t.psd[trap + 'Std'], peakF=peakF, **kwargs)
+            # store fit function data
+            data[trap] = fitTrap.yFitFull
+            # store fit result parameters
+            t.meta[trap].update(fitTrap.fitresAsMeta())
+        data['f'] = fitTrap.fFull
+
+        # store PSD fit
+        t.psdFit = pd.DataFrame(data, columns=cols)
+        # store extra metadata
+        t.meta['psdFitMinF'] = data['f'].iloc[0]
+        t.meta['psdFitMaxF'] = data['f'].iloc[-1]
+
+        return t
 
     def thermalCalibration(self):
         """
@@ -182,23 +210,11 @@ class TweezersDataBase:
 
         t = self.copy()
 
-        for ax in t.meta.traps:
-            # convert diameter to nm (likely given in µm)
-            if t.units[ax]['beadDiameter'] == 'nm':
-                diam = t.meta[ax]['beadDiameter']
-            elif t.units[ax]['beadDiameter'] in ['um', 'µm']:
-                diam = t.meta[ax]['beadDiameter'] * 1000
-            else:
-                raise ValueError('Unknown bead radius unit encountered.')
-
-            res, units = thermalCalibration(diffCoeff=t.meta[ax]['diffusionCoefficient'],
-                                            cornerFreq=t.meta[ax]['cornerFrequency'],
-                                            viscosity=t.meta['viscosity'],
-                                            beadDiameter=diam,
-                                            temperature=t.meta['temperature'])
-
-            t.meta.update({ax: res})
-            t.units.update({ax: units})
+        # sort traps such that y-traps are calibrated first, required for oscillation calibration (gets dragCoef from
+        # y and uses that for x
+        trapsSorted = sorted(t.meta.traps, key=lambda s: s[-1], reverse=True)
+        for trap in trapsSorted:
+            thermal.doThermalCalib(t, trap)
 
         # recompute forces
         t.meta, t.units, t.data = t.source.calculateForce(t.meta, t.units, t.data)
