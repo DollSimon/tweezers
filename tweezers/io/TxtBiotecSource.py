@@ -249,6 +249,14 @@ class TxtBiotecSource(BaseSource):
         # ignore non-fit columns
         cols = [s for s in psd.columns if s.lower().endswith('fit')]
         psd = psd[['f'] + cols]
+
+        # strip 'Fit' from column names
+        cols = [col[:-3] for col in cols]
+        psd.columns = ['f'] + cols
+
+        # remove values where fit is 0, artefact of storing PSD and it's fit in the same file
+        psd = psd[psd.iloc[:, 1] > 0]
+
         return psd
 
     def getTs(self):
