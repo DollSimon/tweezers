@@ -42,7 +42,7 @@ CLASSIFIERS = [
 
 setup(
     name='tweezers',
-    version='0.0.2',
+    version='0.1',
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     url='https://bitbucket.org/majahn/tweezer',
