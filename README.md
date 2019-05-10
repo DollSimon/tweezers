@@ -46,16 +46,14 @@ conda install jupyter_contrib_nbextensions
 
 #### Installing the package
 
-On the command line, go to the `tweezers` directory and run `pip install .` (don't forget the `.`).
+On the command line, go to the `tweezers` directory and run `pip install -e .` (don't forget the `.`).
+
+Note that this will install the package in the development mode and not copy its content to the Python path but create a link to your current folder instead. This allows easier updating of the code via e.g. git.
 
 
-### Installation for developers
+### Notes for developers
 
-Follow the instructions for the environment as written in the previous section.
-
-On the command line, go to the `tweezers` directory and run `pip install -e .`. This will not copy the package files to your Python path but create a link instead. This allows you to run modifications to the package files without having to reinstall everything.
-
-Note that a modified package has to be reloaded though for the changes to take effect. When using IPython (in the terminal or as a Jupyter notebook), use the `autoreload`-extension. Run the following code before importing packages when starting up your IPython session or notebook:
+Installing the package using the `-e` option for `pip` is good for development since you can have the code where ever you like for development. But keep in mind that during an interactive session, a modified package has to be reloaded for the changes to take effect. When using IPython (in the terminal or as a Jupyter notebook), use the `autoreload`-extension. Run the following code before importing packages when starting up your IPython session or notebook:
 
 ```
 %load_ext autoreload
