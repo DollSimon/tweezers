@@ -1,38 +1,15 @@
-from tweezers.physics.constant import kB, Constant
+from scipy import constants as const
 
 
-def thermalEnergy(temperature=298, units='pN nm'):
+def kbt(temperature=25):
     """
     Thermal energy in units of [pN nm]
 
     Args:
-        temperature (float): temperature in units of [K]. (optional, default 298)
-        units (str): unit of the returned energy value, allowed values: 'pN nm', 'J', \
-        or None. (optional, default 'pN nm')
+        temperature (`float`): temperature in units of [C]. (optional, default 25)
 
     Returns:
-        energy (float or Constant): thermal energy in [units] (default is [pN nm])
-
-    Usage:
-
-        >>> thermalEnergy(273.15, 'J')
-        >>> 4.1143334240000004e-21
-
-        >>> thermalEnergy()
-        >>> 4.114333424000001
-
-    .. note::
-
-        The default temperature corresponds to 25°C.
-
+        `float` -- thermal energy in [pN nm]
     """
-    if units is None:
-        energy = kB * temperature * 10**21
-    elif 'pN nm' in units:
-        energy = Constant(kB * temperature * 10**21, 'pN nm')
-    elif 'J' in units:
-        energy = Constant(kB * temperature, 'J')
-    else:
-        raise BaseException("Can't figure out how to return thermal energy value")
 
-    return energy
+    return const.k * (temperature + 273.15) * 1E21

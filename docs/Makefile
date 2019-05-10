@@ -50,7 +50,13 @@ help:
 	@echo "  coverage   to run coverage check of the documentation (if enabled)"
 
 apidoc:
-	sphinx-apidoc -o source/ -f ../tweezers/
+	sphinx-apidoc -e -o source/ -f ../tweezers/ ../tweezers/debug.py
+
+apidochtml:
+	sphinx-apidoc -e -o source/ -f ../tweezers/ ../tweezers/debug.py
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
 clean:
 	rm -rf $(BUILDDIR)/*

@@ -1,13 +1,32 @@
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MaxNLocator
-import seaborn as sns
 import numpy as np
 import math
-sns.set_context('poster')
 
 
-class PsdPlotBase():
+def plotPsd(ax, psd, axis, *args, **kwargs):
+    line = ax.loglog(psd.f, psd[axis], *args, **kwargs)
+    ax.set_xlabel('f [Hz]')
+    ax.set_ylabel('PSD ' + axis)
+    return line
+
+
+def plotPsdError(ax, psd, axis, *args, **kwargs):
+    psdData = psd[axis]
+    errors = psd[axis + 'Std']
+    lowerLimit = psdData - errors
+    lowerLimit[lowerLimit <= 0] = 1e-15
+
+    # set alpha
+    kwargs['alpha'] = 0.3
+
+    ax.fill_between(psd.f, psdData + errors, lowerLimit, *args, **kwargs)
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+
+
+class PsdPlotBase:
     """
     Base class for plotting PSDs. It implements some basic functionality and declares required variables.
     """
@@ -59,7 +78,6 @@ class PsdPlotBase():
             units (str): units of the PSD
         """
 
-        ax.set_ylim([10e-13, 10e-8])
         labelX = 'f [Hz]'
         labelY = 'PSD'
         if units:
@@ -232,7 +250,7 @@ class PsdFitPlot(PsdPlotBase):
         Constructor for PsdFitPlot. Additional arguments are passed on to :meth:`tweezers.plot.psd.PsdFitPlot.plot`.
 
         Args:
-            container (:class:`tweezers.TweezersData`): container that holds PSD data to plot
+            container (:class:`tweezers.TweezersDataBase`): container that holds PSD data to plot
             title (str): title for the plot, optional to override default value used
         """
 

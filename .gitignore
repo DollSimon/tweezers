@@ -1,26 +1,19 @@
+# various stuff
 *.egg-info
 __pycache__
+.ipynb_checkpoints
 
 # certain ipython notebook files
-notebooks/.ipynb_checkpoints
+/notebooks/.ipynb_checkpoints
 
 # PyCharm project files
 .idea
 
-# files related to python testing system
-.coverage
-setup.cfg
-bento.info
-
-# ignore all files related to pythontex except the template itself
-tweezer/legacy/templates/pytex/*
-!tweezer/legacy/templates/pytex/*.tex
-
 .DS_Store
-docs/build
-build
-dist
-docs_legacy
-docs/build
-docs/source/modules.rst
-docs/source/tweezers*.rst
+/docs/build
+/build/
+/dist/
+/docs/source/modules.rst
+/docs/source/tweezers*.rst
+SegmentSelector/build
+SegmentSelector/dist

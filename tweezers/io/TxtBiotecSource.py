@@ -4,72 +4,43 @@ from collections import OrderedDict
 import pandas as pd
 import numpy as np
 import re
+import datetime
 
 from .BaseSource import BaseSource
-import tweezers as t
-from tweezers.ixo.collections import IndexedOrderedDict
-from tweezers.ixo.io import DataFrameJsonDecoder, DataFrameJsonEncoder
+from tweezers.meta import MetaDict, UnitDict
 
 
 class TxtBiotecSource(BaseSource):
     """
-    Data source for *.txt files from the Biotec tweezers.
+    Data source for \*.txt files from the Biotec tweezers.
     """
-    # todo: get segment method to only read segment data
 
-    # hold paths to respective files
-    header = None
+    ts = None
     psd = None
     data = None
-    analysis = None
-    ts = None
-    # path to data, not correct if files sit in different folders
-    path = None
+    image = None
 
-    def __init__(self, data=None, analysis=None, psd=None, ts=None, **kwargs):
+    def __init__(self, data=None, psd=None, ts=None, image=None, **kwargs):
         """
-        Constructor for TxtBiotecSource
-
         Args:
             data (:class:`pathlib.Path`): path to data file to read, if the input is of a different type, it is given to
                                            :class:`pathlib.Path` to try to create an instance
-            psd (:class:`pathlib.Path`): path to psd file to read, similar to `data` input
+            psd (:class:`pathlib.Path`): path to psd file
+            ts (:class:`pathlib.Path`): path to ts file
+            screenshot (:class:`pathlib.Path`): path to screenshot file
+            kwargs: forwared to super class
         """
 
         super().__init__(**kwargs)
 
-        # order is important here for the header file
         if ts:
             self.ts = Path(ts)
-            self.header = self.ts
-
         if psd:
             self.psd = Path(psd)
-            self.header = self.psd
-
         if data:
             self.data = Path(data)
-            self.header = self.data
-
-        if analysis:
-            self.analysis = Path(analysis)
-
-        self.path = self.header.parent
-
-    @classmethod
-    def fromIdDict(cls, idDict):
-        """
-        Creates a data source from a given experiment ID and the associated files.
-
-        Args:
-            idDict (dict): with keys `data`, `ts`, `psd` etc. whose values are the
-                            full paths to the corresponding files.
-
-        Returns:
-            :class:`tweezers.io.TxtBiotecSource`
-        """
-
-        return cls(**idDict)
+        if image:
+            self.image = Path(image)
 
     @staticmethod
     def isDataFile(path):
@@ -80,52 +51,88 @@ class TxtBiotecSource(BaseSource):
             path (:class:`pathlib.Path`): file to check
 
         Returns:
-            :class:`dict` with `id` and `type`
+            `dict` with ``id`` and ``type``
         """
 
-        pPath = Path(path)
-        m = re.match('^(?P<id>[0-9\-_]{19}.*)\s(?P<type>[a-zA-Z]+)\.txt$', pPath.name)
+        _path = Path(path)
+        m = re.match('^(?P<beadId>[0-9\-_]{19}.*#\d{3})(?P<trial>-\d{3})?\s(?P<type>[a-zA-Z]+)\.txt$',
+                     _path.name)
         if m:
-            res = {'id': m.group('id'), 'type': m.group('type').lower()}
+            ide = None
+            if m.group('trial'):
+                ide = '{}{}'.format(m.group('beadId'), m.group('trial'))
+            res = {'beadId': m.group('beadId'),
+                   'id': ide,
+                   'type': m.group('type').lower(),
+                   'path': _path}
             return res
         else:
-            return {}
+            return False
 
-    @staticmethod
-    def getAllIds(path):
+    @classmethod
+    def getAllSources(cls, path):
         """
-        Get a list of all IDs and their files that are at the given path and its subfolders.
+        Get a list of all IDs and their data soruces that are at the given path and its subfolders.
 
         Args:
             path (:class:`pathlib.Path`): root path for searching
 
         Returns:
-            :class:`dir`
+            `dict`
         """
 
-        pPath = Path(path)
+        _path = Path(path)
 
-        ids = {}
-        for obj in pPath.iterdir():
-            if obj.is_dir():
-                # if obj is a directory enter it recursively
-                m = TxtBiotecSource.getAllIds(obj)
-                # merge result to ID list
-                for idStr, info in m.items():
-                    if idStr not in ids.keys():
-                        ids[idStr] = {}
-                    for typeStr, filePath in info.items():
-                        ids[idStr][typeStr] = filePath
+        # get a list of all files and their properties
+        files = cls.getAllFiles(_path)
+        sources = OrderedDict()
+        sharedFiles = {}
+
+        # sort files in sharedFiles and actual data files that belong to an individual trial
+        for el in files:
+            if el['id']:
+                if el['beadId'] not in sources.keys():
+                    sources[el['beadId']] = OrderedDict()
+                if el['id'] not in sources[el['beadId']].keys():
+                    sources[el['beadId']][el['id']] = cls()
+                setattr(sources[el['beadId']][el['id']], el['type'], el['path'])
             else:
-                # if it is a file, check if it is a data file
-                m = TxtBiotecSource.isDataFile(obj)
-                # append result to ID list
-                if m:
-                    if m['id'] not in ids.keys():
-                        ids[m['id']] = {}
-                    ids[m['id']][m['type']] = obj
+                if el['beadId'] not in sharedFiles.keys():
+                    sharedFiles[el['beadId']] = {}
+                sharedFiles[el['beadId']][el['type']] = el['path']
 
-        return ids
+        # append a reference to the shared file to each trial
+        for beadId, beadData in sources.items():
+            if beadId in sharedFiles.keys():
+                # for each trial
+                for trial in beadData.values():
+                    # append each shared file
+                    for fileType, file in sharedFiles[beadId].items():
+                        setattr(trial, fileType, file)
+
+        return sources
+
+    @property
+    def header(self):
+        """
+        Return which file is used for reading the metadata.
+
+        Returns:
+            `pathlib.Path`
+        """
+        header = None
+        # order is important here for the header file
+        if self.ts:
+            header = self.ts
+        if self.psd:
+            header = self.psd
+        if self.data:
+            header = self.data
+
+        if not header:
+            raise ValueError('No header file given (probably no file given at all).')
+
+        return header
 
     def getMetadata(self):
         """
@@ -134,9 +141,6 @@ class TxtBiotecSource(BaseSource):
         Returns:
             :class:`tweezers.MetaDict` and :class:`tweezers.UnitDict`
         """
-
-        if not self.header:
-            raise ValueError('No header file given (probably no file given at all).')
 
         headerStr = ''
         with self.header.open(encoding='utf-8') as f:
@@ -147,21 +151,75 @@ class TxtBiotecSource(BaseSource):
                     headerStr += line
 
         header = json.loads(headerStr, object_pairs_hook=OrderedDict)
-        units = t.UnitDict(header.pop('units'))
-        meta = t.MetaDict(header)
+        units = UnitDict(header.pop('units'))
+        meta = MetaDict(header)
 
         # add column header units
-        colHeaders, colUnits = self.readColumnTitles(self.header)
-        units.update(colUnits)
+        cols = self.readColumnTitles(self.header)
+        units.update(cols['units'])
 
         # add id from header file name
         idDict = self.isDataFile(self.header)
-        meta['id'] = idDict['id']
+        if idDict['id']:
+            meta['id'] = idDict['id']
+        else:
+            meta['id'] = idDict['beadId']
 
         # add trap names
         meta['traps'] = meta.subDictKeys()
 
+        # add ID strings safe for printing (e.g. in matplotlib legend)
+        meta['beadIdSafe'] = meta['beadId'].replace('_', ' ').replace('#', '')
+        meta['idSafe'] = meta['id'].replace('_', ' ').replace('#', '')
+
         return meta, units
+
+    def getData(self):
+        """
+        Return the experiment data.
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        data = self.readToDataframe(self.data)
+        return data
+
+    def getDataSegment(self, tmin, tmax, chunkN=10000):
+        """
+        Returns the data between ``tmin`` and ``tmax`` by reading the datafile chunkwise until ``tmax`` is reached.
+
+        Args:
+            tmin (`float`): minimum data timestamp
+            tmax (`float`): maximum data timestamp
+            chunkN (`int`): number of rows to read per chunk
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        # read required information about file and create the chunked iterator
+        cols = self.readColumnTitles(self.data)
+        # read the first data line to allow conversion between absolute and relative time
+        firstLine = pd.read_csv(self.data, sep='\t', skiprows=cols['n'], header=None,
+                                names=cols['names'], nrows=1)
+        t0 = firstLine.time.iloc[0]
+        iterCsv = pd.read_csv(self.data, sep='\t', skiprows=cols['n']+1, header=None,
+                              names=cols['names'], iterator=True, chunksize=chunkN, engine='c',
+                              dtype=np.float64)
+
+        # read the chunks into memory if they are within the requested limits
+        df = []
+        for chunk in iterCsv:
+            if chunk['time'].iloc[0] - t0 > tmax:
+                # stop reading if the upper time limit was reached
+                iterCsv.close()
+                break
+            selection = chunk[(chunk['time'] - t0 >= tmin) & (chunk['time'] - t0 <= tmax)]
+            df.append(selection)
+
+        # return concatenated dataframe with all the requested data
+        return pd.concat(df, ignore_index=True)
 
     def getPsd(self):
         """
@@ -191,6 +249,14 @@ class TxtBiotecSource(BaseSource):
         # ignore non-fit columns
         cols = [s for s in psd.columns if s.lower().endswith('fit')]
         psd = psd[['f'] + cols]
+
+        # strip 'Fit' from column names
+        cols = [col[:-3] for col in cols]
+        psd.columns = ['f'] + cols
+
+        # remove values where fit is 0, artefact of storing PSD and it's fit in the same file
+        psd = psd[psd.iloc[:, 1] > 0]
+
         return psd
 
     def getTs(self):
@@ -205,48 +271,85 @@ class TxtBiotecSource(BaseSource):
         ts = self.readToDataframe(self.ts)
         ts.rename(columns={'pmXDiff': 'pmX', 'pmYDiff': 'pmY', 'aodXDiff': 'aodX', 'aodYDiff': 'aodY'},
                   inplace=True)
+        # get relative time
+        ts['absTime'] = ts.t.copy()
+        ts.loc[:, 't'] -= ts.loc[0, 't']
+
         return ts
 
-    def getData(self):
+    @staticmethod
+    def calculateDisplacement(meta, units, data):
         """
-        Return the experiment data.
+        Calculate bead displacements from Diff signal and calibration values.
+
+        Args:
+            meta (:class:`.MetaDict`): metadata
+            units (:class:`.UnitDict`): unit metadata
+            data (:class:`pandas.DataFrame`): data
 
         Returns:
-            :class:`pandas.DataFrame`
+
+            Updated versions of the input parameters
+
+            * meta (:class:`.MetaDict`)
+            * units (:class:`.UnitDict`)
+            * data (:class:`pandas.DataFrame`)
         """
 
-        data = self.readToDataframe(self.data)
-        return data
+        # calculate displacement per trap and axis
+        for trap in meta['traps']:
+            m = meta[trap]
+            # displacement from trap signal
+            data[trap + 'Disp'] = (data[trap + 'Diff'] - m['zeroOffset']) * m['displacementSensitivity']
+            units[trap + 'Disp'] = 'nm'
+            # displacement from video signal
+            data[trap + 'DispVid'] = data[trap + 'Bead'] - data[trap + 'Trap']
 
-    def getDataSegment(self, tmin, tmax, chunkN=10000):
-        # todo docstring
-        # todo fix reading endinge in read_csv to 'c' when switching to pandas 0.19
+        # invert PM bead displacement for convenience, disp is positive when pulled towards AOD ("up")
+        data.pmYDisp = -data.pmYDisp
+        data.pmYDispVid = -data.pmYDispVid
 
-        # read required information about file and create the chunked iterator
-        colHeaders, colUnits = self.readColumnTitles(self.data)
-        nHeaderLine = self.findHeaderLine(self.data)
-        # read the first data line to allow conversion between absolute and relative time
-        firstLine = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine + 1, header=None,
-                                names=colHeaders, nrows=1)
-        t0 = firstLine.time.iloc[0]
-        # consider adding dtype=np.float64, when switching to engine='c'
-        iterCsv = pd.read_csv(self.data, sep='\t', skiprows=nHeaderLine+1, header=None,
-                              names=colHeaders, iterator=True, chunksize=chunkN, engine='python')
+        return meta, units, data
 
-        # read the chunks into memory if they are within the requested limits
-        df = []
-        for chunk in iterCsv:
-            if chunk['time'].iloc[0] - t0 > tmax:
-                # stop reading if the upper time limit was reached
-                iterCsv.close()
-                break
-            selection = chunk[(chunk['time'] - t0 >= tmin) & (chunk['time'] - t0 <= tmax)]
-            df.append(selection)
+    @staticmethod
+    def calculateForce(meta, units, data):
+        """
+        Calculate forces from Diff signal and calibration values.
 
-        # return concatenated dataframe with all the requested data
-        return pd.concat(df, ignore_index=True)
+        Args:
+            meta (:class:`.MetaDict`): metadata
+            units (:class:`.UnitDict`): unit metadata
+            data (:class:`pandas.DataFrame`): data
 
-    def postprocessData(self, meta, units, data):
+        Returns:
+
+            Updated versions of the input parameters
+
+            * meta (:class:`.MetaDict`)
+            * units (:class:`.UnitDict`)
+            * data (:class:`pandas.DataFrame`)
+        """
+
+        # calculate force per trap and axis
+        for trap in meta['traps']:
+            m = meta[trap]
+            data[trap + 'Force'] = (data[trap + 'Diff'] - m['zeroOffset']) * m['forceSensitivity']
+            units[trap + 'Force'] = 'pN'
+
+        # invert PM force for convenience, force is positive when pulled towards AOD ("up")
+        data.pmYForce = -data.pmYForce
+
+        # calculate mean force per axis, only meaningful for two traps
+        data['xForce'] = (data.pmXForce + data.aodXForce) / 2
+        data['yForce'] = (data.pmYForce + data.aodYForce) / 2
+
+        units['xForce'] = 'pN'
+        units['yForce'] = 'pN'
+
+        return meta, units, data
+
+    @staticmethod
+    def postprocessData(meta, units, data):
         """
         Modify the time array to use relative times (but keep the absolute time) and calculate forces.
 
@@ -256,100 +359,56 @@ class TxtBiotecSource(BaseSource):
             data: :class:`pandas.DataFrame`
 
         Returns:
-            meta, units, data
+            Updated versions of the input parameters
+
+            * meta (:class:`.MetaDict`)
+            * units (:class:`.UnitDict`)
+            * data (:class:`pandas.DataFrame`)
         """
 
         # create relative time column but keep absolute time
-        data['absTime'] = data.time.copy()
-        data.loc[:, 'time'] -= data.loc[0, 'time']
-        units['absTime'] = 's'
+        if 'absTime' not in data.columns:
+            data['absTime'] = data.time.copy()
+            units['absTime'] = 's'
+        data.loc[:, 'time'] -= data.time.iloc[0]
 
-        # calculate force per trap and axis
+        # ensure values, set them to 0 if they come as None from the file
         for trap in meta['traps']:
-            m = meta[trap]
-            data[trap + 'Force'] = (data[trap + 'Diff'] - m['zeroOffset']) * m['forceSensitivity']
-            units[trap + 'Force'] = 'pN'
+            if not meta[trap].displacementSensitivity:
+                meta[trap].displacementSensitivity = 0
+            if not meta[trap].forceSensitivity:
+                meta[trap].forceSensitivity = 0
 
-        # invert PM force, is not as expected in the raw data
-        data.pmYForce = -data.pmYForce
+        # calculate displacement and forces
+        meta, units, data = TxtBiotecSource.calculateDisplacement(meta, units, data)
+        meta, units, data = TxtBiotecSource.calculateForce(meta, units, data)
 
-        # calculate mean force per axis, only meaningful for two traps
-        data['xForce'] = (data.pmXForce + data.aodXForce) / 2
-        data['yForce'] = (data.pmYForce - data.aodYForce) / 2
+        data['xTrapDist'] = data.pmXTrap - data.aodXTrap
+        data['yTrapDist'] = data.pmYTrap - data.aodYTrap
+        units['xTrapDist'] = 'nm'
+        units['yTrapDist'] = 'nm'
 
-        units['xForce'] = 'pN'
-        units['yForce'] = 'pN'
+        # calculate bead distance center to center from trap signal
+        data['xDistVolt'] = data.xTrapDist - data.pmXDisp - data.aodXDisp
+        data['yDistVolt'] = data.yTrapDist - data.pmYDisp - data.aodYDisp
+        data['distVolt'] = np.sqrt(data.xDistVolt**2 + data.yDistVolt**2)
+        units['xDistVolt'] = 'nm'
+        units['yDistVolt'] = 'nm'
+        units['distVolt'] = 'nm'
 
-        # calculate bead distance centre to centre, only meaningful for two trapped beads
-        data['distance'] = np.sqrt((data.pmYBead - data.aodYBead)**2 + (data.pmXBead - data.aodXBead)**2)
-        units['distance'] = 'nm'
+        # calculate bead distance center to center from video signal, only meaningful for two trapped beads
+        data['xDistVid'] = data.pmXBead - data.aodXBead
+        data['yDistVid'] = data.pmYBead - data.aodYBead
+        data['distVid'] = np.sqrt((data.pmYBead - data.aodYBead)**2 + (data.pmXBead - data.aodXBead)**2)
+        units['xDistVid'] = 'nm'
+        units['yDistVid'] = 'nm'
+        units['distVid'] = 'nm'
 
         return meta, units, data
 
-    def getAnalysisDict(self):
-        #Todo docstring
-
-        if not self.analysis:
-            return IndexedOrderedDict()
-
-        with self.analysis.open(mode='r', encoding='utf-8') as f:
-            analysisDict = json.load(f, object_pairs_hook=IndexedOrderedDict, cls=DataFrameJsonDecoder)
-        return analysisDict
-
-    def writeAnalysisDict(self, analysisDict):
-        # todo docstring
-
-        # build filename if it does not exist
-        if not self.analysis:
-            self.analysis = self.data.parent.joinpath(self.data.name.replace('DATA', 'ANALYSIS'))
-
-        # write data to file
-        jsonStr = json.dumps(analysisDict, indent=4, cls=DataFrameJsonEncoder)
-        with self.analysis.open(mode='w', encoding='utf-8') as f:
-            f.write(jsonStr)
-
-    def getAnalysis(self):
-        """
-        Return the analysis data.
-
-        Returns:
-            :class:`collections.OrderedDict`
-        """
-
-        return self.getAnalysisDict().get('analysis', OrderedDict())
-
-    def writeAnalysis(self, analysis, segment=None):
-        # todo: docstring
-
-        analysisDict = self.getAnalysisDict()
-
-        # should we only update the segment?
-        if segment is not None:
-            analysisDict['segments'][segment] = analysis
-            # remove the general analysis keys
-            for key in analysisDict['analysis'].keys():
-                analysisDict['segments'][segment].pop(key, None)
-        else:
-            # sort analysis keys and store in the proper dictionary
-            analysisDict['analysis'] = OrderedDict(sorted(analysis.items()))
-
-        self.writeAnalysisDict(analysisDict)
-
-    def getSegments(self):
-        # todo docstring
-        return self.getAnalysisDict().get('segments', IndexedOrderedDict())
-
-    def writeSegments(self, segments):
-        #todo docstring
-
-        analysisDict = self.getAnalysisDict()
-        analysisDict['segments'] = segments
-        self.writeAnalysisDict(analysisDict)
-
-
     def findHeaderLine(self, file):
         """
-        Find the line number of the first header line, searches for '### DATA ###'
+        Find the line number of the first header line, searches for ``### DATA ###``
 
         Args:
             file (:class:`pathlib.Path`): path to file
@@ -374,16 +433,18 @@ class TxtBiotecSource(BaseSource):
             file: (:class:`pathlib.Path`): path to file
 
         Returns:
-            list: column header names
-            :class:`tweezers.UnitDict`: units dictionary with available column units
+            `dict` with keys `names` (`list`), `units` (:class:`.UnitDict`) and `n`
         """
-
         # read header line
-        nHeaderLine = self.findHeaderLine(file)
+        n = 0
         with file.open(encoding='utf-8') as f:
-            for i, line in enumerate(f):
-                if i == nHeaderLine:
-                    headerLine = line
+            for line in f:
+                n += 1
+                if line.startswith('#'):
+                    # skip empty line
+                    next(f)
+                    headerLine = next(f)
+                    n += 2
                     break
 
         # get column title names with units
@@ -392,13 +453,13 @@ class TxtBiotecSource(BaseSource):
 
         # store them in a UnitDict
         colHeaders = []
-        colUnits = t.UnitDict()
+        colUnits = UnitDict()
         for (colHeader, unit) in header:
             colHeaders.append(colHeader)
             if unit:
                 colUnits[colHeader] = unit
 
-        return colHeaders, colUnits
+        return {'names': colHeaders, 'units': colUnits, 'n': n}
 
     def readToDataframe(self, file):
         """
@@ -411,8 +472,19 @@ class TxtBiotecSource(BaseSource):
             :class:`pandas.DataFrame`
         """
 
-        colHeaders, colUnits = self.readColumnTitles(file)
-        nHeaderLine = self.findHeaderLine(file)
-        df = pd.read_csv(str(file), sep='\t', dtype=np.float64, skiprows=nHeaderLine+1, header=None,
-                         names=colHeaders, engine='c')
+        cols = self.readColumnTitles(file)
+        df = pd.read_csv(str(file), sep='\t', dtype=np.float64, skiprows=cols['n'], header=None,
+                         names=cols['names'], engine='c')
         return df
+
+    def getTime(self):
+        """
+        Return the time of the source.
+
+        Returns:
+            `datetime.datetime`
+        """
+
+        timeStr = self.header.name[:19]
+        time = datetime.datetime.strptime(timeStr, '%Y-%m-%d_%H-%M-%S')
+        return time

@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 class BaseSource:
     """
     Base class for data sources. Inherit from this class when creating a new data source. Keep in mind that not all
@@ -33,9 +36,21 @@ class BaseSource:
         raise NotImplementedError()
 
     def getDataSegment(self, tmin, tmax, chunkN=10000):
-        # todo docstring
+        """
+        Returns the data between ``tmin`` and ``tmax``.
 
-        raise NotImplementedError()
+        Args:
+            tmin (float): minimum data timestamp
+            tmax (float): maximum data timestamp
+            chunkN (int): number of rows to read per chunk
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        # default expensive implementation....
+        return self.getData().query('{} <= time <= {}'.format(tmin, tmax))
+
 
     def getPsd(self):
         """
@@ -68,12 +83,13 @@ class BaseSource:
 
         raise NotImplementedError()
 
-    def postprocessData(self, meta, units, data):
+    @staticmethod
+    def postprocessData(meta, units, data):
         """
         This method is run after importing the data and can be used to modify the data and metadata or units.
 
         Args:
-            meta: :class:`tweezers.MetaDict`
+            meta (:class:`tweezers.MetaDict`): :class:`tweezers.MetaDict`
             units: :class:`tweezers.UnitDict`
             data: :class:`pandas.DataFrame`
 
@@ -83,32 +99,68 @@ class BaseSource:
 
         return meta, units, data
 
-    def getAnalysis(self):
+    def getTime(self):
         """
-        Returns the analysis data.
+        Return the time of the source.
 
         Returns:
-            :class:`collections.OrderedDict`
-
+            `datetime.datetime`
         """
+
         raise NotImplementedError()
 
-    def writeAnalysis(self, analysis, segment=None):
+    @staticmethod
+    def calculateForce(meta, units, data):
         """
-        Write the analysis data back.
+        Calculate forces from Diff signal and calibration values.
 
         Args:
-            analysis (:class:`collections.OrderedDict`): the analysis data to store
+            meta (:class:`.MetaDict`): metadata
+            units (:class:`.UnitDict`): unit metadata
+            data (:class:`pandas.DataFrame`): data
+
+        Returns:
+
+            Updated versions of the input parameters
+
+            * meta (:class:`.MetaDict`)
+            * units (:class:`.UnitDict`)
+            * data (:class:`pandas.DataFrame`)
         """
 
         raise NotImplementedError()
 
-    def getSegments(self):
-        # todo docstring
+    @staticmethod
+    def isDataFile(path):
 
         raise NotImplementedError()
 
-    def writeSegments(self, segments):
-        # todo docstring
+    @classmethod
+    def getAllSources(cls, path):
 
         raise NotImplementedError()
+
+    @classmethod
+    def getAllFiles(cls, path):
+        """
+        Return a recursive list of all valid data files within a given path.
+
+        Args:
+            path (:class:`pathlib.Path`): root path to search for valid data files
+
+        Returns:
+            `list` of `dict`
+        """
+
+        _path = Path(path)
+        files = []
+
+        for item in _path.iterdir():
+            if item.is_dir():
+                subFiles = cls.getAllFiles(item)
+                files += subFiles
+            else:
+                m = cls.isDataFile(item)
+                if m:
+                    files.append(m)
+        return files

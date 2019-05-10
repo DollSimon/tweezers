@@ -65,7 +65,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Tweezers'
-copyright = '2015, Christoph Ehrlich, Marcus Jahnel'
+copyright = '2017, Christoph Ehrlich, Marcus Jahnel'
 author = 'Christoph Ehrlich, Marcus Jahnel'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -156,7 +156,7 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -309,8 +309,14 @@ texinfo_documents = [
 intersphinx_mapping = {'python': ('http://docs.python.org/3', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
                        'numpy': ('http://docs.scipy.org/doc/numpy/', None),
-                       'matplotlib': ('http://matplotlib.sourceforge.net/', None),
+                       'matplotlib': ('http://matplotlib.org/', None),
                        'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None)}
 
 # auto-generate files for the "autosummary" feature
 autosummary_generate = True
+
+# default cross linking behaviour for e.g. `dict`
+default_role = 'py:obj'
+
+# include __init__ docstring for class documentation
+autoclass_content = 'both'

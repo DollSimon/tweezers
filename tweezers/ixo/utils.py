@@ -25,7 +25,12 @@ def strToBool(value):
 
 
 def configLogger(debug=False):
-    #ToDo: docstring
+    """
+    Configure the logger for use e.g. in a script or jupyter notebook.
+
+    Args:
+        debug (`bool`): turn on / off debug messages
+    """
 
     # ToDo: check if this still applies
     # the basicConfig is not working in iPython notebooks :(

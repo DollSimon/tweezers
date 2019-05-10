@@ -1,14 +1,16 @@
-from collections import OrderedDict, Mapping
+from collections import Mapping
 import pprint
 import pandas as pd
 import logging as log
+from datetime import datetime
 
-from tweezers.ixo.collections import AttrDictMixin
+from tweezers.ixo.collections import IndexedOrderedDict
 
 
-class MetaBaseDict(OrderedDict, AttrDictMixin):
+class MetaBaseDict(IndexedOrderedDict):
     """
-    An ordered dictionary (:class:`collections.OrderedDict`) that returns a default value if a key does not exist and
+    An ordered dictionary (:class:`collections.OrderedDict`) with attribute styled element access (
+    :class:`tweezers.ixo.collections.AttrDictMixin`) that returns a default value if a key does not exist and
     prints a warning.
     The convention for key style is "camelCase" (start lower case, new words begin upper case).
 
@@ -56,8 +58,8 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
         at the end.
 
         Args:
-            oldKey (str): old key name
-            newKey (str): new key name
+            oldKey (`str`): old key name
+            newKey (`str`): new key name
         """
 
         if oldKey in self:
@@ -68,7 +70,7 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
         Delete one or multiple keys from the dictionary.
 
         Args:
-            key (str): one or mulitple keys to (recursively) delete from the dictionary
+            key (`str`): one or mulitple keys to (recursively) delete from the dictionary
         """
 
         delKeys = args
@@ -85,37 +87,58 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
         Create a :class:`pandas.DataFrame` facet view of the metadata. Useful for facet plotting using
         :class:`seaborn.FacetGrid`.
 
-        Args:
-            beams (list): list of strings describing the available beams (e.g. `['pm', 'aod']`)
-            axes (list): list of strings describing the available measured axes per beam (e.g. `['x', 'y']`)
-
         Returns:
             :class:`pandas.DataFrame`
         """
 
-        facets = {}
+        facets = []
 
         # each axis will be a row in the final dataframe so each of them needs to have all the metadata
         generalMeta = {}
         for key, value in self.items():
             if isinstance(value, self.__class__):
-                facets[key] = value
-                facets[key]['axis'] = key
+                facets.append(value.copy())
+                facets[-1]['axis'] = key
+            elif isinstance(value, list):
+                pass
             else:
                 generalMeta[key] = value
 
-        for key, value in facets.items():
-            value.update(generalMeta)
+        # remove not needed keys
+        generalMeta.pop('traps', None)
 
-        # convert to pandas DataFrame
-        facets = pd.DataFrame(list(facets.values()))
+        # turn into a DataFrame
+        facets = pd.DataFrame(facets)
+        # add general data to each row
+        facets = facets.assign(**generalMeta)
+
+        # add an extra column with the timestamp if 'date' column is available
+        if 'date' in facets.columns:
+            getTimestamp = lambda row: datetime.strptime(row.date, '%d.%m.%Y %H:%M:%S').timestamp()
+            facets['timestamp'] = facets.apply(getTimestamp, axis=1)
 
         return facets
 
-    def update(self, E=None, **F):
-        # we assume E to be a dictionary type (have a .keys() method), F is one anyway
-        todo = [E, F]
-        # loop through the two dicts
+    def update(self, *dicts, **kwargs):
+        """
+        Update content with key/value pairs from
+        
+            * one or more other dictionaries
+            * or given key / value pairs
+
+        Args:
+            *dicts: one or multiple dictionaries to use for updating
+            **kwargs: key/value pairs (e.g. ``msg='hello world'``) to update
+
+        Returns:
+            :class:`.MetaBaseDict`
+        """
+
+        # we assume 'dicts' to be a list of dictionary type objects (have a .keys() method), 'kwargs' is one anyway
+        todo = list(dicts)
+        if kwargs:
+            todo.append(kwargs)
+        # loop through all the dicts in 'todo'
         for el in todo:
             # if an element was given...
             if el:
@@ -137,7 +160,7 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
         Returns the keys of elements which are :class:`tweezers.meta.MetaBaseDict` or inherited from it.
 
         Returns:
-            list of strings
+            `list` of `str`
         """
 
         keys = [key for key, value in self.items() if isinstance(value, MetaBaseDict)]
@@ -146,7 +169,7 @@ class MetaBaseDict(OrderedDict, AttrDictMixin):
 
 class MetaDict(MetaBaseDict):
     """
-    An class to hold metadata.
+    A class to hold metadata.
     """
 
     defaults = {'title': 'no title',
@@ -168,7 +191,7 @@ class UnitDict(MetaBaseDict):
                 'aodYDiff': 'V',
                 'temperature': '˚C',
                 'psdSamplingRate': 'Hz',
-                'psd': 'V²/Hz',
+                'psd': 'V^2/Hz',
                 'timeseries': 'V',
     }
 
