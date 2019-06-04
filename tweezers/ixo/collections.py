@@ -23,7 +23,7 @@ class AttrDictMixin(object):
         if name in self.keys():
             return self[name]
         else:
-            raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, name))
+            raise AttributeError("'{}' object has no attribute or key '{}'".format(self.__class__.__name__, name))
 
     def __setattr__(self, name, value):
         # calling super-method here since we reimplemented __dir__ below

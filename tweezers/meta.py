@@ -2,7 +2,6 @@ from collections import Mapping
 import pprint
 import pandas as pd
 import logging as log
-from datetime import datetime
 
 from tweezers.ixo.collections import IndexedOrderedDict
 
@@ -111,11 +110,6 @@ class MetaBaseDict(IndexedOrderedDict):
         facets = pd.DataFrame(facets)
         # add general data to each row
         facets = facets.assign(**generalMeta)
-
-        # add an extra column with the timestamp if 'date' column is available
-        if 'date' in facets.columns:
-            getTimestamp = lambda row: datetime.strptime(row.date, '%d.%m.%Y %H:%M:%S').timestamp()
-            facets['timestamp'] = facets.apply(getTimestamp, axis=1)
 
         return facets
 

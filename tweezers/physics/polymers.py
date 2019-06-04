@@ -53,3 +53,24 @@ def tWlc(F, p=50, S=1000, C=440, L=1000, T=25):
     # twistable worm-like chain
     d = L * (1 - 0.5 * np.sqrt(kbt(T) / (F * p)) + C * F / (-g**2 + S * C))
     return d
+
+
+def fjc(F, b, S, L, T=25):
+    """
+    Freely jointed chain, see Smith et al 1996 (https://doi.org/10.1126%2Fscience.271.5250.795)
+
+    Args:
+        F:
+        b:
+        S:
+        L:
+        T:
+
+    Returns:
+
+    """
+    kt = kbt(T)
+    fb = b * F
+    # calculate extension
+    d = L * (1 / np.tanh(fb / kt) - kt / fb) * (1 + F / S)
+    return d

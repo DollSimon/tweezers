@@ -172,6 +172,9 @@ class TxtBiotecSource(BaseSource):
         meta['beadIdSafe'] = meta['beadId'].replace('_', ' ').replace('#', '')
         meta['idSafe'] = meta['id'].replace('_', ' ').replace('#', '')
 
+        # add time in timestamp format
+        meta['time'] = pd.Timestamp.strptime(meta['date'], '%d.%m.%Y %H:%M:%S').tz_localize('Europe/Berlin')
+
         return meta, units
 
     def getData(self):

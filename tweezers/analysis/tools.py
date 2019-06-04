@@ -222,6 +222,7 @@ def zeroDistance(analysis, axis='y', useTrap='pm'):
 
     return analysis
 
+
 def zeroDistanceByFit(analysis, axis='y', useTrap='pm'):
     """
     Find the trap distance at which the beads touch and use this as an offset to calculate the extension.
@@ -280,7 +281,45 @@ def zeroDistanceByFit(analysis, axis='y', useTrap='pm'):
     return analysis
 
 
-def displacementCorrection(analysis, axis='y', lowForceLimit=5):
+def zeroDistanceByDiameter(analysis, axis='y', diameter=None):
+
+    axesToCorrect = {'x': ['xDistVolt'],
+                     'y': ['yDistVolt']}
+
+    # get bead diameters
+    dsum = 0
+    n = 0
+    if diameter:
+        # overwrite diameter stored in data files
+        offset = diameter
+    else:
+        # get diameter from data files
+        for trap in analysis.meta.traps:
+            if trap.lower().endswith(axis.lower()):
+                dsum += analysis.meta[trap].beadDiameter
+                n += 1
+
+        offset = dsum / 2
+
+        # correct units
+        if analysis.units[trap].beadDiameter != 'nm':
+            # assume um if not given in nm
+            offset *= 1000
+
+    createBslCorrField(analysis)
+
+    # offset data
+    for segId, seg in analysis.bslCorr.items():
+        seg.addField('bslCorr')
+        for ax in axesToCorrect[axis]:
+            seg.data[ax] = seg.data[ax] - offset
+            seg.bslCorr['zeroExt'] = offset
+            seg.bslCorr['zeroExtUnit'] = 'nm'
+
+    return analysis
+
+
+def displacementCorrection(analysis, axis='y', lowForceLimit=5, highForceLimit='inf'):
     """
     Correct the displacement data (displacement of bead from trap center).
 
@@ -306,8 +345,8 @@ def displacementCorrection(analysis, axis='y', lowForceLimit=5):
         d = seg.data
 
         for trap in traps:
-            # get only data above a specific force, should we use trap separation instead?
-            queryStr = '{}Force > {}'.format(trap, lowForceLimit)
+            # get only data above in a specific force range, should we use trap separation instead?
+            queryStr = '{} <= {}Force <= {}'.format(lowForceLimit, trap, highForceLimit)
             dq = d.query(queryStr)
             if dq.empty:
                 raise ValueError('No data found for "videoCorrection" of axis "{}" in "{}"'.format(trap, seg.id))
@@ -349,12 +388,13 @@ def displacementCorrection(analysis, axis='y', lowForceLimit=5):
             # d[trap + 'Disp'] = ds[trap + 'Disp'] + (dm[trap + 'DispVid'] - dm[trap + 'Disp'])
 
         seg.bslCorr['zeroVidFitForceLow'] = lowForceLimit
+        seg.bslCorr['zeroVidFitForceHigh'] = highForceLimit
 
         a = axis.upper()
         try:
             # the 'zeroDistance' function should not be required to run this one
             offset = seg.bslCorr.zeroExt
-        except KeyError:
+        except AttributeError:
             offset = 0
         trapDist = d['pm' + a + 'Trap'] - d['aod' + a + 'Trap'] - offset
         # correct extension from video signal
@@ -464,7 +504,10 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
     plotArgs = {'markersize': 1, 'rasterized': True}
 
     # plot until rip
-    dist = s.ripTrapDist
+    if 'ripTrapDist' in s.keys():
+        dist = s.ripTrapDist
+    else:
+        dist = np.inf
     queryStr = 'yTrapDist < @dist'
 
     ax = axExt
@@ -496,34 +539,34 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
     # original data
     dorig = a.segments[segId].data
 
-    ax = axsDisp[0]
-    # original data
-    ax.scatter(dorig.pmYDisp, dorig.pmYDispVid, c='lightgray', **scatterArgs)
-    # fixed data
-    # scatter plot, using "values" for color argument to convert pandas series to numpy array, series cause errors
-    # for determining categorical or continuous colorbar by mpl
-    p = ax.scatter(d.pmYDisp, d.pmYDispVid, c=d.pmYForce.values, **scatterArgs)
-    # fit limit line
-    idx = (d.pmYForce - s.bslCorr.zeroVidFitForceLow).abs().idxmin()
-    ax.axvline(d.loc[idx].pmYDisp, color='0.7', linestyle='--')
-    # slope 1 line
-    lim = [d.pmYDisp.min(), d.pmYDisp.max()]
-    ax.plot([lim[0], lim[1]], [lim[0], lim[1]], 'r', linestyle='--')
-    ax.set_title('PM Y Displacement', **axsTtl)
-    ax.set_ylabel('Video [nm]', **axsLbl)
+    for trap, ax in zip(['pmY', 'aodY'], axsDisp):
+        # keys
+        disp = trap + 'Disp'
+        dispVid = trap + 'DispVid'
+        force = trap + 'Force'
 
-    ax = axsDisp[1]
-    # original data
-    ax.scatter(dorig.aodYDisp, dorig.aodYDispVid, c='lightgray', **scatterArgs)
-    # fixed data
-    ax.scatter(d.aodYDisp, d.aodYDispVid, c=d.aodYForce.values, **scatterArgs)
-    # fit limit line
-    idx = (d.aodYForce - s.bslCorr.zeroVidFitForceLow).abs().idxmin()
-    ax.axvline(d.loc[idx].aodYDisp, color='0.7', linestyle='--')
-    # slope 1 line
-    lim = [d.aodYDisp.min(), d.aodYDisp.max()]
-    ax.plot([lim[0], lim[1]], [lim[0], lim[1]], 'r', linestyle='--')
-    ax.set_title('AOD Y Displacement', **axsTtl)
+        # original data
+        ax.scatter(dorig[disp], dorig[dispVid], c='lightgray', **scatterArgs)
+        # fixed data
+        # scatter plot, using "values" for color argument to convert pandas series to numpy array, series cause errors
+        # for determining categorical or continuous colorbar by mpl
+        p = ax.scatter(d[disp], d[dispVid], c=d[force].values, **scatterArgs)
+        # plot low force limit line
+        # if s.bslCorr.zeroVidFitForceLow
+        # if isinstance(s.bslCorr.zeroVidFitForceLow, int):
+        #     idx = (d[force] - s.bslCorr.zeroVidFitForceLow).abs().idxmin()
+        #     ax.axvline(d.loc[idx][disp], color='0.7', linestyle='--')
+        # # plot high force limit line
+        # if isinstance(s.bslCorr.zeroVidFitForceHigh, int):
+        #     idx = (d[force] - s.bslCorr.zeroVidFitForceHigh).abs().idxmin()
+        #     ax.axvline(d.loc[idx][disp], color='0.7', linestyle='--')
+        # slope 1 line
+        lim = [d[disp].min(), d[disp].max()]
+        ax.plot([lim[0], lim[1]], [lim[0], lim[1]], 'r', linestyle='--')
+
+    axsDisp[0].set_title('PM Y Displacement', **axsTtl)
+    axsDisp[0].set_ylabel('Video [nm]', **axsLbl)
+    axsDisp[1].set_title('AOD Y Displacement', **axsTtl)
 
     ax = axsDisp[2]
     ax.scatter(d.yDistVolt, d.yDistVid, c=d.pmYForce.values, **scatterArgs)
@@ -542,44 +585,30 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
 
     ### bsl plot ###
     plotArgs = {'rasterized': True, 'markersize': 1}
-    # bsl pm
-    ax = axsBsl[0]
-    if 'bsl' in a.segments.keys():
-        d = a.segments.bsl.data
-        ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL', color='gray', **plotArgs)
-
-    # plot bslBeads
-    d = a.segments.bslBeads.data
-    ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL Beads', zorder=5, **plotArgs)
-    # plot bslFlat
-    d = a.segments.bslFlat.data
-    ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL Flat', zorder=3, **plotArgs)
-    if s.bslCorr.bslSubAverage:
-        d = averageData(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
-        ax.plot(d.yTrapDist, d.pmYForce, '.', zorder=4, **plotArgs)
+    # bsl plots for PM and AOD
+    for ax, force in zip(axsBsl, ['pmYForce', 'aodYForce']):
+        # plot full BSL
+        if 'bsl' in a.segments.keys():
+            d = a.segments.bsl.data
+            ax.plot(d.yTrapDist, d[force], '.', label='BSL', color='gray', **plotArgs)
+        # plot bslBeads
+        if 'bslBeads' in a.segments.keys():
+            d = a.segments.bslBeads.data
+            ax.plot(d.yTrapDist, d[force], '.', label='BSL Beads', zorder=5, **plotArgs)
+        # plot bslFlat
+        if 'bslFlat' in a.segments.keys():
+            d = a.segments.bslFlat.data
+            ax.plot(d.yTrapDist, d[force], '.', label='BSL Flat', zorder=3, **plotArgs)
+        # plot averagd BSL
+        if 'bslSubAverage' in s.bslCorr.keys():
+            d = averageData(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
+            ax.plot(d.yTrapDist, d[force], '.', label='_', zorder=4, **plotArgs)
 
     # general
-    ax.set_title('PM Y', **axsTtl)
-    ax.set_ylabel('Force [pN]', **axsLbl)
-
-    # bsl aod
-    ax = axsBsl[1]
-    if 'bsl' in a.segments.keys():
-        d = a.segments.bsl.data
-        ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL', color='gray', **plotArgs)
-
-    # plot bslBeads
-    d = a.segments.bslBeads.data
-    ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL Beads', zorder=5, **plotArgs)
-    # plot bslFlat
-    d = a.segments.bslFlat.data
-    ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL Flat', zorder=3, **plotArgs)
-    if s.bslCorr.bslSubAverage:
-        d = averageData(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
-        ax.plot(d.yTrapDist, d.aodYForce, '.', label='_', zorder=4, **plotArgs)
-    # general
-    ax.set_title('AOD Y', **axsTtl)
-    ax.legend(fontsize=6)
+    axsBsl[0].set_title('PM Y', **axsTtl)
+    axsBsl[0].set_ylabel('Force [pN]', **axsLbl)
+    axsBsl[1].set_title('AOD Y', **axsTtl)
+    axsBsl[1].legend(fontsize=6)
 
     for ax in axsBsl:
         ax.set_xlabel('Trap Dist [nm]', **axsLbl)

@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
 import logging as logging
+import scipy.signal # scipy import bug?
 
 import tweezers.ixo.fit as fit
 import tweezers.physics.tweezers as tp
@@ -193,6 +194,16 @@ class PsdFit(fit.LeastSquaresFit):
 
         fit = self.fcn(self.fFull, *self.coef)
         return fit
+
+    def fit(self):
+        try:
+            res = super().fit()
+        except RuntimeError:
+            res = np.full(4, np.nan)
+            self.fitError = np.full(4, np.nan)
+            logging.warning('PSD fit failed!')
+
+        return res
 
 
 class PsdFitMle(fit.Fit):
