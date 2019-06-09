@@ -46,9 +46,17 @@ conda install jupyter_contrib_nbextensions
 
 #### Installing the package
 
+If you are using multiple environment, switch to the one you want to use, e.g. `tweezers` by running `conda activate tweezers`.
+
 On the command line, go to the `tweezers` directory and run `pip install -e .` (don't forget the `.`).
 
 Note that this will install the package in the development mode and not copy its content to the Python path but create a link to your current folder instead. This allows easier updating of the code via e.g. git.
+
+
+#### Jupyter Configuration
+
+If you plan to use Jupyter Notebooks, you might want to set the default directory in which to store these. To do that, open a terminal and run `jupyter-lab --generate-config` which will create a file `~/.jupyter/jupyter_notebook_config.py`. In there, look for the line `#c.NotebookApp.notebook_dir = ''`, adjust the path, uncomment the line and save the file.
+You can now run Jupyter from the terminal with `jupyter lab` and use it in the browser.
 
 
 ### Notes for developers
