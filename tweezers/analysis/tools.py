@@ -6,7 +6,7 @@ from pathlib import Path
 
 from tweezers import TweezersAnalysis, TweezersAnalysisCollection
 import tweezers.io as tio
-from tweezers.ixo.statistics import averageData
+from tweezers.ixo.statistics import averageDf, binData
 from tweezers.ixo.fit import PolyFit
 from tweezers.physics.tweezers import tcOsciHydroCorrect
 
@@ -143,7 +143,7 @@ def splitBaseline(analysis, windowSize=500, stdThrs=0.3, stdAxis='pmYForce', lin
     return analysis
 
 
-def baselineSubtraction(analysis, axis='y', averageBsl=None):
+def baselineSubtraction(analysis, axis='y', binBsl=None):
     """
     Remove baseline from signal. Input :class:`.TweezersAnalysis` must have a segment "bsl" which will be
     used as baseline. For all other segments, the baseline is subtracted. Baseline-corrected data is stored in
@@ -166,8 +166,9 @@ def baselineSubtraction(analysis, axis='y', averageBsl=None):
     # get data source class
     sourceClass = getattr(tio, analysis.meta.sourceClass)
 
-    if averageBsl:
-        bslData = averageData(bslData, nsamples=averageBsl)
+    if binBsl:
+        bslData = binData(bslData, trapDist, binWidth=binBsl)
+        # bslData = averageDf(bslData, by=trapDist, nsamples=averageBsl)
 
     # get range of baseline
     mi = bslData[trapDist].min()
@@ -193,7 +194,7 @@ def baselineSubtraction(analysis, axis='y', averageBsl=None):
 
         m, u, bslCorr = sourceClass.postprocessData(meta, analysis.units, seg.data)
         seg.addField('bslCorr')
-        seg.bslCorr['bslSubAverage'] = averageBsl
+        seg.bslCorr['bslSubBinWidth'] = binBsl
 
     return analysis
 
@@ -436,13 +437,15 @@ def detectRip(analysis, axis='y'):
         sel = ds.query(force + ' < @limForce')
         if not sel.empty:
             ripDist = sel.iloc[0][dist]
-        # get ripping force
-        d = d.query(dist + ' < @ripDist')
-        ripF = d.iloc[-10:].pmYForce.max()
         # store as rip distance
         seg['ripTrapDist'] = ripDist
-        # store ripping force
+        # get and store ripping force
+        d = d.query(dist + ' < @ripDist')
+        ripF = d.iloc[-10:].pmYForce.max()
         seg['ripPmYForce'] = ripF
+        # get and store ripping extension
+        ripExt = d.iloc[-10:].yDistVolt.max()
+        seg['ripYExt'] = ripExt
 
         # dist @ 20 pN
         d = seg.data.query('19.5 < pmYForce < 20.5')
@@ -601,7 +604,7 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
             ax.plot(d.yTrapDist, d[force], '.', label='BSL Flat', zorder=3, **plotArgs)
         # plot averagd BSL
         if 'bslSubAverage' in s.bslCorr.keys():
-            d = averageData(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
+            d = averageDf(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
             ax.plot(d.yTrapDist, d[force], '.', label='_', zorder=4, **plotArgs)
 
     # general
@@ -829,7 +832,7 @@ def segmentSummaryFigByFit(analysis, segId, display=True, saveDir=None):
     d = a.segments.bslFlat.data
     ax.plot(d.yTrapDist, d.pmYForce, '.', label='BSL Flat', zorder=3, **plotArgs)
     if s.bslCorr.bslSubAverage:
-        d = averageData(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
+        d = averageDf(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
         ax.plot(d.yTrapDist, d.pmYForce, '.', zorder=4, **plotArgs)
 
     # general
@@ -852,7 +855,7 @@ def segmentSummaryFigByFit(analysis, segId, display=True, saveDir=None):
     d = a.segments.bslFlat.data
     ax.plot(d.yTrapDist, d.aodYForce, '.', label='BSL Flat', zorder=3, **plotArgs)
     if s.bslCorr.bslSubAverage:
-        d = averageData(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
+        d = averageDf(a.segments.bslFlat.data, s.bslCorr.bslSubAverage)
         ax.plot(d.yTrapDist, d.aodYForce, '.', label='_', zorder=4, **plotArgs)
     # general
     ax.set_title('AOD Y', **axsTtl)

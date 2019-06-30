@@ -119,7 +119,7 @@ class TweezersDataCollection(TweezersCollection):
     @classmethod
     def _sourcesToData(cls, sources):
         """
-        Convert the found data sources to :class:`.TweezersData` objects
+        Convert the found data sources to :class:`.TweezersData` objects. Also sorts bey key.
 
         Args:
             sources (dict): dictionary of datasources
@@ -129,7 +129,8 @@ class TweezersDataCollection(TweezersCollection):
         """
 
         res = cls()
-        for key, value in sources.items():
+        for key in sorted(sources.keys()):
+            value = sources[key]
             if isinstance(value, BaseSource):
                 res[key] = TweezersData(source=value)
             else:
@@ -318,7 +319,8 @@ class TweezersAnalysisCollection(TweezersCollection):
         res = cls()
 
         _path = Path(path)
-        for item in _path.iterdir():
+        for item in sorted(_path.iterdir()):
+        # for item in _path.iterdir():
             if item.is_dir():
                 # recursively enter directory
                 content = cls.load(item)

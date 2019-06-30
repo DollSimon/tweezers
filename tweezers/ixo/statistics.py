@@ -2,23 +2,36 @@ import numpy as np
 import pandas as pd
 
 
-def averageData(data, nsamples=10):
+def average(data, nsamples=10, fcn=np.mean):
+    nrows = len(data) // nsamples
+    ndata = nsamples * nrows
+    da = np.reshape(data[:ndata], (nrows, nsamples))
+    da = fcn(da, axis=1)
+    return da
+
+
+def averageDf(data, by='time', nsamples=10):
     """
-    Downsample the data by averaging ``nsamples``.
+    Downsample the data by first sorting the `pandas.DataFrame` by ``by`` and then averaging ``nsamples`` consecutive
+    datapoints.
 
     Args:
         data (`pandas.DataFrame`): data to average
+        by (`str`): column used for sorting
         nsamples (`int`): number of samples to average
 
     Returns:
         :class:`pandas.DataFrame`
     """
 
-    group = data.groupby(data.index // nsamples)
+    ds = data.sort_values(by)
+    groupIdx = np.arange(ds.shape[0]) // nsamples
+    group = ds.groupby(groupIdx)
     avData = group.mean()
-    avData['time'] = group.first()['time']
-    if 'absTime' in data.columns:
-        avData['absTime'] = group.first()['absTime']
+    
+    # avData['time'] = group.first()['time']
+    # if 'absTime' in data.columns:
+    #     avData['absTime'] = group.first()['absTime']
 
     return avData
 
@@ -64,26 +77,34 @@ def cdf(data):
     """
     Computes the cumulative density function (or cumulative probability) of the given data
     """
-    
+
     x = np.sort(np.array(data))
     y = np.arange(1, len(x) + 1) / len(x)
     return x, y
 
 
-def binData(data, binningAxis, bins=100):
+def binData(data, binningAxis, bins=100, binWidth=None):
+    # if binWidth is given, use to determine bins
+    if binWidth:
+        mi = data[binningAxis].min()
+        ma = data[binningAxis].max()
+        bins = int(np.ceil((ma - mi) / binWidth))
+
     if isinstance(bins, int):
         bins = np.linspace(data[binningAxis].min(), data[binningAxis].max(), bins)
     elif len(bins) == 3:
         bins = np.linspace(*bins)
-    # else assume bin limits are given
+    # else assume list of limits for each bin is given
 
     # get center of each bin as label
     labels = bins[:-1] + np.diff(bins) / 2
 
-    data['binned'] = pd.cut(data[binningAxis], bins=bins, labels=labels)
-    res = data.groupby('binned', as_index=False).mean()
+    binnedData = data.copy()
+    binnedData[binningAxis] = pd.cut(binnedData[binningAxis], bins=bins, labels=labels)
+    binnedData = binnedData.groupby(binningAxis, as_index=False).mean()
+    binnedData[binningAxis] = binnedData[binningAxis].astype(data[binningAxis].dtype)
 
-    return res, labels
+    return binnedData
 
 
 def traceBootstrap(data, n=1000, ci=95, interpolation='nearest'):
@@ -108,3 +129,27 @@ def traceBootstrap(data, n=1000, ci=95, interpolation='nearest'):
         upper = np.nanpercentile(bsRes, ci, axis=0, interpolation=interpolation)
 
     return mean, lower, upper
+
+
+def allanVar(data, dt, t=(-5, 1, 100)):
+    tRange = np.logspace(*t)
+    var = []
+    for t in tRange:
+        n = (t / dt).round().astype(int)
+        da = average(data, nsamples=n)
+        if len(da) <= 2:
+            varT = np.nan
+        else:
+            varT = np.nanmean(np.diff(da) ** 2)
+        var.append(varT)
+    var = 0.5 * np.array(var)
+    return tRange, var
+
+
+def allanVarDf(x, data, t=(-5, 1, 100)):
+    dt = data.time.diff().mean()
+    d = data[x].values
+
+    tRange, var = allanVar(data[x].values, dt, t=t)
+    res = pd.DataFrame({'time': tRange, 'allanVar': var})
+    return res

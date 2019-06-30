@@ -57,7 +57,7 @@ def diffusionCoefficient(radius=1000, temperature=25, viscosity=1e-9, verbose=Fa
     return diffusionConstant
 
 
-def viscosityWater(T, absoluteT=False):
+def viscosityWaterEmp(T, absoluteT=False):
     """
     Calculate the viscosity of water at a given temperature from an `empiric equation`_ at Wikipedia in [pN s / nm^2].
 
@@ -87,3 +87,39 @@ def viscosityWater(T, absoluteT=False):
     n = A * 10**(B / (absT - C)) * 1E-6
 
     return n
+
+
+def viscosityWater(T, absoluteT=False):
+    """
+    Calculate the viscosity of water at a given temperature from an empiric equation given by `Huber et al.`_:
+    "New International Formulation for the Viscosity of H2O", eq. 21., in [pN s / nm^2].
+
+    Args:
+        T (float): Temperature
+        absoluteT (bool): if `False`, temperature is given in [C], if `True` in [K]
+
+    Returns:
+        :class:`float` in [pN s / nm^2]
+
+    .. _`Huber et al.`:
+        http://aip.scitation.org/doi/10.1063/1.3088050
+    """
+
+    coef = [[280.68, -1.9], [511.45, -7.7], [61.131, -19.6], [0.45903, -40]]
+
+    # get absolute temp
+    if absoluteT:
+        absT = T
+    else:
+        absT = asKelvin(T)
+    relT = absT / 300
+
+    visc = 0
+    for c in coef:
+        visc += c[0] * relT**c[1]
+
+    # convert units
+    visc *= 1E-12
+    return visc
+
+
