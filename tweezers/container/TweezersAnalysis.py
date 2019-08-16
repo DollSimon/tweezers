@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from tweezers.ixo.collections import IndexedOrderedDict, dictStructure
-from tweezers.ixo import matfile
+from tweezers.ixo import hdf5
 
 
 class TweezersAnalysis(IndexedOrderedDict):
@@ -42,7 +42,7 @@ class TweezersAnalysis(IndexedOrderedDict):
         path = Path(file)
         obj = TweezersAnalysis(path.name)
         obj.path = path.parent
-        data = matfile.load(path, keys=keys)
+        data = hdf5.load(path, keys=keys)
         for key, value in data.items():
             obj[key] = value
         return obj
@@ -85,7 +85,7 @@ class TweezersAnalysis(IndexedOrderedDict):
             for key in keys:
                 toSave[key] = self[key]
         
-        matfile.save(self.path / self.getFilename(self.name), toSave)
+        hdf5.save(self.path / self.getFilename(self.name), toSave)
 
     def structure(self):
         """
