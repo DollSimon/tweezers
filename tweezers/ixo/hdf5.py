@@ -1,13 +1,13 @@
 import numpy as np
 import pandas as pd
 from collections import OrderedDict
-import hdf5storage as h5
+import hdf5storage
 
 from tweezers.meta import MetaDict, UnitDict
 from tweezers.ixo.collections import IndexedOrderedDict
 
 
-class CustomNumpyMarshaller(h5.Marshallers.NumpyScalarArrayMarshaller):
+class CustomNumpyMarshaller(hdf5storage.Marshallers.NumpyScalarArrayMarshaller):
     def __init__(self):
         super().__init__()
 
@@ -21,7 +21,7 @@ class CustomNumpyMarshaller(h5.Marshallers.NumpyScalarArrayMarshaller):
         return data
 
 
-class IndexedOrderedDictMarshaller(h5.Marshallers.PythonDictMarshaller):
+class IndexedOrderedDictMarshaller(hdf5storage.Marshallers.PythonDictMarshaller):
     def __init__(self):
         super().__init__()
 
@@ -106,21 +106,23 @@ class DataFrameMarshaller(IndexedOrderedDictMarshaller):
         return data
 
 
+class CustomMarshallerCollection(hdf5storage.MarshallerCollection):
+    def __init__(self, **kwargs):
+        kwargs['marshallers'] = [DataFrameMarshaller(), IndexedOrderedDictMarshaller(), CustomNumpyMarshaller()]
+        kwargs['priority'] = ('user', 'builtin', 'plugin')
+        super().__init__(**kwargs)
+
+
 def save(path, data):
-    collect = h5.MarshallerCollection(marshallers=[DataFrameMarshaller(),
-                                                   IndexedOrderedDictMarshaller(),
-                                                   CustomNumpyMarshaller()],
-                                      priority=('user', 'builtin', 'plugin'))
-    h5.savemat(str(path), data,
-               marshaller_collection=collect,
-               truncate_existing=True,
-               format='7.3',
-               appendmat=False)
+    collect = CustomMarshallerCollection()
+    hdf5storage.savemat(str(path), data,
+                        marshaller_collection=collect,
+                        truncate_existing=True,
+                        format='7.3',
+                        appendmat=False)
 
 
 def load(path, keys=None):
-    collect = h5.MarshallerCollection(marshallers=[DataFrameMarshaller(),
-                                                   IndexedOrderedDictMarshaller(),
-                                                   CustomNumpyMarshaller()])
-    return h5.loadmat(str(path), marshaller_collection=collect,
-                      appendmat=False, variable_names=keys)
+    collect = CustomMarshallerCollection()
+    return hdf5storage.loadmat(str(path), marshaller_collection=collect,
+                               appendmat=False, variable_names=keys)

@@ -5,14 +5,17 @@ import pandas as pd
 import numpy as np
 import re
 import datetime
+import h5py
 
 from .BaseSource import BaseSource
 from tweezers.meta import MetaDict, UnitDict
+import hdf5storage
+import tweezers.ixo.hdf5 as h5
 
 
-class TxtBiotecSource(BaseSource):
+class Hdf5BiotecSource(BaseSource):
     """
-    Data source for \*.txt files from the Biotec tweezers.
+    Data source for \*.h5 files from the Biotec tweezers.
     """
 
     ts = None
@@ -45,7 +48,7 @@ class TxtBiotecSource(BaseSource):
     @staticmethod
     def isDataFile(path):
         """
-        Checks if a given file is a valid data file and returns its ID and type
+        Checks if a given file is a valid data file and returns its ID and type.
 
         Args:
             path (:class:`pathlib.Path`): file to check
@@ -55,7 +58,7 @@ class TxtBiotecSource(BaseSource):
         """
 
         _path = Path(path)
-        m = re.match('^(?P<beadId>[0-9\-_]{19}.*#\d{3})(?P<trial>-\d{3})?\s(?P<type>[a-zA-Z]+)\.txt$',
+        m = re.match('^(?P<beadId>[0-9\-_]{19}.*#\d{3})(?P<trial>-\d{3})?\s(?P<type>[a-zA-Z]+)\.h5$',
                      _path.name)
         if m:
             ide = None
@@ -142,13 +145,8 @@ class TxtBiotecSource(BaseSource):
             :class:`tweezers.MetaDict` and :class:`tweezers.UnitDict`
         """
 
-        headerStr = ''
-        with self.header.open(encoding='utf-8') as f:
-            for line in f:
-                if line.startswith('#'):
-                    break
-                else:
-                    headerStr += line
+        collect = h5.CustomMarshallerCollection()
+        headerStr = hdf5storage.read(filename=self.header, path='/meta', marshaller_collection=collect)
 
         header = json.loads(headerStr, object_pairs_hook=OrderedDict)
         units = UnitDict(header.pop('units'))
@@ -369,35 +367,13 @@ class TxtBiotecSource(BaseSource):
             * data (:class:`pandas.DataFrame`)
         """
 
-        # create relative time column but keep absolute time
-        if 'absTime' not in data.columns:
-            data['absTime'] = data.time.copy()
-            units['absTime'] = 's'
-        data.loc[:, 'time'] -= data.time.iloc[0]
-
-        # ensure values, set them to 0 if they come as None from the file
-        for trap in meta['traps']:
-            if not meta[trap].displacementSensitivity:
-                meta[trap].displacementSensitivity = 0
-            if not meta[trap].forceSensitivity:
-                meta[trap].forceSensitivity = 0
-
-        # calculate displacement and forces
-        meta, units, data = TxtBiotecSource.calculateDisplacement(meta, units, data)
-        meta, units, data = TxtBiotecSource.calculateForce(meta, units, data)
+        # create relative time column
+        # data['time'] = data.absTime - data.absTime.iloc[0]
 
         data['xTrapDist'] = data.pmXTrap - data.aodXTrap
         data['yTrapDist'] = data.pmYTrap - data.aodYTrap
         units['xTrapDist'] = 'nm'
         units['yTrapDist'] = 'nm'
-
-        # calculate bead distance center to center from trap signal
-        data['xDistVolt'] = data.xTrapDist - data.pmXDisp - data.aodXDisp
-        data['yDistVolt'] = data.yTrapDist - data.pmYDisp - data.aodYDisp
-        data['distVolt'] = np.sqrt(data.xDistVolt**2 + data.yDistVolt**2)
-        units['xDistVolt'] = 'nm'
-        units['yDistVolt'] = 'nm'
-        units['distVolt'] = 'nm'
 
         # calculate bead distance center to center from video signal, only meaningful for two trapped beads
         data['xDistVid'] = data.pmXBead - data.aodXBead
@@ -407,25 +383,26 @@ class TxtBiotecSource(BaseSource):
         units['yDistVid'] = 'nm'
         units['distVid'] = 'nm'
 
+        # ensure values, set them to 0 if they come as None from the file
+        for trap in meta['traps']:
+            if not meta[trap].displacementSensitivity:
+                meta[trap].displacementSensitivity = 0
+            if not meta[trap].forceSensitivity:
+                meta[trap].forceSensitivity = 0
+
+        # calculate displacement and forces
+        meta, units, data = Hdf5BiotecSource.calculateDisplacement(meta, units, data)
+        meta, units, data = Hdf5BiotecSource.calculateForce(meta, units, data)
+
+        # calculate bead distance center to center from trap signal
+        data['xDistVolt'] = data.xTrapDist - data.pmXDisp - data.aodXDisp
+        data['yDistVolt'] = data.yTrapDist - data.pmYDisp - data.aodYDisp
+        data['distVolt'] = np.sqrt(data.xDistVolt**2 + data.yDistVolt**2)
+        units['xDistVolt'] = 'nm'
+        units['yDistVolt'] = 'nm'
+        units['distVolt'] = 'nm'
+
         return meta, units, data
-
-    def findHeaderLine(self, file):
-        """
-        Find the line number of the first header line, searches for ``### DATA ###``
-
-        Args:
-            file (:class:`pathlib.Path`): path to file
-        """
-
-        n = 0
-        with file.open(encoding='utf-8') as f:
-            for line in f:
-                if line.startswith('#'):
-                    break
-                else:
-                    n += 1
-
-        return n + 2
 
     def readColumnTitles(self, file):
         """
@@ -438,35 +415,27 @@ class TxtBiotecSource(BaseSource):
         Returns:
             `dict` with keys `names` (`list`), `units` (:class:`.UnitDict`) and `n`
         """
-        # read header line
-        n = 0
-        with file.open(encoding='utf-8') as f:
-            for line in f:
-                n += 1
-                if line.startswith('#'):
-                    # skip empty line
-                    next(f)
-                    headerLine = next(f)
-                    n += 2
-                    break
+
+        # read columns names
+        with h5py.File(file, 'r') as f:
+            cols = f['data'].attrs['cols']
 
         # get column title names with units
         regex = re.compile('(\w+)(?:\s\[(\w*)\])?')
-        header = regex.findall(headerLine)
-
-        # store them in a UnitDict
         colHeaders = []
         colUnits = UnitDict()
-        for (colHeader, unit) in header:
-            colHeaders.append(colHeader)
-            if unit:
-                colUnits[colHeader] = unit
+        for col in cols:
+            colStr = col.decode('utf-8')
+            res = regex.match(colStr)
+            colHeaders.append(res[1])
+            if res.group(2):
+                colUnits[res[1]] = res[2]
 
-        return {'names': colHeaders, 'units': colUnits, 'n': n}
+        return {'names': colHeaders, 'units': colUnits}
 
     def readToDataframe(self, file):
         """
-        Read the given file into a :class:`pandas.DataFrame` and skip the header lines.
+        Read the given file into a :class:`pandas.DataFrame`.
 
         Args:
             file (:class:`pathlib.Path`): path to file
@@ -476,9 +445,10 @@ class TxtBiotecSource(BaseSource):
         """
 
         cols = self.readColumnTitles(file)
-        df = pd.read_csv(str(file), sep='\t', dtype=np.float64, skiprows=cols['n'], header=None,
-                         names=cols['names'], engine='c')
-        return df
+        data = hdf5storage.read(filename=file, path='/data', marshaller_collection=h5.CustomMarshallerCollection())
+        data = pd.DataFrame(data, columns=cols['names'])
+
+        return data
 
     def getTime(self):
         """

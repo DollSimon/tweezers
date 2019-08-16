@@ -89,23 +89,24 @@ def thermalCalibOsci(cornerFreq, diffCoef, driveFreq, amplitude, driveFreqPower,
     return res, units
 
 
-def wExp(f, psdOsci, psdFit, driveFreq):
+def wExp(psdOsci, psdFit, driveFreq):
     """
     Calculate the experimentally measured power at the driving frequency from the power spectrum and its fit. This is
     required for the oscillation calibration method.
 
     Args:
-        f (:class:`numpy.ndarray`): array of frequencies
-        psdOsci (:class:`numpy.ndarray`): array of PSD values
-        psdFit (:class:`numpy.ndarray`): array of PSD fit values (for estimating background at drive frequency)
+        psdOsci (:class:`numpy.ndarray`): experimental PSD with first column frequencies and second column PSD values
+        psdFit (:class:`numpy.ndarray`): PSD fit with first column frequencies and second PSD fit values
         driveFreq (`float`):
 
     Returns:
         `float`
     """
 
-    pPeak = psdOsci[f == driveFreq]
-    pBackground = psdFit[f == driveFreq]
+    f = psdOsci[:, 0]
+    pPeak = psdOsci[f == driveFreq, 1][0]
+    fFit = psdFit[:, 0]
+    pBackground = psdFit[fFit == driveFreq, 1][0]
     df = f[1] - f[0]
     return (pPeak - pBackground) * df
 
@@ -145,7 +146,7 @@ def doThermalCalib(t, trap):
         if trap.lower().endswith('y'):
             # calculate experimental power in oscillation peak
             driveFreq = t.meta.psdOscillateFrequency
-            wex = wExp(t.psd.f.values, t.psd[trap].values, t.psdFit[trap].values, driveFreq)
+            wex = wExp(t.psd[['f', trap]].values, t.psdFit[['f', trap]].values, driveFreq)
 
             # do calibration
             res, units = thermalCalibOsci(trapMeta.cornerFrequency, trapMeta.diffusionCoefficient,

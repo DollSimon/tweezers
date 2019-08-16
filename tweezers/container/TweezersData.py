@@ -7,7 +7,7 @@ import numpy as np
 from tweezers.container.TweezersAnalysis import TweezersAnalysis
 from tweezers.ixo.collections import IndexedOrderedDict
 from tweezers.ixo.decorators import lazy
-from tweezers.ixo.statistics import averageData
+from tweezers.ixo.statistics import averageDf
 from tweezers.meta import MetaDict, UnitDict
 from tweezers.plot.psd import PsdFitPlot
 from tweezers.plot.utils import peekPlot
@@ -102,7 +102,7 @@ class TweezersDataBase:
             :class:`pandas.DataFrame`
         """
 
-        return averageData(self.data, nsamples=nsamples)
+        return averageDf(self.data, nsamples=nsamples)
 
     def computePsd(self, **kwargs):
         """
@@ -453,7 +453,11 @@ class TweezersData(TweezersDataBase):
 
         log.debug('Reading data from data source')
         data = self.source.getData()
-        self.meta, self.units, data = self.source.postprocessData(self.meta, self.units, data)
+        # try to postprocess data, ignore if it fails
+        try:
+            self.meta, self.units, data = self.source.postprocessData(self.meta, self.units, data)
+        except AttributeError:
+            pass
         return data
 
     def addSegment(self, tmin, tmax, name=None):

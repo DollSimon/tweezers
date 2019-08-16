@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 import re
 import pandas as pd
+import pickle
 
 
 def getSubdirs(path):
@@ -61,3 +62,32 @@ class DataFrameJsonDecoder(json.JSONDecoder):
         if dtype == 'dataframe':
             return pd.DataFrame.from_dict(obj['value'], orient='columns')  # pd.read_json(obj['value'])
         return obj
+
+
+def writePickle(data, path):
+    """
+    Pickle the given data.
+
+    Args:
+        data: data to write to pickle file
+        path: path to the pickle file to write
+    """
+
+    with open(path, 'wb') as fid:
+        pickle.dump(data, fid)
+
+
+def loadPickle(path):
+    """
+    Unpickle the given file, i.e. load the serialized data from that file.
+
+    Args:
+        path: path to the pickle file to load
+
+    Returns:
+        data
+    """
+
+    with open(path, 'rb')as fid:
+        data = pickle.load(fid)
+    return data
