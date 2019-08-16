@@ -65,11 +65,29 @@ class DataFrameJsonDecoder(json.JSONDecoder):
 
 
 def writePickle(data, path):
+    """
+    Pickle the given data.
+
+    Args:
+        data: data to write to pickle file
+        path: path to the pickle file to write
+    """
+
     with open(path, 'wb') as fid:
         pickle.dump(data, fid)
 
 
 def loadPickle(path):
+    """
+    Unpickle the given file, i.e. load the serialized data from that file.
+
+    Args:
+        path: path to the pickle file to load
+
+    Returns:
+        data
+    """
+
     with open(path, 'rb')as fid:
         data = pickle.load(fid)
     return data

@@ -3,6 +3,18 @@ import pandas as pd
 
 
 def average(data, nsamples=10, fcn=np.mean):
+    """
+    Downsample the given 1D array by averaging `nsamples` consecutive datapoints
+
+    Args:
+        data (np.array):  1D array
+        nsamples: number of samples to average
+        fcn: function used to average, defaults to `numpy.mean` but can be anything that returns a single value from an
+             array
+
+    Returns:
+
+    """
     nrows = len(data) // nsamples
     ndata = nsamples * nrows
     da = np.reshape(data[:ndata], (nrows, nsamples))
@@ -75,7 +87,15 @@ def correlate(x, y, length=20):
 
 def cdf(data):
     """
-    Computes the cumulative density function (or cumulative probability) of the given data
+    Computes the cumulative density function (or cumulative probability) of the given data.
+
+    Args:
+        data (np.array): 1D array
+
+    Returns:
+
+        * x (:func:`numpy.array`) - bins
+        * y (:func:`numpy.array`) - cumulative probability for each bin
     """
 
     x = np.sort(np.array(data))
@@ -84,6 +104,20 @@ def cdf(data):
 
 
 def binData(data, binningAxis, bins=100, binWidth=None):
+    """
+    Bin the data in a `pandas.DataFrame` by the given axis.
+
+    Args:
+        data (:class:`pandas.DataFrame`): data to bin
+        binningAxis (str): name of the axis to use for binning
+        bins: can be 1) an integer number of bins to use, 2) an array of 3 numbers passed to :func:`numpy.linpspace` or
+              3) an array of bin limits
+        binWidth: use a fixed width to determine the bins, if set this input is preferred over the `bins` argument
+
+    Returns:
+        :class:`pandas.DataFrame`
+    """
+
     # if binWidth is given, use to determine bins
     if binWidth:
         mi = data[binningAxis].min()
@@ -109,7 +143,19 @@ def binData(data, binningAxis, bins=100, binWidth=None):
 
 def traceBootstrap(data, n=1000, ci=95, interpolation='nearest'):
     """
-    data: each row is an observation, columns are data bins
+    Bootstrap a trace
+
+    Args:
+        data (:func:`numpy.array`): an 2D array where each column is a datapoint of a 1D array and each row is an observation
+        n (int): number of bootstrapping samples
+        ci (int): confidence interval: either 'std' to use mean +/- standard deviation or a value from 0 to 100 used as a percentile
+        interpolation (str): interpolation method used by :func:`numpy.nanpercentile`
+
+    Returns:
+
+        * mean (:func:`numpy.array`) - 1D array with mean values of bootstrapped data
+        * lower (:func:`numpy.array`) - 1D array with lower bound of confidence interval
+        * upper (:func:`numpy.array`) - 1D array with upper bound of confidence interval
     """
 
     nSamples = data.shape[0]
@@ -132,6 +178,22 @@ def traceBootstrap(data, n=1000, ci=95, interpolation='nearest'):
 
 
 def allanVar(data, dt, t=(-5, 1, 100)):
+    """
+    Compute the Allan variance.
+
+    Args:
+        data (:func:`numpy.array`): array holding the data for which to compute the Allan variance
+        dt (float): time resolution of the data; in other words the time difference between consecutive data points in
+                    `data`
+        t (list): tuple with 3 values used as input for :func:`numpy.logspace` which determines the array of time shifts
+                  for which to calculate the Allan variance
+
+    Returns:
+
+        * tRange (:func:`numpy.array`) - time shift array
+        * var (:func:`numpy.array`) - Allan variance for each shift
+    """
+
     tRange = np.logspace(*t)
     var = []
     for t in tRange:
@@ -147,6 +209,19 @@ def allanVar(data, dt, t=(-5, 1, 100)):
 
 
 def allanVarDf(x, data, t=(-5, 1, 100)):
+    """
+    Compute the Allan variance for a :class:`pandas.DataFrame`.
+
+    Args:
+        x (str): name of the column in `data` for which to compute the Allan variance
+        data (:class:`pandas.DataFrame`): data, requires a column named 'time'
+        t (list): tuple with 3 values used as input for :func:`numpy.logspace` which determines the array of time shifts
+                  for which to calculate the Allan variance
+
+    Returns:
+        :class:`pandas.DataFrame`
+    """
+
     dt = data.time.diff().mean()
     d = data[x].values
 

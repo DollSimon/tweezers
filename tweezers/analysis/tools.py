@@ -333,6 +333,7 @@ def displacementCorrection(analysis, axis='y', lowForceLimit=5, highForceLimit='
         analysis (:class:`.TweezersAnalysis`): analysis object
         axis: `x` or `y`, axis to do the displacement correction (default: `y`)
         lowForceLimit (float): ignore signal where force is below this limit (default: 5)
+        highForceLimit (float): ignore signal where force is above this limit (defualt: infinite)
 
     Returns:
         :class:`.TweezersAnalysis`
