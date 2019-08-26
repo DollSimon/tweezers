@@ -6,7 +6,7 @@ from pathlib import Path
 
 from tweezers import TweezersAnalysis, TweezersAnalysisCollection
 import tweezers.io as tio
-from tweezers.ixo.statistics import averageDf, binData
+from tweezers.ixo.statistics import averageDf, binDf
 from tweezers.ixo.fit import PolyFit
 from tweezers.physics.tweezers import tcOsciHydroCorrect
 
@@ -167,7 +167,7 @@ def baselineSubtraction(analysis, axis='y', binBsl=None):
     sourceClass = getattr(tio, analysis.meta.sourceClass)
 
     if binBsl:
-        bslData = binData(bslData, trapDist, binWidth=binBsl)
+        bslData = binDf(bslData, trapDist, binWidth=binBsl)
         # bslData = averageDf(bslData, by=trapDist, nsamples=averageBsl)
 
     # get range of baseline

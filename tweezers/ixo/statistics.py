@@ -103,14 +103,14 @@ def cdf(data):
     return x, y
 
 
-def binData(data, binningAxis, bins=100, binWidth=None):
+def binDf(data, binningAxis, bins=100, binWidth=None):
     """
     Bin the data in a `pandas.DataFrame` by the given axis.
 
     Args:
         data (:class:`pandas.DataFrame`): data to bin
         binningAxis (str): name of the axis to use for binning
-        bins: can be 1) an integer number of bins to use, 2) an array of 3 numbers passed to :func:`numpy.linpspace` or
+        bins: can be 1) an integer number of bins to use, 2) an array of 3 numbers passed to :func:`numpy.linspace` or
               3) an array of bin limits
         binWidth: use a fixed width to determine the bins, if set this input is preferred over the `bins` argument
 
