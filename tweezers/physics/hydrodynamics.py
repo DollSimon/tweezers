@@ -69,7 +69,7 @@ def viscosityWaterEmp(T, absoluteT=False):
         :class:`float` in [pN s / nm^2]
 
     .. _`empiric equation`:
-        https://en.wikipedia.org/wiki/Temperature_dependence_of_liquid_viscosity#Viscosity_of_water
+        https://en.wikipedia.org/w/index.php?title=Temperature_dependence_of_viscosity&oldid=908052318
     """
 
     # formula empiric parameters
@@ -92,7 +92,7 @@ def viscosityWaterEmp(T, absoluteT=False):
 def viscosityWater(T, absoluteT=False):
     """
     Calculate the viscosity of water at a given temperature from an empiric equation given by `Huber et al.`_:
-    "New International Formulation for the Viscosity of H2O", eq. 21., in [pN s / nm^2].
+    "New International Formulation for the Viscosity of H2O", eq. 37, in [pN s / nm^2].
 
     Args:
         T (float): Temperature
