@@ -173,7 +173,8 @@ class TxtBiotecSource(BaseSource):
         meta['idSafe'] = meta['id'].replace('_', ' ').replace('#', '')
 
         # add time in timestamp format
-        meta['time'] = pd.Timestamp.strptime(meta['date'], '%d.%m.%Y %H:%M:%S').tz_localize('Europe/Berlin')
+        # meta['time'] = pd.Timestamp.strptime(meta['date'], '%d.%m.%Y %H:%M:%S').tz_localize('Europe/Berlin')
+        meta['time'] = pd.to_datetime(meta['date'], format='%d.%m.%Y %H:%M:%S').tz_localize('Europe/Berlin')
 
         return meta, units
 

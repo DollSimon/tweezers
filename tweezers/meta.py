@@ -38,7 +38,7 @@ class MetaBaseDict(IndexedOrderedDict):
         except KeyError:
             try:
                 value = self.defaults[item]
-                log.info('%sDefault metadata value used for key: %s', self.warningString, item)
+                log.debug('%sDefault metadata value used for key: %s', self.warningString, item)
                 return value
             except KeyError:
                 pass

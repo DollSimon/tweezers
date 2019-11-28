@@ -217,7 +217,8 @@ class TweezersDataBase:
             thermal.doThermalCalib(t, trap)
 
         # recompute forces
-        t.meta, t.units, t.data = t.source.calculateForce(t.meta, t.units, t.data)
+        if t.source.data:
+            t.meta, t.units, t.data = t.source.calculateForce(t.meta, t.units, t.data)
 
         return t
 

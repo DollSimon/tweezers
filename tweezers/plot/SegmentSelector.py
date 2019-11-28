@@ -25,6 +25,11 @@ class SpanSelector(RectangleSelector):
     """
 
     def __init__(self, *args, **kwargs):
+        # if 'marker_props' not in kwargs.keys():
+        #     kwargs['marker_props'] = {}
+        # # make handle markers larger
+        # kwargs['marker_props']['markersize'] = 50
+
         super().__init__(*args, **kwargs)
 
         # patching handles for the selection
