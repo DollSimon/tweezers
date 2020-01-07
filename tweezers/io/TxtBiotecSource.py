@@ -27,7 +27,7 @@ class TxtBiotecSource(BaseSource):
                                            :class:`pathlib.Path` to try to create an instance
             psd (:class:`pathlib.Path`): path to psd file
             ts (:class:`pathlib.Path`): path to ts file
-            screenshot (:class:`pathlib.Path`): path to screenshot file
+            image (:class:`pathlib.Path`): path to screenshot file
             kwargs: forwared to super class
         """
 

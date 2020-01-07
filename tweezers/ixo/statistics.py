@@ -7,7 +7,7 @@ def average(data, nsamples=10, fcn=np.mean):
     Downsample the given 1D array by averaging `nsamples` consecutive datapoints
 
     Args:
-        data (np.array):  1D array
+        data (`np.array`):  1D array
         nsamples: number of samples to average
         fcn: function used to average, defaults to `numpy.mean` but can be anything that returns a single value from an
              array
