@@ -73,6 +73,13 @@ class BaseSource:
 
         raise NotImplementedError()
 
+    def getImages(self):
+        """
+        Returns the images (if they were recorded) as well as their timestamps.
+        """
+
+        raise NotImplementedError()
+
     def getPsdFit(self):
         """
         Returns the fit to the PSD as performed by the data source.

@@ -6,6 +6,8 @@ import numpy as np
 import re
 import datetime
 import h5py
+import dask.dataframe as dd
+import struct
 
 from .BaseSource import BaseSource
 from tweezers.meta import MetaDict, UnitDict
@@ -22,15 +24,17 @@ class Hdf5BiotecSource(BaseSource):
     psd = None
     data = None
     image = None
+    images = None
 
-    def __init__(self, data=None, psd=None, ts=None, image=None, **kwargs):
+    def __init__(self, data=None, psd=None, ts=None, image=None, images=None, **kwargs):
         """
         Args:
             data (:class:`pathlib.Path`): path to data file to read, if the input is of a different type, it is given to
                                            :class:`pathlib.Path` to try to create an instance
             psd (:class:`pathlib.Path`): path to psd file
             ts (:class:`pathlib.Path`): path to ts file
-            screenshot (:class:`pathlib.Path`): path to screenshot file
+            image (:class:`pathlib.Path`): path to screenshot file
+            images (:class:`pathlib.Path`): path to the file containing the recorded video
             kwargs: forwared to super class
         """
 
@@ -44,6 +48,8 @@ class Hdf5BiotecSource(BaseSource):
             self.data = Path(data)
         if image:
             self.image = Path(image)
+        if images:
+            self.images = Path(image)
 
     @staticmethod
     def isDataFile(path):
@@ -171,7 +177,7 @@ class Hdf5BiotecSource(BaseSource):
         meta['idSafe'] = meta['id'].replace('_', ' ').replace('#', '')
 
         # add time in timestamp format
-        meta['time'] = pd.Timestamp.strptime(meta['date'], '%d.%m.%Y %H:%M:%S').tz_localize('Europe/Berlin')
+        meta['time'] = pd.to_datetime(meta['date'], format='%d.%m.%Y %H:%M:%S').tz_localize('Europe/Berlin')
 
         return meta, units
 
@@ -404,7 +410,8 @@ class Hdf5BiotecSource(BaseSource):
 
         return meta, units, data
 
-    def readColumnTitles(self, file):
+    @staticmethod
+    def readColumnTitles(file):
         """
         Read the column titles and if available their units. They are expected to be given as 'f [Hz]', separated by
         tabstops.
@@ -460,4 +467,65 @@ class Hdf5BiotecSource(BaseSource):
 
         timeStr = self.header.name[:19]
         time = datetime.datetime.strptime(timeStr, '%Y-%m-%d_%H-%M-%S')
+        return time
+
+    def getImages(self):
+        """
+        Returns the image data if it was recorded with the experiment.
+
+        Returns:
+
+            * timestamps for each frame (`numpy.array`)
+            * image data where the first dimension is the time axis (`numpy.array`)
+        """
+
+        data = hdf5storage.read(filename=self.images, path='/data', marshaller_collection=h5.CustomMarshallerCollection())
+        times = np.array([self.getTimeFromImage(image) for image in data])
+        data = np.delete(data, (-1), axis=1)
+
+        return times, data
+
+    def getDask(self, **kwargs):
+        """
+        Get a Dask DataFrame from the data file. Potentially useful for reading chunks of large files.
+
+        The Dask DataFrame must be closed using :meth:`Hdf5BiotecSource.releaseDask`.
+
+        Args:
+            **kwargs: passed on to :meth:`dask.dataframe.from_array`
+
+        Returns:
+            :class:`dask.dataframe`
+        """
+
+        cols = self.readColumnTitles(self.data)
+        cols = cols['names']
+
+        self.daskFile = h5py.File(self.data, mode='r')
+        da = dd.from_array(self.daskFile['/data'], columns=cols, **kwargs)
+        return da
+
+    def releaseDask(self):
+        """
+        Releases the Dask DataFrame after the computations. Basically closes the file.
+        """
+
+        self.daskFile.close()
+
+    def getTimeFromImage(self, image):
+        """
+        Get the timestamp from an image recorded with the video stream during the experiment. The timestamps are encoded
+        in the last row of each image.
+
+        Timestamps are in miliseconds and can be related to the `absTime` column in the experiment data.
+
+        Args:
+            image (`numpy.array`): image data
+
+        Returns:
+            `double`
+        """
+
+        byteArr = image[-1, 0:8]
+        time = struct.unpack('>d', byteArr)[0]
         return time
