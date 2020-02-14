@@ -173,7 +173,6 @@ class TxtBiotecSource(BaseSource):
         meta['idSafe'] = meta['id'].replace('_', ' ').replace('#', '')
 
         # add time in timestamp format
-        # meta['time'] = pd.Timestamp.strptime(meta['date'], '%d.%m.%Y %H:%M:%S').tz_localize('Europe/Berlin')
         meta['time'] = pd.to_datetime(meta['date'], format='%d.%m.%Y %H:%M:%S').tz_localize('Europe/Berlin')
 
         return meta, units
@@ -189,14 +188,14 @@ class TxtBiotecSource(BaseSource):
         data = self.readToDataframe(self.data)
         return data
 
-    def getDataSegment(self, tmin, tmax, chunkN=10000):
+    def getDataSegment(self, tmin, tmax, chunksize=10000):
         """
         Returns the data between ``tmin`` and ``tmax`` by reading the datafile chunkwise until ``tmax`` is reached.
 
         Args:
             tmin (`float`): minimum data timestamp
             tmax (`float`): maximum data timestamp
-            chunkN (`int`): number of rows to read per chunk
+            chunksize (`int`): number of rows to read per chunk
 
         Returns:
             :class:`pandas.DataFrame`
@@ -209,7 +208,7 @@ class TxtBiotecSource(BaseSource):
                                 names=cols['names'], nrows=1)
         t0 = firstLine.time.iloc[0]
         iterCsv = pd.read_csv(self.data, sep='\t', skiprows=cols['n']+1, header=None,
-                              names=cols['names'], iterator=True, chunksize=chunkN, engine='c',
+                              names=cols['names'], iterator=True, chunksize=chunksize, engine='c',
                               dtype=np.float64)
 
         # read the chunks into memory if they are within the requested limits

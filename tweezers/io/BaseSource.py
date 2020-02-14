@@ -35,14 +35,14 @@ class BaseSource:
 
         raise NotImplementedError()
 
-    def getDataSegment(self, tmin, tmax, chunkN=10000):
+    def getDataSegment(self, tmin, tmax, chunksize=10000):
         """
         Returns the data between ``tmin`` and ``tmax``.
 
         Args:
             tmin (float): minimum data timestamp
             tmax (float): maximum data timestamp
-            chunkN (int): number of rows to read per chunk
+            chunksize (int): number of rows to read per chunk
 
         Returns:
             :class:`pandas.DataFrame`

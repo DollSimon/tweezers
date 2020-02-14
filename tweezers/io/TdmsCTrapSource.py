@@ -161,24 +161,6 @@ class TdmsCTrapSource(BaseSource):
             data[name] = channel.data
         return data
 
-    def getDataSegment(self, tmin, tmax, chunkN=10000):
-        """
-        Returns the data between ``tmin`` and ``tmax``. Unfortunately, the ``nptdms`` always reads in all the data
-        when opening the file. So this basically just returns a subset of the already read data and does not speed up things.
-
-        Args:
-            tmin (float): minimum data timestamp
-            tmax (float): maximum data timestamp
-            chunkN (int): number of rows to read per chunk
-
-        Returns:
-            :class:`pandas.DataFrame`
-        """
-
-        data = self.getData()
-        data = data.query('@tmin <= time <= @tmax').copy()
-        return data
-
     @staticmethod
     def postprocessData(meta, units, data):
         """

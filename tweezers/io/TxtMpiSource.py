@@ -177,7 +177,7 @@ class TxtMpiSource(BaseSource):
 
         return self.data.getData()
 
-    def getDataSegment(self, tmin, tmax, chunkN=10000):
+    def getDataSegment(self, tmin, tmax, chunksize=10000):
         """
         Returns the data between ``tmin`` and ``tmax``.
 
