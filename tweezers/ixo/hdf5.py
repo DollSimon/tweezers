@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from collections import OrderedDict
 import hdf5storage
+from datetime import datetime
 
 from tweezers.meta import MetaDict, UnitDict
 from tweezers.ixo.collections import IndexedOrderedDict
@@ -19,6 +20,34 @@ class CustomNumpyMarshaller(hdf5storage.Marshallers.NumpyScalarArrayMarshaller):
         if not data.shape:
             data = data[()]
         return data
+
+
+class TimestampMarshaller(hdf5storage.Marshallers.PythonStringMarshaller):
+    types = [datetime,
+             'pandas._libs.tslibs.timestamps.Timestamp']
+
+    def __init__(self):
+        super().__init__()
+
+        self.types = [datetime,
+                      'pandas._libs.tslibs.timestamps.Timestamp']
+        self.python_type_strings = ['datetime.datetime',
+                                    'pandas._libs.tslibs.timestamps.Timestamp']
+        self.matlab_classes = []
+        self.update_type_lookups()
+
+    def read(self, f, dsetgrp, attributes, options):
+        # read string
+        timeStr = super().read(f, dsetgrp, attributes, options)
+        # convert to timestamp
+        time = datetime.fromisoformat(timeStr)
+        return time
+
+    def write(self, f, grp, name, data, type_string, options):
+        # convert timestamp to string
+        timeStr = data.isoformat()
+        # write data
+        super().write(f, grp, name, timeStr, 'datetime.datetime', options)
 
 
 class IndexedOrderedDictMarshaller(hdf5storage.Marshallers.PythonDictMarshaller):
@@ -108,12 +137,21 @@ class DataFrameMarshaller(IndexedOrderedDictMarshaller):
 
 class CustomMarshallerCollection(hdf5storage.MarshallerCollection):
     def __init__(self, **kwargs):
-        kwargs['marshallers'] = [DataFrameMarshaller(), IndexedOrderedDictMarshaller(), CustomNumpyMarshaller()]
+        kwargs['marshallers'] = [DataFrameMarshaller(), IndexedOrderedDictMarshaller(), CustomNumpyMarshaller(),
+                                 TimestampMarshaller()]
         kwargs['priority'] = ('user', 'builtin', 'plugin')
         super().__init__(**kwargs)
 
 
 def save(path, data):
+    """
+    Save data in a Matlab compatible format.
+
+    Args:
+        path (str or pathlike): path to the file to save
+        data: data to save
+    """
+
     collect = CustomMarshallerCollection()
     hdf5storage.savemat(str(path), data,
                         marshaller_collection=collect,
@@ -123,6 +161,17 @@ def save(path, data):
 
 
 def load(path, keys=None):
+    """
+    Load data from a Matlab compatible file.
+
+    Args:
+        path (str or pathlike): path to the file to read
+        keys: optional, read only some keys from the file
+
+    Returns:
+        data
+    """
+
     collect = CustomMarshallerCollection()
     return hdf5storage.loadmat(str(path), marshaller_collection=collect,
                                appendmat=False, variable_names=keys)
