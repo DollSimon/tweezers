@@ -56,5 +56,6 @@ setup(
             'tweezers=tweezers.cli.main:start'
         ],
     },
-    classifiers=CLASSIFIERS
+    classifiers=CLASSIFIERS,
+    python_requires='>3.7'
 )

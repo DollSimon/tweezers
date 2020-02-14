@@ -57,13 +57,13 @@ class DataFrameMarshaller(IndexedOrderedDictMarshaller):
 
     def write(self, f, grp, name, data, type_string, options):
         # check input
-        if isinstance(data.index, pd.core.index.MultiIndex):
+        if isinstance(data.index, pd.MultiIndex):
             raise ValueError('Saving MultiIndex DataFrames is not supported.')
         if not data.columns.is_unique:
             raise ValueError("DataFrame columns are not unique, some columns will be omitted.")
 
         # convert dataframe to ordereddict
-        data = OrderedDict((k, v.values) for k, v in pd.compat.iteritems(data))
+        data = OrderedDict((k, v.values) for k, v in data.iteritems())
         # store using existing routines
         super().write(f, grp, name, data, 'pandas.DataFrame', options)
         return
