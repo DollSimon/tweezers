@@ -6,7 +6,7 @@ import numpy as np
 import re
 import datetime
 import h5py
-import dask.dataframe as dd
+# import dask.dataframe as dd
 import struct
 
 from .BaseSource import BaseSource
@@ -191,42 +191,6 @@ class Hdf5BiotecSource(BaseSource):
 
         data = self.readToDataframe(self.data)
         return data
-
-    def getDataSegment(self, tmin, tmax, chunkN=10000):
-        """
-        Returns the data between ``tmin`` and ``tmax`` by reading the datafile chunkwise until ``tmax`` is reached.
-
-        Args:
-            tmin (`float`): minimum data timestamp
-            tmax (`float`): maximum data timestamp
-            chunkN (`int`): number of rows to read per chunk
-
-        Returns:
-            :class:`pandas.DataFrame`
-        """
-
-        # read required information about file and create the chunked iterator
-        cols = self.readColumnTitles(self.data)
-        # read the first data line to allow conversion between absolute and relative time
-        firstLine = pd.read_csv(self.data, sep='\t', skiprows=cols['n'], header=None,
-                                names=cols['names'], nrows=1)
-        t0 = firstLine.time.iloc[0]
-        iterCsv = pd.read_csv(self.data, sep='\t', skiprows=cols['n']+1, header=None,
-                              names=cols['names'], iterator=True, chunksize=chunkN, engine='c',
-                              dtype=np.float64)
-
-        # read the chunks into memory if they are within the requested limits
-        df = []
-        for chunk in iterCsv:
-            if chunk['time'].iloc[0] - t0 > tmax:
-                # stop reading if the upper time limit was reached
-                iterCsv.close()
-                break
-            selection = chunk[(chunk['time'] - t0 >= tmin) & (chunk['time'] - t0 <= tmax)]
-            df.append(selection)
-
-        # return concatenated dataframe with all the requested data
-        return pd.concat(df, ignore_index=True)
 
     def getPsd(self):
         """
@@ -484,32 +448,32 @@ class Hdf5BiotecSource(BaseSource):
 
         return times, data
 
-    def getDask(self, **kwargs):
-        """
-        Get a Dask DataFrame from the data file. Potentially useful for reading chunks of large files.
-
-        The Dask DataFrame must be closed using :meth:`Hdf5BiotecSource.releaseDask`.
-
-        Args:
-            **kwargs: passed on to :meth:`dask.dataframe.from_array`
-
-        Returns:
-            :class:`dask.dataframe`
-        """
-
-        cols = self.readColumnTitles(self.data)
-        cols = cols['names']
-
-        self.daskFile = h5py.File(self.data, mode='r')
-        da = dd.from_array(self.daskFile['/data'], columns=cols, **kwargs)
-        return da
-
-    def releaseDask(self):
-        """
-        Releases the Dask DataFrame after the computations. Basically closes the file.
-        """
-
-        self.daskFile.close()
+    # def getDask(self, **kwargs):
+    #     """
+    #     Get a Dask DataFrame from the data file. Potentially useful for reading chunks of large files.
+    #
+    #     The Dask DataFrame must be closed using :meth:`Hdf5BiotecSource.releaseDask`.
+    #
+    #     Args:
+    #         **kwargs: passed on to :meth:`dask.dataframe.from_array`
+    #
+    #     Returns:
+    #         :class:`dask.dataframe`
+    #     """
+    #
+    #     cols = self.readColumnTitles(self.data)
+    #     cols = cols['names']
+    #
+    #     self.daskFile = h5py.File(self.data, mode='r')
+    #     da = dd.from_array(self.daskFile['/data'], columns=cols, **kwargs)
+    #     return da
+    #
+    # def releaseDask(self):
+    #     """
+    #     Releases the Dask DataFrame after the computations. Basically closes the file.
+    #     """
+    #
+    #     self.daskFile.close()
 
     def getTimeFromImage(self, image):
         """
@@ -528,3 +492,93 @@ class Hdf5BiotecSource(BaseSource):
         byteArr = image[-1, 0:8]
         time = struct.unpack('>d', byteArr)[0]
         return time
+
+    def getDataIterator(self, chunksize=10000):
+        """
+        Get an iterator that loops through the data and returns chunks of size `chunksize`.
+
+        Args:
+            chunksize (int): Number of rows in the DataFrame returned in each iteration.
+
+        Returns:
+            :class:`Hdf5Iterator`
+        """
+
+        cols = self.readColumnTitles(self.data)['names']
+        dataIter = Hdf5Iterator(self.data, '/data',  chunksize=chunksize, columns=cols)
+        return dataIter
+
+    def getDataSegment(self, tmin, tmax, chunksize=10000):
+        """
+        Returns the data between ``tmin`` and ``tmax`` by reading the datafile chunkwise until ``tmax`` is reached.
+
+        Args:
+            tmin (`float`): minimum data timestamp
+            tmax (`float`): maximum data timestamp
+            chunksize (`int`): number of rows to read per chunk
+
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        dataIter = self.getDataIterator(chunksize=chunksize)
+        t0 = None
+
+        # read the chunks into memory if they are within the requested limits
+        df = []
+        for chunk in dataIter:
+            if not t0:
+                t0 = chunk.absTime.iloc[0]
+
+            if chunk.absTime.iloc[0] - t0 > tmax:
+                # stop reading if the upper time limit was reached
+                break
+            selection = chunk[(chunk.absTime - t0 >= tmin) & (chunk.absTime - t0 <= tmax)]
+            df.append(selection)
+
+        # return concatenated dataframe with all the requested data
+        return pd.concat(df, ignore_index=True)
+
+
+class Hdf5Iterator:
+    """
+    An iterator to loop through a data table in a HDF5 data file.
+    """
+
+    def __init__(self, filePath, hdf5Path, chunksize=10000, columns=None):
+        """
+        Constructor for the iterator.
+
+        Args:
+            filePath (str or pathlike): the path to the HDF5 file
+            hdf5Path (str): the path in the HDF5 file to the dataset to read
+            chunksize (int): number of rows in the DataFrame that are returned in each iteration
+            columns: names of columns for the DataFrame
+        """
+
+        self.filePath = filePath
+        self.hdf5Path = hdf5Path
+        self.chunksize = chunksize
+        self.n = 0
+        self.columns = columns
+
+    def __iter__(self):
+        """
+        Actual iterator.
+        Returns:
+            :class:`pandas.DataFrame`
+        """
+
+        with h5py.File(self.filePath, 'r') as f:
+            # get dataset
+            dset = f[self.hdf5Path]
+            # until where should we read?
+            maxLen = dset.len()
+            # loop through dataset
+            while self.n < maxLen:
+                # get the data in the current limits and convert do pandas.DataFrame
+                data = pd.DataFrame(dset[self.n:(self.n + self.chunksize)], columns=self.columns)
+                # update current position
+                self.n += data.shape[0]
+                # return data
+                yield data
