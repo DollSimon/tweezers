@@ -263,6 +263,8 @@ class TweezersDataBase:
             m[trap].stiffness /= c ** 2
             m[trap].forceSensitivity /= c
 
+        # store note that correction was done
+        t.meta['psdHydroCorr'] = True
         # recompute data
         t.meta, t.units, t.data = t.source.postprocessData(m, t.units, t.data)
 
