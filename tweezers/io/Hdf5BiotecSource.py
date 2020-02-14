@@ -279,8 +279,7 @@ class Hdf5BiotecSource(BaseSource):
         ts.rename(columns={'pmXDiff': 'pmX', 'pmYDiff': 'pmY', 'aodXDiff': 'aodX', 'aodYDiff': 'aodY'},
                   inplace=True)
         # get relative time
-        ts['absTime'] = ts.t.copy()
-        ts.loc[:, 't'] -= ts.loc[0, 't']
+        ts['t'] = ts.absTime - ts.absTime.iloc[0]
 
         return ts
 
@@ -374,7 +373,7 @@ class Hdf5BiotecSource(BaseSource):
         """
 
         # create relative time column
-        # data['time'] = data.absTime - data.absTime.iloc[0]
+        data['time'] = data.absTime - data.absTime.iloc[0]
 
         data['xTrapDist'] = data.pmXTrap - data.aodXTrap
         data['yTrapDist'] = data.pmYTrap - data.aodYTrap
@@ -452,9 +451,9 @@ class Hdf5BiotecSource(BaseSource):
         """
 
         cols = self.readColumnTitles(file)
-        data = hdf5storage.read(filename=file, path='/data', marshaller_collection=h5.CustomMarshallerCollection())
+        with h5py.File(file, 'r') as f:
+            data = f['data'][()]
         data = pd.DataFrame(data, columns=cols['names'])
-
         return data
 
     def getTime(self):
