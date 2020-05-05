@@ -72,10 +72,12 @@ class ScaleBar(AnchoredOffsetbox):
 
         if vertical:
             children = [txt, bar]
+            separation = 2
         else:
             children = [bar, txt]
+            separation = 6
 
-        box = Packer(children=children, align='center', pad=0, sep=2)
+        box = Packer(children=children, align='center', pad=0, sep=separation)
 
         AnchoredOffsetbox.__init__(self, loc, child=box, frameon=False, bbox_to_anchor=pos, bbox_transform=ax.transAxes,
                                    **kwargs)
