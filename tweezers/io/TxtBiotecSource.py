@@ -373,7 +373,9 @@ class TxtBiotecSource(BaseSource):
         if 'absTime' not in data.columns:
             data['absTime'] = data.time.copy()
             units['absTime'] = 's'
-        data.loc[:, 'time'] -= data.time.iloc[0]
+        # make it work for empty datasets as well
+        if not data.empty:
+            data.loc[:, 'time'] -= data.time.iloc[0]
 
         # ensure values, set them to 0 if they come as None from the file
         for trap in meta['traps']:
