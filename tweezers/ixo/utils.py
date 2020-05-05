@@ -75,6 +75,7 @@ class NbProgress:
     """
 
     n = None
+    i = 0
     startTime = None
     barLength = 20
 
@@ -97,6 +98,7 @@ class NbProgress:
             i: current number
         """
 
+        self.i = i
         progress = i / self.n
 
         # make sure we have a number in the right range
@@ -124,3 +126,6 @@ class NbProgress:
         text += '\nRemaining Time: {}'.format(timeLeftString)
 
         print(text)
+
+    def increment(self, step=1):
+        self.update(self.i + step)
