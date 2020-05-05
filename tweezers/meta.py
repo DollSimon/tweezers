@@ -160,6 +160,35 @@ class MetaBaseDict(IndexedOrderedDict):
         keys = [key for key, value in self.items() if isinstance(value, MetaBaseDict)]
         return keys
 
+    def getOtherTrap(self, trap):
+        suffix = trap[-1:]
+        prefix = trap[:-1]
+        for anyTrap in self.traps:
+            if anyTrap[:-1] != prefix:
+                return anyTrap[:-1] + suffix
+
+    def getYTraps(self):
+        traps = [trap for trap in self.traps if trap.lower().endswith('y')]
+        return traps
+
+    def getXTraps(self):
+        traps = [trap for trap in self.traps if trap.lower().endswith('x')]
+        return traps
+
+    def getTrapAsY(self, trap):
+        trapStem = trap[:-1]
+        for anyTrap in self.traps:
+            if anyTrap[:-1] == trapStem and anyTrap.lower().endswith('y'):
+                return anyTrap
+        raise ValueError(f'y-trap not found for "{trap}"')
+
+    def getTrapAsX(self, trap):
+        trapStem = trap[:-1]
+        for anyTrap in self.traps:
+            if anyTrap[:-1] == trapStem and anyTrap.lower().endswith('x'):
+                return anyTrap
+        raise ValueError(f'x-trap not found for "{trap}"')
+
 
 class MetaDict(MetaBaseDict):
     """

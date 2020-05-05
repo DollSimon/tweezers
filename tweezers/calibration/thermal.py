@@ -153,10 +153,10 @@ def doThermalCalib(t, trap):
                                           driveFreq, t.meta.psdOscillateAmplitude, wex,
                                           temperature=t.meta.temperature)
         else:
-            otherTrap = trap[:-1] + 'Y'
+            yTrap = t.meta.getTrapAsY(trap)
             # do calibration
             res, units = thermalCalibDrag(trapMeta.cornerFrequency, trapMeta.diffusionCoefficient,
-                                          t.meta[otherTrap].dragCoef, temperature=t.meta.temperature)
+                                          t.meta[yTrap].dragCoef, temperature=t.meta.temperature)
 
     else:
         raise(ValueError('Unknown PSD type'))
