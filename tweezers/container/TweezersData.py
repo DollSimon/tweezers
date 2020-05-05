@@ -116,7 +116,7 @@ class TweezersDataBase:
         """
 
         # use the timeseries sampling rate as default if none is given as user input (in kwargs)
-        args = {'samplingRate': self.meta['psdSamplingRate']}
+        args = {'samplingFreq': self.meta['psdSamplingRate']}
         args.update(kwargs)
 
         # create copy

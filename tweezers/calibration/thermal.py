@@ -44,7 +44,7 @@ def thermalCalibDrag(cornerFreq, diffCoef, dragCoef, temperature=25.0):
     units = OrderedDict([('stiffness', 'pN/nm'),
                          ('displacementSensitivity', 'nm/V'),
                          ('forceSensitivity', 'pN/V'),
-                         ('dragCoef', 'pN / (nm Hz)')])
+                         ('dragCoef', 'pN s / nm')])
 
     return res, units
 
@@ -69,7 +69,7 @@ def thermalCalibOsci(cornerFreq, diffCoef, driveFreq, amplitude, driveFreqPower,
         `dragCoef` in units of pN s / nm
     """
 
-    wth = amplitude**2 / (2 * (1 + (cornerFreq / driveFreq)**2))
+    wth = wTh(amplitude, cornerFreq, driveFreq)
     wexp = driveFreqPower
 
     dispSens = np.sqrt(wth / wexp)
@@ -77,7 +77,9 @@ def thermalCalibOsci(cornerFreq, diffCoef, driveFreq, amplitude, driveFreqPower,
     stiffness = 2 * np.pi * cornerFreq * dragCoef
     forceSens = dispSens * stiffness
 
-    res = OrderedDict([('stiffness', stiffness),
+    res = OrderedDict([('wExp', wexp),
+                       ('wTh', wth),
+                       ('stiffness', stiffness),
                        ('displacementSensitivity', dispSens),
                        ('forceSensitivity', forceSens),
                        ('dragCoef', dragCoef)])
@@ -87,6 +89,11 @@ def thermalCalibOsci(cornerFreq, diffCoef, driveFreq, amplitude, driveFreqPower,
                          ('dragCoef', 'pN s / nm')])
 
     return res, units
+
+
+def wTh(amplitude, cornerFreq, driveFreq):
+    wth = amplitude ** 2 / (2 * (1 + (cornerFreq / driveFreq) ** 2))
+    return wth
 
 
 def wExp(psdOsci, psdFit, driveFreq):
