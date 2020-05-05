@@ -474,6 +474,9 @@ def segmentSummaryFig(analysis, segId, display=True, saveDir=None):
         :class:`matplotlib.figure.Figure`
     """
 
+    if 'text.usetex' not in mpl.rcParams or not mpl.rcParams['text.usetex']:
+        raise RuntimeError('Latex backend has to be configured, set "text.usetex" in rcParams')
+
     a = analysis
     s = a.bslCorr[segId]
     m = a.meta
