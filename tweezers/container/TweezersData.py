@@ -89,7 +89,7 @@ class TweezersDataBase:
         attribute is called.
         """
 
-        return self.averageData(nsamples=10)
+        return self.averageData(nsamples=100)
 
     def averageData(self, nsamples=10):
         """
@@ -126,7 +126,7 @@ class TweezersDataBase:
         cols = ['f']
         # compute PSD for each trap
         for trap in t.meta.traps:
-            psdTrap = psd.computePsd(t.ts[trap], **kwargs)[0]
+            psdTrap = psd.computePsd(t.ts[trap], **args)[0]
             data[trap] = psdTrap['psdMean']
             data[trap + 'Std'] = psdTrap['psdStd']
             cols += [trap, trap + 'Std']
@@ -234,39 +234,43 @@ class TweezersDataBase:
 
         t = self.copy()
         m = t.meta
-        # radii in nm
-        rPm = m.pmY.beadDiameter / 2 * 1000
-        rAod = m.aodY.beadDiameter / 2 * 1000
+        yTraps = m.getYTraps()
 
         # get y distance
-        dy = np.abs(m.pmY.trapPosition - m.aodY.trapPosition)
+        dy = np.abs(m[yTraps[0]].trapPosition - m[yTraps[1]].trapPosition)
 
         # todo correct x-axis parameters?
         # go through y-traps
-        for trap in m.traps:
-            if not trap.lower().endswith('y'):
-                continue
+        for trap in yTraps:
             # the radius in the equation is that of the other bead (that causes the flow field)
-            [rTrap, rOther] = [rPm, rAod] if trap.lower().startswith('pm') else [rAod, rPm]
+            rTrap = m[trap].beadDiameter / 2 * 1000
+            rOther = m[m.getOtherTrap(trap)].beadDiameter / 2 * 1000
             # get correction factor
             c = tcOsciHydroCorrect(dy, rTrap=rTrap, rOther=rOther, method='oseen')
             # store correction factor
             m[trap]['hydroCorr'] = c
+            # store trap distance
+            m[trap]['psdTrapDist'] = dy
             # also store for x-trap
-            xTrap = trap[:-1] + 'X'
-            m[xTrap]['hydroCorr'] = c
+            try:
+                m[m.getTrapAsX(trap)]['hydroCorr'] = c
+            except ValueError:
+                # there was no x-trap found, so do nothing
+                pass
 
-            # correct the calibration parameters
+        # correct the calibration parameters
         for trap in m.traps:
             c = m[trap].hydroCorr
             m[trap].displacementSensitivity *= c
-            m[trap].stiffness /= c ** 2
+            m[trap].stiffness /= c**2
             m[trap].forceSensitivity /= c
+            m[trap].dragCoef /= c**2
 
         # store note that correction was done
         t.meta['psdHydroCorr'] = True
         # recompute data
-        t.meta, t.units, t.data = t.source.postprocessData(m, t.units, t.data)
+        if not t.data.empty:
+            t.meta, t.units, t.data = t.source.postprocessData(m, t.units, t.data)
 
         return t
 
@@ -456,11 +460,9 @@ class TweezersData(TweezersDataBase):
 
         log.debug('Reading data from data source')
         data = self.source.getData()
-        # try to postprocess data, ignore if it fails
-        try:
+        # try to postprocess data, if there is any
+        if not data.empty:
             self.meta, self.units, data = self.source.postprocessData(self.meta, self.units, data)
-        except AttributeError:
-            pass
         return data
 
     def addSegment(self, tmin, tmax, name=None):
