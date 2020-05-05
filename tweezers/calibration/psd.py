@@ -168,8 +168,8 @@ class PsdFit(fit.LeastSquaresFit):
         """
 
         meta = {}
-        meta['cornerFrequency'] = self.coef[0]
-        meta['diffusionCoefficient'] = self.coef[1]
+        meta['cornerFrequency'] = np.abs(self.coef[0])
+        meta['diffusionCoefficient'] = np.abs(self.coef[1])
 
         if self.fcn == tp.psdDiode:
             meta['diodeF3db'] = self.coef[2]
@@ -201,7 +201,7 @@ class PsdFit(fit.LeastSquaresFit):
         except RuntimeError:
             res = np.full(4, np.nan)
             self.fitError = np.full(4, np.nan)
-            logging.warning('PSD fit failed!')
+            logging.info('PSD fit failed!')
 
         return res
 
