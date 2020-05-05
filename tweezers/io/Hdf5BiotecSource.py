@@ -129,6 +129,7 @@ class Hdf5BiotecSource(BaseSource):
         Returns:
             `pathlib.Path`
         """
+
         header = None
         # order is important here for the header file
         if self.ts:
