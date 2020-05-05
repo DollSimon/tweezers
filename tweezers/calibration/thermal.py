@@ -103,10 +103,19 @@ def wExp(psdOsci, psdFit, driveFreq):
         `float`
     """
 
+    # get frequencies
     f = psdOsci[:, 0]
-    pPeak = psdOsci[f == driveFreq, 1][0]
-    fFit = psdFit[:, 0]
-    pBackground = psdFit[fFit == driveFreq, 1][0]
+    # get all frequencies as integers for comparison
+    # this is required for cases where driveFreq is not an integer to ensure comparison still works
+    # however it requires that df > 1
+    fInt = f.astype(int)
+    driveFreqInt = int(driveFreq)
+    fFitInt = psdFit[:, 0].astype(int)
+    # get peak value
+    pPeak = psdOsci[fInt == driveFreqInt, 1][0]
+    # get background value
+    pBackground = psdFit[fFitInt == driveFreqInt, 1][0]
+    # get frequency resolution
     df = f[1] - f[0]
     return (pPeak - pBackground) * df
 

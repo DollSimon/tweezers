@@ -149,7 +149,9 @@ class PsdFit(fit.LeastSquaresFit):
         self.fFull = f[idx]
 
         if peakF > 0:
-            idx = idx & (f != peakF)
+            fInt = f.astype(int)
+            peakFInt = int(peakF)
+            idx = idx & (fInt != peakFInt)
 
         x = f[idx]
         y = psd[idx]
