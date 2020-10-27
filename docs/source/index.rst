@@ -1,10 +1,12 @@
-.. Tweezers documentation master file, created by
-   sphinx-quickstart on Sat Dec  5 19:50:39 2015.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Welcome to the Tweezers documentation!
+======================================
 
-Welcome to Tweezers's documentation!
-====================================
+The starting point for using this library are:
+
+* :class:`.TweezersData` - represents a single dataset
+* :class:`.TweezersDataCollection` - is a collection of :class:`.TweezersData` and provides methods to load multiple datasets from disk
+* :class:`.TweezersAnalysis` - represents an analyzed dataset (e.g. when using the Segment Selector tool), can also be created manually
+* :class:`.TweezersAnalysis`  - is a collection of :class:`.TweezersAnalysis` and provides methods to load datasets from disk
 
 Contents:
 
@@ -12,14 +14,6 @@ Contents:
    :maxdepth: 3
 
    tweezers
-
-.. autosummary::
-   :toctree:
-
-    tweezers
-    tweezers.analysis
-    tweezers.io
-    tweezers.plot
 
 Indices and tables
 ==================
