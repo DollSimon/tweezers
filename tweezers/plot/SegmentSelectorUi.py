@@ -2,11 +2,13 @@
 
 # Form implementation generated from reading ui file 'SegmentSelectorUi.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -60,7 +62,6 @@ class Ui_MainWindow(object):
         self.segmentsTb = QtWidgets.QWidget()
         self.segmentsTb.setObjectName("segmentsTb")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.segmentsTb)
-        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
         self.clearSegmentBtn = QtWidgets.QPushButton(self.segmentsTb)
         self.clearSegmentBtn.setObjectName("clearSegmentBtn")
@@ -112,7 +113,6 @@ class Ui_MainWindow(object):
         self.settingsTb = QtWidgets.QWidget()
         self.settingsTb.setObjectName("settingsTb")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.settingsTb)
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.plotOptionsGrp = QtWidgets.QGroupBox(self.settingsTb)
         self.plotOptionsGrp.setObjectName("plotOptionsGrp")
@@ -137,6 +137,16 @@ class Ui_MainWindow(object):
         self.distYAxisCmb = QtWidgets.QComboBox(self.plotOptionsGrp)
         self.distYAxisCmb.setObjectName("distYAxisCmb")
         self.verticalLayout_3.addWidget(self.distYAxisCmb)
+        self.label_6 = QtWidgets.QLabel(self.plotOptionsGrp)
+        self.label_6.setObjectName("label_6")
+        self.verticalLayout_3.addWidget(self.label_6)
+        self.plotAverageDataBx = QtWidgets.QSpinBox(self.plotOptionsGrp)
+        self.plotAverageDataBx.setMinimum(1)
+        self.plotAverageDataBx.setMaximum(100000)
+        self.plotAverageDataBx.setSingleStep(100)
+        self.plotAverageDataBx.setProperty("value", 100)
+        self.plotAverageDataBx.setObjectName("plotAverageDataBx")
+        self.verticalLayout_3.addWidget(self.plotAverageDataBx)
         self.verticalLayout_2.addWidget(self.plotOptionsGrp)
         self.groupBox_2 = QtWidgets.QGroupBox(self.settingsTb)
         self.groupBox_2.setObjectName("groupBox_2")
@@ -187,9 +197,10 @@ class Ui_MainWindow(object):
         self.label_5.setText(_translate("MainWindow", "Time Plot Y-Axis:"))
         self.label_2.setText(_translate("MainWindow", "Distance Plot X-Axis:"))
         self.label_3.setText(_translate("MainWindow", "Distance Plot Y-Axis:"))
+        self.label_6.setText(_translate("MainWindow", "# of data to average"))
+        self.plotAverageDataBx.setToolTip(_translate("MainWindow", "How many datapoints should be averaged for plotting."))
         self.groupBox_2.setTitle(_translate("MainWindow", "Data"))
         self.groupExportBeadCbx.setToolTip(_translate("MainWindow", "<html><head/><body><p><nobr>If set, creates only one Tweezers Analysis file per Bead ID</nobr> and stores all segments in this single file. Otherwise, one file is created per trial file.</p></body></html>"))
         self.groupExportBeadCbx.setText(_translate("MainWindow", "Group Export by Bead"))
         self.label_4.setText(_translate("MainWindow", "Data Source:"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.settingsTb), _translate("MainWindow", "Settings"))
-

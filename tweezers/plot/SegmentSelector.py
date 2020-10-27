@@ -65,6 +65,9 @@ class DataManager:
     loaded = False
     error = None
 
+    def __init__(self, plotAverageData=100):
+        self.plotAverageData = plotAverageData
+
     @staticmethod
     def getSourceTypes():
         sources = tweezers.io.SOURCE_CLASSES
@@ -128,7 +131,7 @@ class DataManager:
     def plotTime(self, ax, yAxis):
         ax.clear()
         # plot data
-        d = self.t.avData
+        d = self.t.averageData(nsamples=self.plotAverageData)
         ax.plot(d.time, d[yAxis], '.', markersize=3)
         ax.set_xlabel('Time [s]', fontsize=12)
         ax.set_ylabel(self.getAxesLabel(yAxis), fontsize=12)
@@ -140,7 +143,7 @@ class DataManager:
     def plotDistance(self, ax, xAxis, yAxis):
         ax.clear()
         # plot data
-        d = self.t.avData
+        d = self.t.averageData(nsamples=self.plotAverageData)
         # is there a selection?
         if self.tLim:
             d = d.query('{} <= time <= {}'.format(*self.tLim))
@@ -417,6 +420,9 @@ class SegmentSelector(QtWidgets.QMainWindow, Ui_MainWindow):
         self.timeYAxisCmb.currentIndexChanged[int].connect(self.onSelectTimeYAxis)
         self.distXAxisCmb.currentIndexChanged[int].connect(self.onSelectDistXAxis)
         self.distYAxisCmb.currentIndexChanged[int].connect(self.onSelectDistYAxis)
+        # set averaging spin box
+        self.plotAverageDataBx.setValue(self.settings.value('plotAverageData', 100))
+        self.plotAverageDataBx.valueChanged.connect(self.onPlotAverageDataChanged)
 
     def _setupSegmentUi(self):
         """
@@ -471,7 +477,7 @@ class SegmentSelector(QtWidgets.QMainWindow, Ui_MainWindow):
             self.settings.setValue('importDir', path)
             self.statusbar.showMessage('Loading directory ...')
             self.setDataLoaded(False)
-            self.data = DataManager()
+            self.data = DataManager(plotAverageData=self.plotAverageDataBx.value())
             tcPath = None
             # are we loading analysis files?
             if sourceType is tweezers.TweezersAnalysis:
@@ -754,6 +760,15 @@ class SegmentSelector(QtWidgets.QMainWindow, Ui_MainWindow):
             self.displayError('Could not save analysis files!', error)
         self.statusbar.showMessage('Segments exported')
 
+    def onPlotAverageDataChanged(self):
+        """
+        Event handler for when number of datapoints to average was changed.
+        """
+
+        self.data.plotAverageData = self.plotAverageDataBx.value()
+        self.plotTime()
+        self.plotDist()
+
     def closeEvent(self, event):
         """
         Event handler for closing the window. Used to store some settings before exiting.
@@ -765,6 +780,7 @@ class SegmentSelector(QtWidgets.QMainWindow, Ui_MainWindow):
         self.settings.setValue('timeYAxis', self.timeYAxisCmb.currentText())
         self.settings.setValue('distXAxis', self.distXAxisCmb.currentText())
         self.settings.setValue('distYAxis', self.distYAxisCmb.currentText())
+        self.settings.setValue('plotAverageData', self.plotAverageDataBx.value())
 
     def displayError(self, message, error):
         """
