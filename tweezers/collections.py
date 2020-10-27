@@ -6,7 +6,7 @@ from datetime import datetime
 
 from tweezers.ixo.collections import IndexedOrderedDict
 from tweezers.container.TweezersAnalysis import TweezersAnalysis
-from tweezers.io.TxtBiotecSource import TxtBiotecSource
+from tweezers.io import Hdf5BiotecSource
 from tweezers.io.BaseSource import BaseSource
 from tweezers import TweezersData
 
@@ -89,7 +89,7 @@ class TweezersDataCollection(TweezersCollection):
     """
 
     @classmethod
-    def load(cls, path, source=TxtBiotecSource):
+    def load(cls, path, source=Hdf5BiotecSource):
         """
         Load data from disk. This will recursively find all files in the provied `path` that can be used with the
         provided tweezers data source, construct a :class:`.TweezersData` from it and populate a
@@ -102,7 +102,7 @@ class TweezersDataCollection(TweezersCollection):
                 :class:`.TweezersData` objects
             source (:class:`tweezers.io.BaseSource.BaseSource`, optional): a tweezers data source used to
                 identify valid data files and build the :class:`.TweezersData` object, defaults to
-                :class:`tweezers.io.TxtBiotecSource`
+                :class:`tweezers.io.Hdf5BiotecSource`
 
         Returns:
             :class:`.TweezersDataCollection`
