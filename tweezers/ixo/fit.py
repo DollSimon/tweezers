@@ -268,5 +268,12 @@ class PolyFit(Fit):
         return self.poly.linspace()
 
 
+class GaussFit(LeastSquaresFit):
+    def __init__(self, x, y, **kwargs):
+        kwargs['fcn'] = self.gauss
+        super().__init__(x, y, **kwargs)
 
-
+    @staticmethod
+    def gauss(x, mu, sigma, a):
+        exp = -0.5 * ((x - mu) / sigma) ** 2
+        return a * np.exp(exp)
