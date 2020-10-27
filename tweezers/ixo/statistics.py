@@ -48,7 +48,7 @@ def averageDf(data, by='time', nsamples=10):
     return avData
 
 
-def correlate(x, y, length=20):
+def correlate(x, y, length=20, dl=1, method='fast'):
     """
     Calculate the normalized correlation coefficients of two 1-D arrays for a given maximum lag starting at 0.
 
@@ -56,14 +56,27 @@ def correlate(x, y, length=20):
         x (np.array): first array to compute the correlation coefficients
         y (np.array): second array to compute the correlation coefficients
         length (int): maximum lag to compute the corrleation coefficients, return array will have size `length + 1`
+        dl (float): size of the lag, results in the x-axis step size of the computed result
+        method (str): one of `fast` or `ref`, the reference method is the direct sum approach to calculate the
+                      cross-correlation and should be more accurate, use `ref` for double checking the result!
 
     Returns:
         np.array
     """
 
-    def corr_coeff(x, y, meanX, meanY, stdX, stdY):
+    def corr_coeff_ref(x, y, meanX, meanY, stdX, stdY):
         # this assumes x and y of same length
         return 1.0/len(x) * np.sum((x - meanX) * (y - meanY)) / (stdX * stdY)
+
+    def corr_coeff_fast(x, y, meanX, meanY, stdX, stdY):
+        # this assumes x and y of same length
+        # return 1.0 / (len(x) * stdX * stdY) * np.correlate(x - meanX, y - meanY, mode='valid')[0]
+        return 1.0 / len(x) * np.correlate(x - meanX, y - meanY, mode='valid')[0]
+
+    if method == 'fast':
+        corr_coeff = corr_coeff_fast
+    else:
+        corr_coeff = corr_coeff_ref
 
     #TODO: check dimensions of x and y, if they are 2-D, assume that they contain x and y values
 
@@ -76,11 +89,11 @@ def correlate(x, y, length=20):
 
     res = np.zeros((length + 1, 2))
     # calculate first column values
-    res[:, 0] = np.arange(length + 1)
+    res[:, 0] = np.arange(length + 1) * dl
 
     res[0, 1] = corr_coeff(x, y, meanX, meanY, stdX, stdY)
     for i in range(1, length + 1):
-        res[i, 1] = corr_coeff(x[i:], y[:-i], meanX, meanY, stdX, stdY)
+        res[i, 1] = corr_coeff(x[:-i], y[i:], meanX, meanY, stdX, stdY)
 
     return res
 
@@ -103,7 +116,7 @@ def cdf(data):
     return x, y
 
 
-def binDf(data, binningAxis, bins=100, binWidth=None):
+def binDf(data, binningAxis, bins=100, binWidth=None, fcn='mean'):
     """
     Bin the data in a `pandas.DataFrame` by the given axis.
 
@@ -113,6 +126,7 @@ def binDf(data, binningAxis, bins=100, binWidth=None):
         bins: can be 1) an integer number of bins to use, 2) an array of 3 numbers passed to :func:`numpy.linspace` or
               3) an array of bin limits
         binWidth: use a fixed width to determine the bins, if set this input is preferred over the `bins` argument
+        fcn (str): which function to apply to the data inside a bin, can bei either `mean` or `count`
 
     Returns:
         :class:`pandas.DataFrame`
@@ -135,7 +149,15 @@ def binDf(data, binningAxis, bins=100, binWidth=None):
 
     binnedData = data.copy()
     binnedData[binningAxis] = pd.cut(binnedData[binningAxis], bins=bins, labels=labels)
-    binnedData = binnedData.groupby(binningAxis, as_index=False).mean()
+    group = binnedData.groupby(binningAxis, as_index=False)
+    if fcn == 'mean':
+        binnedData = group.mean()
+    elif fcn == 'count':
+        binnedData = group.count()
+    elif fcn == 'std':
+        binnedData = group.std()
+    else:
+        raise ValueError('Invalid parameter for `fcn` given. Allowwed are `mean` and `count`.')
     binnedData[binningAxis] = binnedData[binningAxis].astype(data[binningAxis].dtype)
 
     return binnedData
