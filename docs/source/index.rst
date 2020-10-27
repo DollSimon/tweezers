@@ -15,6 +15,14 @@ Contents:
 
    tweezers
 
+How to build the SegmentSelector
+--------------------------------
+
+Open a terminal (or command prompt on Windows) and navigate to the `tweezers \ SegmentSelector` directory.
+
+From there, run `buildSegmentSelector.sh` (or `buildSegmentSelector.bat` on Windows) to build the tool. The resulting executable
+is located in `tweezers \ SegmentSelector \ dist`.
+
 Indices and tables
 ==================
 
