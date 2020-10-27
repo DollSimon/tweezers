@@ -75,7 +75,13 @@ class BaseSource:
 
     def getImages(self):
         """
-        Returns the images (if they were recorded) as well as their timestamps.
+        Returns the images (if they were recorded) as well as their timestamps as an iterator.
+
+        Usage example::
+
+            t = TweezersData.load('path/to/data')
+            for time, image in t.source.getImages():
+                print(time)
         """
 
         raise NotImplementedError()

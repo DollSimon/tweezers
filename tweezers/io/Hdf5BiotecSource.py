@@ -435,19 +435,21 @@ class Hdf5BiotecSource(BaseSource):
 
     def getImages(self):
         """
-        Returns the image data if it was recorded with the experiment.
+        Returns the an iterator of the image data if it was recorded with the experiment.
+
+        Usage example::
+
+            t = TweezersData.load('path/to/data')
+            for time, image in t.source.getImages():
+                print(time)
 
         Returns:
-
             * timestamps for each frame (`numpy.array`)
-            * image data where the first dimension is the time axis (`numpy.array`)
+            * image data (`numpy.array`)
         """
 
-        data = hdf5storage.read(filename=self.images, path='/data', marshaller_collection=h5.CustomMarshallerCollection())
-        times = np.array([self.getTimeFromImage(image) for image in data])
-        data = np.delete(data, (-1), axis=1)
-
-        return times, data
+        iterator = Hdf5ImageIterator(filePath=self.images, hdf5Path='/data')
+        return iterator
 
     # def getDask(self, **kwargs):
     #     """
@@ -476,7 +478,8 @@ class Hdf5BiotecSource(BaseSource):
     #
     #     self.daskFile.close()
 
-    def getTimeFromImage(self, image):
+    @staticmethod
+    def getTimeFromImage(image):
         """
         Get the timestamp from an image recorded with the video stream during the experiment. The timestamps are encoded
         in the last row of each image.
@@ -583,3 +586,38 @@ class Hdf5Iterator:
                 self.n += data.shape[0]
                 # return data
                 yield data
+
+
+class Hdf5ImageIterator:
+    """
+    An iterator to loop through the images in a HDF5 data file.
+    """
+
+    def __init__(self, filePath, hdf5Path):
+        self.filePath = filePath
+        self.hdf5Path = hdf5Path
+        self.n = 0
+
+    def __iter__(self):
+        """
+        Actual iterator.
+        Returns:
+            timestamp and image data as numpy array
+        """
+
+        with h5py.File(self.filePath, 'r') as f:
+            # get dataset
+            dset = f[self.hdf5Path]
+            # until where should we read?
+            maxLen = dset.len()
+            # loop through dataset
+            while self.n < maxLen:
+                # get the data in the current limits and convert do pandas.DataFrame
+                image = dset[self.n]
+                time = Hdf5BiotecSource.getTimeFromImage(image)
+                # remove row which holds the timestamp data
+                image = np.delete(image, (-1), axis=1)
+                # update current position
+                self.n += 1
+                # return data
+                yield time, image

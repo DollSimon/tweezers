@@ -523,6 +523,23 @@ class TweezersData(TweezersDataBase):
 
         return TweezersDataSegment(self, segId)
 
+    def getImages(self):
+        """
+        Wrapper for the :meth:`.BaseSource.getImages` which returns an iterator.
+
+        Usage example::
+
+            t = TweezersData.load('path/to/data')
+            for time, image in t.getImages():
+                print(time)
+
+        Returns:
+            * timestamps for each frame (`numpy.array`)
+            * image data (`numpy.array`)
+        """
+
+        return self.source.getImages()
+
 
 class TweezersDataSegment(TweezersDataBase):
     """
