@@ -266,9 +266,9 @@ class PsdFitPlot(PsdPlotBase):
         # set figure height depending if we should plot the residuals
         nrows = math.ceil(len(self.psdAxes) / 2)
         if self.residuals:
-            figureSize = [15, 5 * nrows + 2]
+            figureSize = [9, 3 * nrows + 2]
         else:
-            figureSize = [18, 6 * nrows]
+            figureSize = [10, 4 * nrows]
 
         # set up the figure
         self.fig = plt.figure(figsize=figureSize)
@@ -326,10 +326,10 @@ class PsdFitPlot(PsdPlotBase):
             if 'psdFitChi2' in self.c.meta[axis]:
                 label += ', $\\chi^2$ = {:.4}'.format(self.c.meta[axis]['psdFitChi2'])
             # plot fit
-            self.plotPsdFits(psdAxes, fFit, self.c.psdFit[axis + 'Fit'],
+            self.plotPsdFits(psdAxes, fFit, self.c.psdFit[axis],
                              label=label, **kwargs)
             # add legend to PSD plot
-            self.legend(psdAxes)
+            self.legend(psdAxes, prop={'size': 10})
 
             # plot residuals if required
             if self.residuals:
