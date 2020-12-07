@@ -127,6 +127,8 @@ class TweezersAnalysis(IndexedOrderedDict):
             return False
         if not _file.name.endswith('.h5'):
             return False
+        if _file.name.endswith('DATA.h5') or _file.name.endswith('PSD.h5') or _file.name.endswith('TS.h5'):
+            return False
         return True
 
     @staticmethod
