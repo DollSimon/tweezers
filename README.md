@@ -14,6 +14,10 @@ A python package containing all the relevant files for tweezers data analysis.
     5. using active calibration methods (oscillation)
 
 
+## Download
+
+Get the code by either cloning it via e.g. SourceTree or download the entire repository using the Downloads section (on the left) and click on "Download repository" (or get the latest committed / tagged version).
+
 ## Installation
 
 ### Installation for users
