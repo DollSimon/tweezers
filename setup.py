@@ -20,7 +20,7 @@ DEPENDENCIES = [# documentation stuff
                 'matplotlib >= 1.2.1',
                 'scipy',
                 # when hdf5storage 0.2 is released on PyPi, this can be changed
-                'hdf5storage >= 0.2',
+                'hdf5storage >= 0.1',
                 #'hdf5storage @ https://github.com/frejanordsiek/hdf5storage/archive/master.zip',
                 'jupyter',
                 'npTDMS >= 0.11.4',
